@@ -1,0 +1,77 @@
+==========================================
+Node:    r5n25
+Job ID:  7406094
+CPUs:    32
+Started: Thu Aug 27 12:29:42 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01c_run_od_corrected_locations.py --workers 32
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01c_run_od_corrected_locations.py ===
+Device: cpu  |  fetch workers: 32  |  output: /work/GRDVULN/correction/data/od_features_corrected
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+Correction (true-location) plants loaded: 403
+Resuming: skipping 312 already-processed corrections
+
+--- State DE: 1 corrections ---
+    ...1 corrections done (0.6 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State DE done
+
+--- State KY: 1 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+  No containing parcel found for 1 corrected locations -- skipped
+  State KY done
+
+--- State LA: 1 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+  No containing parcel found for 1 corrected locations -- skipped
+  State LA done
+
+--- State MO: 1 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+  No containing parcel found for 1 corrected locations -- skipped
+  State MO done
+
+--- State MS: 6 corrections ---
+    ...7 corrections done (1.1 min elapsed, batch of 6)
+    flushed 6 corrections (resume point advanced)
+  State MS done
+
+--- State OH: 80 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+  2 corrections matched >1 parcel (boundary edge case) -- kept one match each
+    ...87 corrections done (2.0 min elapsed, batch of 80)
+    flushed 80 corrections (resume point advanced)
+  State OH done
+
+--- State OK: 1 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+  No containing parcel found for 1 corrected locations -- skipped
+  State OK done
+
+=== Summary ===
+  Corrections processed : 87
+  No parcel found        : 4
+  Parcels capped         : 0
+  Tiles w/ detections    : 74
+  Tiles empty            : 18
+  Fetch failures         : 4
+  Elapsed                : 2.1 min
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/correction/data/od_features_corrected
+Finished: Thu Aug 27 12:32:36 EDT 2026

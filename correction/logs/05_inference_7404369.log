@@ -1,0 +1,85 @@
+==========================================
+Node:    r5n10
+Job ID:  7404369
+CPUs:    8
+Started: Tue Aug 25 16:33:23 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/05_run_inference.py --states OH
+=== 05_run_inference.py ===
+States: ['OH']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 66 feature columns, threshold=0.519
+  Loaded stage2_rf_model.joblib: 39 feature columns, threshold=0.582
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  844 plants across 1 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Plant features: 929 rows  |  Parcel features: 4873248 rows
+
+Loading OD features (01b reported-location output)...
+  2769 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 844  |  reported parcel found: 620  |  no parcel: 224 (26.5%)
+Traceback (most recent call last):
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 470, in <module>
+    main()
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 420, in main
+    stage1_out = run_stage1(con, plants, plant_features, parcel_features,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 237, in run_stage1
+    probs = score(bundle, scoreable)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 182, in score
+    return bundle["pipeline"].predict_proba(X)[:, 1]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/pipeline.py", line 925, in predict_proba
+    Xt = transform.transform(Xt)
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/utils/_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/compose/_column_transformer.py", line 1079, in transform
+    Xs = self._call_func_on_transformers(
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/compose/_column_transformer.py", line 889, in _call_func_on_transformers
+    return Parallel(n_jobs=self.n_jobs)(jobs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/utils/parallel.py", line 91, in __call__
+    return super().__call__(iterable_with_config_and_warning_filters)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/joblib/parallel.py", line 1986, in __call__
+    return output if self.return_generator else list(output)
+                                                ^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/joblib/parallel.py", line 1914, in _get_sequential_output
+    res = func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/utils/parallel.py", line 184, in __call__
+    return self.function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/pipeline.py", line 1546, in _transform_one
+    res = transformer.transform(X, **params.transform)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/pipeline.py", line 1110, in transform
+    Xt = transform.transform(Xt, **routed_params[name].transform)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/utils/_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/preprocessing/_encoders.py", line 1051, in transform
+    X_int, X_mask = self._transform(
+                    ^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/preprocessing/_encoders.py", line 213, in _transform
+    diff, valid_mask = _check_unknown(Xi, self.categories_[i], return_mask=True)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/utils/_encode.py", line 269, in _check_unknown
+    values_set = set(values)
+                 ^^^^^^^^^^^
+TypeError: unhashable type: 'bytearray'
+Finished: Tue Aug 25 16:33:47 EDT 2026

@@ -1,0 +1,10 @@
+==========================================
+Node:    a0n16
+Job ID:  7413662
+CPUs:    4
+Started: Wed Sep  9 10:15:26 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+/var/spool/slurm/job7413662/slurm_script: line 30: 1: ERROR: pass states as a positional arg, e.g. sbatch 10_build_review_queue.slurm "OH,MS,DE" 1

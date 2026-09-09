@@ -1,0 +1,21 @@
+==========================================
+Node:    r5n17
+Job ID:  7403205
+CPUs:    8
+Started: Mon Aug 24 16:27:04 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/08_diagnose_candidate_coverage.py
+Traceback (most recent call last):
+  File "/work/GRDVULN/correction/scripts/08_diagnose_candidate_coverage.py", line 67, in <module>
+    _spec.loader.exec_module(extract_lib)
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/work/GRDVULN/correction/scripts/01a_extract_parcels.py", line 391
+    plants = load_treatment_plants(states_filter, training_only=not args.full_universe)
+IndentationError: unexpected indent
+Finished: Mon Aug 24 16:27:12 EDT 2026

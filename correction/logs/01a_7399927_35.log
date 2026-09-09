@@ -1,0 +1,24 @@
+==========================================
+Node:    r7n16
+Job ID:  7399963
+CPUs:    16
+Started: Fri Aug 21 06:49:28 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: OH  (array index 35 of 52)
+Running: python /work/GRDVULN/correction/scripts/01a_extract_parcels.py --states OH
+=== 01a_extract_parcels.py ===
+K rings: 18
+
+  Dropped 1 rows with non-numeric/missing LATITUDE or LONGITUDE
+  Training plant universe: 2494 classes + 316 corrections -> 2494 unique CWNS_IDs
+  Restricted to training-labeled plants: 16453 -> 2308
+Treatment plants loaded: 84
+
+--- State OH: output already exists, skipping (/work/GRDVULN/correction/data/nlcd_features/nlcd_OH_k18.parquet) ---
+
+=== 01a_extract_parcels.py complete ===
+Outputs in: /work/GRDVULN/correction/data/nlcd_features
+Finished: Fri Aug 21 06:49:36 EDT 2026

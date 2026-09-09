@@ -1,0 +1,23 @@
+==========================================
+Node:    a0n15
+Job ID:  7400180
+CPUs:    4
+Started: Fri Aug 21 08:40:55 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Reading 2 part-file(s) for KY...
+
+676 total tile rows, 134 fetch_failed
+
+--- fetch_error message distribution ---
+fetch_error
+Read failed. See previous exception for details.    134
+
+--- sample failed tile_ids per distinct error ---
+
+  Error: Read failed. See previous exception for details.
+  Affected CWNS_IDs (sample of up to 5): ['21000269001']
+  Total tiles with this error: 134
+Finished: Fri Aug 21 08:40:57 EDT 2026

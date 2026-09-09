@@ -1,0 +1,77 @@
+==========================================
+Node:    r4n29
+Job ID:  7403223
+CPUs:    2
+Started: Mon Aug 24 17:10:23 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/08b_analyze_ring_misses.py
+=== 08b_analyze_ring_misses.py ===
+Source: correction_coverage.parquet   |   current K_RINGS = 18
+
+Corrections total            : 316
+Currently usable (ceiling)   : 266  (84.2%)
+Outside the search window    : 45  (14.2%)
+
+--- Ring distance of the misses (current ring ends at k=18) ---
+  ring            19-25 (near miss) :  11  ###########
+  ring                        26-35 :   9  #########
+  ring                        36-50 :   7  #######
+  ring                       51-100 :   8  ########
+  ring                      101-250 :   9  #########
+  ring                         250+ :   1  #
+
+  ring distance  min=20  median=37  max=948
+  distance (km)  min=5.8  median=11.6  max=331.3
+
+--- Split at 50 km ---
+  radius problems (<= 50 km) : 41  -- a wider ring could reach these
+  records errors  (>  50 km) : 4  -- no radius reaches these; needs a second candidate source
+
+  Even an unbounded ring leaves the ceiling at 97.2% (307/316) unless the records errors are handled separately.
+
+  Records-error plants (candidates for ECHO/ICIS cross-reference or address geocoding):
+    CWNS_ID STATE_CODE  distance_km  ring_distance
+20001102001         KS        331.3            948
+36007026001         NY         81.8            232
+49000023001         UT         78.1            247
+27001409001         MN         55.8            177
+
+--- Recovery curve: what each candidate k buys ---
+  'pool' is the approximate multiple of today's candidate count (scales ~k^2).
+  'per_recovered' is extra pool multiple per correction recovered -- lower is better.
+
+ k  recovered  of_which_radius  new_ceiling_pct  pool_multiple  per_recovered
+20          3                3             85.1           1.23          0.078
+22          7                7             86.4           1.49          0.071
+25         11               11             87.7           1.93          0.084
+30         15               15             88.9           2.78          0.119
+35         20               20             90.5           3.78          0.139
+40         24               24             91.8           4.94          0.164
+50         27               27             92.7           7.72          0.249
+
+  Best cost-per-recovery in this range: k=22 (7 recovered, 1.49x pool, ceiling 86.4%)
+  Read that as an upper bound on the benefit, not a recommendation: it prices
+  candidate RECALL only. It does not price the recall@1 lost to ranking
+  dilution, which is the cost that actually matters and is not knowable
+  until the holdout exists.
+
+--- States contributing the most misses ---
+  (a concentrated state may indicate a parcel-coverage or coordinate-convention
+   problem there, which is cheaper to fix than a global radius change)
+    NY: 10
+    UT: 3
+    OR: 3
+    SD: 3
+    MI: 2
+    NC: 2
+    WI: 2
+    MD: 2
+
+Written: /work/GRDVULN/correction/data/diagnostics/ring_recovery_curve.csv
+Written: /work/GRDVULN/correction/data/diagnostics/outside_window_corrections.csv
+
+=== complete ===
+Finished: Mon Aug 24 17:10:27 EDT 2026

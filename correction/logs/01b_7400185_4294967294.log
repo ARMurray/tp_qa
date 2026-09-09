@@ -1,0 +1,54 @@
+==========================================
+Node:    r4n16
+Job ID:  7400185
+CPUs:    32
+Started: Fri Aug 21 09:01:42 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: KY  (array index 0 of 1)
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01b_run_object_detection.py --states KY --workers 32 --no-resume
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01b_run_object_detection_hpc.py ===
+Device: cpu  |  fetch workers: 32  |  tile=500m imgsz=864px  |  imagery: Planetary Computer NAIP (streamed, no local download)
+
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+  Dropped 1 rows with non-numeric/missing coordinates
+  Training plant universe: 2494 classes + 316 corrections -> 2494 unique CWNS_IDs
+  Restricted to training-labeled plants: 16453 -> 2308
+Treatment plants loaded: 76
+
+--- State KY: 76 plants ---
+  No containing parcel found for 8 plants -- skipped, not written to any table (rerun later if parcel coverage improves)
+  1 plants matched >1 parcel (boundary edge case) -- kept one match each
+    21000269001: 121 tiles even after real-polygon filtering (area=1.24 km2, bbox=8.5 km) -- exceeds MAX_TILES_PER_PLANT=60, falling back to point footprint
+    ...68 plants done (1.2 min elapsed, batch of 68)
+    flushed 68 plants (resume point advanced)
+  State KY done
+
+=== Summary ===
+  Plants processed : 68
+  No parcel found  : 8
+  Parcels capped (area > 2.0 km2, OR still >60 tiles after real-polygon-filtered tiling -- used point-fallback footprint instead): 5
+  Tiles w/ detections   : 44
+  Tiles empty           : 59
+  Fetch failures        : 0
+  Elapsed               : 1.2 min
+  Mean fetch time  : 7.228s/tile (network, concurrent across 32 workers)
+  Mean infer time  : 0.258s/tile (device=cpu, sequential in main thread)
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/correction/data/od_features
+Finished: Fri Aug 21 09:03:33 EDT 2026

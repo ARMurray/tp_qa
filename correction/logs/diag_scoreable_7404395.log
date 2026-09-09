@@ -1,0 +1,45 @@
+==========================================
+Node:    a0n15
+Job ID:  7404395
+CPUs:    4
+Started: Tue Aug 25 16:55:05 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== diagnose_scoreable_dtypes.py ===
+Sample: 20 plants
+
+--- point_in_parcel_lookup raw output (OH): 17 rows, 4 cols ---
+Traceback (most recent call last):
+  File "/work/GRDVULN/correction/scripts/diagnose_scoreable_dtypes.py", line 109, in <module>
+    main()
+  File "/work/GRDVULN/correction/scripts/diagnose_scoreable_dtypes.py", line 80, in main
+    report_dtypes(matched, f"point_in_parcel_lookup raw output ({state})")
+  File "/work/GRDVULN/correction/scripts/diagnose_scoreable_dtypes.py", line 45, in report_dtypes
+    f"python types={dict(types_seen)}")
+                    ^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/series.py", line 991, in __getitem__
+    return self._get_with(key)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/series.py", line 1003, in _get_with
+    return self.loc[key]
+           ~~~~~~~~^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/indexing.py", line 1207, in __getitem__
+    return self._getitem_axis(maybe_callable, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/indexing.py", line 1438, in _getitem_axis
+    return self._getitem_iterable(key, axis=axis)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/indexing.py", line 1378, in _getitem_iterable
+    keyarr, indexer = self._get_listlike_indexer(key, axis)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/indexing.py", line 1576, in _get_listlike_indexer
+    keyarr, indexer = ax._get_indexer_strict(key, axis_name)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/indexes/base.py", line 6302, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/indexes/base.py", line 6352, in _raise_if_missing
+    raise KeyError(f"None of [{key}] are in the [{axis_name}]")
+KeyError: "None of [Index([17], dtype='int64', name='geom_wkb')] are in the [index]"
+Finished: Tue Aug 25 16:55:09 EDT 2026

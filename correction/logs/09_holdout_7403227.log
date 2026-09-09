@@ -1,0 +1,36 @@
+==========================================
+Node:    r4n16
+Job ID:  7403227
+CPUs:    2
+Started: Mon Aug 24 17:26:41 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/09_build_holdout.py --dry-run
+=== 09_build_holdout.py ===
+
+Loading labeled plant pool...
+  'class' column values: {'Correct': 2178, 'Incorrect': 316}
+
+Labeled pool: 2382 plants
+  correct     : 2066
+  corrections : 316
+
+Sampling...
+
+--- Draw: 200 plants (cohort A) ---
+  correct     : 150
+  corrections : 50
+  states      : 46
+
+  Corrections slice n=50: recall@1 standard error about +/-7.1pp (worst case p=0.5).
+  Leaves 266 corrections for training (pool was 316).
+
+Resolving true parcels...
+  True parcel resolved for 200/200 derivable-truth plants
+  Truth already known : 200
+  Needs review        : 0  (the 'incorrect' bin)
+
+--dry-run: nothing written.
+Finished: Mon Aug 24 17:31:13 EDT 2026

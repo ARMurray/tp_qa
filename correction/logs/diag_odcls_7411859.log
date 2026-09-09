@@ -1,0 +1,77 @@
+==========================================
+Node:    a0n16
+Job ID:  7411859
+CPUs:    4
+Started: Thu Sep  3 17:21:47 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== diagnose_od_class_shift.py ===
+MODELS_DIR   : /work/GRDVULN/correction/models
+OD_MODEL_DIR : /work/GRDVULN/correction/models/object_detection
+
+Weights: /work/GRDVULN/correction/models/object_detection/best.pt
+  modified: 2026-08-20 18:18:20.652530909
+
+Model emits 3 class(es): ['aeration_basin', 'clarifier', 'digester']
+config.CLASSES lists 6: ['aeration_basin', 'chlorine_contact', 'clarifier', 'digester', 'drying_bed', 'oxidation_pond']
+  live (model can emit) : ['aeration_basin', 'clarifier', 'digester']
+  dead (schema only)    : ['chlorine_contact', 'drying_bed', 'oxidation_pond']
+
+Per-stage importance attributable to dead classes:
+
+  --- stage1 (71 features) ---
+    other          102.40% of total importance
+    dead             0.00% of total importance
+    categorical     -0.78% of total importance
+    live            -1.62% of total importance
+    dead features, highest first:
+      rank  18   0.00%  od_has_drying_bed
+      rank  18   0.00%  od_max_conf_chlorine_contact
+      rank  18   0.00%  od_max_conf_drying_bed
+      rank  18   0.00%  od_has_chlorine_contact
+      rank  18   0.00%  od_n_chlorine_contact
+      rank  18   0.00%  od_n_drying_bed
+      rank  18   0.00%  od_has_oxidation_pond
+      rank  18   0.00%  od_max_conf_oxidation_pond
+      rank  18   0.00%  od_n_oxidation_pond
+    dead features inside the top 15: 0
+
+  --- stage2 (43 features) ---
+    other          100.00% of total importance
+    dead features inside the top 15: 0
+
+  --- stage2b (58 features) ---
+    other           98.94% of total importance
+    live             1.58% of total importance
+    dead             0.00% of total importance
+    categorical     -0.52% of total importance
+    dead features, highest first:
+      rank  36   0.00%  od_has_drying_bed
+      rank  36   0.00%  od_n_chlorine_contact
+      rank  36   0.00%  od_has_chlorine_contact
+      rank  36   0.00%  od_n_drying_bed
+      rank  36   0.00%  od_n_oxidation_pond
+      rank  36   0.00%  od_has_oxidation_pond
+    dead features inside the top 15: 0
+
+  --- od_dominant_class in training features (2243 rows) ---
+    nan                      931  41.51%
+    digester                 601  26.79%
+    clarifier                564  25.14%
+    aeration_basin           147   6.55%
+
+=== verdict ===
+  stage1   dead-class share:  0.00%
+  stage2   dead-class share:  0.00%
+  stage2b  dead-class share:  0.00%
+
+  Under 1%. Noise. The national run is safe to launch.
+Finished: Thu Sep  3 17:22:21 EDT 2026

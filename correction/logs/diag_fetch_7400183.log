@@ -1,0 +1,29 @@
+==========================================
+Node:    a0n15
+Job ID:  7400183
+CPUs:    4
+Started: Fri Aug 21 08:52:13 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Reading 2 part-file(s) for KY...
+Deduplicated: 676 raw tile rows -> 338 unique tiles (kept most recent attempt per tile_id)
+
+338 total tile rows, 67 fetch_failed
+
+--- fetch_error message distribution ---
+fetch_error
+Read failed. See previous exception for details.    67
+
+--- per-CWNS_ID breakdown ---
+CWNS_ID
+21000269001    67
+
+--- affected plants: parcel context ---
+  21000269001: 67/234 tiles failed, parcel_area=1.239 km2, parcel_capped=False
+
+--- sample errors (first 3, full detail) ---
+
+  Read failed. See previous exception for details.
+Finished: Fri Aug 21 08:52:13 EDT 2026

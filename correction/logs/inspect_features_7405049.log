@@ -1,0 +1,75 @@
+==========================================
+Node:    a0n17
+Job ID:  7405049
+CPUs:    2
+Started: Wed Aug 26 13:20:39 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/inspect_model_features.py
+=== inspect_model_features.py ===
+Models   : /work/GRDVULN/correction/models
+Features : /work/GRDVULN/correction/data/features
+
+==========================================================================
+STAGE1
+==========================================================================
+  model : stage1_rf_model.joblib  (71 trained features)
+  table : 14_stage1_training.parquet  (2172 rows, 85 cols)
+  drops : 03_train_stage1.py DROP_COLS
+
+  Preprocessor treatment: 38 one-hot categorical, 33 numeric, 0 absent from table
+
+  No scaffolding or identifier-like columns in the trained feature set.
+  Highest-cardinality one-hot features (levels / rows):
+    lbcs_structure                  23 / 2172   (0.011)
+    lbcs_site                       17 / 2172   (0.008)
+    lbcs_activity                   10 / 2172   (0.005)
+    dominant_class_group             8 / 2172   (0.004)
+    lbcs_ownership                   5 / 2172   (0.002)
+
+  DROP_COLS entries absent from this table (inert): ['LATITUDE', 'LONGITUDE', 'geom_wkb', 'state', 'x_5070', 'y_5070']
+
+==========================================================================
+STAGE2
+==========================================================================
+  model : stage2_rf_model.joblib  (43 trained features)
+  table : 15_stage2_training.parquet  (3487416 rows, 61 cols)
+  drops : 04_train_stage2.py DROP_COLS
+
+  Preprocessor treatment: 29 one-hot categorical, 14 numeric, 0 absent from table
+
+  No scaffolding or identifier-like columns in the trained feature set.
+  Highest-cardinality one-hot features (levels / rows):
+    lbcs_structure                 110 / 3487416   (0.000)
+    lbcs_site                       30 / 3487416   (0.000)
+    lbcs_activity                    9 / 3487416   (0.000)
+    dominant_class_group             7 / 3487416   (0.000)
+    lbcs_ownership                   4 / 3487416   (0.000)
+
+  DROP_COLS entries absent from this table (inert): ['LATITUDE', 'LONGITUDE', 'geom_wkb', 'state', 'x_5070', 'y_5070']
+
+==========================================================================
+STAGE2B
+==========================================================================
+  model : stage2b_rf_model.joblib  (58 trained features)
+  table : 16_stage2b_training.parquet  (357 rows, 79 cols)
+  drops : 07_train_stage2b.py DROP_COLS
+
+  Preprocessor treatment: 31 one-hot categorical, 27 numeric, 0 absent from table
+
+  No scaffolding or identifier-like columns in the trained feature set.
+  Highest-cardinality one-hot features (levels / rows):
+    lbcs_structure                  12 / 357   (0.034)
+    lbcs_site                       12 / 357   (0.034)
+    lbcs_activity                    9 / 357   (0.025)
+    dominant_class_group             7 / 357   (0.020)
+    lbcs_ownership                   4 / 357   (0.011)
+
+  DROP_COLS entries absent from this table (inert): ['DISCHARGES_TO_CWNSID', 'DISCHARGE_TYPE', 'FACILITY_ID', 'PRESENT_DISCHARGE_PERCENTAGE', 'PROJECTED_DISCHARGE_PERCENTAGE', 'STATE_CODE', 'county_geoid', 'h3_res9', 'owner']
+
+==========================================================================
+Reminder: a flagged column means the DEPLOYED model was fitted with it.
+Adding it to DROP_COLS changes nothing until that model is retrained.
+Finished: Wed Aug 26 13:21:00 EDT 2026

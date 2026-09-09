@@ -1,0 +1,25 @@
+==========================================
+Node:    a0n15
+Job ID:  7404255
+CPUs:    4
+Started: Tue Aug 25 14:57:55 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/diagnose_parcel_duplicates.py --states OH
+=== diagnose_parcel_duplicates.py ===
+PARCEL_BASE: /work/GRDVULN/data/parcels
+
+--- OH ---
+  Checking: /work/GRDVULN/data/parcels/state=OH/*.parquet
+  total rows: 6460521  distinct ll_uuid: 6460521  ratio: 1.000
+  Top duplicated ll_uuid values (up to 5):
+    none found
+
+=== Summary across all states ===
+state   total  distinct  ratio  n_duplicated_uuids
+   OH 6460521   6460521    1.0                   0
+
+=== complete ===
+Finished: Tue Aug 25 14:57:59 EDT 2026

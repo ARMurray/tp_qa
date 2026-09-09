@@ -1,0 +1,25 @@
+==========================================
+Node:    r4n07
+Job ID:  7400364
+CPUs:    16
+Started: Fri Aug 21 10:58:05 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== 03_train_stage1.py: Stage 1 Model Training (Random Forest) ===
+
+Loading Stage 1 training data...
+  Rows: 1257
+  Correct: 1168
+  Incorrect: 89
+Traceback (most recent call last):
+  File "/work/GRDVULN/correction/scripts/03_train_stage1.py", line 209, in <module>
+    main()
+  File "/work/GRDVULN/correction/scripts/03_train_stage1.py", line 72, in main
+    s1 = s1.dropna(subset=["LATITUDE", "LONGITUDE"])
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pandas/core/frame.py", line 7803, in dropna
+    raise KeyError(np.array(subset)[check].tolist())
+KeyError: ['LATITUDE', 'LONGITUDE']
+Finished: Fri Aug 21 10:58:27 EDT 2026

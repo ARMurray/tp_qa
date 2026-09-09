@@ -1,0 +1,43 @@
+==========================================
+Node:    a0n15
+Job ID:  7404935
+CPUs:    2
+Started: Wed Aug 26 09:19:57 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== check_location_type.py ===
+
+=== PHYSICAL_LOCATION.txt ===
+  30881 rows, 30881 distinct CWNS_ID
+  CWNS_IDs with >1 row: 0 (0.00%)
+
+  LOCATION_TYPE value counts:
+LOCATION_TYPE
+Point        22848
+City          4576
+County        3201
+Watershed      187
+State           69
+
+=== POPULATION_WASTEWATER.txt ===
+  21641 rows, 21641 distinct CWNS_ID
+  CWNS_IDs with >1 row: 0 (0.00%)
+
+  POPULATION_TYPE value counts:
+POPULATION_TYPE
+Receiving Collection         21518
+Total Receiving Treatment      123
+
+  INFRASTRUCTURE_TYPE value counts:
+INFRASTRUCTURE_TYPE
+Wastewater    21641
+
+=== complete ===
+
+If either table shows real duplicate CWNS_IDs across genuinely
+different type values, load_treatment_plants() (01a/01b/05) and
+build_population_features() (02) need an explicit filter before
+drop_duplicates(), not just drop_duplicates() alone.
+Finished: Wed Aug 26 09:20:02 EDT 2026

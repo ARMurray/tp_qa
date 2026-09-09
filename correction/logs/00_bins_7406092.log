@@ -1,0 +1,36 @@
+==========================================
+Node:    a0n16
+Job ID:  7406092
+CPUs:    4
+Started: Thu Aug 27 12:25:45 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python "/work/GRDVULN/correction/scripts/build_training_bins.py"     --gdb   "/work/GRDVULN/correction/data/training/Updates.gdb"     --layer "CWNS_Locations_20260820"     --out   "/work/GRDVULN/correction/data/training/training_locations.gpkg" --review-gpkg "/work/GRDVULN/correction/data/training/review/review_derived_locations.gpkg"
+Loading CWNS_Locations_20260820 from /work/GRDVULN/correction/data/training/Updates.gdb ...
+  Loaded 32296 rows
+
+Verified: 2494  |  Unverified: 29802
+Correct bin candidates  : 2178
+Incorrect bin candidates: 316
+'classes' layer final size: 2494 (2178 Correct, 316 Incorrect)
+'corrections' layer final size: 316
+'unverified' layer size: 29802
+
+Unioning review-derived rows from /work/GRDVULN/correction/data/training/review/review_derived_locations.gpkg ...
+  classes: 7 CWNS_ID(s) already present from Updates.gdb -- Updates.gdb wins, review verdict dropped for: ['39000000273', '39000144001', '39000175001', '39001792002', '39002093001', '39002868001', '39005016001']
+  classes: +104 review-derived row(s) (2494 -> 2598)
+  corrections: 3 CWNS_ID(s) already present from Updates.gdb -- Updates.gdb wins, review verdict dropped for: ['39000175001', '39001792002', '39002093001']
+  corrections: +87 review-derived row(s) (316 -> 403)
+
+Writing /work/GRDVULN/correction/data/training/training_locations.gpkg ...
+
+=== Done ===
+  classes     : 2598 rows (2195 Correct / 403 Incorrect)
+  corrections : 403 rows
+  unverified  : 29802 rows
+
+Output: /work/GRDVULN/correction/data/training/training_locations.gpkg
+Point config.py's / config_hpc.py's TRAINING_GPKG at this file (with TRAINING_LAYER_CLASSES='classes', TRAINING_LAYER_CORRECTIONS='corrections') once you're satisfied with these counts.
+Finished: Thu Aug 27 12:25:48 EDT 2026

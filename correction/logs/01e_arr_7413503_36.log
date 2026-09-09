@@ -1,0 +1,56 @@
+==========================================
+Node:    r4n19
+Job ID:  7413565
+CPUs:    16
+Started: Wed Sep  9 03:07:08 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: RI  (array index 36 of 48)
+Running: python /work/GRDVULN/correction/scripts/01e_run_od_candidates.py --all --states RI --workers 8
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/correction/data/od_features_candidates
+
+Loading Stage 2a candidates...
+  240546 candidate(s) across 12030 plant(s) (top 20 each)
+  --all: no scope restriction
+  Restricted to ['RI']: 60 candidate(s)
+
+--- work plan ---
+  RI: 60 candidate parcel(s), 3 plant(s)
+  TOTAL: 60 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+  Using weights: best.pt
+
+Weights: /work/GRDVULN/correction/models/object_detection/best.pt
+Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+--- State RI: 60 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 19s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 23s (attempt 2/5)
+    ...60 candidate(s) done (2.0 min elapsed)
+  Flushed 60 candidate row(s)
+
+=== Summary ===
+  Candidates processed : 60
+  Skipped (resume)     : 0
+  No parcel geometry   : 0
+  Elapsed              : 2.0 min
+
+Outputs in: /work/GRDVULN/correction/data/od_features_candidates
+Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
+Finished: Wed Sep  9 03:09:28 EDT 2026  (exit 0, 2 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 2
+  min, then SUM across concurrent tasks to get aggregate rate. Compare
+  that against the 39/min single-job baseline before raising the throttle.

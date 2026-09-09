@@ -1,0 +1,57 @@
+==========================================
+Node:    r7n19
+Job ID:  7413174
+CPUs:    8
+Started: Tue Sep  8 08:34:14 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: IL  (array index 11 of 48)
+Output: /work/GRDVULN/correction/data/inference_shards/state=IL
+Running: python /work/GRDVULN/correction/scripts/05_run_inference.py --states IL --out-dir /work/GRDVULN/correction/data/inference_shards/state=IL
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_chlorine_contact' 'od_max_conf_drying_bed'
+ 'od_max_conf_oxidation_pond']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+=== 05_run_inference.py ===
+States: ['IL']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 71 feature columns, threshold=0.512
+  Loaded stage2_rf_model.joblib: 43 feature columns, threshold=0.409
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  792 plants across 1 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Parcel features narrowed to ['IL']: 77686909 -> 3502458 rows
+  Plant features: 2412 rows  |  Parcel features: 3502458 rows
+
+Loading OD features (01b reported-location output)...
+  12469 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 792  |  reported parcel found: 473  |  no parcel: 319 (40.3%)
+  Flagged for Stage 2: 692 (319 no_parcel + 373 low_confidence)
+
+=== Stage 2a: candidate scoring ===
+    IL: 100/692 plants (0.1 min elapsed)
+    IL: 200/692 plants (0.2 min elapsed)
+    IL: 300/692 plants (0.3 min elapsed)
+    IL: 400/692 plants (0.5 min elapsed)
+    IL: 500/692 plants (0.6 min elapsed)
+    IL: 600/692 plants (0.7 min elapsed)
+  IL: 692 flagged plants processed
+  Raw candidates (post reported-parcel exclusion): 4842414
+
+=== Summary ===
+  Plants scored          : 792
+  Flagged for Stage 2     : 692
+  Plants with >=1 candidate: 692
+  Flagged w/ 0 candidates  : 0 (no parcel survived K_RINGS + reported-parcel exclusion)
+  Not flagged (Stage 1 ok) : 100 (no candidates by design -- confirm_reported task in 10)
+
+Written: /work/GRDVULN/correction/data/inference_shards/state=IL/plant_summary.parquet
+Written: /work/GRDVULN/correction/data/inference_shards/state=IL/stage2_candidates.parquet
+Finished: Tue Sep  8 08:39:42 EDT 2026  (exit 0)

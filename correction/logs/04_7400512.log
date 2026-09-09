@@ -1,0 +1,44 @@
+==========================================
+Node:    r4n10
+Job ID:  7400512
+CPUs:    16
+Started: Fri Aug 21 14:44:14 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== 04_train_stage2.py: Stage 2 Model Training (Balanced Random Forest) ===
+NEG_RATIO: 50
+
+Loading Stage 2 training data...
+  Total rows: 3487416
+  Positive labels: 259
+  Negative labels: 3487157
+  Plants: 311
+
+Sampling negatives with hard negative mining...
+  Positives: 259
+  Hard negatives sampled: 9065
+  Easy negatives sampled: 3885
+  Total training rows: 13209
+
+  Balanced class distribution:
+label
+0    12950
+1      259
+Name: count, dtype: int64
+  WARNING: dropping apparent merge-suffix artifact columns: ['STATE_CODE_x', 'STATE_CODE_y']
+  Model columns: 39
+
+Setting up cross-validation folds...
+  Spatial fold 1 train -- Correct: 210, Incorrect: 9240
+  Spatial fold 2 train -- Correct: 211, Incorrect: 11097
+  Spatial fold 3 train -- Correct: 248, Incorrect: 12035
+  Spatial fold 4 train -- Correct: 228, Incorrect: 10081
+  Spatial fold 5 train -- Correct: 139, Incorrect: 9347
+  Spatial folds: 5  |  Standard folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+[2026-08-21T14:44:22.567] error: *** JOB 7400512 ON r4n10 CANCELLED AT 2026-08-21T14:44:22 DUE to SIGNAL Terminated ***

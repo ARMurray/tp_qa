@@ -1,0 +1,145 @@
+==========================================
+Node:    r5n15
+Job ID:  7404411
+CPUs:    4
+Started: Tue Aug 25 17:16:54 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/build_test_bundle.py
+=== build_test_bundle.py ===
+Source ROOT : /work/GRDVULN/correction
+Bundle      : /work/GRDVULN/correction/testing/tpqa_test
+State       : OH
+
+--- Selecting plants ---
+  Full universe in OH: 844 plants
+  Training universe: 2494 classes, 316 corrections
+  Holdout manifest: 425 plants
+
+  Top counties by label content:
+geoid  n_corrections  n_classes  n_total  score
+39093              1          4       14     32
+39165              1          5        9     29
+39055              0          2       24     28
+39041              1          2       12     26
+39099              1          2       11     25
+39113              1          2       11     25
+39173              0          3       19     25
+39139              1          2       11     25
+
+  Chose 2 county/counties: ['39093', '39165']
+  Pool within them: 23 plants (2 corrections, 9 classes, 1 holdout)
+
+  SELECTED 23 plants:
+    corrections bin : 2   <-- Stage 2/2b positives
+    classes bin     : 9   <-- Stage 1 labels
+    holdout members : 1   <-- exercises the anti-joins
+    unlabelled      : 14   <-- inference-only
+
+  Counties needed (plants + 10km buffer): 12 -> ['39017', '39025', '39027', '39035', '39043', '39057', '39061', '39077', '39093', '39103', '39113', '39165']
+
+--- Scripts ---
+    61 files (0.6 MB)
+
+--- CWNS source tables ---
+    4 files (12.8 MB)
+
+--- Training labels ---
+    training_locations.gpkg: 4.2 MB
+    Updates.gdb: 69 files (22.3 MB)
+
+--- Regrid parcels (whole county files, unmodified) ---
+    12 county file(s) (1061.0 MB)
+
+--- 01a NLCD features (filtered to selected plants' candidates) ---
+    254039 of 4417788 rows kept (9.8 MB)
+
+--- 01b / 01c OD output (filtered to selected plants) ---
+    od_features: 996 rows kept (0.6 MB)
+    od_features_corrected: 14 rows kept (0.0 MB)
+
+--- 02 feature tables ---
+    05_plant_features.parquet: 23 of 929 rows (0.0 MB)
+    14_stage1_training.parquet: 8 of 91 rows (0.1 MB)
+    15_stage2_training.parquet: 40738 of 165320 rows (2.7 MB)
+    16_stage2b_training.parquet: 3 of 428 rows (0.0 MB)
+    17_review_training.parquet: not present
+    10_parcel_features.parquet: 254039 of 4873248 rows (18.6 MB)
+    10_parcel_features_by_state/: deliberately NOT copied (cache; 02 rebuilds it -- see MANIFEST.md)
+
+--- Trained models ---
+    stage2_cv_comparison.parquet: 0.0 MB
+    stage1_rf_importance.parquet: 0.0 MB
+    stage2_optimal_threshold.joblib: 0.0 MB
+    stage1_optimal_threshold.joblib: 0.0 MB
+    stage2b_threshold_analysis.parquet: 0.0 MB
+    stage2_rf_model.joblib: 15.9 MB
+    stage1_rf_model.joblib: 3.8 MB
+    stage2b_cv_comparison.parquet: 0.0 MB
+    stage2_threshold_analysis.parquet: 0.0 MB
+    stage2b_optimal_threshold.joblib: 0.0 MB
+    stage2b_rf_importance.parquet: 0.0 MB
+    stage2_rf_importance.parquet: 0.0 MB
+    stage1_cv_comparison.parquet: 0.0 MB
+    stage2b_rf_model.joblib: 2.0 MB
+    stage1_threshold_analysis.parquet: 0.0 MB
+    object_detection/best.pt: 22.5 MB
+    16 files (44.3 MB)
+
+--- Holdout ---
+    4 files (0.1 MB)
+
+--- 08 diagnostics output (input to 01d) ---
+    4 files (0.1 MB)
+
+--- Reference layers (clipped) ---
+    census County: 41 of 3235 features
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pyogrio/raw.py:200: RuntimeWarning: organizePolygons() received a polygon with more than 100 parts. The processing may be really slow.  You can skip the processing by setting METHOD=SKIP, or only make it analyze counter-clock wise parts by setting METHOD=ONLY_CCW if you can assume that the outline of holes is counter-clock wise defined
+  return ogr_read(
+    census County_Subdivision: 481 of 36600 features
+    census Incorporated_Place: 330 of 19734 features
+    census Census_Designated_Place: 124 of 12732 features
+    census_subset.gpkg: 8.1 MB
+    Wastewater_Plants.gpkg: 245 of 35737 points (0.1 MB)
+
+--- NLCD raster (clipped) ---
+    Annual_NLCD_LndCov_2023_CU_C1V1.tif: 9276x13964 px (16.5 MB)
+
+--- Recent logs (last 25) ---
+    25 files (0.1 MB)
+
+--- Docs ---
+    MISSING: TPQA_MASTER_REFERENCE.md (searched /work/GRDVULN/correction, /work/GRDVULN/correction/scripts, /work/GRDVULN/correction/docs)
+    MISSING: REVIEW_LOOP_PLAN.md (searched /work/GRDVULN/correction, /work/GRDVULN/correction/scripts, /work/GRDVULN/correction/docs)
+
+--- Writing MANIFEST.md ---
+    MANIFEST.md written (6118 chars)
+
+============================================================
+BUNDLE COMPLETE
+============================================================
+  data                                          1157.1 MB
+  data/cwns                                       12.8 MB
+  data/features                                   21.5 MB
+  data/nlcd                                       16.5 MB
+  data/nlcd_features                               9.8 MB
+  data/od_features                                 0.6 MB
+  data/parcels                                  1061.0 MB
+  data/reference                                   8.2 MB
+  data/training                                   26.5 MB
+  models                                          44.3 MB
+  models/object_detection                         22.5 MB
+  scripts                                          0.6 MB
+
+  TOTAL: 1202.1 MB
+
+  /work/GRDVULN/correction/testing/tpqa_test
+
+  To compress before download:
+    cd /work/GRDVULN/correction/testing && tar -czf tpqa_test.tar.gz tpqa_test/
+
+  Read tpqa_test/MANIFEST.md first -- it lists the four config.py
+  paths to change, and the known issues carried over in this snapshot.
+Finished: Tue Aug 25 17:17:41 EDT 2026

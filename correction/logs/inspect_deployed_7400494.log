@@ -1,0 +1,59 @@
+Reading: /work/GRDVULN/correction/scripts/02_feature_engineering.py
+
+--- Every line mentioning FACILITY_ID or DISCHARGE_TYPE ---
+  202:         names=["CWNS_ID", "FACILITY_ID", "STATE_CODE", "DISCHARGE_TYPE",
+  210:         surf = g["DISCHARGE_TYPE"] == "Outfall To Surface Waters"
+  214:             ocean_discharge=bool((g["DISCHARGE_TYPE"] == "Ocean Discharge").any()),
+  215:             cso_discharge=bool((g["DISCHARGE_TYPE"] == "CSO Discharge").any()),
+  216:             requires_npdes=bool(g["DISCHARGE_TYPE"].isin([
+  219:             any_reuse=bool(g["DISCHARGE_TYPE"].str.startswith("Reuse:", na=False).any()),
+  220:             n_discharge_types=g["DISCHARGE_TYPE"].nunique(),
+
+--- Full build_discharge_features function ---
+  199: def build_discharge_features(treatment_ids: set) -> pd.DataFrame:
+  200:     df = pd.read_csv(
+  201:         C.CWNS_DIR / "DISCHARGES.csv",
+  202:         names=["CWNS_ID", "FACILITY_ID", "STATE_CODE", "DISCHARGE_TYPE",
+  203:                "PRESENT_DISCHARGE_PERCENTAGE", "PROJECTED_DISCHARGE_PERCENTAGE",
+  204:                "DISCHARGES_TO"],
+  205:         header=0, dtype={"CWNS_ID": str}, encoding="latin1",
+  206:     )
+  207:     df = df[df["CWNS_ID"].isin(treatment_ids)]
+  208: 
+  209:     def agg(g):
+  210:         surf = g["DISCHARGE_TYPE"] == "Outfall To Surface Waters"
+  211:         return pd.Series(dict(
+  212:             surface_water_discharge=bool(surf.any()),
+  213:             surface_water_pct=float(g.loc[surf, "PRESENT_DISCHARGE_PERCENTAGE"].sum()),
+  214:             ocean_discharge=bool((g["DISCHARGE_TYPE"] == "Ocean Discharge").any()),
+  215:             cso_discharge=bool((g["DISCHARGE_TYPE"] == "CSO Discharge").any()),
+  216:             requires_npdes=bool(g["DISCHARGE_TYPE"].isin([
+  217:                 "Outfall To Surface Waters", "Ocean Discharge",
+  218:                 "CSO Discharge", "Overland Flow With Discharge"]).any()),
+  219:             any_reuse=bool(g["DISCHARGE_TYPE"].str.startswith("Reuse:", na=False).any()),
+  220:             n_discharge_types=g["DISCHARGE_TYPE"].nunique(),
+  221:         ))
+  222: 
+  223:     return df.groupby("CWNS_ID").apply(agg, include_groups=False).reset_index()
+  224: 
+  225: 
+
+--- Every line mentioning STATE_CODE ---
+  185:     loc = loc[["CWNS_ID", "STATE_CODE", "LATITUDE", "LONGITUDE"]]
+  192:         loc = loc[loc["STATE_CODE"].isin(states)]
+  202:         names=["CWNS_ID", "FACILITY_ID", "STATE_CODE", "DISCHARGE_TYPE",
+  308:     # Defensive: STATE_CODE has been observed to drop out of this merge chain
+  314:     if "STATE_CODE" not in plant_features.columns:
+  315:         print("  WARNING: STATE_CODE dropped out of the plant_features merge chain -- "
+  318:             plants[["CWNS_ID", "STATE_CODE"]], on="CWNS_ID", how="left")
+  319:     assert "STATE_CODE" in plant_features.columns, \
+  320:         "STATE_CODE still missing from plant_features after re-attach -- check plants df itself"
+  589:     classes = classes.merge(plant_features[["CWNS_ID", "STATE_CODE"]], on="CWNS_ID", how="left")
+  593:     for state, grp in classes.dropna(subset=["STATE_CODE"]).groupby("STATE_CODE"):
+  614:         plant_features.drop(columns=["STATE_CODE", "LATITUDE", "LONGITUDE"], errors="ignore"),
+  655:     for state, grp in plant_features.groupby("STATE_CODE"):
+  680:     for state in stage2_plants["STATE_CODE"].dropna().unique():
+  690:         for _, plant in stage2_plants[stage2_plants["STATE_CODE"] == state].iterrows():
+  752:         stage2_plants.drop(columns=["STATE_CODE", "LATITUDE", "LONGITUDE"], errors="ignore"),
+  785:     state_list = states or sorted(plant_features["STATE_CODE"].dropna().unique())
+Finished: Fri Aug 21 14:05:58 EDT 2026

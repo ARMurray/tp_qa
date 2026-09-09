@@ -1,0 +1,28 @@
+==========================================
+check_01a_01b_complete.sh
+Expected states: 52
+==========================================
+
+--- 01a (job 7399927): sacct status ---
+  All array tasks COMPLETED.
+
+--- 01b (job 7400216): sacct status ---
+  All array tasks COMPLETED.
+
+--- 01a (nlcd_features): output per state ---
+  Present: 52 / 52
+
+--- 01b (od_features/plants): output per state ---
+  Present: 51 / 52
+  MISSING states: DC
+
+--- 01b: fetch failures per state (from logs) ---
+  Processing state: MD  (array index 1 of 4) --   Fetch failures        : 17  <-- check for rate-limiting if this is high relative to plants processed  <-- worth a closer look
+  Processing state: TX  (array index 2 of 4) --   Fetch failures        : 6  <-- worth a closer look
+  Processing state: FL  (array index 3 of 4) --   Fetch failures        : 17  <-- check for rate-limiting if this is high relative to plants processed  <-- worth a closer look
+  (states with <=3 fetch failures not listed individually -- normal/expected)
+
+==========================================
+RESULT: Issues found above -- resolve before running 02.
+==========================================
+Finished: Fri Aug 21 09:52:07 EDT 2026

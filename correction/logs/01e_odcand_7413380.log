@@ -1,0 +1,301 @@
+==========================================
+Node:    r4n16
+Job ID:  7413380
+CPUs:    32
+Started: Tue Sep  8 12:50:53 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/01e_run_od_candidates.py --workers 32 --training-corrections
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/correction/data/od_features_candidates_train
+
+Loading Stage 2a candidates...
+  240546 candidate(s) across 12030 plant(s) (top 20 each)
+  Corrections layer: 403 plant(s)
+  Excluding 425 holdout plant(s) -> 353 trainable
+  Candidates for those plants: 6555 across 328 plant(s)
+  NOTE: 25 trainable correction(s) have no Stage 2a candidates at all -- Stage 1 did not flag them, or K_RINGS produced nothing. They cannot contribute a row either way.
+
+--- work plan ---
+  AR: 20 candidate parcel(s), 1 plant(s)
+  CA: 60 candidate parcel(s), 3 plant(s)
+  CO: 40 candidate parcel(s), 2 plant(s)
+  DE: 20 candidate parcel(s), 1 plant(s)
+  FL: 200 candidate parcel(s), 10 plant(s)
+  GA: 80 candidate parcel(s), 4 plant(s)
+  IA: 80 candidate parcel(s), 4 plant(s)
+  ID: 40 candidate parcel(s), 2 plant(s)
+  IL: 180 candidate parcel(s), 9 plant(s)
+  IN: 160 candidate parcel(s), 8 plant(s)
+  KS: 560 candidate parcel(s), 28 plant(s)
+  KY: 360 candidate parcel(s), 18 plant(s)
+  LA: 40 candidate parcel(s), 2 plant(s)
+  MA: 40 candidate parcel(s), 2 plant(s)
+  MD: 60 candidate parcel(s), 3 plant(s)
+  MI: 120 candidate parcel(s), 6 plant(s)
+  MN: 80 candidate parcel(s), 4 plant(s)
+  MO: 100 candidate parcel(s), 5 plant(s)
+  MS: 120 candidate parcel(s), 6 plant(s)
+  MT: 40 candidate parcel(s), 2 plant(s)
+  NC: 200 candidate parcel(s), 10 plant(s)
+  ND: 60 candidate parcel(s), 3 plant(s)
+  NE: 60 candidate parcel(s), 3 plant(s)
+  NM: 55 candidate parcel(s), 3 plant(s)
+  NV: 20 candidate parcel(s), 1 plant(s)
+  NY: 380 candidate parcel(s), 19 plant(s)
+  OH: 1700 candidate parcel(s), 85 plant(s)
+  OK: 40 candidate parcel(s), 2 plant(s)
+  OR: 440 candidate parcel(s), 22 plant(s)
+  PA: 60 candidate parcel(s), 3 plant(s)
+  SC: 20 candidate parcel(s), 1 plant(s)
+  SD: 40 candidate parcel(s), 2 plant(s)
+  TN: 20 candidate parcel(s), 1 plant(s)
+  TX: 260 candidate parcel(s), 13 plant(s)
+  UT: 60 candidate parcel(s), 3 plant(s)
+  VA: 40 candidate parcel(s), 2 plant(s)
+  VT: 20 candidate parcel(s), 1 plant(s)
+  WA: 140 candidate parcel(s), 7 plant(s)
+  WI: 460 candidate parcel(s), 23 plant(s)
+  WV: 40 candidate parcel(s), 2 plant(s)
+  WY: 40 candidate parcel(s), 2 plant(s)
+  TOTAL: 6555 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+  Using weights: best.pt
+
+Weights: /work/GRDVULN/correction/models/object_detection/best.pt
+Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+--- State AR: 20 candidate(s) ---
+    ...20 candidate(s) done (0.6 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State CA: 60 candidate(s) ---
+    ...80 candidate(s) done (1.2 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State CO: 40 candidate(s) ---
+    ...120 candidate(s) done (19.0 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State DE: 20 candidate(s) ---
+    ...140 candidate(s) done (19.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State FL: 200 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    ...340 candidate(s) done (21.1 min elapsed)
+  Flushed 200 candidate row(s)
+
+--- State GA: 80 candidate(s) ---
+    ...420 candidate(s) done (21.7 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State IA: 80 candidate(s) ---
+    ...500 candidate(s) done (22.4 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State ID: 40 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    ...540 candidate(s) done (23.0 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State IL: 180 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    ...720 candidate(s) done (24.6 min elapsed)
+  Flushed 180 candidate row(s)
+
+--- State IN: 160 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 1/5)
+    ...880 candidate(s) done (26.2 min elapsed)
+  Flushed 160 candidate row(s)
+
+--- State KS: 560 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    ...1080 candidate(s) done (27.9 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    ...1280 candidate(s) done (29.5 min elapsed)
+    ...1440 candidate(s) done (46.8 min elapsed)
+  Flushed 560 candidate row(s)
+
+--- State KY: 360 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    ...1640 candidate(s) done (48.6 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    ...1800 candidate(s) done (50.2 min elapsed)
+  Flushed 360 candidate row(s)
+
+--- State LA: 40 candidate(s) ---
+    ...1840 candidate(s) done (50.8 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State MA: 40 candidate(s) ---
+    ...1880 candidate(s) done (51.3 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State MD: 60 candidate(s) ---
+    ...1940 candidate(s) done (52.0 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State MI: 120 candidate(s) ---
+    ...2060 candidate(s) done (53.6 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State MN: 80 candidate(s) ---
+    ...2140 candidate(s) done (54.3 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State MO: 100 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    ...2240 candidate(s) done (55.5 min elapsed)
+  Flushed 100 candidate row(s)
+
+--- State MS: 120 candidate(s) ---
+    ...2360 candidate(s) done (56.3 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State MT: 40 candidate(s) ---
+    ...2400 candidate(s) done (56.7 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State NC: 200 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    ...2600 candidate(s) done (58.8 min elapsed)
+  Flushed 200 candidate row(s)
+
+--- State ND: 60 candidate(s) ---
+    ...2660 candidate(s) done (76.7 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State NE: 60 candidate(s) ---
+    ...2720 candidate(s) done (77.5 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State NM: 55 candidate(s) ---
+    ...2775 candidate(s) done (78.0 min elapsed)
+  Flushed 55 candidate row(s)
+
+--- State NV: 20 candidate(s) ---
+    ...2795 candidate(s) done (78.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NY: 380 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 1/5)
+    ...2995 candidate(s) done (80.6 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    ...3175 candidate(s) done (82.4 min elapsed)
+  Flushed 380 candidate row(s)
+
+--- State OH: 1700 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    ...3375 candidate(s) done (84.8 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    ...3575 candidate(s) done (86.8 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    ...3775 candidate(s) done (88.9 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    ...3975 candidate(s) done (91.4 min elapsed)
+    ...4175 candidate(s) done (93.8 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    ...4375 candidate(s) done (95.6 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    ...4575 candidate(s) done (97.6 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    ...4775 candidate(s) done (99.7 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    ...4875 candidate(s) done (117.6 min elapsed)
+  Flushed 1700 candidate row(s)
+
+--- State OK: 40 candidate(s) ---
+    ...4915 candidate(s) done (118.1 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State OR: 440 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    ...5115 candidate(s) done (119.9 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    ...5315 candidate(s) done (139.0 min elapsed)
+    ...5355 candidate(s) done (139.3 min elapsed)
+  Flushed 440 candidate row(s)
+
+--- State PA: 60 candidate(s) ---
+    ...5415 candidate(s) done (139.8 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State SC: 20 candidate(s) ---
+    ...5435 candidate(s) done (140.0 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State SD: 40 candidate(s) ---
+    ...5475 candidate(s) done (140.4 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State TN: 20 candidate(s) ---
+    ...5495 candidate(s) done (140.6 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State TX: 260 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    ...5695 candidate(s) done (142.5 min elapsed)
+    ...5755 candidate(s) done (143.0 min elapsed)
+  Flushed 260 candidate row(s)
+
+--- State UT: 60 candidate(s) ---
+    ...5815 candidate(s) done (143.3 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State VA: 40 candidate(s) ---
+    ...5855 candidate(s) done (143.8 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State VT: 20 candidate(s) ---
+    ...5875 candidate(s) done (144.0 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State WA: 140 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    ...6015 candidate(s) done (145.3 min elapsed)
+  Flushed 140 candidate row(s)
+
+--- State WI: 460 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 1/5)
+    ...6215 candidate(s) done (147.1 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    ...6415 candidate(s) done (148.7 min elapsed)
+    ...6475 candidate(s) done (166.7 min elapsed)
+  Flushed 460 candidate row(s)
+
+--- State WV: 40 candidate(s) ---
+    ...6515 candidate(s) done (167.2 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State WY: 40 candidate(s) ---
+    ...6555 candidate(s) done (167.6 min elapsed)
+  Flushed 40 candidate row(s)
+
+=== Summary ===
+  Candidates processed : 6555
+  Skipped (resume)     : 0
+  No parcel geometry   : 0
+  Elapsed              : 167.6 min
+
+Outputs in: /work/GRDVULN/correction/data/od_features_candidates_train
+Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
+Finished: Tue Sep  8 15:39:16 EDT 2026  (exit 0)

@@ -1,0 +1,30 @@
+==========================================
+Node:    a0n15
+Job ID:  7404940
+CPUs:    2
+Started: Wed Aug 26 09:22:47 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== check_location_type_overlap.py ===
+Treatment plants (FACILITY_TYPES): 16454
+
+PHYSICAL_LOCATION rows for treatment plants: 16454
+LOCATION_TYPE
+Point    16452
+City         2
+
+Non-Point rows within the treatment-plant universe: 2 (0.01%)
+
+Sample non-Point treatment-plant rows (up to 10):
+    CWNS_ID LOCATION_TYPE  LATITUDE   LONGITUDE STATE_CODE       CITY COUNTY_NAME
+01000000087          City 31.390645  -86.501884         AL     Angoon         NaN
+16000023001          City 43.631137 -111.773572         ID Colchester         NaN
+
+  Layer 'classes': 0 / 2494 plants have a non-Point reported location
+
+  Layer 'corrections': 0 / 316 plants have a non-Point reported location
+
+=== complete ===
+Finished: Wed Aug 26 09:22:50 EDT 2026

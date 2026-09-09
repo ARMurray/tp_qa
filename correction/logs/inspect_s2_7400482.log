@@ -1,0 +1,83 @@
+==========================================
+Node:    a0n16
+Job ID:  7400482
+CPUs:    4
+Started: Fri Aug 21 13:43:59 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Reading columns from: /work/GRDVULN/correction/data/features/15_stage2_training.parquet
+
+Total columns: 60
+
+--- Columns containing 'state' (case-insensitive) ---
+  'STATE_CODE_x'  dtype=str  sample=IN
+  'STATE_CODE_y'  dtype=str  sample=nan
+
+--- ALL suffixed columns (any _x/_y, not just state) ---
+  'STATE_CODE_x'  dtype=str  sample=IN
+  'STATE_CODE_y'  dtype=str  sample=nan
+
+--- Full column list ---
+  ll_uuid
+  h3_index_9
+  geoid
+  total_pixels
+  water_pixels
+  water_pixel_pct
+  dominant_class_group
+  dominant_count
+  has_water
+  ll_gisacre
+  log_gisacre
+  ll_bldg_count
+  bldg_per_acre
+  lbcs_activity
+  lbcs_function
+  lbcs_structure
+  lbcs_site
+  lbcs_ownership
+  zoning_type
+  owner_is_person
+  owner_is_govt
+  owner_is_utility
+  owner_is_electric
+  owner_has_llc_corp
+  has_ww_keyword
+  osm_ww
+  data_quality_score
+  n_parcels
+  pct_lbcs_activity_known
+  pct_owner_known
+  centroid_lat
+  centroid_lng
+  CWNS_ID
+  label
+  is_reported
+  distance_m
+  log_distance
+  distance_ring
+  within_1km
+  within_5km
+  STATE_CODE_x
+  h3_res9
+  FACILITY_ID
+  STATE_CODE_y
+  DISCHARGE_TYPE
+  PRESENT_DISCHARGE_PERCENTAGE
+  PROJECTED_DISCHARGE_PERCENTAGE
+  DISCHARGES_TO
+  pop_served
+  subdivision
+  place
+  county
+  county_geoid
+  is_rural
+  is_municipal
+  owner_water
+  sd_match
+  place_match
+  county_match
+  any_geo_match
+Finished: Fri Aug 21 13:44:06 EDT 2026

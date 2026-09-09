@@ -1,0 +1,64 @@
+==========================================
+Node:    a0n15
+Job ID:  7400224
+CPUs:    4
+Started: Fri Aug 21 09:54:34 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Reading 3 part-file(s) for MD...
+Deduplicated: 412 raw tile rows -> 154 unique tiles (kept most recent attempt per tile_id)
+
+154 total tile rows, 30 fetch_failed
+
+--- fetch_error message distribution ---
+fetch_error
+Read failed. See previous exception for details.                                                                                                                                                                                                                                                                                                     13
+tile window (16595,6659 size 2015x1950) falls outside item raster (18554x23430) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                  1
+tile window (16541,4484 size 2018x1934) falls outside item raster (18495x23521) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                  1
+tile window (8976,10730 size 1013x951) falls outside item raster (9980x12430) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-242,-2638 size 2025x1902) falls outside item raster (18810x23694) -- likely a different NAIP quad than the one resolved for this plant         1
+tile window (5387,-170 size 2017x1940) falls outside item raster (18415x23483) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-12844,22771 size 2017x1940) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant      1
+tile window (6957,21829 size 2017x1940) falls outside item raster (18399x23484) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-11035,21649 size 2017x1940) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant     1
+tile window (-474,814 size 2017x1941) falls outside item raster (18400x23472) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-697,23934 size 2017x1941) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant         1
+tile window (1336,-309 size 2017x1941) falls outside item raster (18400x23472) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (1113,22811 size 2017x1941) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant        1
+tile window (11627,-313 size 2017x1940) falls outside item raster (18415x23483) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-6604,22628 size 2017x1940) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant      1
+tile window (16390,-783 size 2017x1941) falls outside item raster (18415x23483) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-1841,22158 size 2017x1941) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant      1
+tile window (-141,-635 size 2017x1941) falls outside item raster (18400x23472) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-364,22485 size 2017x1941) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant        1
+tile window (2922,21688 size 2017x1941) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                  1
+tile window (-513,16362 size 2017x1941) falls outside item raster (18384x23472) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                  1
+tile window (17329,14 size 2024x1908) falls outside item raster (18671x23672) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                    1
+tile window (16875,2389 size 2027x1897) falls outside item raster (18690x23736) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                  1
+tile window (-692,7754 size 2023x1915) falls outside item raster (18745x23618) -- likely a different NAIP quad than the one resolved for this plant                                                                                                                                                                                                   1
+tile window (17142,9530 size 2023x1915) falls outside item raster (18760x23630) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (-1025,9203 size 2023x1915) falls outside item raster (18745x23618) -- likely a different NAIP quad than the one resolved for this plant       1
+tile window (11601,22006 size 2024x1908) falls outside item raster (18671x23672) -- likely a different NAIP quad than the one resolved for this plant | caused by: TileOutsideItemCoverage: tile window (12078,-1116 size 2024x1908) falls outside item raster (18686x23671) -- likely a different NAIP quad than the one resolved for this plant     1
+
+--- per-CWNS_ID breakdown ---
+CWNS_ID
+24000102001    22
+24000300024     2
+24000008001     1
+24000017001     1
+24000018005     1
+24000018002     1
+24000084001     1
+24000062001     1
+
+--- affected plants: parcel context ---
+  24000102001: 22/99 tiles failed, parcel_area=0.724 km2, parcel_capped=False
+  24000300024: 2/4 tiles failed, parcel_area=0.820 km2, parcel_capped=False
+  24000008001: 1/1 tiles failed, parcel_area=0.019 km2, parcel_capped=False
+  24000017001: 1/1 tiles failed, parcel_area=0.153 km2, parcel_capped=False
+  24000018005: 1/2 tiles failed, parcel_area=0.341 km2, parcel_capped=False
+  24000018002: 1/1 tiles failed, parcel_area=0.245 km2, parcel_capped=False
+  24000084001: 1/1 tiles failed, parcel_area=0.260 km2, parcel_capped=False
+  24000062001: 1/1 tiles failed, parcel_area=0.019 km2, parcel_capped=False
+
+--- sample errors (first 3, full detail) ---
+
+  Read failed. See previous exception for details.
+
+  tile window (16595,6659 size 2015x1950) falls outside item raster (18554x23430) -- likely a different NAIP quad than the one resolved for this plant
+
+  tile window (16541,4484 size 2018x1934) falls outside item raster (18495x23521) -- likely a different NAIP quad than the one resolved for this plant
+Finished: Fri Aug 21 09:54:34 EDT 2026

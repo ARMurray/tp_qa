@@ -1,0 +1,48 @@
+==========================================
+Node:    r4n15
+Job ID:  7403230
+CPUs:    2
+Started: Mon Aug 24 17:34:10 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/09_build_holdout.py
+=== 09_build_holdout.py ===
+
+Loading labeled plant pool...
+  'class' column values: {'Correct': 2178, 'Incorrect': 316}
+
+Labeled pool: 2382 plants
+  correct     : 2066
+  corrections : 316
+
+Sampling...
+
+--- Draw: 200 plants (cohort A) ---
+  correct     : 150
+  corrections : 50
+  states      : 46
+
+  Corrections slice n=50: recall@1 standard error about +/-7.1pp (worst case p=0.5).
+  Leaves 266 corrections for training (pool was 316).
+
+Resolving true parcels...
+  True parcel resolved for 200/200 derivable-truth plants
+  Truth already known : 200
+  Needs review        : 0  (the 'incorrect' bin)
+
+Written: /work/GRDVULN/correction/data/holdout/holdout_manifest.parquet  (200 plants)
+  checksum: d5d9dba82c57990c8b5cb9331aa697f1f8017951577cc9171436b2e74235ff6e
+Written: /work/GRDVULN/correction/data/holdout/holdout_truth.parquet  (200 plants with truth)
+
+NEXT:
+  1. Apply PATCH_holdout_antijoins.md to 03/04/06/07 -- until then the
+     manifest protects nothing.
+  2. Retrain. Stage 2b loses ~50 plants' worth of rows.
+  3. Pilot inference, then 12_score_holdout.py: 200 plants
+     score immediately; only the 0 'incorrect' ones need
+     review first.
+
+=== complete ===
+Finished: Mon Aug 24 17:38:39 EDT 2026

@@ -1,0 +1,10 @@
+==========================================
+Node:    r4n09
+Job ID:  7411871
+CPUs:    16
+Started: Thu Sep  3 17:42:32 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+/var/spool/slurm/job7411871/slurm_script: line 56: STATES: ERROR: set STATES, e.g. --export=STATES=OH PA

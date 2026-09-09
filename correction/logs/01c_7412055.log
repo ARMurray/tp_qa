@@ -1,0 +1,13 @@
+==========================================
+Node:    r7n27
+Job ID:  7412055
+CPUs:    32
+Started: Thu Sep  3 22:19:08 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01c_run_od_corrected_locations.py --workers 32 --no-resume
+[2026-09-03T22:19:33.106] error: *** JOB 7412055 ON r7n27 CANCELLED AT 2026-09-03T22:19:33 DUE to SIGNAL Terminated ***

@@ -1,0 +1,263 @@
+==========================================
+Node:    r7n09
+Job ID:  7400567
+CPUs:    32
+Started: Fri Aug 21 18:43:08 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01c_run_od_corrected_locations.py --workers 32
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01c_run_od_corrected_locations.py ===
+Device: cpu  |  fetch workers: 32  |  output: /work/GRDVULN/correction/data/od_features_corrected
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+Correction (true-location) plants loaded: 316
+Resuming: skipping 10 already-processed corrections
+
+--- State AR: 1 corrections ---
+    ...1 corrections done (0.5 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State AR done
+
+--- State CA: 4 corrections ---
+    ...5 corrections done (1.0 min elapsed, batch of 4)
+    flushed 4 corrections (resume point advanced)
+  State CA done
+
+--- State CO: 2 corrections ---
+    ...7 corrections done (1.4 min elapsed, batch of 2)
+    flushed 2 corrections (resume point advanced)
+  State CO done
+
+--- State DC: 1 corrections ---
+    ...8 corrections done (1.9 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State DC done
+
+--- State FL: 8 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+    ...16 corrections done (2.4 min elapsed, batch of 8)
+    flushed 8 corrections (resume point advanced)
+  State FL done
+
+--- State GA: 6 corrections ---
+    ...22 corrections done (3.1 min elapsed, batch of 6)
+    flushed 6 corrections (resume point advanced)
+  State GA done
+
+--- State HI: 14 corrections ---
+  1 corrections matched >1 parcel (boundary edge case) -- kept one match each
+    ...36 corrections done (3.7 min elapsed, batch of 14)
+    flushed 14 corrections (resume point advanced)
+  State HI done
+
+--- State IA: 5 corrections ---
+    ...41 corrections done (4.1 min elapsed, batch of 5)
+    flushed 5 corrections (resume point advanced)
+  State IA done
+
+--- State ID: 2 corrections ---
+    ...43 corrections done (4.2 min elapsed, batch of 2)
+    flushed 2 corrections (resume point advanced)
+  State ID done
+
+--- State IL: 11 corrections ---
+    ...54 corrections done (5.2 min elapsed, batch of 11)
+    flushed 11 corrections (resume point advanced)
+  State IL done
+
+--- State IN: 9 corrections ---
+    ...63 corrections done (5.8 min elapsed, batch of 9)
+    flushed 9 corrections (resume point advanced)
+  State IN done
+
+--- State KS: 35 corrections ---
+    ...98 corrections done (7.0 min elapsed, batch of 35)
+    flushed 35 corrections (resume point advanced)
+  State KS done
+
+--- State KY: 21 corrections ---
+  No containing parcel found for 1 corrected locations -- skipped
+    ...118 corrections done (8.0 min elapsed, batch of 20)
+    flushed 20 corrections (resume point advanced)
+  State KY done
+
+--- State LA: 2 corrections ---
+  No containing parcel found for 1 corrected locations -- skipped
+    ...119 corrections done (8.4 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State LA done
+
+--- State MA: 3 corrections ---
+  1 corrections matched >1 parcel (boundary edge case) -- kept one match each
+    ...122 corrections done (9.2 min elapsed, batch of 3)
+    flushed 3 corrections (resume point advanced)
+  State MA done
+
+--- State MD: 4 corrections ---
+    ...126 corrections done (9.6 min elapsed, batch of 4)
+    flushed 4 corrections (resume point advanced)
+  State MD done
+
+--- State MI: 7 corrections ---
+    ...133 corrections done (10.1 min elapsed, batch of 7)
+    flushed 7 corrections (resume point advanced)
+  State MI done
+
+--- State MN: 5 corrections ---
+    ...138 corrections done (10.7 min elapsed, batch of 5)
+    flushed 5 corrections (resume point advanced)
+  State MN done
+
+--- State MO: 6 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+  No containing parcel found for 1 corrected locations -- skipped
+    ...143 corrections done (11.0 min elapsed, batch of 5)
+    flushed 5 corrections (resume point advanced)
+  State MO done
+
+--- State MT: 3 corrections ---
+    ...146 corrections done (11.5 min elapsed, batch of 3)
+    flushed 3 corrections (resume point advanced)
+  State MT done
+
+--- State NC: 12 corrections ---
+  1 corrections matched >1 parcel (boundary edge case) -- kept one match each
+    ...158 corrections done (12.0 min elapsed, batch of 12)
+    flushed 12 corrections (resume point advanced)
+  State NC done
+
+--- State ND: 4 corrections ---
+    ...162 corrections done (12.4 min elapsed, batch of 4)
+    flushed 4 corrections (resume point advanced)
+  State ND done
+
+--- State NE: 4 corrections ---
+    ...166 corrections done (13.0 min elapsed, batch of 4)
+    flushed 4 corrections (resume point advanced)
+  State NE done
+
+--- State NM: 4 corrections ---
+    ...170 corrections done (13.5 min elapsed, batch of 4)
+    flushed 4 corrections (resume point advanced)
+  State NM done
+
+--- State NV: 1 corrections ---
+    ...171 corrections done (13.8 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State NV done
+
+--- State NY: 22 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+    ...193 corrections done (15.2 min elapsed, batch of 22)
+    flushed 22 corrections (resume point advanced)
+  State NY done
+
+--- State OH: 8 corrections ---
+    ...201 corrections done (15.7 min elapsed, batch of 8)
+    flushed 8 corrections (resume point advanced)
+  State OH done
+
+--- State OK: 3 corrections ---
+  No containing parcel found for 1 corrected locations -- skipped
+    ...203 corrections done (15.7 min elapsed, batch of 2)
+    flushed 2 corrections (resume point advanced)
+  State OK done
+
+--- State OR: 27 corrections ---
+  6 corrections matched >1 parcel (boundary edge case) -- kept one match each
+    ...230 corrections done (16.4 min elapsed, batch of 27)
+    flushed 27 corrections (resume point advanced)
+  State OR done
+
+--- State PA: 4 corrections ---
+    ...234 corrections done (16.8 min elapsed, batch of 4)
+    flushed 4 corrections (resume point advanced)
+  State PA done
+
+--- State PR: 1 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+    ...235 corrections done (16.9 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State PR done
+
+--- State SC: 1 corrections ---
+    ...236 corrections done (17.3 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State SC done
+
+--- State SD: 3 corrections ---
+    ...239 corrections done (17.7 min elapsed, batch of 3)
+    flushed 3 corrections (resume point advanced)
+  State SD done
+
+--- State TN: 1 corrections ---
+    ...240 corrections done (18.1 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State TN done
+
+--- State TX: 15 corrections ---
+    ...255 corrections done (19.6 min elapsed, batch of 15)
+    flushed 15 corrections (resume point advanced)
+  State TX done
+
+--- State UT: 3 corrections ---
+    ...258 corrections done (20.1 min elapsed, batch of 3)
+    flushed 3 corrections (resume point advanced)
+  State UT done
+
+--- State VA: 2 corrections ---
+    ...260 corrections done (20.6 min elapsed, batch of 2)
+    flushed 2 corrections (resume point advanced)
+  State VA done
+
+--- State VT: 1 corrections ---
+    ...261 corrections done (20.6 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State VT done
+
+--- State WA: 9 corrections ---
+    ...270 corrections done (21.3 min elapsed, batch of 9)
+    flushed 9 corrections (resume point advanced)
+  State WA done
+
+--- State WI: 28 corrections ---
+  Resuming: skipping 0 already-processed corrections in this state
+    ...298 corrections done (22.7 min elapsed, batch of 28)
+    flushed 28 corrections (resume point advanced)
+  State WI done
+
+--- State WV: 2 corrections ---
+    ...300 corrections done (23.1 min elapsed, batch of 2)
+    flushed 2 corrections (resume point advanced)
+  State WV done
+
+--- State WY: 2 corrections ---
+    ...302 corrections done (23.4 min elapsed, batch of 2)
+    flushed 2 corrections (resume point advanced)
+  State WY done
+
+=== Summary ===
+  Corrections processed : 302
+  No parcel found        : 4
+  Parcels capped         : 2
+  Tiles w/ detections    : 213
+  Tiles empty            : 104
+  Fetch failures         : 33
+  Elapsed                : 23.4 min
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/correction/data/od_features_corrected
+Finished: Fri Aug 21 19:07:22 EDT 2026

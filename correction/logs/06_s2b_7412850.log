@@ -1,0 +1,12 @@
+==========================================
+Node:    a0n15
+Job ID:  7412850
+CPUs:    8
+Started: Fri Sep  4 18:07:41 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+/var/spool/slurm/job7412850/slurm_script: line 22: 2521776 Killed                  python "$SCRIPTS/06_build_stage2b_training.py"
+Finished: Fri Sep  4 18:09:38 EDT 2026
+[2026-09-04T18:09:38.062] error: Detected 1 oom_kill event in StepId=7412850.batch. Some of the step tasks have been OOM Killed.

@@ -1,0 +1,173 @@
+==========================================
+Node:    r7n21
+Job ID:  7413338
+CPUs:    32
+Started: Tue Sep  8 11:25:47 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/01e_run_od_candidates.py --workers 32
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/correction/data/od_features_candidates
+
+Loading Stage 2a candidates...
+  240546 candidate(s) across 12030 plant(s) (top 20 each)
+  Holdout manifest: 425 plants; 50 in bin(s) ['corrections']
+  Candidates for those plants: 880 across 44 plant(s)
+
+--- work plan ---
+  CA: 20 candidate parcel(s), 1 plant(s)
+  FL: 20 candidate parcel(s), 1 plant(s)
+  GA: 20 candidate parcel(s), 1 plant(s)
+  IA: 20 candidate parcel(s), 1 plant(s)
+  IL: 40 candidate parcel(s), 2 plant(s)
+  IN: 20 candidate parcel(s), 1 plant(s)
+  KS: 120 candidate parcel(s), 6 plant(s)
+  KY: 60 candidate parcel(s), 3 plant(s)
+  MA: 20 candidate parcel(s), 1 plant(s)
+  MD: 20 candidate parcel(s), 1 plant(s)
+  MI: 20 candidate parcel(s), 1 plant(s)
+  MN: 20 candidate parcel(s), 1 plant(s)
+  MT: 20 candidate parcel(s), 1 plant(s)
+  NC: 20 candidate parcel(s), 1 plant(s)
+  ND: 20 candidate parcel(s), 1 plant(s)
+  NE: 20 candidate parcel(s), 1 plant(s)
+  NM: 20 candidate parcel(s), 1 plant(s)
+  NY: 60 candidate parcel(s), 3 plant(s)
+  OH: 20 candidate parcel(s), 1 plant(s)
+  OK: 20 candidate parcel(s), 1 plant(s)
+  OR: 80 candidate parcel(s), 4 plant(s)
+  PA: 20 candidate parcel(s), 1 plant(s)
+  SD: 20 candidate parcel(s), 1 plant(s)
+  TX: 40 candidate parcel(s), 2 plant(s)
+  WA: 20 candidate parcel(s), 1 plant(s)
+  WI: 100 candidate parcel(s), 5 plant(s)
+  TOTAL: 880 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+  Using weights: best.pt
+
+Weights: /work/GRDVULN/correction/models/object_detection/best.pt
+Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+--- State CA: 20 candidate(s) ---
+    ...20 candidate(s) done (0.6 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State FL: 20 candidate(s) ---
+    ...40 candidate(s) done (0.9 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State GA: 20 candidate(s) ---
+    ...60 candidate(s) done (1.1 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State IA: 20 candidate(s) ---
+    ...80 candidate(s) done (1.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State IL: 40 candidate(s) ---
+    ...120 candidate(s) done (1.6 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State IN: 20 candidate(s) ---
+    ...140 candidate(s) done (1.8 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State KS: 120 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    ...260 candidate(s) done (2.9 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State KY: 60 candidate(s) ---
+    ...320 candidate(s) done (3.5 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State MA: 20 candidate(s) ---
+    ...340 candidate(s) done (3.8 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State MD: 20 candidate(s) ---
+    ...360 candidate(s) done (4.1 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State MI: 20 candidate(s) ---
+    ...380 candidate(s) done (4.3 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State MN: 20 candidate(s) ---
+    ...400 candidate(s) done (4.5 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State MT: 20 candidate(s) ---
+    ...420 candidate(s) done (4.8 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NC: 20 candidate(s) ---
+    ...440 candidate(s) done (5.1 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State ND: 20 candidate(s) ---
+    ...460 candidate(s) done (5.4 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NE: 20 candidate(s) ---
+    ...480 candidate(s) done (5.6 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NM: 20 candidate(s) ---
+    ...500 candidate(s) done (5.8 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NY: 60 candidate(s) ---
+    ...560 candidate(s) done (6.5 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State OH: 20 candidate(s) ---
+    ...580 candidate(s) done (6.8 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State OK: 20 candidate(s) ---
+    ...600 candidate(s) done (7.1 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State OR: 80 candidate(s) ---
+    ...680 candidate(s) done (7.9 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State PA: 20 candidate(s) ---
+    ...700 candidate(s) done (8.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State SD: 20 candidate(s) ---
+    ...720 candidate(s) done (8.4 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State TX: 40 candidate(s) ---
+    ...760 candidate(s) done (8.9 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State WA: 20 candidate(s) ---
+    ...780 candidate(s) done (9.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State WI: 100 candidate(s) ---
+    ...880 candidate(s) done (10.3 min elapsed)
+  Flushed 100 candidate row(s)
+
+=== Summary ===
+  Candidates processed : 880
+  Skipped (resume)     : 0
+  No parcel geometry   : 0
+  Elapsed              : 10.3 min
+
+Outputs in: /work/GRDVULN/correction/data/od_features_candidates
+Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
+Finished: Tue Sep  8 11:36:51 EDT 2026  (exit 0)

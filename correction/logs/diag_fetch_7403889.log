@@ -1,0 +1,10 @@
+==========================================
+Node:    a0n16
+Job ID:  7403889
+CPUs:    4
+Started: Tue Aug 25 10:25:29 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+/var/spool/slurm/job7403889/slurm_script: line 16: STATE: ERROR: set STATE, e.g. --export=STATE=KY

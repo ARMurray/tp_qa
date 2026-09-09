@@ -1,0 +1,22 @@
+==========================================
+Node:    r5n04
+Job ID:  7403238
+CPUs:    2
+Started: Mon Aug 24 17:45:57 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/09_build_holdout.py --n-correct 300 --n-unlabeled 75 --dry-run
+=== 09_build_holdout.py ===
+
+Manifest already exists: /work/GRDVULN/correction/data/holdout/holdout_manifest.parquet
+  200 plants, cohorts ['A'], first sampled 2026-08-24T17:38:37
+  checksum: d5d9dba82c57990c...
+
+Refusing to overwrite. The holdout is sampled ONCE by design --
+re-drawing rotates plants between train and eval and makes every
+previously recorded score incomparable.
+To GROW it safely:  --append-cohort B
+To discard history deliberately:  --force-resample
+Finished: Mon Aug 24 17:45:58 EDT 2026

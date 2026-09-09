@@ -1,0 +1,63 @@
+==========================================
+Node:    a0n17
+Job ID:  7405153
+CPUs:    2
+Started: Wed Aug 26 15:32:20 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== check_competition_losses.py (revised) ===
+
+plant_summary rows      : 929
+stage2_candidates rows  : 15080
+summary columns         : ['CWNS_ID', 'LATITUDE', 'LONGITUDE', 'STATE_CODE', 'h3_res9', 'n_candidates', 'point_location', 'reported_ll_uuid', 'stage1_prob_correct', 'top_candidate_ll_uuid', 'top_distance_m', 'top_stage2_prob', 'top_within_1km', 'top_within_5km', 'trigger_reason']
+
+Flagged plants (trigger_reason != 'none'): 754
+  trigger_reason breakdown:
+    low_confidence                           514
+    no_parcel                                240
+
+--- Reconciling summary columns against raw candidate table ---
+  plants where n_candidates != raw count : 754
+    ^ summary n_candidates is NOT the raw candidate count. It may already be post-filter. Sample:
+       CWNS_ID  n_candidates  raw_n_candidates
+0  39004205002          7577                20
+1  39004102001          2003                20
+2  39003907007         11820                20
+3  39000012001          2755                20
+4  39000241001          2876                20
+
+--- Provenance of top_stage2_prob ---
+  comparable plants                      : 754
+  top_stage2_prob == raw max             : 709
+  top_stage2_prob <  raw max (displaced) : 45
+  top_stage2_prob >  raw max (!!)        : 0
+
+  Competition demonstrably displaced 45 top picks. The column is post-competition and the loss count is real.
+
+--- Parcel exclusivity ---
+  No winning-parcel column found (looked for ['top_parcel_id', 'top_ll_uuid', 'll_uuid', 'parcel_id']). Cannot verify exclusivity; add the correct column name to PARCEL_ID_CANDIDATES.
+
+--- Outcome buckets (mutually exclusive, raw counts) ---
+  candidates and a top pick              : 754
+  zero raw candidates, no pick           : 0
+  candidates but lost ALL to competition : 0
+  IMPOSSIBLE (pick with zero candidates) : 0
+  unclassified                           : 0
+
+  partition total: 754  (should equal 754)
+
+  No competition losses detected. Candidate-count distribution for flagged plants (to confirm there was anything to compete over):
+count    754.0
+mean      20.0
+std        0.0
+min       20.0
+25%       20.0
+50%       20.0
+75%       20.0
+max       20.0
+    plants with >1 candidate: 754 of 754
+
+=== complete ===
+Finished: Wed Aug 26 15:32:22 EDT 2026

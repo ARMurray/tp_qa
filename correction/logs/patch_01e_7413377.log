@@ -1,0 +1,21 @@
+==========================================
+Node:    a0n16
+Job ID:  7413377
+CPUs:    1
+Started: Tue Sep  8 12:42:00 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/patch_01e_training_scope.py
+=== patch_01e_training_scope.py ===
+target: /work/GRDVULN/correction/scripts/01e_run_od_candidates.py
+
+  APPLIED 1. restrict_to_training_corrections()
+  APPLIED 2. --training-corrections argument
+  APPLIED 3. dispatch on the new scope
+  APPLIED 4. separate output root for the training scope
+
+Backup: 01e_run_od_candidates.py.bak-20260908-124200
+Syntax: OK
+Finished: Tue Sep  8 12:42:00 EDT 2026  (exit 0)

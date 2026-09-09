@@ -1,0 +1,111 @@
+==========================================
+Node:    r4n10
+Job ID:  7400511
+CPUs:    16
+Started: Fri Aug 21 14:39:44 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== 04_train_stage2.py: Stage 2 Model Training (Balanced Random Forest) ===
+NEG_RATIO: 50
+
+Loading Stage 2 training data...
+  Total rows: 3487416
+  Positive labels: 259
+  Negative labels: 3487157
+  Plants: 311
+
+Sampling negatives with hard negative mining...
+  Positives: 259
+  Hard negatives sampled: 9065
+  Easy negatives sampled: 3885
+  Total training rows: 13209
+
+  Balanced class distribution:
+label
+0    12950
+1      259
+Name: count, dtype: int64
+  WARNING: dropping apparent merge-suffix artifact columns: ['STATE_CODE_x', 'STATE_CODE_y']
+  Model columns: 39
+
+Setting up cross-validation folds...
+  Spatial fold 1 train -- Correct: 210, Incorrect: 9240
+  Spatial fold 2 train -- Correct: 211, Incorrect: 11097
+  Spatial fold 3 train -- Correct: 248, Incorrect: 12035
+  Spatial fold 4 train -- Correct: 228, Incorrect: 10081
+  Spatial fold 5 train -- Correct: 139, Incorrect: 9347
+  Spatial folds: 5  |  Standard folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 0.5 minutes
+  Best SPATIAL ROC AUC: 0.9874
+
+========================================
+Tuning with STANDARD cross-validation...
+========================================
+  STANDARD CV complete in 0.4 minutes
+  Best STANDARD ROC AUC: 0.9890
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.989021
+0   Spatial  0.987353
+
+========================================
+Fitting final model on full training data...
+========================================
+
+FINAL RESULTS SUMMARY
+Test set metrics:
+  roc_auc     : 0.9872
+  accuracy    : 0.9552
+  sensitivity : 0.9231
+  specificity : 0.9558
+  brier_class : 0.0370
+
+Confusion matrix (rows=truth, cols=predicted; 1=Correct, 0=Incorrect):
+[[3095  143]
+ [   5   60]]
+
+Computing feature importance...
+Top 20 features:
+          Variable  Importance  Importance_std
+     ll_bldg_count    0.003270        0.000784
+      is_municipal    0.003087        0.001048
+       log_gisacre    0.003020        0.001180
+        distance_m    0.002918        0.000628
+      log_distance    0.002779        0.000692
+        ll_gisacre    0.002012        0.000978
+    lbcs_ownership    0.001866        0.000587
+     bldg_per_acre    0.001408        0.000378
+        pop_served    0.001235        0.000421
+            osm_ww    0.001181        0.000070
+    dominant_count    0.000501        0.000561
+        within_1km    0.000407        0.000126
+   water_pixel_pct    0.000391        0.000071
+         has_water    0.000363        0.000129
+       place_match    0.000359        0.000117
+data_quality_score    0.000326        0.000215
+      total_pixels    0.000316        0.000510
+      water_pixels    0.000273        0.000083
+         lbcs_site    0.000230        0.000227
+owner_has_llc_corp    0.000143        0.000199
+
+Running threshold analysis...
+  Optimal Stage 2 threshold (Youden J): 0.582
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.989021
+0   Spatial  0.987353
+Optimal threshold: 0.582
+
+Saving model...
+  stage2_rf_model.joblib saved: 15.9 MB
+
+=== Stage 2 training complete ===
+Finished: Fri Aug 21 14:41:17 EDT 2026

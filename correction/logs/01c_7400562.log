@@ -1,0 +1,64 @@
+==========================================
+Node:    r4n10
+Job ID:  7400562
+CPUs:    32
+Started: Fri Aug 21 18:01:00 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01c_run_od_corrected_locations.py --workers 32 --limit 10 --no-resume
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01c_run_od_corrected_locations.py ===
+Device: cpu  |  fetch workers: 32  |  output: /work/GRDVULN/correction/data/od_features_corrected
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+Correction (true-location) plants loaded: 10
+
+--- State FL: 6 corrections ---
+    ...6 corrections done (0.6 min elapsed, batch of 6)
+    flushed 6 corrections (resume point advanced)
+  State FL done
+
+--- State MO: 1 corrections ---
+    ...7 corrections done (1.1 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State MO done
+
+--- State NY: 1 corrections ---
+    ...8 corrections done (1.2 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State NY done
+
+--- State PR: 1 corrections ---
+    ...9 corrections done (1.6 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State PR done
+
+--- State WI: 1 corrections ---
+    ...10 corrections done (1.6 min elapsed, batch of 1)
+    flushed 1 corrections (resume point advanced)
+  State WI done
+
+=== Summary ===
+  Corrections processed : 10
+  No parcel found        : 0
+  Parcels capped         : 0
+  Tiles w/ detections    : 11
+  Tiles empty            : 3
+  Fetch failures         : 4
+  Elapsed                : 1.6 min
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/correction/data/od_features_corrected
+Finished: Fri Aug 21 18:03:19 EDT 2026

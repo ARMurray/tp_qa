@@ -1,0 +1,34 @@
+==========================================
+Node:    a0n15
+Job ID:  7412052
+CPUs:    2
+Started: Thu Sep  3 22:14:07 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/check_od_freshness.py --delete
+=== check_od_freshness.py ===
+Model      : /work/GRDVULN/correction/models/object_detection/best.pt
+Model time : 2026-09-03 17:23
+
+192 partition(s) newer than the model
+
+10 STALE partition(s) across 3 state(s) -- written before the deployed model:
+    AK   newest 2026-08-21 06:51   [plants, tiles]
+    HI   newest 2026-08-21 06:51   [plants, tiles, detections, objects]
+    PR   newest 2026-08-21 07:40   [plants, tiles, detections, objects]
+
+  deleted    plants/state=AK
+  deleted    plants/state=HI
+  deleted    plants/state=PR
+  deleted    tiles/state=AK
+  deleted    tiles/state=HI
+  deleted    tiles/state=PR
+  deleted    detections/state=HI
+  deleted    detections/state=PR
+  deleted    objects/state=HI
+  deleted    objects/state=PR
+
+10 partition(s) handled. Safe to run 02.
+Finished: Thu Sep  3 22:14:07 EDT 2026  (exit 0)

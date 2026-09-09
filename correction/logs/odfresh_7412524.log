@@ -1,0 +1,18 @@
+==========================================
+Node:    a0n16
+Job ID:  7412524
+CPUs:    2
+Started: Fri Sep  4 08:22:48 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/check_od_freshness.py --delete
+=== check_od_freshness.py ===
+Model      : /work/GRDVULN/correction/models/object_detection/best.pt
+Model time : 2026-09-03 17:23
+
+192 partition(s) newer than the model
+
+No stale partitions. Safe to run 02.
+Finished: Fri Sep  4 08:22:49 EDT 2026  (exit 0)

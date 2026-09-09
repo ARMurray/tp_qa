@@ -1,3 +1,6 @@
+correction/models/*
+!correction/models/object_detection/
+!correction/models/object_detection/best.pt
 correction/archive/
 correction/data/
 correction/.venv/

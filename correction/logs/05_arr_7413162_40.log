@@ -1,0 +1,18 @@
+==========================================
+Node:    r7n19
+Job ID:  7413205
+CPUs:    8
+Started: Tue Sep  8 08:39:56 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: TX  (array index 40 of 48)
+Output: /work/GRDVULN/correction/data/inference_shards/state=TX
+Running: python /work/GRDVULN/correction/scripts/05_run_inference.py --states TX --out-dir /work/GRDVULN/correction/data/inference_shards/state=TX
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_chlorine_contact' 'od_max_conf_drying_bed'
+ 'od_max_conf_oxidation_pond']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/var/spool/slurm/job7413205/slurm_script: line 66: 805635 Killed                  python /work/GRDVULN/correction/scripts/05_run_inference.py --states TX --out-dir /work/GRDVULN/correction/data/inference_shards/state=TX
+Finished: Tue Sep  8 08:57:39 EDT 2026  (exit 137)
+[2026-09-08T08:57:39.096] error: Detected 1 oom_kill event in StepId=7413205.batch. Some of the step tasks have been OOM Killed.

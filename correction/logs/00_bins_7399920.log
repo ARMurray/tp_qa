@@ -1,0 +1,29 @@
+==========================================
+Node:    a0n15
+Job ID:  7399920
+CPUs:    4
+Started: Fri Aug 21 05:59:05 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Loading CWNS_Locations_20260820 from /work/GRDVULN/correction/data/training/Updates.gdb ...
+  Loaded 32296 rows
+
+Verified: 2494  |  Unverified: 29802
+Correct bin candidates  : 2178
+Incorrect bin candidates: 316
+'classes' layer final size: 2494 (2178 Correct, 316 Incorrect)
+'corrections' layer final size: 316
+'unverified' layer size: 29802
+
+Writing /work/GRDVULN/correction/data/training/training_locations.gpkg ...
+
+=== Done ===
+  classes     : 2494 rows (2178 Correct / 316 Incorrect)
+  corrections : 316 rows
+  unverified  : 29802 rows
+
+Output: /work/GRDVULN/correction/data/training/training_locations.gpkg
+Point config.py's / config_hpc.py's TRAINING_GPKG at this file (with TRAINING_LAYER_CLASSES='classes', TRAINING_LAYER_CORRECTIONS='corrections') once you're satisfied with these counts.
+Finished: Fri Aug 21 05:59:07 EDT 2026

@@ -1,0 +1,150 @@
+==========================================
+Node:    r4n13
+Job ID:  7412691
+CPUs:    8
+Started: Fri Sep  4 10:47:42 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/01d_nlcd_topup.py
+=== 01d_nlcd_topup.py ===
+
+Parcels to top up: 20 across 15 states (source: missing_parcels_topup.csv)
+
+
+--- CA: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_CA_k18.pre-topup-20260904-104758.parquet
+  Written: nlcd_CA_k18.parquet  (5795329 -> 5795330 rows)
+
+--- FL: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_FL_k18.pre-topup-20260904-104807.parquet
+  Written: nlcd_FL_k18.parquet  (5729131 -> 5729132 rows)
+
+--- HI: 2 parcels requested ---
+  Already present: 0  |  to compute: 2
+  Extracting NLCD stats for 2 parcels...
+  Computed: 2 rows  (0 with water, 2 with 0 pixels)
+  NOTE: 2 parcels got 0 NLCD pixels -- slivers below the 50% coverage threshold. They will carry null-ish land cover; check them before trusting them as positives.
+  Backed up original -> nlcd_HI_k18.pre-topup-20260904-104811.parquet
+  Written: nlcd_HI_k18.parquet  (287046 -> 287048 rows)
+
+--- ID: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_ID_k18.pre-topup-20260904-104813.parquet
+  Written: nlcd_ID_k18.parquet  (623063 -> 623064 rows)
+
+--- KY: 3 parcels requested ---
+  Already present: 0  |  to compute: 3
+  Extracting NLCD stats for 3 parcels...
+  Computed: 3 rows  (3 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_KY_k18.pre-topup-20260904-104816.parquet
+  Written: nlcd_KY_k18.parquet  (1041127 -> 1041130 rows)
+
+--- MT: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_MT_k18.pre-topup-20260904-104818.parquet
+  Written: nlcd_MT_k18.parquet  (358886 -> 358887 rows)
+
+--- NM: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_NM_k18.pre-topup-20260904-104819.parquet
+  Written: nlcd_NM_k18.parquet  (621163 -> 621164 rows)
+
+--- NY: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_NY_k18.pre-topup-20260904-104823.parquet
+  Written: nlcd_NY_k18.parquet  (3930522 -> 3930523 rows)
+
+--- OH: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_OH_k18.pre-topup-20260904-104830.parquet
+  Written: nlcd_OH_k18.parquet  (4417788 -> 4417789 rows)
+
+--- OR: 3 parcels requested ---
+  Already present: 0  |  to compute: 3
+  Extracting NLCD stats for 3 parcels...
+  Computed: 3 rows  (0 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_OR_k18.pre-topup-20260904-104836.parquet
+  Written: nlcd_OR_k18.parquet  (953279 -> 953282 rows)
+
+--- SC: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_SC_k18.pre-topup-20260904-104837.parquet
+  Written: nlcd_SC_k18.parquet  (386310 -> 386311 rows)
+
+--- SD: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_SD_k18.pre-topup-20260904-104838.parquet
+  Written: nlcd_SD_k18.parquet  (93517 -> 93518 rows)
+
+--- TN: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_TN_k18.pre-topup-20260904-104841.parquet
+  Written: nlcd_TN_k18.parquet  (1292424 -> 1292425 rows)
+
+--- UT: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_UT_k18.pre-topup-20260904-104843.parquet
+  Written: nlcd_UT_k18.parquet  (765003 -> 765004 rows)
+
+--- WA: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  Backed up original -> nlcd_WA_k18.pre-topup-20260904-104845.parquet
+  Written: nlcd_WA_k18.parquet  (1524998 -> 1524999 rows)
+
+=== Summary ===
+state  requested  added  missing_geom
+   CA          1      1             0
+   FL          1      1             0
+   HI          2      2             0
+   ID          1      1             0
+   KY          3      3             0
+   MT          1      1             0
+   NM          1      1             0
+   NY          1      1             0
+   OH          1      1             0
+   OR          3      3             0
+   SC          1      1             0
+   SD          1      1             0
+   TN          1      1             0
+   UT          1      1             0
+   WA          1      1             0
+
+Parcels added: 20
+
+NEXT STEPS (in order -- 01d alone changes nothing downstream):
+  1. python 02_feature_engineering.py     # rebuilds 10_parcel_features
+  2. python 06_build_stage2b_training.py  # should now report fewer drops
+  3. python 07_train_stage2b.py
+
+Re-run 08 afterwards: ok_usable should have risen by roughly the number above, and anything still missing is a real parcel-data gap.
+
+=== complete ===
+Finished: Fri Sep  4 10:48:47 EDT 2026

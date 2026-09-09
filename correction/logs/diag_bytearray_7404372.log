@@ -1,0 +1,29 @@
+==========================================
+Node:    a0n15
+Job ID:  7404372
+CPUs:    4
+Started: Tue Aug 25 16:38:13 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+/work/GRDVULN/correction/scripts/diagnose_bytearray_columns.py:38: Pandas4Warning: For backward compatibility, 'str' dtypes are included by select_dtypes when 'object' dtype is specified. This behavior is deprecated and will be removed in a future version. Explicitly pass 'str' to `include` to select them, or to `exclude` to remove them and silence this warning.
+See https://pandas.pydata.org/docs/user_guide/migration-3-strings.html#string-migration-select-dtypes for details on how to write code that works with pandas 2 and 3.
+  obj_cols = df.select_dtypes(include=["object"]).columns.tolist()
+/work/GRDVULN/correction/scripts/diagnose_bytearray_columns.py:38: Pandas4Warning: For backward compatibility, 'str' dtypes are included by select_dtypes when 'object' dtype is specified. This behavior is deprecated and will be removed in a future version. Explicitly pass 'str' to `include` to select them, or to `exclude` to remove them and silence this warning.
+See https://pandas.pydata.org/docs/user_guide/migration-3-strings.html#string-migration-select-dtypes for details on how to write code that works with pandas 2 and 3.
+  obj_cols = df.select_dtypes(include=["object"]).columns.tolist()
+=== diagnose_bytearray_columns.py ===
+
+=== 10_parcel_features.parquet ===
+  4417788 rows (scoped to ['OH'])
+  object-dtype columns: ['ll_uuid', 'h3_index_9', 'state', 'geoid', 'dominant_class_group', 'lbcs_activity', 'lbcs_function', 'lbcs_structure', 'lbcs_site', 'lbcs_ownership', 'zoning_type', 'owner']
+  No non-str values found in any object column.
+
+=== 05_plant_features.parquet ===
+  844 rows (scoped to ['OH'])
+  object-dtype columns: ['CWNS_ID', 'STATE_CODE_x', 'h3_res9', 'FACILITY_ID', 'STATE_CODE_y', 'DISCHARGES_TO', 'subdivision', 'place', 'county', 'county_geoid', 'STATE_CODE']
+  No non-str values found in any object column.
+
+=== complete ===
+Finished: Tue Aug 25 16:38:21 EDT 2026

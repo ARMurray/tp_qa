@@ -1,0 +1,67 @@
+==========================================
+Node:    r4n16
+Job ID:  7413378
+CPUs:    32
+Started: Tue Sep  8 12:43:07 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/01e_run_od_candidates.py --workers 32 --training-corrections --dry-run
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/correction/data/od_features_candidates_train
+
+Loading Stage 2a candidates...
+  240546 candidate(s) across 12030 plant(s) (top 20 each)
+  Corrections layer: 403 plant(s)
+  Excluding 425 holdout plant(s) -> 353 trainable
+  Candidates for those plants: 6555 across 328 plant(s)
+  NOTE: 25 trainable correction(s) have no Stage 2a candidates at all -- Stage 1 did not flag them, or K_RINGS produced nothing. They cannot contribute a row either way.
+
+--- work plan ---
+  AR: 20 candidate parcel(s), 1 plant(s)
+  CA: 60 candidate parcel(s), 3 plant(s)
+  CO: 40 candidate parcel(s), 2 plant(s)
+  DE: 20 candidate parcel(s), 1 plant(s)
+  FL: 200 candidate parcel(s), 10 plant(s)
+  GA: 80 candidate parcel(s), 4 plant(s)
+  IA: 80 candidate parcel(s), 4 plant(s)
+  ID: 40 candidate parcel(s), 2 plant(s)
+  IL: 180 candidate parcel(s), 9 plant(s)
+  IN: 160 candidate parcel(s), 8 plant(s)
+  KS: 560 candidate parcel(s), 28 plant(s)
+  KY: 360 candidate parcel(s), 18 plant(s)
+  LA: 40 candidate parcel(s), 2 plant(s)
+  MA: 40 candidate parcel(s), 2 plant(s)
+  MD: 60 candidate parcel(s), 3 plant(s)
+  MI: 120 candidate parcel(s), 6 plant(s)
+  MN: 80 candidate parcel(s), 4 plant(s)
+  MO: 100 candidate parcel(s), 5 plant(s)
+  MS: 120 candidate parcel(s), 6 plant(s)
+  MT: 40 candidate parcel(s), 2 plant(s)
+  NC: 200 candidate parcel(s), 10 plant(s)
+  ND: 60 candidate parcel(s), 3 plant(s)
+  NE: 60 candidate parcel(s), 3 plant(s)
+  NM: 55 candidate parcel(s), 3 plant(s)
+  NV: 20 candidate parcel(s), 1 plant(s)
+  NY: 380 candidate parcel(s), 19 plant(s)
+  OH: 1700 candidate parcel(s), 85 plant(s)
+  OK: 40 candidate parcel(s), 2 plant(s)
+  OR: 440 candidate parcel(s), 22 plant(s)
+  PA: 60 candidate parcel(s), 3 plant(s)
+  SC: 20 candidate parcel(s), 1 plant(s)
+  SD: 40 candidate parcel(s), 2 plant(s)
+  TN: 20 candidate parcel(s), 1 plant(s)
+  TX: 260 candidate parcel(s), 13 plant(s)
+  UT: 60 candidate parcel(s), 3 plant(s)
+  VA: 40 candidate parcel(s), 2 plant(s)
+  VT: 20 candidate parcel(s), 1 plant(s)
+  WA: 140 candidate parcel(s), 7 plant(s)
+  WI: 460 candidate parcel(s), 23 plant(s)
+  WV: 40 candidate parcel(s), 2 plant(s)
+  WY: 40 candidate parcel(s), 2 plant(s)
+  TOTAL: 6555 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+
+--dry-run: no imagery fetched.
+Finished: Tue Sep  8 12:43:42 EDT 2026  (exit 0)

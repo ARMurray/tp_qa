@@ -1,0 +1,196 @@
+==========================================
+Node:    a0n16
+Job ID:  7400430
+CPUs:    8
+Started: Fri Aug 21 12:10:07 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== diagnose_stage1_attrition.py ===
+
+Source labels: 2178 Correct, 316 Incorrect
+Survived into training: 1168 Correct, 89 Incorrect
+  Correct survival rate  : 53.6%
+  Incorrect survival rate: 28.2%
+
+--- Dropped Incorrect rows: 227 ---
+Checking whether the reported point truly matches NO parcel at all (vs some other reason for dropping)...
+  AR: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=AR/*.parquet...
+                             ^)
+  CA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=CA/*.parquet...
+                             ^)
+  CO: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=CO/*.parquet...
+                             ^)
+  DC: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=DC/*.parquet...
+                             ^)
+  FL: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=FL/*.parquet...
+                             ^)
+  GA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=GA/*.parquet...
+                             ^)
+  HI: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=HI/*.parquet...
+                             ^)
+  IA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=IA/*.parquet...
+                             ^)
+  ID: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=ID/*.parquet...
+                             ^)
+  IL: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=IL/*.parquet...
+                             ^)
+  IN: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=IN/*.parquet...
+                             ^)
+  KS: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=KS/*.parquet...
+                             ^)
+  KY: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=KY/*.parquet...
+                             ^)
+  LA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=LA/*.parquet...
+                             ^)
+  MA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=MA/*.parquet...
+                             ^)
+  MD: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=MD/*.parquet...
+                             ^)
+  MI: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=MI/*.parquet...
+                             ^)
+  MN: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=MN/*.parquet...
+                             ^)
+  MO: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=MO/*.parquet...
+                             ^)
+  MT: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=MT/*.parquet...
+                             ^)
+  NC: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=NC/*.parquet...
+                             ^)
+  ND: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=ND/*.parquet...
+                             ^)
+  NE: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=NE/*.parquet...
+                             ^)
+  NM: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=NM/*.parquet...
+                             ^)
+  NY: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=NY/*.parquet...
+                             ^)
+  OH: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=OH/*.parquet...
+                             ^)
+  OK: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=OK/*.parquet...
+                             ^)
+  OR: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=OR/*.parquet...
+                             ^)
+  PA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=PA/*.parquet...
+                             ^)
+  PR: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=PR/*.parquet...
+                             ^)
+  SC: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=SC/*.parquet...
+                             ^)
+  SD: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=SD/*.parquet...
+                             ^)
+  TN: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=TN/*.parquet...
+                             ^)
+  TX: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=TX/*.parquet...
+                             ^)
+  UT: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=UT/*.parquet...
+                             ^)
+  VA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=VA/*.parquet...
+                             ^)
+  VT: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=VT/*.parquet...
+                             ^)
+  WA: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=WA/*.parquet...
+                             ^)
+  WI: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=WI/*.parquet...
+                             ^)
+  WV: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=WV/*.parquet...
+                             ^)
+  WY: lookup failed (Invalid Input Error: Geoparquet metadata does not have a version
+
+LINE 4:                 JOIN read_parquet('/work/GRDVULN/data/parcels/state=WY/*.parquet...
+                             ^)
+  Checked: 227 / 227 dropped rows (0 had no local parcel coverage for their state at all)
+  Truly match NO parcel : 227 (100% of checked)
+  DID match a parcel    : 0 (0% of checked) -- these were dropped for a DIFFERENT reason, worth investigating further
+
+--- OSM representation within the 1168 surviving Correct rows ---
+osm_ww
+True     986
+False    179
+None       3
+
+  Correct examples WITHOUT an OSM tag: 179 (15% of surviving Correct rows)
+
+=== Done ===
+Finished: Fri Aug 21 12:10:25 EDT 2026

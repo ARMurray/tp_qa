@@ -1,0 +1,14 @@
+==========================================
+Node:    r4n19
+Job ID:  7413484
+CPUs:    16
+Started: Tue Sep  8 16:54:36 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/07b_train_rerank.py
+=== 07b_train_rerank.py: Stage 2a Re-ranker ===
+
+ERROR: /work/GRDVULN/correction/data/features/17_rerank_training.parquet not found. Run 06b_build_rerank_training.py first.
+Finished: Tue Sep  8 16:54:52 EDT 2026  (exit 2)

@@ -1,0 +1,51 @@
+==========================================
+Node:    r7n19
+Job ID:  7413169
+CPUs:    8
+Started: Tue Sep  8 08:32:02 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: DE  (array index 6 of 48)
+Output: /work/GRDVULN/correction/data/inference_shards/state=DE
+Running: python /work/GRDVULN/correction/scripts/05_run_inference.py --states DE --out-dir /work/GRDVULN/correction/data/inference_shards/state=DE
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_chlorine_contact' 'od_max_conf_drying_bed'
+ 'od_max_conf_oxidation_pond']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+=== 05_run_inference.py ===
+States: ['DE']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 71 feature columns, threshold=0.512
+  Loaded stage2_rf_model.joblib: 43 feature columns, threshold=0.409
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  19 plants across 1 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Parcel features narrowed to ['DE']: 77686909 -> 169090 rows
+  Plant features: 2412 rows  |  Parcel features: 169090 rows
+
+Loading OD features (01b reported-location output)...
+  12469 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 19  |  reported parcel found: 17  |  no parcel: 2 (10.5%)
+  Flagged for Stage 2: 11 (2 no_parcel + 9 low_confidence)
+
+=== Stage 2a: candidate scoring ===
+  DE: 11 flagged plants processed
+  Raw candidates (post reported-parcel exclusion): 124032
+
+=== Summary ===
+  Plants scored          : 19
+  Flagged for Stage 2     : 11
+  Plants with >=1 candidate: 11
+  Flagged w/ 0 candidates  : 0 (no parcel survived K_RINGS + reported-parcel exclusion)
+  Not flagged (Stage 1 ok) : 8 (no candidates by design -- confirm_reported task in 10)
+
+Written: /work/GRDVULN/correction/data/inference_shards/state=DE/plant_summary.parquet
+Written: /work/GRDVULN/correction/data/inference_shards/state=DE/stage2_candidates.parquet
+Finished: Tue Sep  8 08:32:51 EDT 2026  (exit 0)

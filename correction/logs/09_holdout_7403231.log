@@ -1,0 +1,44 @@
+==========================================
+Node:    r4n15
+Job ID:  7403231
+CPUs:    2
+Started: Mon Aug 24 17:37:39 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/09_build_holdout.py --dry-run
+=== 09_build_holdout.py ===
+
+Loading labeled plant pool...
+  'class' column values: {'Correct': 2178, 'Incorrect': 316}
+
+Labeled pool: 2382 plants
+  correct     : 2066
+  corrections : 316
+Unlabeled pool: 14145 plants
+
+Sampling...
+
+--- Draw: 275 plants (cohort A) ---
+  correct     : 150
+  unlabeled   : 75
+  corrections : 50
+  states      : 47
+
+  Corrections slice n=50: recall@1 standard error about +/-7.1pp (worst case p=0.5).
+  Leaves 266 corrections for training (pool was 316).
+
+  Unlabeled slice n=75: national error-rate estimate carries a standard error of about +/-5.8pp.
+  These need a one-time review before they score. Review them
+  FIRST in round 1 -- until they have truth, the deployment-
+  distribution number does not exist.
+
+Resolving true parcels...
+  True parcel resolved for 198/200 derivable-truth plants
+    (2 truth points fall on no parcel -- scored by containment against coordinates instead)
+  Truth already known : 200  (labeled bins -- scoreable immediately)
+  Needs review        : 75  (unlabeled bin -- one-time cost)
+
+--dry-run: nothing written.
+Finished: Mon Aug 24 17:42:05 EDT 2026

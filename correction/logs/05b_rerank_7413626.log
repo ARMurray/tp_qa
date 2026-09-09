@@ -1,0 +1,14 @@
+==========================================
+Node:    r4n19
+Job ID:  7413626
+CPUs:    8
+Started: Wed Sep  9 08:48:13 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/05b_rerank_candidates.py --states AL AR AZ CA CO CT DE FL GA IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN UT VA VT WA WI WV WY
+usage: 05b_rerank_candidates.py [-h] [--no-od] [--top-k TOP_K]
+                                [--states STATES] [--no-fallback]
+05b_rerank_candidates.py: error: unrecognized arguments: AR AZ CA CO CT DE FL GA IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN UT VA VT WA WI WV WY
+Finished: Wed Sep  9 08:48:19 EDT 2026  (exit 2)

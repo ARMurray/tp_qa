@@ -1,0 +1,128 @@
+==========================================
+Node:    r4n04
+Job ID:  7412527
+CPUs:    8
+Started: Fri Sep  4 08:25:59 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/01d_nlcd_topup.py --dry-run
+=== 01d_nlcd_topup.py ===
+
+Parcels to top up: 20 across 15 states (source: missing_parcels_topup.csv)
+
+
+--- CA: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- FL: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- HI: 2 parcels requested ---
+  Already present: 0  |  to compute: 2
+  Extracting NLCD stats for 2 parcels...
+  Computed: 2 rows  (0 with water, 2 with 0 pixels)
+  NOTE: 2 parcels got 0 NLCD pixels -- slivers below the 50% coverage threshold. They will carry null-ish land cover; check them before trusting them as positives.
+  --dry-run: not writing.
+
+--- ID: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- KY: 3 parcels requested ---
+  Already present: 0  |  to compute: 3
+  Extracting NLCD stats for 3 parcels...
+  Computed: 3 rows  (3 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- MT: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- NM: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- NY: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- OH: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- OR: 3 parcels requested ---
+  Already present: 0  |  to compute: 3
+  Extracting NLCD stats for 3 parcels...
+  Computed: 3 rows  (0 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- SC: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (1 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- SD: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- TN: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- UT: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+--- WA: 1 parcels requested ---
+  Already present: 0  |  to compute: 1
+  Extracting NLCD stats for 1 parcels...
+  Computed: 1 rows  (0 with water, 0 with 0 pixels)
+  --dry-run: not writing.
+
+=== Summary ===
+state  requested  added  missing_geom  dry_run
+   CA          1      1             0     True
+   FL          1      1             0     True
+   HI          2      2             0     True
+   ID          1      1             0     True
+   KY          3      3             0     True
+   MT          1      1             0     True
+   NM          1      1             0     True
+   NY          1      1             0     True
+   OH          1      1             0     True
+   OR          3      3             0     True
+   SC          1      1             0     True
+   SD          1      1             0     True
+   TN          1      1             0     True
+   UT          1      1             0     True
+   WA          1      1             0     True
+
+Parcels added: 20
+
+=== complete ===
+Finished: Fri Sep  4 08:26:38 EDT 2026

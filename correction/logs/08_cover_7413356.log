@@ -1,0 +1,13 @@
+==========================================
+Node:    r4n14
+Job ID:  7413356
+CPUs:    8
+Started: Tue Sep  8 11:52:08 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/08_diagnose_candidate_coverage.py
+/var/spool/slurm/job7413356/slurm_script: line 35: 3302143 Killed                  python /work/GRDVULN/correction/scripts/08_diagnose_candidate_coverage.py
+Finished: Tue Sep  8 11:58:14 EDT 2026
+[2026-09-08T11:58:14.730] error: Detected 1 oom_kill event in StepId=7413356.batch. Some of the step tasks have been OOM Killed.

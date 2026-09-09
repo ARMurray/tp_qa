@@ -1,0 +1,70 @@
+==========================================
+Node:    a0n16
+Job ID:  7413657
+CPUs:    4
+Started: Wed Sep  9 10:01:49 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/12_score_holdout.py
+=== 12_score_holdout.py ===
+
+Manifest: 425 plant(s)
+  correct     : 300
+  unlabeled   : 75
+  corrections : 50
+
+==================================================================
+CORRECTIONS BIN -- recall@k
+==================================================================
+  Holdout corrections plants : 50
+  With derivable truth        : 50
+  With Stage 2a candidates    : 0
+  With NO candidates          : 50  (unreachable by any ranking)
+
+  True parcel in the top-20   : 0/50 (0% candidate recall)
+    -> that is the CEILING for every arm below.
+
+  Stage 2a ordering
+    recall@1     0/0   =   nan% (pool)       0/50  =   0.0% (all)
+    recall@3     0/0   =   nan% (pool)       0/50  =   0.0% (all)
+    recall@5     0/0   =   nan% (pool)       0/50  =   0.0% (all)
+    recall@10    0/0   =   nan% (pool)       0/50  =   0.0% (all)
+
+  Re-ranked ordering
+    recall@1     0/0   =   nan% (pool)       0/50  =   0.0% (all)
+    recall@3     0/0   =   nan% (pool)       0/50  =   0.0% (all)
+    recall@5     0/0   =   nan% (pool)       0/50  =   0.0% (all)
+    recall@10    0/0   =   nan% (pool)       0/50  =   0.0% (all)
+
+  Delta (re-rank minus Stage 2a), pool denominator:
+    recall@1    +0 plant(s)    +nan%
+    recall@3    +0 plant(s)    +nan%
+    recall@5    +0 plant(s)    +nan%
+    recall@10   +0 plant(s)    +nan%
+
+  n=0 scoreable -> standard error about +/-50pp on any single figure.
+  Differences smaller than that are not distinguishable from noise.
+
+  Plants resolved by Stage 2a fallback (nothing fired): 0/0
+
+==================================================================
+CORRECT BIN -- false-move rate
+==================================================================
+  Holdout correct plants   : 300
+  Present in plant_summary : 284
+
+  Flagged for relocation   : 13 (4.6%)  <-- FALSE-MOVE RATE
+    low_confidence  : 13
+
+  These plants are known CORRECT, so every flag is a false positive.
+  This is a STAGE 1 property -- re-ranking cannot change it. A plant
+  Stage 1 never flagged has no candidates to reorder.
+
+==================================================================
+Reading these: the 'pool' denominator measures RANKING, the 'all'
+denominator measures the PIPELINE. If they diverge sharply, the
+gap belongs to candidate generation (08_diagnose_candidate_
+coverage.py), not to any ranking model.
+Finished: Wed Sep  9 10:01:58 EDT 2026  (exit 0)

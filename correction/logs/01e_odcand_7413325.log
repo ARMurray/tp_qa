@@ -1,0 +1,50 @@
+==========================================
+Node:    r7n29
+Job ID:  7413325
+CPUs:    32
+Started: Tue Sep  8 11:13:28 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/01e_run_od_candidates.py --workers 32 --dry-run
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/correction/data/od_features_candidates
+
+Loading Stage 2a candidates...
+  240546 candidate(s) across 12030 plant(s) (top 20 each)
+  Holdout manifest: 425 plants; 50 in bin(s) ['corrections']
+  Candidates for those plants: 880 across 44 plant(s)
+
+--- work plan ---
+  CA: 20 candidate parcel(s), 1 plant(s)
+  FL: 20 candidate parcel(s), 1 plant(s)
+  GA: 20 candidate parcel(s), 1 plant(s)
+  IA: 20 candidate parcel(s), 1 plant(s)
+  IL: 40 candidate parcel(s), 2 plant(s)
+  IN: 20 candidate parcel(s), 1 plant(s)
+  KS: 120 candidate parcel(s), 6 plant(s)
+  KY: 60 candidate parcel(s), 3 plant(s)
+  MA: 20 candidate parcel(s), 1 plant(s)
+  MD: 20 candidate parcel(s), 1 plant(s)
+  MI: 20 candidate parcel(s), 1 plant(s)
+  MN: 20 candidate parcel(s), 1 plant(s)
+  MT: 20 candidate parcel(s), 1 plant(s)
+  NC: 20 candidate parcel(s), 1 plant(s)
+  ND: 20 candidate parcel(s), 1 plant(s)
+  NE: 20 candidate parcel(s), 1 plant(s)
+  NM: 20 candidate parcel(s), 1 plant(s)
+  NY: 60 candidate parcel(s), 3 plant(s)
+  OH: 20 candidate parcel(s), 1 plant(s)
+  OK: 20 candidate parcel(s), 1 plant(s)
+  OR: 80 candidate parcel(s), 4 plant(s)
+  PA: 20 candidate parcel(s), 1 plant(s)
+  SD: 20 candidate parcel(s), 1 plant(s)
+  TX: 40 candidate parcel(s), 2 plant(s)
+  WA: 20 candidate parcel(s), 1 plant(s)
+  WI: 100 candidate parcel(s), 5 plant(s)
+  TOTAL: 880 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+
+--dry-run: no imagery fetched.
+Finished: Tue Sep  8 11:14:03 EDT 2026  (exit 0)

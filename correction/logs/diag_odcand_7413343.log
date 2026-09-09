@@ -1,0 +1,55 @@
+==========================================
+Node:    a0n15
+Job ID:  7413343
+CPUs:    4
+Started: Tue Sep  8 11:41:08 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== diagnose_candidate_od.py ===
+
+Candidate OD rows: 880 across 44 plant(s)
+
+--- 1. overall ---
+  od_ran           : 93.0%  (818/880)
+  od_has_detection : 8.8%  (77/880)
+  reference: 01c saw 55% at KNOWN-CORRECT locations (232 of 423 tiles)
+
+--- 2. how many of each plant's candidates fired ---
+      0 fired:   16 plant(s)  ################
+      1 fired:   11 plant(s)  ###########
+      2 fired:    6 plant(s)  ######
+      3 fired:    3 plant(s)  ###
+      4 fired:    3 plant(s)  ###
+      5 fired:    1 plant(s)  #
+      6 fired:    1 plant(s)  #
+      7 fired:    2 plant(s)  ##
+      8 fired:    1 plant(s)  #
+
+    all candidates fired : 0 plant(s)  (OD cannot rank these)
+    no candidate fired   : 16 plant(s)  (OD cannot rank these)
+    MIXED                : 28 plant(s)  (OD has something to say)
+    -> OD is potentially informative for 64% of plants
+
+--- 3. true parcel vs competitors ---
+  plants with a resolved true parcel : 44
+  true parcel present in the top-K   : 28 (64% candidate recall@K)
+
+  detection rate -- true parcels : 46.4% (n=28)
+  detection rate -- competitors  : 9.0% (n=532)
+  difference                     : +37.4%
+  od_max_confidence  true 0.678  vs competitors 0.547
+  od_n_objects       true 2.643  vs competitors 0.318
+
+--- 4. OD-only recall@1 (no model, just rank by confidence) ---
+  OD alone picks the true parcel first: 35.7% (10/28)
+  random baseline within a 20-candidate pool: 5.0%
+
+=== reading this ===
+  True parcels fire clearly more than competitors. OD carries
+  signal at the candidate level that Stage 2b's reported-vs-
+  corrected training never had a chance to show. Building the
+  re-rank -- and retraining Stage 2b on this distribution -- is
+  justified.
+Finished: Tue Sep  8 11:41:12 EDT 2026

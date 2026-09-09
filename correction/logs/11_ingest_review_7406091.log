@@ -1,0 +1,35 @@
+==========================================
+Node:    a0n16
+Job ID:  7406091
+CPUs:    4
+Started: Thu Aug 27 12:23:23 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/11_ingest_review_log.py --round 1 
+=== 11_ingest_review_log.py ===
+Round: 1
+
+Loaded 146 reviewed plant(s)
+  [holdout] review-ingest: removed 0 rows / 0 plants (146 -> 146)
+
+Verdict breakdown:
+plant_verdict
+candidate_correct           66
+needs_info                  35
+truth_outside_candidates    24
+reported_correct            21
+
+Built classes: 111 rows (21 Correct, 90 Incorrect)
+Built corrections: 90 rows
+Built candidate_recall_failures: 24 rows
+  classes: 111 row(s) total in review_derived_locations.gpkg
+  corrections: 90 row(s) total in review_derived_locations.gpkg
+  candidate_recall_failures.parquet: 24 row(s) total (24 added/updated this run)
+
+NEXT:
+  python build_training_bins.py --gdb <Updates.gdb> --layer <layer> --out training_locations.gpkg --review-gpkg /work/GRDVULN/correction/data/training/review/review_derived_locations.gpkg
+  then re-run 01a/01c for any genuinely NEW plants/corrected points, then 02, then 03/04/06/07.
+=== complete ===
+Finished: Thu Aug 27 12:23:43 EDT 2026

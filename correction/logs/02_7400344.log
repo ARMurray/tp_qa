@@ -1,0 +1,984 @@
+==========================================
+Node:    r4n16
+Job ID:  7400344
+CPUs:    16
+Started: Fri Aug 21 10:20:56 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/02_feature_engineering.py --states AK,AL,AR,AZ,CA,CO,CT,DC,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pyogrio/raw.py:200: RuntimeWarning: organizePolygons() received a polygon with more than 100 parts. The processing may be really slow.  You can skip the processing by setting METHOD=SKIP, or only make it analyze counter-clock wise parts by setting METHOD=ONLY_CCW if you can assume that the outline of holes is counter-clock wise defined
+  return ogr_read(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+=== 02_feature_engineering.py ===
+
+PART 1: Building plant features
+  Plants loaded: 2308
+  Loading census geographies...
+  Running census spatial joins...
+  WARNING: STATE_CODE dropped out of the plant_features merge chain -- re-attaching from source. Root cause not yet diagnosed, worth revisiting.
+  Plant features combined: 2308 rows, 18 cols
+
+PART 2: Building parcel features
+
+--- State AK ---
+  Fetching parcel attributes for 26463 parcels...
+  has_ww_keyword TRUE: 5
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 5
+
+--- State AL ---
+  Fetching parcel attributes for 367125 parcels...
+  has_ww_keyword TRUE: 488
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 34
+
+--- State AR ---
+  Fetching parcel attributes for 152567 parcels...
+  has_ww_keyword TRUE: 22
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 18
+
+--- State AZ ---
+  Fetching parcel attributes for 518349 parcels...
+  has_ww_keyword TRUE: 1000
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 34
+
+--- State CA ---
+  Fetching parcel attributes for 1485753 parcels...
+  has_ww_keyword TRUE: 1919
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 140
+
+--- State CO ---
+  Fetching parcel attributes for 349703 parcels...
+  has_ww_keyword TRUE: 353
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 29
+
+--- State CT ---
+  Fetching parcel attributes for 297266 parcels...
+  has_ww_keyword TRUE: 9
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 28
+
+--- State DC ---
+  Fetching parcel attributes for 7531 parcels...
+  has_ww_keyword TRUE: 5
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 0
+
+--- State DE ---
+  Fetching parcel attributes for 35722 parcels...
+  has_ww_keyword TRUE: 8
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 3
+
+--- State FL ---
+  Fetching parcel attributes for 3141741 parcels...
+  has_ww_keyword TRUE: 4494
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 196
+
+--- State GA ---
+  Fetching parcel attributes for 551466 parcels...
+  has_ww_keyword TRUE: 330
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 58
+
+--- State HI ---
+  Fetching parcel attributes for 287046 parcels...
+  has_ww_keyword TRUE: 16
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 17
+
+--- State IA ---
+  Fetching parcel attributes for 336939 parcels...
+  has_ww_keyword TRUE: 263
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 94
+
+--- State ID ---
+  Fetching parcel attributes for 118155 parcels...
+  has_ww_keyword TRUE: 33
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 18
+
+--- State IL ---
+  Fetching parcel attributes for 633334 parcels...
+  has_ww_keyword TRUE: 162
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 52
+
+--- State IN ---
+  Fetching parcel attributes for 682557 parcels...
+  has_ww_keyword TRUE: 2143
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 78
+
+--- State KS ---
+  Fetching parcel attributes for 452865 parcels...
+  has_ww_keyword TRUE: 1097
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 101
+
+--- State KY ---
+  Fetching parcel attributes for 395499 parcels...
+  has_ww_keyword TRUE: 374
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 63
+
+--- State LA ---
+  Fetching parcel attributes for 449535 parcels...
+  has_ww_keyword TRUE: 262
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 21
+
+--- State MA ---
+  Fetching parcel attributes for 565010 parcels...
+  has_ww_keyword TRUE: 1326
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 155
+
+--- State MD ---
+  Fetching parcel attributes for 292650 parcels...
+  has_ww_keyword TRUE: 186
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 32
+
+--- State ME ---
+  Fetching parcel attributes for 173968 parcels...
+  has_ww_keyword TRUE: 201
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 28
+
+--- State MI ---
+  Fetching parcel attributes for 369239 parcels...
+  has_ww_keyword TRUE: 30
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 42
+
+--- State MN ---
+  Fetching parcel attributes for 283488 parcels...
+  has_ww_keyword TRUE: 79
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 50
+
+--- State MO ---
+  Fetching parcel attributes for 300980 parcels...
+  has_ww_keyword TRUE: 204
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 52
+
+--- State MS ---
+  Fetching parcel attributes for 54850 parcels...
+  has_ww_keyword TRUE: 131
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 6
+
+--- State MT ---
+  Fetching parcel attributes for 80663 parcels...
+  has_ww_keyword TRUE: 11
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 6
+
+--- State NC ---
+  Fetching parcel attributes for 758907 parcels...
+  has_ww_keyword TRUE: 742
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 82
+
+--- State ND ---
+  Fetching parcel attributes for 32971 parcels...
+  has_ww_keyword TRUE: 2
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 0
+
+--- State NE ---
+  Fetching parcel attributes for 85709 parcels...
+  has_ww_keyword TRUE: 18
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 10
+
+--- State NH ---
+  Fetching parcel attributes for 181559 parcels...
+  has_ww_keyword TRUE: 14
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 21
+
+--- State NJ ---
+  Fetching parcel attributes for 1036558 parcels...
+  has_ww_keyword TRUE: 387
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 58
+
+--- State NM ---
+  Fetching parcel attributes for 52502 parcels...
+  has_ww_keyword TRUE: 5
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 5
+
+--- State NV ---
+  Fetching parcel attributes for 91538 parcels...
+  has_ww_keyword TRUE: 61
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 2
+
+--- State NY ---
+  Fetching parcel attributes for 1277243 parcels...
+  has_ww_keyword TRUE: 1265
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 79
+
+--- State OH ---
+  Fetching parcel attributes for 935436 parcels...
+  has_ww_keyword TRUE: 2066
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 90
+
+--- State OK ---
+  Fetching parcel attributes for 319799 parcels...
+  has_ww_keyword TRUE: 21
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 43
+
+--- State OR ---
+  Fetching parcel attributes for 320686 parcels...
+  has_ww_keyword TRUE: 36
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 33
+
+--- State PA ---
+  Fetching parcel attributes for 340362 parcels...
+  has_ww_keyword TRUE: 1020
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 45
+
+--- State PR ---
+  Fetching parcel attributes for 304816 parcels...
+  has_ww_keyword TRUE: 16
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 15
+
+--- State RI ---
+  Fetching parcel attributes for 224426 parcels...
+  has_ww_keyword TRUE: 215
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 11
+
+--- State SC ---
+  Fetching parcel attributes for 101144 parcels...
+  has_ww_keyword TRUE: 140
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 6
+
+--- State SD ---
+  Fetching parcel attributes for 26535 parcels...
+  has_ww_keyword TRUE: 4
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 4
+
+--- State TN ---
+  Fetching parcel attributes for 761895 parcels...
+  has_ww_keyword TRUE: 613
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 107
+
+--- State TX ---
+  Fetching parcel attributes for 2076243 parcels...
+  has_ww_keyword TRUE: 210
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 174
+
+--- State UT ---
+  Fetching parcel attributes for 120842 parcels...
+  has_ww_keyword TRUE: 55
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 4
+
+--- State VA ---
+  Fetching parcel attributes for 276866 parcels...
+  has_ww_keyword TRUE: 213
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 36
+
+--- State VT ---
+  Fetching parcel attributes for 72452 parcels...
+  has_ww_keyword TRUE: 70
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 18
+
+--- State WA ---
+  Fetching parcel attributes for 553529 parcels...
+  has_ww_keyword TRUE: 1559
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 60
+
+--- State WI ---
+  Fetching parcel attributes for 303246 parcels...
+  has_ww_keyword TRUE: 131
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 26
+
+--- State WV ---
+  Fetching parcel attributes for 105184 parcels...
+  has_ww_keyword TRUE: 267
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 10
+
+--- State WY ---
+  Fetching parcel attributes for 34049 parcels...
+  has_ww_keyword TRUE: 4
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 2
+
+Unioning 52 per-state parcel feature files...
+
+Parcel features combined: 22804961 rows
+  OD plants: 73 part-file(s) found across 51 partition(s); reading and unioning all of them
+  1617 duplicate CWNS_ID rows across part-files (same plant processed more than once, e.g. a --limit test followed by a full run) -- kept the most recently written row for each
+
+STEP 14: Building Stage 1 training data
+  Classes: 2494
+  Reported parcels found: 1257
+  OD features joined -- od_ran True for 1219 / 1257
+  Stage 1 training rows: 1257
+  Correct: 1168
+  Incorrect: 89
+
+STEP 15: Building Stage 2 training data
+  Corrected parcels found: 223
+  Plants for Stage 2: 223
+  Stage 2 raw candidates labeled: 2500326
+  Stage 2 training rows: 2500326
+  Positive labels: 186
+  Negative labels: 2500140
+
+=== 02_feature_engineering.py complete ===
+Outputs in: /work/GRDVULN/correction/data/features
+Finished: Fri Aug 21 10:51:38 EDT 2026

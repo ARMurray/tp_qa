@@ -1,0 +1,115 @@
+==========================================
+Node:    r5n26
+Job ID:  7405040
+CPUs:    8
+Started: Wed Aug 26 13:05:29 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/07_train_stage2b.py
+=== 07_train_stage2b.py: Stage 2b Model Training (Random Forest) ===
+
+Loading Stage 2b training data...
+  [holdout] stage2b: removed 0 rows / 0 plants (357 -> 357)
+  Rows: 357
+  Label=1 (right): 223
+  Label=0 (wrong): 134
+  Distinct plants: 244  (113 contribute both a wrong and right row, 131 contribute only one)
+  NOTE: this is a MUCH smaller training set than Stage 1/2a (hundreds of rows,
+  not thousands) -- expect higher variance in CV scores and test metrics than
+  those models. Treat single-run numbers with real caution; consider repeating
+  with different --seed values before trusting a specific figure.
+  CAUTION: only 113 of 244 plants contribute a within-plant contrast.
+  Unpaired rows carry no wrong-vs-right comparison for their own plant, so
+  a good AUC here can reflect plant-vs-plant separability rather than the
+  candidate-ranking task this model actually performs at inference.
+  Dropping 4 all-NaN columns: ['od_max_conf_chlorine_contact', 'od_max_conf_drying_bed', 'od_max_conf_oxidation_pond', 'parcel_cap_reason']
+  Model columns: 58
+  Class weights -- Right: 0.375 | Wrong: 0.625
+
+Setting up cross-validation folds...
+  Spatial fold 1 train -- Right: 156, Wrong: 95
+  Spatial fold 2 train -- Right: 175, Wrong: 118
+  Spatial fold 3 train -- Right: 213, Wrong: 125
+  Spatial fold 4 train -- Right: 185, Wrong: 110
+  Spatial fold 5 train -- Right: 163, Wrong: 88
+  Spatial folds: 5  |  Standard (grouped) folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 0.3 minutes
+  Best SPATIAL ROC AUC: 0.9810
+    across 20 configs: mean 0.9607, sd 0.0115, range 0.9401-0.9810
+    best config's own fold sd: 0.0191
+
+========================================
+Tuning with STANDARD (grouped) cross-validation...
+========================================
+  STANDARD (grouped) CV complete in 0.3 minutes
+  Best STANDARD (grouped) ROC AUC: 0.9796
+    across 20 configs: mean 0.9639, sd 0.0116, range 0.9442-0.9796
+    best config's own fold sd: 0.0149
+
+CV Comparison:
+         cv   roc_auc
+0   Spatial  0.981024
+1  Standard  0.979566
+
+========================================
+Fitting final model on full training data...
+========================================
+Test set metrics:
+  roc_auc     : 0.9513
+  accuracy    : 0.9011
+  sensitivity : 0.9107
+  specificity : 0.8857
+  brier_class : 0.0691
+  (test set: 91 rows from 61 plants -- small, expect noisy metrics)
+
+Confusion matrix (rows=truth, cols=predicted; 1=Right, 0=Wrong):
+[[31  4]
+ [ 5 51]]
+
+Computing feature importance...
+Top 20 features:
+             Variable  Importance  Importance_std
+parcel_bbox_max_dim_m    0.140587        0.020079
+         is_municipal    0.048648        0.016156
+   data_quality_score    0.005663        0.001415
+       dominant_count    0.001531        0.005164
+        od_n_digester    0.000561        0.000191
+  od_n_aeration_basin    0.000510        0.000161
+      water_pixel_pct    0.000434        0.000656
+               osm_ww    0.000408        0.001704
+   od_mean_confidence    0.000357        0.000758
+         total_pixels    0.000332        0.003983
+       lbcs_structure    0.000332        0.000362
+ od_max_conf_digester    0.000204        0.000250
+               od_ran    0.000128        0.000261
+    n_tiles_generated    0.000051        0.000153
+         county_match    0.000051        0.000153
+         water_pixels    0.000026        0.000689
+      od_n_drying_bed    0.000000        0.000000
+    od_has_drying_bed    0.000000        0.000000
+       has_ww_keyword    0.000000        0.000000
+   owner_has_llc_corp    0.000000        0.000000
+
+Running threshold analysis...
+  Optimal Stage 2b threshold (Youden J): 0.573
+
+Saving model...
+  stage2b_rf_model.joblib saved: 2.0 MB
+
+=== Stage 2b training complete ===
+
+FINAL RESULTS SUMMARY
+  Seed: 42  |  OD features: included
+  Test roc_auc: 0.9513
+  Optimal threshold: 0.573
+  CV comparison:
+         cv   roc_auc
+0   Spatial  0.981024
+1  Standard  0.979566
+Finished: Wed Aug 26 13:06:38 EDT 2026

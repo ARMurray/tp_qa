@@ -1,0 +1,20 @@
+==========================================
+Node:    a0n15
+Job ID:  7405117
+CPUs:    2
+Started: Wed Aug 26 14:25:04 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== check_competition_losses.py ===
+
+Flagged plants (trigger_reason != 'none'): 688
+  with a competition-resolved top pick      : 688
+  with zero raw candidates at all            : 0
+  with candidates but lost ALL to competition : 0
+
+  sanity check: 688 + 0 + 0 = 688  (should equal 688)
+
+=== complete ===
+Finished: Wed Aug 26 14:25:06 EDT 2026

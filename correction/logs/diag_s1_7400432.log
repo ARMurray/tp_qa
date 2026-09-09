@@ -1,0 +1,32 @@
+==========================================
+Node:    a0n16
+Job ID:  7400432
+CPUs:    8
+Started: Fri Aug 21 12:16:13 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== diagnose_stage1_attrition.py ===
+
+Source labels: 2178 Correct, 316 Incorrect
+Survived into training: 1168 Correct, 89 Incorrect
+  Correct survival rate  : 53.6%
+  Incorrect survival rate: 28.2%
+
+--- Dropped Incorrect rows: 227 ---
+Checking whether the reported point truly matches NO parcel at all (vs some other reason for dropping)...
+  Checked: 227 / 227 dropped rows (0 had no local parcel coverage for their state at all)
+  Truly match NO parcel : 135 (59% of checked)
+  DID match a parcel    : 92 (41% of checked) -- these were dropped for a DIFFERENT reason, worth investigating further
+
+--- OSM representation within the 1168 surviving Correct rows ---
+osm_ww
+True     986
+False    179
+None       3
+
+  Correct examples WITHOUT an OSM tag: 179 (15% of surviving Correct rows)
+
+=== Done ===
+Finished: Fri Aug 21 12:17:19 EDT 2026

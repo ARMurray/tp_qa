@@ -1,0 +1,78 @@
+==========================================
+Node:    a0n16
+Job ID:  7403883
+CPUs:    4
+Started: Tue Aug 25 10:10:57 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Training universe: 2494 unique CWNS_IDs
+
+STATE_CODE    plants
+AK                17
+AL                41
+AR                23
+AZ                25
+CA                87
+CO                20
+CT                23
+DC                 1
+DE                 5
+FL               162
+GA                63
+HI                22
+IA               110
+ID                22
+IL                48
+IN                84
+KS               150
+KY                77
+LA                27
+MA                38
+MD                39
+ME                28
+MI                56
+MN                70
+MO                70
+MS                 7
+MT                19
+NC                90
+ND                 5
+NE                15
+NH                31
+NJ                54
+NM                13
+NV                 3
+NY                97
+OH                86
+OK                55
+OR                51
+PA                25
+PR                22
+RI                12
+SC                 9
+SD                 9
+TN               114
+TX               147
+UT                 8
+VA                39
+VT                15
+WA                66
+WI                60
+WV                17
+WY                 5
+
+Total states/territories: 52
+Total plants (state-known): 2382
+Largest single state: FL with 162 plants
+
+--- Copy-paste ready ---
+Space-separated (for --array + 01a/01b):
+AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
+
+Comma-separated (for 02's --states):
+AK,AL,AR,AZ,CA,CO,CT,DC,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+
+Array range for sbatch: --array=0-51
+Finished: Tue Aug 25 10:11:01 EDT 2026

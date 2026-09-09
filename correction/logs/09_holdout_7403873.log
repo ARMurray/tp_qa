@@ -1,0 +1,67 @@
+==========================================
+Node:    r5n10
+Job ID:  7403873
+CPUs:    2
+Started: Tue Aug 25 09:42:29 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/09_build_holdout.py --n-correct 300 --n-unlabeled 75 --force-resample
+=== 09_build_holdout.py ===
+
+************************************************************************
+WARNING: --force-resample overwrites the holdout manifest.
+Every score recorded so far becomes incomparable. Previously held-out
+plants may enter training; previously trained plants may enter the
+holdout. The old manifest is backed up, but CONTAMINATION IS NOT
+REVERSIBLE once models are retrained against the new split.
+Consider --append-cohort instead.
+************************************************************************
+
+Old manifest -> holdout_manifest.superseded-20260825-094237.parquet
+Old truth    -> holdout_truth.superseded-20260825-094237.parquet
+
+Loading labeled plant pool...
+  'class' column values: {'Correct': 2178, 'Incorrect': 316}
+
+Labeled pool: 2382 plants
+  correct     : 2066
+  corrections : 316
+Unlabeled pool: 14145 plants
+
+Sampling...
+
+--- Draw: 425 plants (cohort A) ---
+  correct     : 300
+  unlabeled   : 75
+  corrections : 50
+  states      : 49
+
+  Corrections slice n=50: recall@1 standard error about +/-7.1pp (worst case p=0.5).
+  Leaves 266 corrections for training (pool was 316).
+
+  Unlabeled slice n=75: national error-rate estimate carries a standard error of about +/-5.8pp.
+  These need a one-time review before they score. Review them
+  FIRST in round 1 -- until they have truth, the deployment-
+  distribution number does not exist.
+
+Resolving true parcels...
+  True parcel resolved for 350/350 derivable-truth plants (100.0%)
+  Truth already known : 350  (labeled bins -- scoreable immediately)
+  Needs review        : 75  (unlabeled bin -- one-time cost)
+
+Written: /work/GRDVULN/correction/data/holdout/holdout_manifest.parquet  (425 plants)
+  checksum: 6d300a633b347d3f34a701afe310c5516cc3f5babb64e3f95dac71ead775c9af
+Written: /work/GRDVULN/correction/data/holdout/holdout_truth.parquet  (350 plants with truth)
+
+NEXT:
+  1. Apply PATCH_holdout_antijoins.md to 03/04/06/07 -- until then the
+     manifest protects nothing.
+  2. Retrain. Stage 2b loses ~50 plants' worth of rows.
+  3. Pilot inference, then 12_score_holdout.py: 350 of the
+     425 holdout plants score immediately; the 75 unlabeled
+     ones need a one-time review first.
+
+=== complete ===
+Finished: Tue Aug 25 09:47:09 EDT 2026

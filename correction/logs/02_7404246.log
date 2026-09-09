@@ -1,0 +1,102 @@
+==========================================
+Node:    r7n05
+Job ID:  7404246
+CPUs:    16
+Started: Tue Aug 25 14:24:05 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/02_feature_engineering.py --states OH,MS,DE --full-universe
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/pyogrio/raw.py:200: RuntimeWarning: organizePolygons() received a polygon with more than 100 parts. The processing may be really slow.  You can skip the processing by setting METHOD=SKIP, or only make it analyze counter-clock wise parts by setting METHOD=ONLY_CCW if you can assume that the outline of holes is counter-clock wise defined
+  return ogr_read(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:369: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:374: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:377: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:381: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:385: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/correction/scripts/02_feature_engineering.py:389: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+=== 02_feature_engineering.py ===
+
+PART 1: Building plant features
+  Plants loaded: 929
+  Loading census geographies...
+  Running census spatial joins...
+  WARNING: STATE_CODE dropped out of the plant_features merge chain -- re-attaching from source. Root cause not yet diagnosed, worth revisiting.
+  Plant features combined: 929 rows, 18 cols
+
+PART 2: Building parcel features
+
+--- State OH ---
+  Fetching parcel attributes for 4417788 parcels...
+  has_ww_keyword TRUE: 9150
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 296
+
+--- State MS ---
+  Fetching parcel attributes for 286370 parcels...
+  has_ww_keyword TRUE: 642
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 19
+
+--- State DE ---
+  Fetching parcel attributes for 169090 parcels...
+  has_ww_keyword TRUE: 88
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 14
+
+Unioning 3 per-state parcel feature files...
+
+Parcel features combined: 26652201 rows
+  OD plants: 78 part-file(s) found across 51 partition(s); reading and unioning all of them
+  1617 duplicate CWNS_ID rows across part-files (same plant processed more than once, e.g. a --limit test followed by a full run) -- kept the most recently written row for each
+
+STEP 14: Building Stage 1 training data
+  Classes: 2494
+  Reported parcels found: 91
+  OD features joined -- od_ran True for 91 / 91
+  Stage 1 training rows: 91
+  Correct: 87
+  Incorrect: 4
+
+STEP 15: Building Stage 2 training data
+  Corrected parcels found: 8
+  Plants for Stage 2: 8
+  Stage 2 raw candidates labeled: 165320
+  Stage 2 training rows: 165320
+  Positive labels: 8
+  Negative labels: 165312
+
+=== 02_feature_engineering.py complete ===
+Outputs in: /work/GRDVULN/correction/data/features
+Finished: Tue Aug 25 14:29:14 EDT 2026

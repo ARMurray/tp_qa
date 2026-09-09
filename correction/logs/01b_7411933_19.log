@@ -1,0 +1,63 @@
+==========================================
+Node:    r5n04
+Job ID:  7411954
+CPUs:    32
+Started: Thu Sep  3 20:04:10 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: MI  (array index 19 of 48)
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01b_run_object_detection.py --states MI --workers 32 --full-universe --no-resume
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01b_run_object_detection_hpc.py ===
+Device: cpu  |  fetch workers: 32  |  tile=500m imgsz=864px  |  imagery: Planetary Computer NAIP (streamed, no local download)
+
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+  Dropped 1 rows with non-numeric/missing coordinates
+Treatment plants loaded: 394
+
+--- State MI: 394 plants ---
+  No containing parcel found for 121 plants -- skipped, not written to any table (rerun later if parcel coverage improves)
+  11 plants matched >1 parcel (boundary edge case) -- kept one match each
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 16s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 19s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 22s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 34s (attempt 3/5)
+    ...200 plants done (3.3 min elapsed, batch of 200)
+    flushed 200 plants (resume point advanced)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    ...273 plants done (4.2 min elapsed, batch of 73)
+    flushed 73 plants (resume point advanced)
+  State MI done
+
+=== Summary ===
+  Plants processed : 273
+  No parcel found  : 121
+  Parcels capped (area > 2.0 km2, OR still >150 tiles after real-polygon-filtered tiling -- used point-fallback footprint instead): 6
+  Tiles w/ detections   : 92
+  Tiles empty           : 326
+  Fetch failures        : 30  <-- check for rate-limiting if this is high relative to plants processed
+  Elapsed               : 4.2 min
+  Mean fetch time  : 2.420s/tile (network, concurrent across 32 workers)
+  Mean infer time  : 0.154s/tile (device=cpu, sequential in main thread)
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/correction/data/od_features
+Finished: Thu Sep  3 20:08:49 EDT 2026

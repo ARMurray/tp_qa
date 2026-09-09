@@ -1,0 +1,42 @@
+==========================================
+Node:    a0n15
+Job ID:  7403892
+CPUs:    4
+Started: Tue Aug 25 10:31:06 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Reading 2 part-file(s) for DE...
+
+43 total tile rows, 5 fetch_failed
+
+--- fetch_error message distribution ---
+fetch_error
+tile window (10974,21927 size 2014x1951) falls outside item raster (18657x23840) -- likely a different NAIP quad than the one resolved for this plant    1
+tile window (10673,-345 size 2015x1951) falls outside item raster (18862x23837) -- likely a different NAIP quad than the one resolved for this plant     1
+tile window (9195,-671 size 2015x1951) falls outside item raster (18862x23837) -- likely a different NAIP quad than the one resolved for this plant      1
+tile window (11000,-251 size 2015x1951) falls outside item raster (18909x23835) -- likely a different NAIP quad than the one resolved for this plant     1
+tile window (4309,-9 size 2012x1963) falls outside item raster (18814x23762) -- likely a different NAIP quad than the one resolved for this plant        1
+
+--- per-CWNS_ID breakdown ---
+CWNS_ID
+10000002001    2
+10000001004    1
+10000003001    1
+10000023008    1
+
+--- affected plants: parcel context ---
+  10000002001: 2/2 tiles failed, parcel_area=0.710 km2, parcel_capped=False
+  10000001004: 1/1 tiles failed, parcel_area=0.003 km2, parcel_capped=False
+  10000003001: 1/1 tiles failed, parcel_area=0.240 km2, parcel_capped=False
+  10000023008: 1/3 tiles failed, parcel_area=0.359 km2, parcel_capped=False
+
+--- sample errors (first 3, full detail) ---
+
+  tile window (10974,21927 size 2014x1951) falls outside item raster (18657x23840) -- likely a different NAIP quad than the one resolved for this plant
+
+  tile window (10673,-345 size 2015x1951) falls outside item raster (18862x23837) -- likely a different NAIP quad than the one resolved for this plant
+
+  tile window (9195,-671 size 2015x1951) falls outside item raster (18862x23837) -- likely a different NAIP quad than the one resolved for this plant
+Finished: Tue Aug 25 10:31:12 EDT 2026

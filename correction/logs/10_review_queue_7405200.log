@@ -1,0 +1,34 @@
+==========================================
+Node:    a0n15
+Job ID:  7405200
+CPUs:    4
+Started: Wed Aug 26 16:54:04 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/10_build_review_queue.py --states OH,MS,DE --round 1
+=== 10_build_review_queue.py ===
+States: OH,MS,DE  |  Round: 1  |  Model version tag: unversioned-2026-08-26
+
+Loaded 929 scored plants, 15080 candidate rows
+
+Loading plant display info (address/city/county, pop_served, discharge facts)...
+
+Review tasks: 929 plants -- 754 candidate_pick, 175 confirm_reported
+
+Holdout slice: 4 unreviewed unlabeled-bin plant(s) in this pilot's scope
+
+Batch composition (target size 150):
+  holdout   : 4
+  uncertain : 102 (of 692 eligible, target 102)
+  random    : 44 (target 44)
+
+=== Summary ===
+  Plants queued : 150
+  Queue rows    : 714 (705 candidate_pick, 9 confirm_reported)
+
+Written: /work/GRDVULN/correction/data/review_queue/review_queue_round1.parquet
+
+NOTE: 'stage2a_score' in this file is Stage 2a's output, standing in for the plan's 'stage2b_score' -- see module docstring.
+Finished: Wed Aug 26 16:54:07 EDT 2026

@@ -1,0 +1,46 @@
+==========================================
+Node:    r7n17
+Job ID:  7412962
+CPUs:    8
+Started: Sun Sep  6 13:49:16 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/05_run_inference.py --states AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+=== 05_run_inference.py ===
+States: ['AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 71 feature columns, threshold=0.512
+  Loaded stage2_rf_model.joblib: 43 feature columns, threshold=0.409
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  16198 plants across 48 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Plant features: 2412 rows  |  Parcel features: 77686909 rows
+
+Loading OD features (01b reported-location output)...
+  12469 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 16198  |  reported parcel found: 12473  |  no parcel: 3725 (23.0%)
+Traceback (most recent call last):
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 547, in <module>
+    main()
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 497, in main
+    stage1_out = run_stage1(con, plants, plant_features, parcel_features,
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/scripts/05_run_inference.py", line 281, in run_stage1
+    scoreable = add_name_matching(scoreable)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/correction/scripts/02_feature_engineering.py", line 597, in add_name_matching
+    sd_match.append(None if not sd else bool(re.search(re.escape(sd), oc, re.IGNORECASE)))
+                                                       ^^^^^^^^^^^^^
+  File "/usr/lib64/python3.11/re/__init__.py", line 260, in escape
+    pattern = str(pattern, 'latin1')
+              ^^^^^^^^^^^^^^^^^^^^^^
+TypeError: decoding to str: need a bytes-like object, float found
+Finished: Sun Sep  6 13:51:53 EDT 2026

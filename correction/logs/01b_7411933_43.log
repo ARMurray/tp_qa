@@ -1,0 +1,116 @@
+==========================================
+Node:    r4n09
+Job ID:  7411979
+CPUs:    32
+Started: Thu Sep  3 20:21:48 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: VT  (array index 43 of 48)
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/correction/scripts/01b_run_object_detection.py --states VT --workers 32 --full-universe --no-resume
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1813: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01b_run_object_detection_hpc.py ===
+Device: cpu  |  fetch workers: 32  |  tile=500m imgsz=864px  |  imagery: Planetary Computer NAIP (streamed, no local download)
+
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'clarifier', 2: 'digester'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+  Dropped 1 rows with non-numeric/missing coordinates
+Treatment plants loaded: 96
+
+--- State VT: 96 plants ---
+  No containing parcel found for 9 plants -- skipped, not written to any table (rerun later if parcel coverage improves)
+  2 plants matched >1 parcel (boundary edge case) -- kept one match each
+    50000009001: 271 tiles even after real-polygon filtering (area=1.76 km2, bbox=13.0 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000000019: 257 tiles even after real-polygon filtering (area=1.90 km2, bbox=11.2 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000040001: 231 tiles even after real-polygon filtering (area=1.42 km2, bbox=12.7 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000053001: 175 tiles even after real-polygon filtering (area=1.00 km2, bbox=9.1 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000019001: 225 tiles even after real-polygon filtering (area=1.78 km2, bbox=12.0 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000052001: 166 tiles even after real-polygon filtering (area=1.27 km2, bbox=9.9 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000057001: 222 tiles even after real-polygon filtering (area=1.82 km2, bbox=13.4 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000054001: 269 tiles even after real-polygon filtering (area=1.79 km2, bbox=14.1 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000000045: 232 tiles even after real-polygon filtering (area=1.77 km2, bbox=11.3 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    50000015001: 214 tiles even after real-polygon filtering (area=1.29 km2, bbox=12.8 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 20s (attempt 2/5)
+    50000051001: 249 tiles even after real-polygon filtering (area=1.51 km2, bbox=12.0 km) -- exceeds MAX_TILES_PER_PLANT=150, falling back to point footprint
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 8s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 12s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 10s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 17s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 15s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 13s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 19s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 23s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 22s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 11s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 21s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 21s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 19s (attempt 2/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com.) -- retrying in 17s (attempt 2/5)
+    ...87 plants done (3.3 min elapsed, batch of 87)
+    flushed 87 plants (resume point advanced)
+  State VT done
+
+=== Summary ===
+  Plants processed : 87
+  No parcel found  : 9
+  Parcels capped (area > 2.0 km2, OR still >150 tiles after real-polygon-filtered tiling -- used point-fallback footprint instead): 20
+  Tiles w/ detections   : 55
+  Tiles empty           : 573
+  Fetch failures        : 26  <-- check for rate-limiting if this is high relative to plants processed
+  Elapsed               : 3.3 min
+  Mean fetch time  : 3.986s/tile (network, concurrent across 32 workers)
+  Mean infer time  : 0.138s/tile (device=cpu, sequential in main thread)
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/correction/data/od_features
+Finished: Thu Sep  3 20:25:16 EDT 2026

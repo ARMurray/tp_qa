@@ -1,0 +1,25 @@
+==========================================
+Node:    r7n21
+Job ID:  7413269
+CPUs:    4
+Started: Tue Sep  8 10:26:42 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/merge_05_shards.py --states "AL AR AZ CA CO CT DE FL GA IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA VT WA WI WV WY" --dry-run
+=== merge_05_shards.py ===
+shards : /work/GRDVULN/correction/data/inference_shards
+output : /work/GRDVULN/correction/data/inference
+states : 48
+
+--- plant_summary.parquet ---
+  48 shard(s) -> 16198 rows
+  --dry-run: not written
+
+--- stage2_candidates.parquet ---
+  48 shard(s) -> 240546 rows
+  --dry-run: not written
+
+=== complete ===
+Finished: Tue Sep  8 10:26:52 EDT 2026  (exit 0)

@@ -1,0 +1,32 @@
+==========================================
+Node:    a0n17
+Job ID:  7405038
+CPUs:    8
+Started: Wed Aug 26 12:59:50 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+=== 06_build_stage2b_training.py ===
+
+Corrections-bin plants: 316
+Reported-location parcel matches : 181 / 316
+Corrected-location parcel matches: 312 / 316
+
+Reported parcels already in 10_parcel_features.parquet: 162 / 181
+Corrected parcels already in 10_parcel_features.parquet: 266 / 312
+  NOTE: 46 corrected parcels have no precomputed NLCD/Regrid features (outside 01a's original k=18-ring search around the reported point) -- DROPPED from this training set for now. Not building a targeted NLCD top-up until this count is known to matter.
+
+OD (reported) plants available : 2769
+OD (corrected) plants available: 312
+  Name-match features added; raw 'owner' column consumed and dropped.
+
+=== Stage 2b training table ===
+Total rows  : 428
+Label=0 (wrong)  : 162
+Label=1 (right)  : 266
+Plants with BOTH a positive and negative row (usable pairs): 136
+  [holdout] stage2b-build: removed 71 rows / 48 plants (428 -> 357)
+
+Written: /work/GRDVULN/correction/data/features/16_stage2b_training.parquet
+Finished: Wed Aug 26 13:04:19 EDT 2026

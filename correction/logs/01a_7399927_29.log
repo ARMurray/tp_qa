@@ -1,0 +1,31 @@
+==========================================
+Node:    r7n13
+Job ID:  7399957
+CPUs:    16
+Started: Fri Aug 21 06:49:28 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Processing state: NE  (array index 29 of 52)
+Running: python /work/GRDVULN/correction/scripts/01a_extract_parcels.py --states NE
+=== 01a_extract_parcels.py ===
+K rings: 18
+
+  Dropped 1 rows with non-numeric/missing LATITUDE or LONGITUDE
+  Training plant universe: 2494 classes + 316 corrections -> 2494 unique CWNS_IDs
+  Restricted to training-labeled plants: 16453 -> 2308
+Treatment plants loaded: 14
+
+--- State NE: 14 plants ---
+  Unique H3 cells to query: 14378
+  Parcels retrieved: 85718
+  Dropping 9 candidate parcels over 2.0 km2 (largest: 2.6 km2) -- treated as digitization artifacts, not real candidate locations
+  Extracting NLCD stats...
+  43164 parcels had 0 pixels at >=50% coverage -- falling back to nearest-pixel centroid sample for these
+  Results: 85709 parcels, 767 with water, 43164 used centroid fallback, 0 with 0 pixels (real gaps, after fallback)
+  Written: /work/GRDVULN/correction/data/nlcd_features/nlcd_NE_k18.parquet
+
+=== 01a_extract_parcels.py complete ===
+Outputs in: /work/GRDVULN/correction/data/nlcd_features
+Finished: Fri Aug 21 06:50:03 EDT 2026
