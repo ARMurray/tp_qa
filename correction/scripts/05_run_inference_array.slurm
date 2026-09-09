@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/05_arr_%A_%a.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/05_arr_%A_%a.log
 
 # Per-state Stage 1 -> Stage 2a inference, one array task per state.
 #
@@ -36,7 +36,7 @@
 # 10_build_review_queue.py expects:
 #     sbatch merge_05_shards.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch --array=0-47%8 05_run_inference_array.slurm \"AL AR AZ\"}"
 read -ra STATE_LIST <<< "$STATES_ARG"

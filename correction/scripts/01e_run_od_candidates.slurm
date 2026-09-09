@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/01e_odcand_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/01e_odcand_%A.log
 
 # Object detection on Stage 2a's top-K candidate parcels, so a re-ranker can
 # use it. This is the step 05_run_inference.py's docstring defers as "the
@@ -53,7 +53,7 @@
 # realistic invocation. A national --all run needs far more and should be
 # split by state instead.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/01e_run_od_candidates.py --workers ${WORKERS:-32}"
 

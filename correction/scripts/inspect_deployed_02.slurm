@@ -7,10 +7,10 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/inspect_deployed_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/inspect_deployed_%A.log
 
 #   sbatch inspect_deployed_02.slurm
 
-python /work/GRDVULN/correction/scripts/inspect_deployed_02.py
+python /work/GRDVULN/tp_qa/correction/scripts/inspect_deployed_02.py
 
 echo "Finished: $(date)"

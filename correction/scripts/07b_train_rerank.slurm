@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/07b_rerank_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/07b_rerank_%A.log
 
 # Trains the Stage 2a re-ranker on 17_rerank_training.parquet.
 #
@@ -37,7 +37,7 @@
 #                 default -- near-miss pools are real at inference.
 #   TESTFRAC=f    plant-level test fraction (default 0.25)
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/07b_train_rerank.py"
 [ -n "${NOOD:-}" ]      && CMD="$CMD --no-od"

@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/01c_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/01c_%A.log
 
 # Runs object detection on the CORRECTED (true) location for every Stage 2
 # training plant -- the companion half of the contrastive pair 01b already
@@ -21,7 +21,7 @@
 # sweep, so this is a single job, not an array, and should finish quickly
 # given the throughput already proven in 01b's runs today.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 echo "Checking outbound HTTPS to Planetary Computer..."
 curl -s -o /dev/null -w "  STAC API HTTP status: %{http_code}\n" \

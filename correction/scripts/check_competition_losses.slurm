@@ -7,11 +7,11 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/check_competition_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/check_competition_%A.log
 
 #   sbatch check_competition_losses.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/check_competition_losses.py"
 

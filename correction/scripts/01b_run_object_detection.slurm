@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/01b_%A_%a.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/01b_%A_%a.log
 
 # Object detection over candidate parcels, streaming NAIP from Planetary
 # Computer. Output: data/od_features/{tiles,detections,objects,plants}/state=XX/
@@ -46,7 +46,7 @@
 # --workers is bound to the CPU allocation, but this is I/O-bound work, so the
 # two aren't really coupled; see config.py NAIP_WORKERS note.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES=${STATES:?ERROR: set STATES, e.g. --export=STATES="OH PA"}
 read -ra STATE_ARR <<< "$STATES"

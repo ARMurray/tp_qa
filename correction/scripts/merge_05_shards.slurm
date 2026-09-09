@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/05_merge_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/05_merge_%A.log
 
 # Concatenates data/inference_shards/state=XX/ into the two flat files that
 # 10_build_review_queue.py reads by name:
@@ -37,7 +37,7 @@
 # order of 10^5 rows nationally, not 10^8. 128G is generous; lower it if the
 # partition is busy.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch merge_05_shards.slurm \"AL AR AZ\"}"
 

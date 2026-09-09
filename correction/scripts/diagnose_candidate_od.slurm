@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/diag_odcand_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/diag_odcand_%A.log
 
 #   sbatch diagnose_candidate_od.slurm
 #
@@ -20,7 +20,7 @@
 # more often than competitors, a re-rank cannot help no matter how the
 # model is trained, and the answer costs 15 minutes instead of a day.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/diagnose_candidate_od.py"
 

@@ -7,11 +7,11 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/inspect_s2_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/inspect_s2_%A.log
 
 #   sbatch inspect_stage2_columns.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/inspect_stage2_columns.py"
 

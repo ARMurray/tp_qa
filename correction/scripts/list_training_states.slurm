@@ -7,11 +7,11 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/list_states_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/list_states_%A.log
 
 #   sbatch list_training_states.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/list_training_states.py"
 

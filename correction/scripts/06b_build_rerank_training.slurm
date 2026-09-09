@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/06b_rerank_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/06b_rerank_%A.log
 
 # Builds data/features/17_rerank_training.parquet: one row per Stage 2a
 # candidate parcel, labelled 1 for the plant's true parcel and 0 for the
@@ -38,7 +38,7 @@
 # Memory: joins the national stage2_candidates table (240k rows) against
 # per-state parcel parquet for the true-parcel lookup. 64G is ample.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/06b_build_rerank_training.py"
 [ -n "${DRYRUN:-}" ]    && CMD="$CMD --dry-run"

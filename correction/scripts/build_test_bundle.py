@@ -3,7 +3,7 @@ build_test_bundle.py
 =====================
 Assembles a self-contained, downloadable copy of the correction pipeline --
 every script, plus a geographically-concentrated subset of every input it
-reads -- into /work/GRDVULN/correction/testing/tpqa_test/.
+reads -- into /work/GRDVULN/tp_qa/correction/testing/tpqa_test/.
 
 Purpose: let the whole pipeline be run and debugged on a normal machine with
 a fast edit/run loop, instead of one sbatch per hypothesis. The bundle mirrors

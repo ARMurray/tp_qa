@@ -7,11 +7,11 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/diag_bytearray_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/diag_bytearray_%A.log
 
 #   sbatch --export=STATES="OH,MS,DE" diagnose_bytearray_columns.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES=${STATES:?ERROR: set STATES, e.g. --export=STATES="OH,MS,DE"}
 

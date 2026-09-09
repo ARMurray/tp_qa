@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/odfresh_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/odfresh_%A.log
 
 # Checks every data/od_features/{plants,tiles,detections,objects}/state=XX/
 # partition against the mtime of the deployed best.pt. Anything older was
@@ -38,7 +38,7 @@
 # Chain it ahead of 02 so a stale partition stops the pipeline:
 #   sbatch --dependency=afterok:<thisjobid> 02_feature_engineering.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/check_od_freshness.py"
 [ -n "${ALLOW:-}" ]     && CMD="$CMD --allow $ALLOW"

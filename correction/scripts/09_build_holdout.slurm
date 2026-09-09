@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/09_holdout_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/09_holdout_%A.log
 
 # Samples the frozen evaluation holdout. RUN THIS ONCE.
 #
@@ -39,7 +39,7 @@
 # exclude_holdout(). That is intended -- fail-closed beats silently training on
 # the evaluation set.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/09_build_holdout.py"
 [ -n "${NCORRECTIONS:-}" ] && CMD="$CMD --n-corrections $NCORRECTIONS"

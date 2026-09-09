@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/11_ingest_review_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/11_ingest_review_%A.log
 
 # Converts reviewed, non-holdout verdicts into Updates.gdb-compatible
 # classes/corrections rows (review_derived_locations.gpkg) plus
@@ -32,7 +32,7 @@
 # small DuckDB lookups against PARCEL_BASE for candidate_correct centroids,
 # nowhere near the scale of 01a/02's nationwide parcel work.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 ROUND_ARG="${1:?ERROR: pass round number as a positional arg, e.g. sbatch 11_ingest_review_log.slurm 1}"
 shift || true   # allow a trailing --dry-run after the round number

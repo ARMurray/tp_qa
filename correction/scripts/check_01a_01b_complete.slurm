@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/check_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/check_%A.log
 
 # Verifies the nationwide 01a/01b array run completed cleanly before
 # trusting it enough to run 02.
@@ -16,6 +16,6 @@
 #
 # Get the job IDs from your earlier sbatch output, or:  sacct -u $USER --format=JobID,JobName%20 | grep corr_01
 
-bash /work/GRDVULN/correction/scripts/check_01a_01b_complete.sh
+bash /work/GRDVULN/tp_qa/correction/scripts/check_01a_01b_complete.sh
 
 echo "Finished: $(date)"

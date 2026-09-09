@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/08b_rings_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/08b_rings_%A.log
 
 # Prices the K_RINGS decision from 08's output. Reads one parquet, writes two
 # CSVs -- no compute, so it runs fine on a login node too:
@@ -21,7 +21,7 @@
 # Run 08_diagnose_candidate_coverage.slurm first -- this reads the
 # correction_coverage.parquet it writes.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/08b_analyze_ring_misses.py"
 [ -n "${KS:-}" ]     && CMD="$CMD --candidate-ks $KS"

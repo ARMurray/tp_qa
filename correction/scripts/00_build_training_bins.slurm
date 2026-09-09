@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/00_bins_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/00_bins_%A.log
 
 # Builds data/training/training_locations.gpkg from the uploaded Updates.gdb,
 # optionally unioning in review-derived rows from 11_ingest_review_log.py
@@ -25,7 +25,7 @@
 #
 # Small/fast job -- debug partition is fine.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python \"$SCRIPTS/build_training_bins.py\" \
     --gdb   \"$ROOT/data/training/Updates.gdb\" \

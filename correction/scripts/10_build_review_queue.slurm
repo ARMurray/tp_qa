@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/10_review_queue_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/10_review_queue_%A.log
 
 # Builds data/review_queue/review_queue_round{N}.parquet from 05's inference
 # output. See script docstring for the Stage2b->Stage2a substitution and the
@@ -25,7 +25,7 @@
 # reads data/inference/plant_summary.parquet and stage2_candidates.parquet
 # directly, does not regenerate them.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch 10_build_review_queue.slurm \"OH,MS,DE\" 1}"
 ROUND_ARG="${2:?ERROR: pass round number as the second positional arg, e.g. sbatch 10_build_review_queue.slurm \"OH,MS,DE\" 1}"

@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/01a_%A_%a.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/01a_%A_%a.log
 
 # Candidate parcel extraction + NLCD zonal stats, one state per array task.
 # Output: data/nlcd_features/nlcd_{STATE}_k{K}.parquet
@@ -51,7 +51,7 @@
 # parcels is the memory-heaviest step in the pipeline. Drop it if a state
 # runs comfortably.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES=${STATES:?ERROR: set STATES, e.g. --export=STATES="OH PA"}
 read -ra STATE_ARR <<< "$STATES"

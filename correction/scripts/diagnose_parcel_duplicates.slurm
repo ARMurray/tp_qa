@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/diag_parcel_dupes_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/diag_parcel_dupes_%A.log
 
 # Checks whether PARCEL_BASE has duplicate rows per ll_uuid -- the suspected
 # root cause of the 5.47x row inflation in 02_feature_engineering.py's parcel
@@ -20,7 +20,7 @@
 # (4.4M candidate parcels from 01a; PARCEL_BASE itself is presumably larger
 # since it's the full store, not just k=18-ring candidates).
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES=${STATES:?ERROR: set STATES, e.g. --export=STATES="OH,MS,DE"}
 

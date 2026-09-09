@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/diag_odcls_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/diag_odcls_%A.log
 
 #   sbatch diagnose_od_class_shift.slurm
 #
@@ -19,7 +19,7 @@
 # Upload the new best.pt to $ROOT/models/object_detection/ BEFORE running,
 # or this will report on whatever weights are already there.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/diagnose_od_class_shift.py"
 

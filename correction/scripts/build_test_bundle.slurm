@@ -7,9 +7,9 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/build_bundle_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/build_bundle_%A.log
 
-# Assembles /work/GRDVULN/correction/testing/tpqa_test/ -- a self-contained,
+# Assembles /work/GRDVULN/tp_qa/correction/testing/tpqa_test/ -- a self-contained,
 # downloadable copy of the pipeline plus a subset of every input it reads.
 #
 #   sbatch build_test_bundle.slurm
@@ -34,7 +34,7 @@
 # filtering (4.9M rows for the OH/MS/DE pilot). If the nationwide version is
 # ever in place, this may need raising.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/build_test_bundle.py"
 [ -n "${STATE:-}" ]      && CMD="$CMD --state $STATE"

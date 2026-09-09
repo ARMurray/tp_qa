@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/02_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/02_%A.log
 
 # Feature engineering: assembles plant features, parcel features, and the
 # Stage 1 / Stage 2 training tables.
@@ -43,7 +43,7 @@
 # separate 02 runs with distinct output paths and combine the resulting
 # parquet files by hand -- ask before doing that, it needs a small script.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES_ARG="${1:-}"
 

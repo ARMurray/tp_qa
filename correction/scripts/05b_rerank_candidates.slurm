@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/05b_rerank_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/05b_rerank_%A.log
 
 # Scores stage2_candidates.parquet with the re-ranker, writing rerank_score
 # alongside the existing stage2_prob_correct.
@@ -38,7 +38,7 @@
 # 2a thought and what the re-ranker thought, and plants resolved by fallback
 # are flagged with rerank_fallback.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/05b_rerank_candidates.py"
 [ -n "${NOOD:-}" ]       && CMD="$CMD --no-od"

@@ -7,12 +7,12 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/diag_scoreable_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/diag_scoreable_%A.log
 
 #   sbatch --export=STATES="OH" diagnose_scoreable_dtypes.slurm
 #   sbatch --export=STATES="OH",LIMIT="50" diagnose_scoreable_dtypes.slurm
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES=${STATES:?ERROR: set STATES, e.g. --export=STATES="OH"}
 LIMIT=${LIMIT:-20}

@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/07_stage2b_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/07_stage2b_%A.log
 
 # Stage 2b: OD-aware final-candidate-selection model.
 # Reads  data/features/16_stage2b_training.parquet
@@ -42,7 +42,7 @@
 # but do not treat the surviving stage2b_rf_model.joblib as "the" model from
 # a sweep. Pick a seed and run it alone to produce the artifact you keep.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/07_train_stage2b.py"
 [ -n "${SEED:-}" ]              && CMD="$CMD --seed $SEED"

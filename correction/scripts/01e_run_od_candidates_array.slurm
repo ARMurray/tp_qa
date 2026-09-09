@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/01e_arr_%A_%a.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/01e_arr_%A_%a.log
 
 # Per-state candidate object detection, one array task per state. This is the
 # national SCOPE=all run, split so it can actually finish.
@@ -70,7 +70,7 @@
 # 20,000 candidates needs ~8.5 hours. If one times out, resubmit that index
 # and resume continues from the last flush.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch --array=0-47%6 01e_run_od_candidates_array.slurm \"AL AR AZ\"}"
 read -ra STATE_LIST <<< "$STATES_ARG"

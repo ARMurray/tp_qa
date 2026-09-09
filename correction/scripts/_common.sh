@@ -3,7 +3,7 @@
 # _common.sh -- shared preamble sourced by every correction pipeline job
 # ==============================================================================
 # Not submitted directly. Each 0Nx_*.slurm does:
-#     source /work/GRDVULN/correction/scripts/_common.sh
+#     source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 #
 # Keeps the module-load + venv-activate + sanity-check logic in ONE place so
 # the five job scripts can't drift out of sync with each other.

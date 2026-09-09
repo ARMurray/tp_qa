@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/12_holdout_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/12_holdout_%A.log
 
 # Scores the frozen holdout. Read-only.
 #
@@ -36,7 +36,7 @@
 #
 # REQUIRES 05b to have been run for the matching arm.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/12_score_holdout.py"
 [ -n "${NOOD:-}" ]   && CMD="$CMD --no-od"

@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/04_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/04_%A.log
 
 # Stage 2 model: which nearby parcel is the true location?
 # Reads  data/features/15_stage2_training.parquet
@@ -19,7 +19,7 @@
 # against 73,142 negatives -- spatial CV (KMeans leave-one-cluster-out) can't
 # form meaningful folds from 4 positives. Check 02's log first.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/04_train_stage2.py"
 

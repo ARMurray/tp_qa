@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/03_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/03_%A.log
 
 # Stage 1 model: is the reported location correct?
 # Reads  data/features/14_stage1_training.parquet
@@ -20,7 +20,7 @@
 # stratified CV will fail or produce a degenerate model. Check the class counts
 # printed at the end of 02's log before submitting this.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 python "$SCRIPTS/03_train_stage1.py"
 

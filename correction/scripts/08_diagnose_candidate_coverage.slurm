@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/08_cover_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/08_cover_%A.log
 
 # Candidate-coverage diagnostic. Answers: the true k-ring radius in km, what
 # fraction of known corrections the candidate pool can reach (the pipeline
@@ -26,7 +26,7 @@
 # Memory is modest: the point-in-parcel lookups are per-state and the NLCD
 # membership checks read only the ll_uuid column.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/08_diagnose_candidate_coverage.py"
 [ -n "${STATES:-}" ] && CMD="$CMD --states $STATES"

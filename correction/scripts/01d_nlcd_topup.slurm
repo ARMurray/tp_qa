@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/01d_topup_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/01d_topup_%A.log
 
 # Targeted NLCD zonal stats for parcels 01a's k-ring window missed, appended
 # into the existing per-state nlcd_{STATE}_k{K}.parquet files.
@@ -25,7 +25,7 @@
 #     02_feature_engineering.slurm  ->  06_build_stage2b_training.slurm
 #     ->  07_train_stage2b.slurm  ->  re-run 08 to confirm the gain.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/01d_nlcd_topup.py"
 [ "${DRYRUN:-0}" = "1" ] && CMD="$CMD --dry-run"

@@ -3,7 +3,7 @@
 # setup_env.sh -- one-time environment build for /work/GRDVULN/correction
 # ==============================================================================
 # Run this ONCE on a login node before submitting any pipeline jobs:
-#     bash /work/GRDVULN/correction/scripts/setup_env.sh
+#     bash /work/GRDVULN/tp_qa/correction/scripts/setup_env.sh
 #
 # Every SLURM wrapper sources the venv this creates rather than building its
 # own -- building a venv inside each job wastes minutes of allocation and (as

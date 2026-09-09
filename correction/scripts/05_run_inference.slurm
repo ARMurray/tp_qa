@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --output=/work/GRDVULN/correction/logs/05_inference_%A.log
+#SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/05_inference_%A.log
 
 # Stage 1 -> Stage 2a inference (Stage 2b excluded this round -- see script
 # docstring / TPQA_MASTER_REFERENCE.md S3,S10).
@@ -36,7 +36,7 @@
 # alone produced 5.6M raw candidates. 64G is a starting point based on that,
 # not a hard measurement for larger multi-state runs.
 
-source /work/GRDVULN/correction/scripts/_common.sh
+source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch 05_run_inference.slurm \"OH,MS,DE\"}"
 
