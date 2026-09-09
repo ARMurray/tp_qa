@@ -7,3 +7,4 @@ correction/.venv/
 detection/.venv/
 correction/testing/
 detection/data/correction/models/
+detection/data/

@@ -175,16 +175,16 @@ def counts_by_slice(conn) -> list[dict]:
     return [dict(r) for r in rows]
 
 
-def next_unreviewed(conn) -> dict | None:
+def next_unreviewed(conn, review_round: int) -> dict | None:
     """Holdout plants first (round-1 priority: establish the benchmark before
     burning review time elsewhere), then everything else in whatever order
     they were inserted (queue builder already randomized within slices)."""
     row = conn.execute("""
         SELECT * FROM plants
-        WHERE reviewed = 0
+        WHERE reviewed = 0 AND review_round = ?
         ORDER BY (queue_slice = 'holdout') DESC, rowid
         LIMIT 1
-    """).fetchone()
+    """, (review_round,)).fetchone()
     return dict(row) if row else None
 
 
@@ -234,3 +234,9 @@ def submit_verdict(conn, cwns_id: str, verdict: dict):
             reviewer = :reviewer
         WHERE cwns_id = :cwns_id
     """, {**verdict, "cwns_id": cwns_id})
+
+def list_available_rounds(conn) -> list[int]:
+    rows = conn.execute(
+        "SELECT DISTINCT review_round FROM plants ORDER BY review_round"
+    ).fetchall()
+    return [r[0] for r in rows]

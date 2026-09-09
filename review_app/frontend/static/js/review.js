@@ -22,12 +22,13 @@ let selectedCandidate = null;   // {ll_uuid, candidate_rank}
 let capturedTruth = null;       // {lat, lng}
 let confirmationType = null;    // auto-determined, see setVerdict()
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     map = ReviewMap.init();
     loadReviewerName();
+    await loadRounds();       // sets currentRound
     refreshStatus();
     refreshNavList();
-    loadNextPlant();
+    loadNextPlant();          // now safe, currentRound is set
 
     document.getElementById("submit-verdict-btn").addEventListener("click", submitVerdict);
     document.getElementById("reviewer-name").addEventListener("change", saveReviewerName);
@@ -55,7 +56,7 @@ async function refreshStatus() {
 
 async function loadNextPlant() {
     resetVerdictState();
-    const res = await fetch("/api/plants/next");
+    const res = await fetch(`/api/plants/next?review_round=${currentRound}`);
     const data = await res.json();
 
     if (data.done) {
@@ -83,6 +84,29 @@ async function loadPlantById(cwnsId) {
     currentCandidates = data.candidates;
     renderPlant(data.plant, data.candidates, data.reported_geometry, data.reported_context);
     highlightCurrentInNav(data.plant.cwns_id);
+}
+
+let currentRound = null;
+
+async function loadRounds() {
+    const res = await fetch("/api/plants/rounds");
+    const data = await res.json();
+    const select = document.getElementById("round-select");
+    select.innerHTML = "";
+    data.rounds.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r;
+        opt.textContent = `Round ${r}`;
+        select.appendChild(opt);
+    });
+    currentRound = data.latest;
+    select.value = currentRound;
+    select.addEventListener("change", () => {
+    currentRound = parseInt(select.value, 10);
+    refreshNavList();
+    refreshStatus();
+    loadNextPlant();   // jump to next unreviewed plant in the newly selected round
+});
 }
 
 async function refreshNavList() {
