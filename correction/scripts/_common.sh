@@ -9,7 +9,7 @@
 # the five job scripts can't drift out of sync with each other.
 # ==============================================================================
 
-ROOT=/work/GRDVULN/correction
+ROOT=/work/GRDVULN/tp_qa/correction
 SCRIPTS="$ROOT/scripts"
 VENV_DIR="$ROOT/.venv"
 

@@ -15,7 +15,7 @@
 # ==============================================================================
 set -euo pipefail
 
-ROOT=/work/GRDVULN/correction
+ROOT=/work/GRDVULN/tp_qa/correction
 VENV_DIR="$ROOT/.venv"
 
 echo "=== correction pipeline environment setup ==="
