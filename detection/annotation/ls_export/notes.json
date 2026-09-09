@@ -1,0 +1,33 @@
+{
+  "categories": [
+    {
+      "id": 0,
+      "name": "aeration_basin"
+    },
+    {
+      "id": 1,
+      "name": "chlorine_contact"
+    },
+    {
+      "id": 2,
+      "name": "clarifier"
+    },
+    {
+      "id": 3,
+      "name": "digester"
+    },
+    {
+      "id": 4,
+      "name": "drying_bed"
+    },
+    {
+      "id": 5,
+      "name": "oxidation_pond"
+    }
+  ],
+  "info": {
+    "year": 2026,
+    "version": "1.0",
+    "contributor": "Label Studio"
+  }
+}

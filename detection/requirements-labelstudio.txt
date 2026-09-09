@@ -1,0 +1,11 @@
+# =============================================================================
+# Label Studio env — INSTALL IN A SEPARATE VENV (ls_env), never in yolo_env.
+# Label Studio pins dependencies that conflict with ultralytics + torch.
+#
+#   python -m venv C:\Users\AMURRA02\ls_env
+#   & "C:\Users\AMURRA02\ls_env\Scripts\Activate.ps1"
+#   pip install -r requirements-labelstudio.txt
+#   label-studio
+# =============================================================================
+
+label-studio>=1.12

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>tp_qa Review</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+    <div id="app">
+        <header id="header">
+            <div id="progress-info">
+                <span id="progress-text">Loading...</span>
+                <div id="progress-bar-track"><div id="progress-bar-fill"></div></div>
+            </div>
+            <div id="holdout-badge" class="hidden">HOLDOUT PLANT -- verdict routes to holdout truth, not the training feed</div>
+            <div id="reviewer-field">
+                Reviewer: <input type="text" id="reviewer-name" placeholder="your name" />
+            </div>
+        </header>
+
+        <main id="main">
+            <nav id="plant-nav">
+                <h3>Plants <span id="nav-count"></span></h3>
+                <div id="plant-nav-list"></div>
+            </nav>
+
+            <div id="map"></div>
+
+            <aside id="sidebar">
+                <div id="plant-info">
+                    <h2 id="plant-cwns-id">--</h2>
+                    <div id="plant-meta"></div>
+                </div>
+
+                <div id="task-panel">
+                    <!-- populated per review_task type by review.js -->
+                </div>
+
+                <div id="verdict-panel">
+                    <h3>Verdict</h3>
+                    <div id="verdict-status">No verdict selected yet.</div>
+                    <div id="verdict-buttons"></div>
+
+                    <div id="confirmation-type-display" class="hidden"></div>
+
+                    <div id="truth-capture-panel" class="hidden">
+                        <p>Click the map to mark the true location.</p>
+                        <p id="truth-coords">No point selected yet.</p>
+                    </div>
+
+                    <textarea id="reviewer-notes" placeholder="Notes (optional)"></textarea>
+
+                    <button id="submit-verdict-btn" disabled>Submit</button>
+                    <div id="submit-status"></div>
+                </div>
+            </aside>
+        </main>
+
+        <footer id="plant-info-dock">
+            <div class="dock-section">
+                <strong>Identifying info</strong>
+                <div id="dock-identity">--</div>
+            </div>
+            <div class="dock-section">
+                <strong>Population served</strong>
+                <div id="dock-population">--</div>
+            </div>
+            <div class="dock-section">
+                <strong>Discharge</strong>
+                <div id="dock-discharge">--</div>
+            </div>
+            <div class="dock-section">
+                <strong>Geography</strong>
+                <div id="dock-geography">--</div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="/static/js/map.js"></script>
+    <script src="/static/js/review.js"></script>
+</body>
+</html>

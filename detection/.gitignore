@@ -1,0 +1,35 @@
+# --- Environments (regenerated from requirements*.txt; never committed) ---
+.venv/
+venv/
+*env*/
+yolo_env/
+ls_env/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# --- Data & artifacts (large / binary / regenerable) ---
+data/tiles/
+data/inference/
+data/tile_metadata.csv
+dataset/
+dataset.yaml
+models/
+*.pt
+
+# Population tables / raw inputs, if copied locally
+data/*.txt
+data/*.csv
+
+# --- Kept in git: pipeline/, config.py, docs/, requirements*.txt,
+#     annotation/ls_export/classes.txt, and data/samples/*.gpkg
+#     (small sample gpkgs are tracked for provenance) ---
+!data/samples/
+!data/samples/*.gpkg
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+structure.txt

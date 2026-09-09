@@ -1,0 +1,90 @@
+==========================================
+Node:    r7n11
+Job ID:  7413499
+CPUs:    16
+Started: Tue Sep  8 17:20:31 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/correction/scripts/07b_train_rerank.py --seed 13
+=== 07b_train_rerank.py: Stage 2a Re-ranker ===
+
+Loading re-rank training data...
+  [holdout] rerank: removed 0 rows / 0 plants (6475 -> 6475)
+  Rows: 6475  |  plants: 324
+  Label=1 (true parcel): 263
+  Label=0 (competitor) : 6212
+  Pools containing the true parcel: 263/324 (81%)
+
+  Split by plant: 243 train / 81 test plant(s)
+  Dropping leaking columns: ['true_ll_uuid', 'pool_has_positive']
+  Dropping 3 all-NaN columns: ['od_max_conf_chlorine_contact', 'od_max_conf_drying_bed', 'od_max_conf_oxidation_pond']
+  Model columns: 72
+  Class balance 1:23  |  weights true 0.959 / competitor 0.041
+
+Setting up cross-validation folds...
+  Spatial folds: 5  |  Standard (grouped): 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 0.9 minutes
+  Best SPATIAL ROC AUC: 0.9648
+    across 20 configs: mean 0.9625, sd 0.0017
+
+========================================
+Tuning with STANDARD (grouped) cross-validation...
+========================================
+  STANDARD (grouped) CV complete in 0.8 minutes
+  Best STANDARD (grouped) ROC AUC: 0.9688
+    across 20 configs: mean 0.9662, sd 0.0023
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.968842
+0   Spatial  0.964751
+
+========================================
+Fitting final model...
+========================================
+
+========================================
+Ranking performance on held-out plants
+========================================
+  recall@1:  Stage 2a 66.7% (42/63)   re-rank 76.2% (48/63)   +9.5%
+  recall@3:  Stage 2a 81.0% (51/63)   re-rank 92.1% (58/63)   +11.1%
+  recall@5:  Stage 2a 84.1% (53/63)   re-rank 96.8% (61/63)   +12.7%
+
+  Denominator is the 63 test plant(s) whose pool contains
+  the true parcel, of 81 total. The other 18 cannot be
+  found by ANY ranking -- that gap belongs to candidate generation
+  (see 08_diagnose_candidate_coverage.py), not to this model.
+
+Computing feature importance...
+              Variable  Importance  Importance_std
+          stage2a_rank    0.036314        0.003673
+   stage2_prob_correct    0.031047        0.003365
+                osm_ww    0.013783        0.000848
+     od_max_confidence    0.006567        0.001865
+  dominant_class_group    0.003260        0.000537
+od_fired_share_of_pool    0.001917        0.000338
+          log_distance    0.001523        0.001269
+            distance_m    0.001285        0.001191
+       water_pixel_pct    0.000944        0.000339
+            pop_served    0.000832        0.000431
+         bldg_per_acre    0.000822        0.000230
+        dominant_count    0.000783        0.000498
+        lbcs_ownership    0.000730        0.000964
+         ll_bldg_count    0.000720        0.000451
+       od_pool_n_fired    0.000593        0.000326
+        od_n_clarifier    0.000410        0.000590
+             has_water    0.000383        0.000171
+                od_ran    0.000308        0.000040
+          water_pixels    0.000222        0.000237
+  od_any_fired_in_pool    0.000175        0.000059
+
+Saved: rerank_rf_model.joblib
+
+Next: 05b_rerank_candidates.py, then score the holdout.
+Finished: Tue Sep  8 17:22:28 EDT 2026  (exit 0)
