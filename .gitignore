@@ -3,4 +3,4 @@ correction/data/
 correction/.venv/
 detection/.venv/
 correction/testing/
-detection/data/
+detection/data/correction/models/
