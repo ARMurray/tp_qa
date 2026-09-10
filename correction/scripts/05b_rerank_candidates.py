@@ -124,8 +124,11 @@ def add_derived(df: pd.DataFrame, has_od: bool) -> pd.DataFrame:
     fired = df.groupby("CWNS_ID")["od_has_detection"].transform("sum")
     df["od_pool_n_fired"] = fired.astype(int)
     df["od_any_fired_in_pool"] = fired > 0
-    df["od_fired_share_of_pool"] = np.where(
-        fired > 0, df["od_has_detection"].astype(float) / fired, 0.0)
+    fired_arr = fired.to_numpy(dtype=float)
+    detected_arr = df["od_has_detection"].astype(float).to_numpy()
+    share = np.zeros(len(df), dtype=float)
+    np.divide(detected_arr, fired_arr, out=share, where=(fired_arr > 0))
+    df["od_fired_share_of_pool"] = share
     return df
 
 

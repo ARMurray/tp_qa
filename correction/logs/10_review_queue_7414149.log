@@ -1,0 +1,15 @@
+==========================================
+Node:    a0n15
+Job ID:  7414149
+CPUs:    4
+Started: Thu Sep 10 13:06:55 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/10_build_review_queue.py --states --states --round AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+usage: 10_build_review_queue.py [-h] --states STATES --round ROUND
+                                [--batch-size BATCH_SIZE]
+                                [--model-version MODEL_VERSION] [--seed SEED]
+10_build_review_queue.py: error: argument --states: expected one argument
+Finished: Thu Sep 10 13:07:02 EDT 2026

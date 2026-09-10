@@ -1,0 +1,16 @@
+==========================================
+Node:    r4n12
+Job ID:  7414115
+CPUs:    8
+Started: Thu Sep 10 11:30:30 EDT 2026
+==========================================
+Loaded module: python/3.11
+/work/GRDVULN/tp_qa/correction/scripts/_common.sh: line 36: /work/GRDVULN/tp_qa/correction/.venv/bin/activate: No such file or directory
+Python:  Python 3.11.13  (/usr/local/apps/python/3.11/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py --states AR
+Traceback (most recent call last):
+  File "/work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py", line 55, in <module>
+    import geopandas as gpd
+ModuleNotFoundError: No module named 'geopandas'
+Finished: Thu Sep 10 11:30:30 EDT 2026  (exit 1)

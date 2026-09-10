@@ -1,0 +1,36 @@
+==========================================
+Node:    a0n15
+Job ID:  7414158
+CPUs:    2
+Started: Thu Sep 10 13:24:10 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/check_review_queue_scores.py --round 2
+Loaded /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round2.parquet
+Columns: ['CWNS_ID', 'STATE_CODE', 'll_uuid', 'candidate_rank', 'stage2a_score', 'stage2b_score', 'score_margin', 'rerank_fallback', 'review_task', 'owner', 'lbcs_activity', 'lbcs_ownership', 'lbcs_function', 'lbcs_structure', 'lbcs_site', 'll_gisacre', 'll_bldg_count', 'dominant_class_group', 'has_ww_keyword', 'osm_ww', 'distance_m', 'within_1km', 'within_5km', 'data_quality_score', 'queue_slice', 'model_version', 'review_round', 'is_holdout', 'LATITUDE', 'LONGITUDE', 'reported_ll_uuid', 'stage1_prob_correct', 'trigger_reason', 'ADDRESS', 'CITY', 'COUNTY_NAME', 'ZIP_CODE', 'pop_served', 'subdivision', 'place', 'county', 'is_rural', 'surface_water_discharge', 'requires_npdes', 'any_reuse']
+
+stage2b_score present  : True
+rerank_fallback present: True
+
+candidate_pick rows: 695
+  stage2a_score null: 0 / 695
+  stage2b_score null: 0 / 695
+  rerank_fallback True: 345 / 695
+
+Sample rows:
+    CWNS_ID  candidate_rank  stage2a_score  stage2b_score  score_margin  rerank_fallback
+01000161001             1.0       0.791167       0.191087      0.104021             True
+01000161001             2.0       0.722517       0.087066      0.104021             True
+01000161001             3.0       0.782633       0.082489      0.104021             True
+01000161001             4.0       0.585650       0.044954      0.104021             True
+01000161001             5.0       0.650133       0.042508      0.104021             True
+05000437001             1.0       0.837031       0.850117      0.313088            False
+05000437001             2.0       0.966017       0.537029      0.313088            False
+05000437001             3.0       0.932850       0.529319      0.313088            False
+05000437001             4.0       0.910255       0.224841      0.313088            False
+05000437001             5.0       0.690675       0.194587      0.313088            False
+
+Done.
+Finished: Thu Sep 10 13:24:11 EDT 2026

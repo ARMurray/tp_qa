@@ -1,0 +1,59 @@
+==========================================
+Node:    r4n17
+Job ID:  7414143
+CPUs:    8
+Started: Thu Sep 10 12:56:46 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py --states AL,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+=== 05b_rerank_candidates.py ===
+
+Loading re-ranker...
+  Loaded rerank_rf_model.joblib: 72 feature columns
+
+Loading Stage 2a candidates...
+  Restricted to ['AL', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
+  234246 candidate(s) across 11715 plant(s)
+
+Loading candidate OD features (01e --all)...
+  234225 candidate(s) with OD across 11715 plant(s)
+  OD coverage: 234225/234246 candidate(s) (100.0%)
+
+Deriving features...
+Traceback (most recent call last):
+  File "/work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py", line 282, in <module>
+    main()
+  File "/work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py", line 208, in main
+    df = add_derived(df, has_od)
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py", line 128, in add_derived
+    fired > 0, df["od_has_detection"].astype(float) / fired, 0.0)
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/ops/common.py", line 85, in new_method
+    return method(self, other)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/arraylike.py", line 214, in __truediv__
+    return self._arith_method(other, operator.truediv)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/series.py", line 6751, in _arith_method
+    return base.IndexOpsMixin._arith_method(self, other, op)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/base.py", line 1644, in _arith_method
+    result = ops.arithmetic_op(lvalues, rvalues, op)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/ops/array_ops.py", line 289, in arithmetic_op
+    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/ops/array_ops.py", line 220, in _na_arithmetic_op
+    result = func(left, right)
+             ^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/computation/expressions.py", line 252, in evaluate
+    return _evaluate(op, op_str, left_op, right_op)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/computation/expressions.py", line 83, in _evaluate_standard
+    return op(left_op, right_op)
+           ^^^^^^^^^^^^^^^^^^^^^
+ZeroDivisionError: float division by zero
+Finished: Thu Sep 10 12:57:06 EDT 2026  (exit 1)

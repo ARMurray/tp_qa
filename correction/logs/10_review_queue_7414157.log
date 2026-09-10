@@ -1,0 +1,34 @@
+==========================================
+Node:    r4n19
+Job ID:  7414157
+CPUs:    4
+Started: Thu Sep 10 13:22:35 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/10_build_review_queue.py --states AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY --round 2
+=== 10_build_review_queue.py ===
+States: AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY  |  Round: 2  |  Model version tag: unversioned-2026-09-10
+Using re-ranked (OD-aware) inference output
+
+Loaded 16198 scored plants, 240546 candidate rows
+  Excluding 150 plant(s) already reviewed in a prior round (150 total prior reviews found across all uploaded review_log/holdout_truth files)
+
+Loading plant display info (address/city/county, pop_served, discharge facts)...
+
+Review tasks: 16048 plants -- 11894 candidate_pick, 4154 confirm_reported
+
+Holdout slice: 0 unreviewed unlabeled-bin plant(s) in this pilot's scope (skipped -- round > 1)
+
+Batch composition (target size 150):
+  holdout   : 0
+  uncertain : 105 (of 3769 eligible, target 105)
+  random    : 45 (target 45)
+
+=== Summary ===
+  Plants queued : 150
+  Queue rows    : 706 (695 candidate_pick, 11 confirm_reported)
+
+Written: /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round2.parquet
+Finished: Thu Sep 10 13:22:43 EDT 2026

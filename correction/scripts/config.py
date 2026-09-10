@@ -37,7 +37,7 @@ from pathlib import Path
 # ===========================================================================
 # 1. ROOT  (the only line that changes if the pipeline moves)
 # ===========================================================================
-ROOT = Path("/work/GRDVULN/correction")
+ROOT = Path("/work/GRDVULN/tp_qa/correction")
 
 SCRIPTS_DIR = ROOT / "scripts"
 LOGS_DIR    = ROOT / "logs"

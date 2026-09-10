@@ -1,0 +1,38 @@
+==========================================
+Node:    r7n28
+Job ID:  7414139
+CPUs:    8
+Started: Thu Sep 10 12:47:51 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py --states AR
+=== 05b_rerank_candidates.py ===
+
+Loading re-ranker...
+  Loaded rerank_rf_model.joblib: 72 feature columns
+
+Loading Stage 2a candidates...
+  Restricted to ['AR']
+  6300 candidate(s) across 315 plant(s)
+
+Loading candidate OD features (01e --all)...
+  6300 candidate(s) with OD across 315 plant(s)
+  OD coverage: 6300/6300 candidate(s) (100.0%)
+
+Deriving features...
+Scoring...
+
+  Fallback to Stage 2a ordering for 182 plant(s) where no candidate fired
+
+  Candidates whose rank changed : 2360 (37.5%)
+  Plants with a NEW top pick    : 58 (18.4%)
+  Median Stage 2a rank of the promoted candidate: 5
+
+Written: /work/GRDVULN/tp_qa/correction/data/inference/stage2_candidates_reranked.parquet
+Written: /work/GRDVULN/tp_qa/correction/data/inference/plant_summary_reranked.parquet
+
+Next: point 10_build_review_queue.py at the reranked table. Both scores are
+preserved per candidate, so a reviewer can compare Stage 2a against the re-rank.
+Finished: Thu Sep 10 12:48:09 EDT 2026  (exit 0)

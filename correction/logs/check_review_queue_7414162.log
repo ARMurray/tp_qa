@@ -1,0 +1,36 @@
+==========================================
+Node:    a0n15
+Job ID:  7414162
+CPUs:    2
+Started: Thu Sep 10 13:32:52 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/check_review_queue_scores.py --round 2
+Loaded /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round2.parquet
+Columns: ['CWNS_ID', 'STATE_CODE', 'll_uuid', 'candidate_rank', 'stage2a_score', 'stage2b_score', 'score_margin', 'rerank_fallback', 'review_task', 'owner', 'lbcs_activity', 'lbcs_ownership', 'lbcs_function', 'lbcs_structure', 'lbcs_site', 'll_gisacre', 'll_bldg_count', 'dominant_class_group', 'has_ww_keyword', 'osm_ww', 'distance_m', 'within_1km', 'within_5km', 'data_quality_score', 'queue_slice', 'model_version', 'review_round', 'is_holdout', 'LATITUDE', 'LONGITUDE', 'reported_ll_uuid', 'stage1_prob_correct', 'trigger_reason', 'ADDRESS', 'CITY', 'COUNTY_NAME', 'ZIP_CODE', 'pop_served', 'subdivision', 'place', 'county', 'is_rural', 'surface_water_discharge', 'requires_npdes', 'any_reuse']
+
+stage2b_score present  : True
+rerank_fallback present: True
+
+candidate_pick rows: 730
+  stage2a_score null: 0 / 730
+  stage2b_score null: 0 / 730
+  rerank_fallback True: 475 / 730
+
+Sample rows:
+    CWNS_ID  candidate_rank  stage2a_score  stage2b_score  score_margin  rerank_fallback
+05000176001             1.0       0.867833       0.172199      0.043533             True
+05000176001             2.0       0.824300       0.048985      0.043533             True
+05000176001             3.0       0.768648       0.161224      0.043533             True
+05000176001             4.0       0.747750       0.017369      0.043533             True
+05000176001             5.0       0.732000       0.019676      0.043533             True
+05000782001             1.0       0.796600       0.541141      0.042100             True
+05000782001             2.0       0.754500       0.390316      0.042100             True
+05000782001             3.0       0.712017       0.023194      0.042100             True
+05000782001             4.0       0.704083       0.298547      0.042100             True
+05000782001             5.0       0.685800       0.025075      0.042100             True
+
+Done.
+Finished: Thu Sep 10 13:32:53 EDT 2026

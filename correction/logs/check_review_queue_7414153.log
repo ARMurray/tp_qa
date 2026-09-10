@@ -1,0 +1,18 @@
+==========================================
+Node:    a0n15
+Job ID:  7414153
+CPUs:    2
+Started: Thu Sep 10 13:14:27 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/check_review_queue_scores.py --round 2
+Loaded /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round2.parquet
+Columns: ['CWNS_ID', 'STATE_CODE', 'll_uuid', 'candidate_rank', 'stage2a_score', 'score_margin', 'review_task', 'owner', 'lbcs_activity', 'lbcs_ownership', 'lbcs_function', 'lbcs_structure', 'lbcs_site', 'll_gisacre', 'll_bldg_count', 'dominant_class_group', 'has_ww_keyword', 'osm_ww', 'distance_m', 'within_1km', 'within_5km', 'data_quality_score', 'queue_slice', 'model_version', 'review_round', 'is_holdout', 'LATITUDE', 'LONGITUDE', 'reported_ll_uuid', 'stage1_prob_correct', 'trigger_reason', 'ADDRESS', 'CITY', 'COUNTY_NAME', 'ZIP_CODE', 'pop_served', 'subdivision', 'place', 'county', 'is_rural', 'surface_water_discharge', 'requires_npdes', 'any_reuse']
+
+stage2b_score present  : False
+rerank_fallback present: False
+
+STOP: stage2b_score is missing entirely -- the 10_ edits didn't take, or this file predates them. Nothing further to check.
+Finished: Thu Sep 10 13:14:28 EDT 2026

@@ -4,15 +4,12 @@
 Assembles a reviewable batch from 05_run_inference.py's output, per
 REVIEW_LOOP_PLAN.md Phase 3.
 
-DEVIATION FROM THE PLAN, INTENTIONAL: the plan's queue schema is built around
-Stage 2b scores (`stage2b_score`, margin between Stage 2b's top-1/top-2).
-Stage 2b is deliberately excluded from this pilot round -- see
-TPQA_MASTER_REFERENCE.md S3/S10: OD features contribute almost nothing to the
-current Stage 2b model, so it isn't in 05's inference chain yet. Every place
-the plan says "Stage 2b score" this script uses Stage 2a's `stage2_prob_correct`
-instead, and says so in the column names (`stage2a_score`, not `stage2b_score`)
-so nothing pretends otherwise. If Stage 2b re-enters the pipeline later, this
-script's scoring basis needs to change, not just its labels.
+STAGE 2B: this now uses the OD-aware re-ranker (05b_rerank_candidates.py's
+rerank_score) as stage2b_score, ranking candidates by it when available.
+stage2a_score (Stage 2a's stage2_prob_correct) is always kept alongside it
+so a reviewer can compare both. Falls back to Stage 2a-only scoring (with
+stage2b_score left null) if 05b hasn't been run for the requested states --
+see the coverage check in main().
 
 TWO REVIEW TASK TYPES, not one -- the plan's per-candidate schema assumes
 every queued plant has candidates to choose from. It doesn't, for a reason
@@ -92,26 +89,43 @@ def load_holdout_unreviewed() -> set:
 
 def build_candidate_pick_rows(plant_summary: pd.DataFrame,
                               candidates: pd.DataFrame) -> pd.DataFrame:
-    """One row per (plant, candidate), top TOP_K_SHOWN by stage2a_score,
-    plus candidate_rank and score_margin (top1 vs top2 for that plant)."""
+    """One row per (plant, candidate), top TOP_K_SHOWN. Ranked by
+    stage2b_score normally, but stage2a_score for plants where the
+    re-ranker fell back (nothing in the pool fired OD, so stage2b_score
+    carries no ranking signal there -- see 05b's own docstring). Both raw
+    scores are always kept in the output regardless of which one is used
+    to rank."""
     cand = candidates.copy()
     cand = cand.rename(columns={"stage2_prob_correct": "stage2a_score"})
-    cand = cand.sort_values(["CWNS_ID", "stage2a_score"], ascending=[True, False])
+
+    has_rerank = "rerank_score" in cand.columns
+    if has_rerank:
+        cand = cand.rename(columns={"rerank_score": "stage2b_score"})
+    else:
+        cand["stage2b_score"] = np.nan
+    if "rerank_fallback" not in cand.columns:
+        cand["rerank_fallback"] = False
+
+    if has_rerank:
+        cand["_rank_score"] = np.where(
+            cand["rerank_fallback"], cand["stage2a_score"], cand["stage2b_score"])
+    else:
+        cand["_rank_score"] = cand["stage2a_score"]
+
+    cand = cand.sort_values(["CWNS_ID", "_rank_score"], ascending=[True, False])
     cand["candidate_rank"] = cand.groupby("CWNS_ID").cumcount() + 1
     cand = cand[cand["candidate_rank"] <= TOP_K_SHOWN].copy()
 
     margins = (cand[cand["candidate_rank"].isin([1, 2])]
-               .pivot(index="CWNS_ID", columns="candidate_rank", values="stage2a_score"))
+               .pivot(index="CWNS_ID", columns="candidate_rank", values="_rank_score"))
     if 2 in margins.columns:
         margins["score_margin"] = margins[1] - margins[2]
     else:
-        # only one candidate for every plant in this batch -- undefined margin,
-        # treated as maximally uncertain (nothing to compare against) rather
-        # than as confidently separated.
         margins["score_margin"] = 0.0
     margins = margins[["score_margin"]].reset_index()
 
     cand = cand.merge(margins, on="CWNS_ID", how="left")
+    cand = cand.drop(columns=["_rank_score"])
     cand["review_task"] = "candidate_pick"
     return cand
 
@@ -119,16 +133,18 @@ def build_candidate_pick_rows(plant_summary: pd.DataFrame,
 def build_confirm_reported_rows(plant_summary: pd.DataFrame,
                                 cwns_ids: set) -> pd.DataFrame:
     """One row per plant with nothing to rank -- reviewer confirms/rejects the
-    reported location directly. Covers both Stage-1-passed plants (no Stage 2a
-    run at all) and flagged plants that lost every candidate."""
+    reported location directly."""
     rows = plant_summary[plant_summary["CWNS_ID"].isin(cwns_ids)].copy()
     rows["candidate_rank"] = pd.NA
     rows["ll_uuid"] = rows["reported_ll_uuid"]
     rows["stage2a_score"] = np.nan
+    rows["stage2b_score"] = np.nan
     rows["score_margin"] = np.nan
+    rows["rerank_fallback"] = False
     rows["review_task"] = "confirm_reported"
     keep_cols = ["CWNS_ID", "STATE_CODE", "ll_uuid", "candidate_rank",
-                 "stage2a_score", "score_margin", "review_task"]
+                 "stage2a_score", "stage2b_score", "score_margin",
+                 "rerank_fallback", "review_task"]
     return rows[[c for c in keep_cols if c in rows.columns]]
 
 
@@ -239,6 +255,10 @@ def main():
                           "(round_manifest.json doesn't exist yet either, see "
                           "TPQA_MASTER_REFERENCE.md S4 Phase 7).")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--allow-partial-rerank", action="store_true",
+                     help="proceed even if some states with flagged plants have no "
+                          "reranked candidates (those plants get empty candidate "
+                          "lists). Off by default -- the script exits instead.")
     args = ap.parse_args()
 
     from datetime import date
@@ -249,8 +269,40 @@ def main():
           f"Model version tag: {model_version}")
 
     inference_dir = C.DATA_DIR / "inference"
-    plant_summary = pd.read_parquet(inference_dir / "plant_summary.parquet")
-    candidates = pd.read_parquet(inference_dir / "stage2_candidates.parquet")
+    reranked_summary = inference_dir / "plant_summary_reranked.parquet"
+    reranked_cands = inference_dir / "stage2_candidates_reranked.parquet"
+    if reranked_summary.exists() and reranked_cands.exists():
+        print("Using re-ranked (OD-aware) inference output")
+        plant_summary = pd.read_parquet(reranked_summary)
+        candidates = pd.read_parquet(reranked_cands)
+
+        flagged_states = set(plant_summary.loc[plant_summary["n_candidates"] > 0, "STATE_CODE"])
+        reranked_states = set(candidates["STATE_CODE"])
+        missing_states = flagged_states - reranked_states
+        requested_states = set(s.strip() for s in args.states.split(","))
+        missing_states &= requested_states
+
+        if missing_states:
+            n_affected_plants = int(plant_summary.loc[
+                plant_summary["STATE_CODE"].isin(missing_states)
+                & (plant_summary["n_candidates"] > 0), "CWNS_ID"].nunique())
+            msg = (f"{len(missing_states)} requested state(s) have flagged plants "
+                   f"but NO reranked candidates -- {n_affected_plants} plant(s) "
+                   f"would get EMPTY candidate lists: {sorted(missing_states)}\n"
+                   f"Run 05b_rerank_candidates.py for these states first, or "
+                   f"remove them from --states, or pass --allow-partial-rerank "
+                   f"to proceed anyway (NOT recommended for a live review round).")
+            if args.allow_partial_rerank:
+                print(f"  WARNING (proceeding, --allow-partial-rerank set): {msg}")
+            else:
+                print(f"  ERROR: {msg}")
+                sys.exit(2)
+    else:
+        print("WARNING: reranked output not found -- run 05b_rerank_candidates.py "
+              "first for OD-aware scores. Falling back to Stage 2a-only.")
+        plant_summary = pd.read_parquet(inference_dir / "plant_summary.parquet")
+        candidates = pd.read_parquet(inference_dir / "stage2_candidates.parquet")
+
     print(f"\nLoaded {len(plant_summary)} scored plants, "
           f"{len(candidates)} candidate rows")
 
@@ -344,7 +396,8 @@ def main():
                         "dominant_class_group", "has_ww_keyword", "osm_ww",
                         "distance_m", "within_1km", "within_5km", "data_quality_score"]
     common_cols = ["CWNS_ID", "STATE_CODE", "ll_uuid", "candidate_rank",
-                   "stage2a_score", "score_margin", "review_task"]
+                   "stage2a_score", "stage2b_score", "score_margin",
+                   "rerank_fallback", "review_task"]
     all_row_cols = common_cols + PARCEL_INFO_COLS
     for df in (cp, cr):
         for c in all_row_cols:
@@ -385,8 +438,6 @@ def main():
     print(f"  Queue rows    : {len(queue)} "
           f"({len(cp)} candidate_pick, {len(cr)} confirm_reported)")
     print(f"\nWritten: {out_path}")
-    print(f"\nNOTE: 'stage2a_score' in this file is Stage 2a's output, standing in "
-          f"for the plan's 'stage2b_score' -- see module docstring.")
 
 
 if __name__ == "__main__":

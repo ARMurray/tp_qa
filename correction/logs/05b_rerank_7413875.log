@@ -1,0 +1,9 @@
+==========================================
+Node:    r7n29
+Job ID:  7413875
+CPUs:    8
+Started: Wed Sep  9 17:47:29 EDT 2026
+==========================================
+Loaded module: python/3.11
+ERROR: venv not found at /work/GRDVULN/tp_qa/correction/.venv
+Run 'bash /work/GRDVULN/tp_qa/correction/scripts/setup_env.sh' on a login node first.
