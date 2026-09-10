@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get("/status")
-def queue_status():
+def queue_status(review_round: int | None = None):
     with db.get_conn() as conn:
         slices = db.counts_by_slice(conn)
     total = sum(s["total"] for s in slices)
@@ -71,11 +71,11 @@ def _load_plant_with_context(plant: dict, candidates: list[dict]) -> dict:
 
 
 @router.get("/next")
-def next_plant():
+def get_next_plant(review_round: int = 1):
     with db.get_conn() as conn:
-        plant = db.next_unreviewed(conn)
-        if plant is None:
-            return {"done": True}
+        plant = db.next_unreviewed(conn, review_round)
+    if not plant:
+        return {"done": True}
         candidates = db.get_candidates(conn, plant["cwns_id"]) if plant["review_task"] == "candidate_pick" else []
 
     result = _load_plant_with_context(plant, candidates)
@@ -94,3 +94,9 @@ def get_plant_by_id(cwns_id: str):
         candidates = db.get_candidates(conn, cwns_id) if plant["review_task"] == "candidate_pick" else []
 
     return _load_plant_with_context(plant, candidates)
+
+@router.get("/rounds")
+def available_rounds():
+    with db.get_conn() as conn:
+        rounds = db.list_available_rounds(conn)
+    return {"rounds": rounds, "latest": max(rounds) if rounds else None}
