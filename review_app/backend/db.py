@@ -128,6 +128,7 @@ CANDIDATES_MIGRATION_COLS = [
     ("ll_gisacre", "REAL"), ("ll_bldg_count", "REAL"),
     ("dominant_class_group", "TEXT"), ("has_ww_keyword", "INTEGER"),
     ("osm_ww", "INTEGER"), ("data_quality_score", "REAL"),
+    ("stage2b_score", "REAL"), ("rerank_fallback", "INTEGER"),
 ]
 
 

@@ -102,15 +102,15 @@ async function loadRounds() {
     currentRound = data.latest;
     select.value = currentRound;
     select.addEventListener("change", () => {
-    currentRound = parseInt(select.value, 10);
-    refreshNavList();
-    refreshStatus();
-    loadNextPlant();   // jump to next unreviewed plant in the newly selected round
-});
+        currentRound = parseInt(select.value, 10);
+        refreshNavList();
+        refreshStatus();
+        loadNextPlant();   // jump to next unreviewed plant in the newly selected round
+    });
 }
 
 async function refreshNavList() {
-    const res = await fetch("/api/plants/list?review_round=1");
+    const res = await fetch(`/api/plants/list?review_round=${currentRound}`);
     const plants = await res.json();
 
     document.getElementById("nav-count").textContent =

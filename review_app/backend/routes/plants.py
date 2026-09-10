@@ -69,13 +69,18 @@ def _load_plant_with_context(plant: dict, candidates: list[dict]) -> dict:
         "reported_context": reported_context,
     }
 
+@router.get("/rounds")
+def available_rounds():
+    with db.get_conn() as conn:
+        rounds = db.list_available_rounds(conn)
+    return {"rounds": rounds, "latest": max(rounds) if rounds else None}
 
 @router.get("/next")
 def get_next_plant(review_round: int = 1):
     with db.get_conn() as conn:
         plant = db.next_unreviewed(conn, review_round)
-    if not plant:
-        return {"done": True}
+        if not plant:
+            return {"done": True}
         candidates = db.get_candidates(conn, plant["cwns_id"]) if plant["review_task"] == "candidate_pick" else []
 
     result = _load_plant_with_context(plant, candidates)
@@ -95,8 +100,3 @@ def get_plant_by_id(cwns_id: str):
 
     return _load_plant_with_context(plant, candidates)
 
-@router.get("/rounds")
-def available_rounds():
-    with db.get_conn() as conn:
-        rounds = db.list_available_rounds(conn)
-    return {"rounds": rounds, "latest": max(rounds) if rounds else None}

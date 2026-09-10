@@ -46,12 +46,12 @@ PLANT_DISPLAY_COLS = ["ADDRESS", "CITY", "COUNTY_NAME", "ZIP_CODE",
                       "pop_served", "subdivision", "place", "county", "is_rural",
                       "surface_water_discharge", "requires_npdes", "any_reuse"]
 
-CAND_COLS = ["CWNS_ID", "candidate_rank", "ll_uuid", "stage2a_score",
+CAND_COLS = ["CWNS_ID", "candidate_rank", "ll_uuid", "stage2a_score", "stage2b_score",
              "score_margin", "distance_m", "within_1km", "within_5km",
              "owner", "lbcs_activity", "lbcs_ownership", "lbcs_function",
              "lbcs_structure", "lbcs_site", "ll_gisacre", "ll_bldg_count",
              "dominant_class_group", "has_ww_keyword", "osm_ww",
-             "data_quality_score"]
+             "data_quality_score", "rerank_fallback"]
 
 
 def _insert_plant(conn, r):
@@ -82,19 +82,20 @@ def _bool_or_none(v):
 def _insert_candidate(conn, r):
     conn.execute("""
         INSERT INTO candidates (cwns_id, candidate_rank, ll_uuid,
-            stage2a_score, score_margin, distance_m, within_1km, within_5km,
+            stage2a_score, stage2b_score, score_margin, distance_m, within_1km, within_5km,
             owner, lbcs_activity, lbcs_ownership, lbcs_function,
             lbcs_structure, lbcs_site, ll_gisacre, ll_bldg_count,
-            dominant_class_group, has_ww_keyword, osm_ww, data_quality_score)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            dominant_class_group, has_ww_keyword, osm_ww, data_quality_score,
+            rerank_fallback)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (str(r["CWNS_ID"]), int(r["candidate_rank"]), r["ll_uuid"],
-          r.get("stage2a_score"), r.get("score_margin"), r.get("distance_m"),
+          r.get("stage2a_score"), r.get("stage2b_score"), r.get("score_margin"), r.get("distance_m"),
           _bool_or_none(r.get("within_1km")), _bool_or_none(r.get("within_5km")),
           r.get("owner"), r.get("lbcs_activity"), r.get("lbcs_ownership"),
           r.get("lbcs_function"), r.get("lbcs_structure"), r.get("lbcs_site"),
           r.get("ll_gisacre"), r.get("ll_bldg_count"), r.get("dominant_class_group"),
           _bool_or_none(r.get("has_ww_keyword")), _bool_or_none(r.get("osm_ww")),
-          r.get("data_quality_score")))
+          r.get("data_quality_score"), _bool_or_none(r.get("rerank_fallback"))))
 
 
 def load_round(round_num: int, force: bool = False, update_metadata: bool = False):
