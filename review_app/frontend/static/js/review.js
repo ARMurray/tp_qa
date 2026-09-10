@@ -34,6 +34,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("reviewer-name").addEventListener("change", saveReviewerName);
 });
 
+function formatScores(c) {
+    const b = c.stage2b_score;
+    const a = c.stage2a_score;
+    if (b != null) {
+        return `${b.toFixed(3)}${a != null ? ` (2a: ${a.toFixed(3)})` : ""}`;
+    }
+    return a != null ? `${a.toFixed(3)} (2a only)` : "n/a";
+}
+
 function loadReviewerName() {
     const saved = localStorage.getItem("reviewer_name");
     if (saved) document.getElementById("reviewer-name").value = saved;
@@ -225,7 +234,8 @@ function renderCandidatePickTask(candidates, panel) {
         row.className = "candidate-row";
         row.innerHTML = `
             <span class="rank-swatch rank-${c.candidate_rank}">${c.candidate_rank}</span>
-            <span>score ${c.stage2a_score !== null ? c.stage2a_score.toFixed(3) : "n/a"}</span>
+            <span>score ${formatScores(c)}</span>
+            ${c.rerank_fallback ? '<span class="fallback-badge" title="No candidate in this pool fired OD -- ordered by Stage 2a instead">2a fallback</span>' : ''}
             <span>${c.distance_m !== null ? Math.round(c.distance_m) + "m" : ""}</span>
             <button data-uuid="${c.ll_uuid}" data-rank="${c.candidate_rank}" class="pick-candidate-btn">
                 This is correct
@@ -233,8 +243,6 @@ function renderCandidatePickTask(candidates, panel) {
         `;
         list.appendChild(row);
 
-        // owner/lbcs detail line under each row -- same info as the map
-        // popup, visible without hovering, since the popup requires a click.
         const detail = document.createElement("div");
         detail.className = "candidate-detail";
         detail.innerHTML = buildCandidateDetailLine(c);
@@ -250,7 +258,8 @@ function renderCandidatePickTask(candidates, panel) {
 }
 
 function buildCandidatePopup(c) {
-    const lines = [`<b>Rank ${c.candidate_rank}</b>`, `Score: ${c.stage2a_score !== null ? c.stage2a_score.toFixed(3) : "n/a"}`];
+    const lines = [`<b>Rank ${c.candidate_rank}</b>`, `Score: ${formatScores(c)}`];
+    if (c.rerank_fallback) lines.push(`<i>No OD detections in this pool -- ranked by Stage 2a</i>`);
     if (c.distance_m != null) lines.push(`Distance: ${Math.round(c.distance_m)}m`);
     if (c.owner) lines.push(`Owner: ${c.owner}`);
     if (c.lbcs_activity_desc) lines.push(`Activity: ${c.lbcs_activity_desc}`);

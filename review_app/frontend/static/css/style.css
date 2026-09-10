@@ -28,6 +28,16 @@ html, body, #app { height: 100%; margin: 0; font-family: -apple-system, Segoe UI
 #main { display: flex; flex: 1; min-height: 0; }
 #map { flex: 1; }
 
+.fallback-badge {
+    font-size: 0.7em;
+    padding: 1px 6px;
+    border-radius: 3px;
+    background: #fff3cd;
+    color: #856404;
+    white-space: nowrap;
+    margin-left: 4px;
+}
+
 #plant-nav {
     width: 240px;
     background: #23233a;

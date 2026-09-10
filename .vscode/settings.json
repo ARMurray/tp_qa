@@ -1,0 +1,4 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/review_app/.venv/Scripts/python.exe",
+    "python.analysis.extraPaths": ["review_app"]
+}
