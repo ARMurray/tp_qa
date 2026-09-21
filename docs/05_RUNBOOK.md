@@ -17,6 +17,9 @@ python -m sync.close_round --round N --dry-run
 python -m sync.close_round --round N
 ```
 
+Omit `--round` to close every reviewed round at once — the catch-up case,
+for a machine with review history that has never folded any of it in.
+
 Then upload what it tells you to:
 
 | File | Destination on HPC |
@@ -136,6 +139,26 @@ Confirm the shared external stores exist:
 cd review_app
 pip install -r requirements.txt
 ```
+
+**Migrate the master to GeoPackage — once per machine that holds it.**
+
+The master moved from `.gdb` to `.gpkg` on 2026-09-21 so the review loop can
+write the file it reads. If this machine still has `Updates.gdb`:
+
+```bash
+python -m sync.migrate_master_to_gpkg --dry-run
+python -m sync.migrate_master_to_gpkg
+```
+
+It copies the newest dated layer across unchanged — a container change, not
+a data change — and asserts the row and column counts match afterwards.
+`close_round.py` cannot create the master, only add layers to it, so this
+must happen first or the first fold-back fails with "Master gpkg not found."
+
+> Do **not** seed the master from any `Updates.gpkg` written by the retired
+> `pull_reviews.R`. Its corrections point at the location they were meant to
+> correct. The migration script refuses such a source, but it is worth
+> knowing why.
 
 Then check `config.py`:
 

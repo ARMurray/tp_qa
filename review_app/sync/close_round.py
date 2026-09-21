@@ -7,6 +7,17 @@ next model training run can consume, then prints exactly what to upload.
     python -m sync.close_round --round 2 --dry-run
     python -m sync.close_round --round 2
 
+    python -m sync.close_round              # catch-up: every reviewed round
+
+Omitting --round closes every round with reviewed plants in app.db, folding
+them into the master in a single dated layer. That is what you want the
+first time this runs on a machine that has review history but has never
+folded any of it in. Normal per-round use passes --round N.
+
+FIRST RUN ON A MACHINE HOLDING THE MASTER: the master must already be a
+.gpkg. If it is still Updates.gdb, run sync/migrate_master_to_gpkg.py once
+first -- this script cannot create the master, only add layers to it.
+
 WHY ONE COMMAND
 ---------------
 A review round produces four different things with four different
@@ -85,6 +96,7 @@ was deleted 2026-09-21.
                         the one most easily forgotten.
 """
 import argparse
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -119,11 +131,28 @@ def run(label: str, argv: list[str], cwd: Path, dry_run: bool) -> bool:
     return True
 
 
+def reviewed_rounds(db_path: Path) -> list[int]:
+    """Every round with at least one reviewed plant, ascending."""
+    if not db_path.exists():
+        raise SystemExit(f"app.db not found: {db_path}")
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute(
+            "SELECT DISTINCT review_round FROM plants WHERE reviewed = 1 "
+            "ORDER BY review_round").fetchall()
+    return [r[0] for r in rows]
+
+
 def main():
     ap = argparse.ArgumentParser(
         description="Close a review round: export, fold into the master, "
                     "rebuild training bins, extract tiles.")
-    ap.add_argument("--round", type=int, required=True)
+    # Optional, not required (2026-09-21). Omitting it closes EVERY reviewed
+    # round at once, which is what you want on a first run against a machine
+    # that has review history but has never folded any of it into the master
+    # -- the catch-up case. Passing --round N is the normal per-round use.
+    ap.add_argument("--round", type=int, default=None,
+                    help="round to close. Omit to close every reviewed round "
+                         "found in app.db (catch-up).")
     ap.add_argument("--all", action="store_true",
                     help="pass --all to push_review_log (re-export every "
                          "reviewed plant for this round, not just new ones)")
@@ -140,24 +169,44 @@ def main():
                     help="print every command without running any of them")
     args = ap.parse_args()
 
-    print(f"=== close_round.py -- round {args.round} ===")
+    rounds = [args.round] if args.round is not None else reviewed_rounds(C.APP_DB_PATH)
+    if not rounds:
+        raise SystemExit("No reviewed plants in app.db -- nothing to close.")
+
+    label = f"round {args.round}" if args.round is not None \
+        else f"ALL reviewed rounds {rounds}"
+    print(f"=== close_round.py -- {label} ===")
+    if args.round is None:
+        print("  (no --round given: closing every reviewed round at once)")
     if args.dry_run:
         print("--dry-run: nothing will be written\n")
 
     results: list[tuple[str, bool, str]] = []
 
     # ---- 1. export verdicts --------------------------------------------
-    argv = ["-m", "sync.push_review_log", "--round", str(args.round)]
-    if args.all:
-        argv.append("--all")
-    ok = run("1/4  push_review_log -- export verdicts + route holdout",
-             argv, APP_ROOT, args.dry_run)
-    results.append(("push_review_log", ok, "audit trail + holdout routing"))
+    # One export per round: push_review_log writes per-round parquet files
+    # and tracks exports per round, so it has no "all rounds" mode.
+    export_ok = True
+    for rnd in rounds:
+        argv = ["-m", "sync.push_review_log", "--round", str(rnd)]
+        if args.all:
+            argv.append("--all")
+        if not run(f"1/4  push_review_log -- export round {rnd} + route holdout",
+                   argv, APP_ROOT, args.dry_run):
+            export_ok = False
+    results.append(("push_review_log", export_ok,
+                    f"audit trail + holdout routing ({len(rounds)} round(s))"))
 
     # ---- 2. fold into the master ---------------------------------------
-    # Not gated on step 1: the master update reads app.db directly, not the
-    # exported parquet, so an export failure does not invalidate it.
-    argv = ["-m", "sync.update_master_locations", "--round", str(args.round)]
+    # ONE call covering every round: the master update reads app.db directly
+    # and updates rows in place, so folding all rounds at once produces one
+    # dated layer rather than a chain of same-day _vN layers.
+    #
+    # Not gated on step 1: it reads app.db, not the exported parquet, so an
+    # export failure does not invalidate it.
+    argv = ["-m", "sync.update_master_locations"]
+    if args.round is not None:
+        argv += ["--round", str(args.round)]
     if args.include_holdout:
         argv.append("--include-holdout")
     if args.dry_run:
@@ -211,8 +260,9 @@ def main():
     print(f"\nUPLOAD TO HPC ({C.OUTGOING_DIR}):")
     print(f"  training_locations.gpkg          -> correction/data/training/")
     print(f"  candidate_recall_failures.parquet -> correction/data/features/")
-    print(f"  holdout_truth_round{args.round}.parquet       -> merge into "
-          f"correction/data/holdout/holdout_truth.parquet BY HAND")
+    for rnd in rounds:
+        print(f"  holdout_truth_round{rnd}.parquet        -> merge into "
+              f"correction/data/holdout/holdout_truth.parquet BY HAND")
     print(f"     (evaluation only -- it must never reach training)")
 
     print(f"\nTHEN, ON HPC -- in this order:")
