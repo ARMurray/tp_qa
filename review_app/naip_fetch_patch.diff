@@ -1,0 +1,30 @@
+--- a/detection/pipeline/naip_fetch.py
++++ b/detection/pipeline/naip_fetch.py
+@@ def with_retry(fn, *args, max_retries=5, base_delay=8, **kwargs):
+             msg = str(e).lower()
++            # Connection-level failures (forcibly-closed sockets, resets,
++            # aborted connections) show up wrapped differently depending on
++            # layer -- pystac_client.exceptions.APIError, requests'
++            # ConnectionError, urllib3's ProtocolError, or a bare
++            # ConnectionResetError/OSError/WinError 10054 -- none of which
++            # contain "rate limit"/"timeout"/429/503/504 in their message.
++            # Confirmed 2026-09-16: a long run (1600+ sites) died on an
++            # unretried WinError 10054 mid-run with no network outage on
++            # this end -- Planetary Computer or an intermediate proxy just
++            # dropped the socket. These ARE safe to retry (same reasoning
++            # as the rate-limit case: nothing about the request itself was
++            # wrong), so checked by TYPE (not just message, since the type
++            # is the more reliable signal here) in addition to the existing
++            # message-based checks below.
++            transient_types = (ConnectionResetError, ConnectionAbortedError,
++                                ConnectionError, TimeoutError, OSError)
+             is_transient = (
+                 "rate limit" in msg or "timeout" in msg or "timed out" in msg
+                 or re.search(r"\b(429|503|504)\b", msg) is not None
++                or "connection aborted" in msg or "connection reset" in msg
++                or "forcibly closed" in msg or "10054" in msg
++                or isinstance(e, transient_types)
++                or isinstance(e.__cause__, transient_types)
+             )
+             if not is_transient or attempt == max_retries - 1:
+                 raise

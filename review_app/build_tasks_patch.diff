@@ -1,0 +1,41 @@
+--- a/review_app/analysis/extract_review_tiles.py
++++ b/review_app/analysis/extract_review_tiles.py
+@@ def build_tasks(gdf, existing_ids, extract, catalog, dry_run):
+     tasks = []
+-    stats = {"single": 0, "ring": 0, "no_item": 0}
++    stats = {"single": 0, "ring": 0, "no_item": 0, "lookup_failed": 0}
+     print(f"\nBuilding tile grid for {len(gdf)} site(s)...")
+
+     for i, site in enumerate(gdf.itertuples(), start=1):
+         grid = extract.generate_tile_grid(site.geometry)
+         stats["ring" if len(grid) > 1 else "single"] += 1
+         bboxes, centers = extract.tiles_to_wgs84(grid)
+
+         ctr_idx = next(k for k, t in enumerate(grid)
+                        if t["row"] == 2 and t["col"] == 2)
+
+         if dry_run:
+             item_url, acq = "", ""
+         else:
+-            item_url, acq = extract.resolve_item(catalog, bboxes[ctr_idx])
+-            if item_url is None:
+-                print(f"    {site.cwns_id}/{site.ll_uuid}: no NAIP item -- skipping")
+-                stats["no_item"] += 1
+-                continue
++            try:
++                item_url, acq = extract.resolve_item(catalog, bboxes[ctr_idx])
++            except Exception as e:
++                # A site-level lookup failure (all 5 with_retry attempts
++                # exhausted) shouldn't take down planning for every other
++                # site in a 1000+ site run -- log it and move on. Whatever
++                # broke here will very likely also break on a full re-run
++                # from scratch, so failing loud-but-local beats crashing
++                # and losing all the planning work already done.
++                print(f"    {site.cwns_id}/{site.ll_uuid}: item lookup FAILED "
++                      f"({type(e).__name__}: {e}) -- skipping this site")
++                stats["lookup_failed"] += 1
++                continue
++            if item_url is None:
++                print(f"    {site.cwns_id}/{site.ll_uuid}: no NAIP item -- skipping")
++                stats["no_item"] += 1
++                continue

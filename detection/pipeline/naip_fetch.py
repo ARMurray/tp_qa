@@ -101,12 +101,28 @@ class TileOutsideItemCoverage(Exception):
 def with_retry(fn, *args, max_retries=5, base_delay=8, **kwargs):
     """Exponential backoff + jitter for transient Planetary Computer errors.
 
-    Two dated fixes from 01b_run_object_detection.py, both worth keeping:
+    Three dated fixes, all worth keeping:
       - TileOutsideItemCoverage is checked by TYPE and never retried.
         Retrying against the same item fails identically every time.
       - The 429/503/504 check uses a word-boundary regex. A plain substring
         match on "429" false-positived on a pixel offset like "11429" in a
         real error message (confirmed 2026-08-21).
+      - CONNECTION-LEVEL FAILURES (added 2026-09-16): forcibly-closed
+        sockets, resets, aborted connections. These show up wrapped
+        differently depending on layer -- pystac_client's APIError,
+        requests' ConnectionError, urllib3's ProtocolError, or a bare
+        ConnectionResetError/OSError (WinError 10054 on Windows) -- and
+        none of those contain "rate limit"/"timeout"/429/503/504 in their
+        message, so the original checks below missed them entirely and a
+        1600+-site run died on an unretried connection reset mid-run, with
+        no real network outage on this end (Planetary Computer or an
+        intermediate proxy just dropped the socket). These are safe to
+        retry for the same reason a rate limit is -- nothing about the
+        request itself was wrong -- so they're checked by TYPE (more
+        reliable across wrapping layers than message text) in addition to
+        message-based matching, since str(e) does reliably include text
+        like "Connection aborted" / "forcibly closed" even after being
+        wrapped by pystac_client's APIError.
     """
     last_exc = None
     for attempt in range(max_retries):
@@ -117,9 +133,15 @@ def with_retry(fn, *args, max_retries=5, base_delay=8, **kwargs):
             if isinstance(e, TileOutsideItemCoverage):
                 raise
             msg = str(e).lower()
+            transient_types = (ConnectionResetError, ConnectionAbortedError,
+                                ConnectionError, TimeoutError, OSError)
             is_transient = (
                 "rate limit" in msg or "timeout" in msg or "timed out" in msg
                 or re.search(r"\b(429|503|504)\b", msg) is not None
+                or "connection aborted" in msg or "connection reset" in msg
+                or "forcibly closed" in msg or "10054" in msg
+                or isinstance(e, transient_types)
+                or isinstance(getattr(e, "__cause__", None), transient_types)
             )
             if not is_transient or attempt == max_retries - 1:
                 raise
