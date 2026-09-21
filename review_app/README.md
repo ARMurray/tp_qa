@@ -1,5 +1,8 @@
 # tp_qa Review App
 
+> Part of the tp_qa project. For the full manual, start at
+> [`docs/README.md`](../docs/README.md).
+
 Local review app for treatment plant location corrections. Runs entirely on
 your machine -- no HPC connection needed while reviewing. Parcel geometry is
 looked up live via DuckDB against your local Regrid parquet mirror.
@@ -50,31 +53,39 @@ the one thing I couldn't verify without seeing your actual folder structure.
    `holdout_truth`, not the training feed. This matters for your workflow but
    the app doesn't ask you to review any differently.
 
-5. **Export verdicts back out**, any time, as often as you like (safe to
-   re-run -- only exports what's new since the last export unless you pass
-   `--all`):
+5. **Close the round.** One command runs every local post-review step:
+   ```
+   python -m sync.close_round --round N --dry-run
+   python -m sync.close_round --round N
+   ```
+   It exports verdicts, folds them into the master `Updates.gpkg` as a new
+   dated layer, rebuilds `training_locations.gpkg`, and pulls NAIP tiles for
+   every reviewed parcel into `detection/data/tiles/`. Then it prints
+   exactly what to upload to HPC and which jobs to run there.
+
+   Every step is idempotent -- safe to re-run as often as you like.
+   `--skip-tiles` skips the slow imagery fetch, `--skip-bins` the
+   training-bin rebuild. See [`docs/04_REVIEW_LOOP.md`](../docs/04_REVIEW_LOOP.md)
+   for what each step does and why.
+
+   To export verdicts alone without the rest:
    ```
    python -m sync.push_review_log --round N
    ```
-   Writes two files to `data/outgoing/`:
-   - `review_log_round{N}.parquet` -- non-holdout verdicts. Input to the
-     not-yet-built `11_ingest_review_log.py`.
-   - `holdout_truth_round{N}.parquet` -- holdout verdicts. Needs manual
-     merging into HPC's `holdout_truth.parquet` -- **do not** feed this into
-     training.
 
-6. **Sync `data/outgoing/*.parquet` back to HPC** (reverse of step 1 -- no
-   script for this yet, same manual/scp process).
+6. **Upload what `close_round` lists** to HPC (reverse of step 1 -- same
+   manual process). `holdout_truth_round{N}.parquet` is merged into HPC's
+   `holdout_truth.parquet` **by hand** and must never reach training.
 
-## What's NOT built yet
+## Known limitations
 
 - `10_build_review_queue.py`'s round 2+ behavior for holdout: after round 1,
   holdout plants should stop appearing in the queue entirely (per
   REVIEW_LOOP_PLAN.md Phase 4 #3). The queue builder already handles this
   (`--round` > 1 skips the holdout slice) -- nothing to do here, just noting
   it so it's not mistaken for a gap in the app.
-- `11_ingest_review_log.py` on HPC. This app's export is designed to be a
-  reasonable input to it, not a guess at its exact final schema.
+- `sync/pull_round.sh` is a template, not a working script -- its host and
+  paths are placeholders for an HPC access method that was never recorded.
 - Any way to review a specific plant out of the queue's own order, beyond
   `GET /api/plants/{cwns_id}` existing as a raw endpoint. No UI for it yet.
 - Undo / re-review. `POST /api/verdict` refuses a second submission for an
@@ -104,6 +115,8 @@ review_app/
 │   ├── app.db                Local SQLite -- your live review state
 │   └── outgoing/              Exported for syncing back TO HPC
 └── sync/
-    ├── pull_round.sh          Template -- adjust host/path for your HPC access
-    └── push_review_log.py      app.db -> outgoing/*.parquet
+    ├── close_round.py          ONE command to close a round -- start here
+    ├── update_master_locations.py  verdicts -> master Updates.gpkg
+    ├── push_review_log.py        app.db -> outgoing/*.parquet
+    └── pull_round.sh              Template -- adjust for your HPC access
 ```
