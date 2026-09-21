@@ -7,8 +7,8 @@ is manual.
 
 ## The local workstation (Windows)
 
-Runs `detection/` and `review_app/`. This is also where the **master
-locations file** lives, and it is the only copy.
+Runs `detection/` and `review_app/`. The **master locations file** lives in
+the repo here and is tracked in git, so any machine with a clone has it.
 
 ### Python environments
 
@@ -28,7 +28,7 @@ the review app itself.
 | Regrid parcel mirror | `C:\Users\AMURRA02\OneDrive - Environmental Protection Agency (EPA)\Data\Regrid\Parquet_Storage` |
 | Layout within it | `state={state}/*.parquet` (`REGRID_STATE_GLOB`) |
 | CWNS facility names | `...\Github\Sewersheds\Data\FACILITIES.txt` |
-| **Master locations** | `...\Github\Location_Correction\data\Updates.gpkg` |
+| **Master locations** | `correction/data/training/Updates.gpkg` (tracked in git) |
 | Review database | `review_app/data/app.db` |
 | Synced in / out | `review_app/data/incoming/`, `review_app/data/outgoing/` |
 
@@ -36,16 +36,18 @@ the review app itself.
 > back empty. `config.py` carries a long comment about this — it was never
 > verified against the real local folder layout by the person who wrote it.
 
-> **`Updates.gpkg` is not in this repo and not in any backup this project
-> controls.** It is the accumulated output of months of manual verification.
-> See [08_HANDOFF.md](08_HANDOFF.md) — protecting this file is the single
-> highest-value handoff action.
+> **`Updates.gpkg` IS in this repo** (since 2026-09-21) — the one file
+> un-ignored under `correction/data/`. Git is its backup and its sync between
+> machines. It is binary, so git cannot merge it: pull before closing a round,
+> push right after. See [08_HANDOFF.md](08_HANDOFF.md).
 
 ### Local storage note
 
-`detection/data/` and `correction/data/` are both `.gitignore`d. The repo
-holds code and documentation only. Cloning it gets you nothing runnable until
-you also have the data.
+`detection/data/` and `correction/data/` are `.gitignore`d, with exactly one
+exception: `correction/data/training/Updates.gpkg`, the master. Everything
+else — CWNS text exports, the Regrid mirror, NAIP tiles, model outputs —
+stays out. Cloning the repo gets you the master and the code; you still need
+the rest of the data before anything runs.
 
 ---
 
@@ -107,7 +109,7 @@ models/           trained stage1_*/stage2_*/rerank_* models
   object_detection/   best.pt, uploaded from local detection/
 data/
   cwns/                 CWNS text exports
-  training/             Updates.gpkg (uploaded), training_locations.gpkg (built)
+  training/             training_locations.gpkg (uploaded from local)
   nlcd_features/        01a output
   od_features/          01b output — OD at REPORTED locations
   od_features_corrected/    01c output — OD at CORRECTED locations
@@ -161,10 +163,11 @@ run, so you do not have to remember it.
 
 ### What does **not** get uploaded
 
-The master `Updates.gpkg` stays local. Only the narrow derived file
-(`training_locations.gpkg`) crosses. That was a deliberate change on
-2026-09-21 — it is smaller, it is the actual contract the pipeline consumes,
-and it means the HPC never holds a second copy of the master that could drift.
+The master `Updates.gpkg` does not go to the HPC. Only the narrow derived
+file (`training_locations.gpkg`) crosses. It is smaller, it is the actual
+contract the pipeline consumes, and it means the HPC never holds a second copy
+of the master that could drift. The master syncs between local machines
+through git instead.
 
 `build_training_bins.py` still runs on the HPC if you want it to
 (`00_build_training_bins.slurm`), which requires uploading the master. Kept

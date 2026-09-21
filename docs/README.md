@@ -45,8 +45,8 @@ Everything the human review loop produces reaches the models through **one
 file**:
 
 ```
-Updates.gpkg  (master, local)
-    └─ newest CWNS_Locations_YYYYMMDD layer
+Updates.gpkg  (master — tracked in git at correction/data/training/)
+    └─ its single CWNS_Locations_YYYYMMDD layer
          └─ build_training_bins.py
               └─ training_locations.gpkg  (classes / corrections / unverified)
                    └─ every model: Stage 1, Stage 2a, Stage 2b, re-ranker
@@ -57,6 +57,10 @@ There is exactly one derivation path. A second one existed
 producing the same labels from the same verdicts is how they silently
 diverge. If you find yourself adding a second way for review data to reach
 training, that is the thing this design is specifically trying to prevent.
+
+The master lives at `correction/data/training/Updates.gpkg` and is **tracked
+in git** — the one file un-ignored under `correction/data/`. It is binary, so
+pull before closing a round and push right after.
 
 ---
 

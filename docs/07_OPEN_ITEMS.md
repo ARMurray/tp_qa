@@ -105,10 +105,15 @@ They belong somewhere between Stage 2a/2b scoring and final output assembly.
 Template with placeholder host and paths. Either fix it for the real access
 method or delete it so it stops looking like a working tool.
 
-### No automated backup of the master
+### The master is backed up by git, on a personal account
 
-See [08_HANDOFF.md](08_HANDOFF.md). This is the most urgent item in this
-document.
+Resolved in part (2026-09-21): `correction/data/training/Updates.gpkg` is
+tracked, so it has a backup, version history, and cross-machine sync.
+
+What remains: the repository is under a personal GitHub account, which moves
+the account-deprovisioning risk rather than removing it. A repo under an EPA
+organization, or a copy somewhere the team controls, would close it properly.
+See [08_HANDOFF.md](08_HANDOFF.md).
 
 ---
 
@@ -158,7 +163,9 @@ of what was on screen, or delete the export. Do not wire it into training;
 
 ## What I would do first, taking this over
 
-1. **Back up the master.** Nothing else matters if `Updates.gpkg` is lost.
+1. **Get the master somewhere the team controls.** It is in git now, which
+   is a real backup, but the repo is on a personal account — so the
+   deprovisioning risk has moved rather than gone.
 2. **Run one full cycle end to end** on a small state list, using
    [05_RUNBOOK.md](05_RUNBOOK.md), to confirm your access and environment
    work before you need them to.

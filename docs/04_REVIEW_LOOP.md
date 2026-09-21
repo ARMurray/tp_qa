@@ -92,8 +92,14 @@ the HPC.
 | 3 | `build_training_bins.py` | `training_locations.gpkg` — the file that actually crosses to HPC |
 | 4 | `extract_review_tiles.py` | NAIP tiles into `detection/data/tiles/` |
 
-Every step is idempotent. Re-running is safe; step 2 writes a `_vN`-suffixed
-layer rather than overwriting a same-day one.
+Every step is idempotent. Re-running is safe — step 2 rewrites the single
+`CWNS_Locations_YYYYMMDD` layer from `app.db` each time, so a re-run converges
+rather than accumulating.
+
+**Commit and push the master afterwards.** It is tracked in git and binary, so
+git cannot merge it; leaving a round's work uncommitted risks losing it to a
+conflict the next time another machine pushes. `close_round.py` prints the
+commands.
 
 Useful flags: `--skip-tiles` (step 4 fetches imagery and is slow — skip it
 when re-running to fix something downstream), `--skip-bins`, `--all`
@@ -101,15 +107,29 @@ when re-running to fix something downstream), `--skip-bins`, `--all`
 
 ### The master layer convention
 
-`CWNS_Locations_YYYYMMDD`, with `_vN` for same-day re-runs. `YYYYMMDD` sorts
-lexicographically in date order, which is what makes "the newest layer" a
-reliable question to ask. `build_training_bins.py` resolves it automatically
-via `config.latest_master_layer()`, which sorts by **parsed date** and raises
-if nothing matches, rather than falling back to whatever the driver listed
-first.
+`CWNS_Locations_YYYYMMDD`, and there is exactly **one** layer at a time —
+each round replaces it. `YYYYMMDD` sorts lexicographically in date order, so
+"the newest layer" stays a reliable question even if a stray older one turns
+up. `build_training_bins.py` resolves it via `config.latest_master_layer()`,
+which sorts by **parsed date** and raises if nothing matches, rather than
+falling back to whatever the driver listed first.
 
-Set `config.MASTER_LAYER` to a specific name to freeze training labels at a
-known version — reproducing an old run, or bisecting a regression.
+History lives in git, not in a stack of layers inside the file. To freeze
+training labels at a known version — reproducing an old run, bisecting a
+regression:
+
+```bash
+git log correction/data/training/Updates.gpkg
+git checkout <sha> -- correction/data/training/Updates.gpkg
+```
+
+That replaces pinning `config.MASTER_LAYER`, which still works but now has
+nothing older to point at inside a single file.
+
+`update_master_locations.py --keep-layers` appends instead, for a deliberate
+local snapshot. Single-layer mode refuses to run if the file contains any
+layer that is not a dated `CWNS_Locations` one, since rebuilding the file
+would silently drop it.
 
 ---
 

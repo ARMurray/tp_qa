@@ -201,8 +201,8 @@ def find_latest_layer(master_path: Path) -> str:
 def next_layer_name(existing_layers: list[str], run_date: date) -> str:
     """Today's layer name, suffixed if today's already exists.
 
-    Re-running on the same day is normal (review a few more, push again),
-    and overwriting the layer written an hour ago loses that run's rows.
+    Only used with --keep-layers. In the default single-layer mode the old
+    layer is replaced, so a same-day re-run needs no suffix.
     """
     base = f"{LAYER_PREFIX}{run_date.strftime(LAYER_DATE_FMT)}"
     if base not in existing_layers:
@@ -212,6 +212,43 @@ def next_layer_name(existing_layers: list[str], run_date: date) -> str:
         if candidate not in existing_layers:
             return candidate
     raise RuntimeError(f"Too many layers already written for {base}")
+
+
+def write_single_layer(gdf, master_path: Path, layer: str):
+    """Replace the master with a file containing ONLY this layer.
+
+    SINGLE LAYER, NOT AN ACCUMULATING STACK (changed 2026-09-21, when the
+    master moved into git). Each round used to append a full copy of all
+    ~32k rows as a new dated layer, so the file grew ~10 MB per round and
+    every commit stored another full copy. Git already keeps the history,
+    far better than the file can -- `git log` on this path, and
+    `git checkout <sha>` to reproduce any past training build. Keeping both
+    means paying for the same history twice, in the medium that handles it
+    worse.
+
+    Written to a sibling temp file and moved into place with os.replace, an
+    atomic rename on the same filesystem. A crash mid-write leaves the
+    existing master untouched rather than half-rewritten -- which matters
+    because this file is the irreplaceable one. It also compacts: dropping
+    a layer in place would leave the freed SQLite pages behind.
+    """
+    import os
+
+    tmp = master_path.with_name(master_path.name + ".tmp")
+    if tmp.exists():
+        tmp.unlink()
+    gdf.to_file(tmp, layer=layer, driver="GPKG")
+
+    # Verify the temp file before letting it become the master.
+    import geopandas as gpd
+    check = gpd.read_file(tmp, layer=layer)
+    if len(check) != len(gdf):
+        tmp.unlink(missing_ok=True)
+        raise RuntimeError(
+            f"temp master has {len(check)} rows, expected {len(gdf)} -- "
+            f"not replacing the real one")
+
+    os.replace(tmp, master_path)
 
 
 # ---------------------------------------------------------------------------
@@ -474,6 +511,12 @@ def main():
     ap.add_argument("--include-holdout", action="store_true",
                     help="also write holdout plants' verdicts. Off by "
                          "default -- read this script's docstring first.")
+    ap.add_argument("--keep-layers", action="store_true",
+                    help="append a new dated layer instead of replacing the "
+                         "existing one. The master is versioned in git now, "
+                         "so accumulating layers pays for the same history "
+                         "twice -- see write_single_layer(). Here for a "
+                         "deliberate local snapshot, not routine use.")
     ap.add_argument("--dry-run", action="store_true",
                     help="report what would change and write nothing.")
     args = ap.parse_args()
@@ -519,9 +562,33 @@ def main():
         return
 
     layers = [str(n) for n in pyogrio.list_layers(master_path)[:, 0]]
-    out_layer = args.out_layer or next_layer_name(layers, date.today())
-    print(f"\nWriting layer {out_layer} to {master_path} ...")
-    out_gdf.to_file(master_path, layer=out_layer, driver="GPKG")
+    if args.keep_layers:
+        out_layer = args.out_layer or next_layer_name(layers, date.today())
+        print(f"\nAppending layer {out_layer} to {master_path} ...")
+        out_gdf.to_file(master_path, layer=out_layer, driver="GPKG")
+    else:
+        out_layer = args.out_layer or \
+            f"{LAYER_PREFIX}{date.today().strftime(LAYER_DATE_FMT)}"
+        # write_single_layer rebuilds the file from scratch, so anything in
+        # it that ISN'T a dated CWNS_Locations layer would vanish without a
+        # word. The real master has only those -- but a stray notes or
+        # scratch layer someone added in GIS is exactly the kind of thing
+        # you'd never notice was gone until you needed it.
+        foreign = [l for l in layers if parse_layer_date(l) is None]
+        if foreign:
+            raise SystemExit(
+                f"\n{master_path} contains layer(s) that are not dated "
+                f"CWNS_Locations layers:\n  {foreign}\n"
+                f"Single-layer mode rebuilds the file and would drop them.\n"
+                f"Move them to their own .gpkg, or pass --keep-layers to "
+                f"append instead. Nothing written.")
+        replaced = [l for l in layers if l != out_layer]
+        print(f"\nWriting layer {out_layer} to {master_path} ...")
+        if replaced:
+            print(f"  replacing previous layer(s): {replaced}")
+            print(f"  (history lives in git -- `git log` this file, "
+                  f"`git checkout <sha>` to get an earlier version back)")
+        write_single_layer(out_gdf, master_path, out_layer)
 
     print("\nRecall-failure diagnostics ...")
     n_rf = write_recall_failures(verdicts, C.OUTGOING_DIR)

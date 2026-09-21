@@ -131,6 +131,54 @@ def run(label: str, argv: list[str], cwd: Path, dry_run: bool) -> bool:
     return True
 
 
+def check_master_is_current() -> None:
+    """Warn if the tracked master looks out of sync with the remote.
+
+    The master is a binary GPKG tracked in git, so git CANNOT merge it. If
+    this round is closed on one machine while another machine has unpushed
+    changes to the same file, one side's verdicts are lost -- and the loss
+    is a merge conflict resolved by picking a file, which looks like a
+    routine git annoyance rather than data loss.
+
+    Advisory only. It never blocks and never fails the run: it reads
+    already-fetched refs (no network), and a machine without git, without a
+    remote, or offline should still be able to close a round.
+    """
+    import subprocess
+
+    def git(*args):
+        try:
+            r = subprocess.run(["git", *args], cwd=str(REPO_ROOT),
+                               capture_output=True, text=True, timeout=10)
+            return r.stdout.strip() if r.returncode == 0 else None
+        except Exception:
+            return None
+
+    rel = None
+    try:
+        rel = C.MASTER_GPKG.resolve().relative_to(REPO_ROOT.resolve()).as_posix()
+    except ValueError:
+        return  # master lives outside the repo; nothing to check
+
+    if git("ls-files", "--error-unmatch", rel) is None:
+        return  # not tracked
+
+    dirty = git("status", "--porcelain", "--", rel)
+    behind = git("rev-list", "--count", "HEAD..@{u}")
+
+    if behind and behind != "0":
+        print(f"\n  *** WARNING: this branch is {behind} commit(s) behind its "
+              f"remote. ***")
+        print(f"      The master is binary and git cannot merge it. If one of "
+              f"those commits touched it,")
+        print(f"      closing the round now and pushing will overwrite that "
+              f"work. Run `git pull` first.")
+    if dirty:
+        print(f"\n  note: {rel} has uncommitted changes going in. Fine if "
+              f"that's this session's work;")
+        print(f"        worth a look if you don't know where they came from.")
+
+
 def reviewed_rounds(db_path: Path) -> list[int]:
     """Every round with at least one reviewed plant, ascending."""
     if not db_path.exists():

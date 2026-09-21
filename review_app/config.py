@@ -68,12 +68,20 @@ for d in (INCOMING_DIR, OUTGOING_DIR):
 # Master CWNS locations file (added 2026-09-21)
 # ---------------------------------------------------------------------------
 # The single source of truth for what's verified correct / incorrect /
-# corrected. sync/update_master_locations.py reads the newest dated
-# CWNS_Locations layer here and writes a new one after each review round;
-# build_training_bins.py on the HPC reads the same file to build training
-# bins. Was a .gdb -- moved to .gpkg so the same file can be read AND
-# written by the same tooling.
-MASTER_GPKG = Path(
-    r"C:\Users\AMURRA02\OneDrive - Environmental Protection Agency (EPA)"
-    r"\Github\Location_Correction\data\Updates.gpkg"
-)
+# corrected. sync/update_master_locations.py reads the CWNS_Locations layer
+# here and replaces it after each review round; build_training_bins.py reads
+# the same file to build training bins. Was a .gdb -- moved to .gpkg so the
+# same file can be read AND written by the same tooling.
+#
+# IN THE REPO, NOT OneDrive (changed 2026-09-21). This used to point at
+# ...\Github\Location_Correction\data\Updates.gpkg. Tracking the master in
+# git gives it the backup and the cross-machine sync it never had -- but
+# only if every machine reads the tracked copy. Leaving config pointed at a
+# OneDrive path while git carried a second copy would have produced two
+# masters that silently diverge, which is worse than the single unbacked-up
+# one it replaced.
+#
+# It is the ONE file un-ignored under correction/data/ -- see .gitignore.
+# It is binary and git cannot merge it, so: pull before closing a round,
+# commit and push right after. close_round.py checks and warns.
+MASTER_GPKG = APP_ROOT.parent / "correction" / "data" / "training" / "Updates.gpkg"

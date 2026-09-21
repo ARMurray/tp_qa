@@ -2,7 +2,20 @@ correction/models/*
 !correction/models/object_detection/
 !correction/models/object_detection/best.pt
 correction/archive/
-correction/data/
+correction/data/*
+# ...EXCEPT the master locations file. It is the accumulated result of
+# months of manual verification and the one artifact here that cannot be
+# rebuilt from code, so it is tracked: git is its backup and its sync
+# between machines. ~10 MB, single layer -- update_master_locations.py
+# replaces the layer rather than appending, so the file does not grow.
+# Git can't merge a binary: pull before closing a round, push right after.
+#
+# Each level has to be re-opened explicitly -- git does not descend into an
+# excluded directory, so "!correction/data/training/Updates.gpkg" alone
+# would never be reached.
+!correction/data/training/
+correction/data/training/*
+!correction/data/training/Updates.gpkg
 correction/.venv/
 detection/.venv/
 correction/testing/

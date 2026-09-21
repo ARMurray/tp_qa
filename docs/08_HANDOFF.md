@@ -9,32 +9,40 @@ irreplaceable data, and judgment that only existed in one person's head.
 
 ## Read this first: the irreplaceable thing
 
-**`Updates.gpkg` — the master locations file.**
-
-```
-C:\Users\AMURRA02\OneDrive - Environmental Protection Agency (EPA)
-    \Github\Location_Correction\data\Updates.gpkg
-```
+**`correction/data/training/Updates.gpkg` — the master locations file.**
 
 It is the accumulated result of months of manual verification. Every verified
-location, every correction, every round of review is in it.
+location, every correction, every round of review is in it. Everything else in
+this project can be rebuilt from code. This cannot.
 
-- It is **not in this repo** (`correction/data/` is gitignored).
-- It is **not on the HPC** — only the derived `training_locations.gpkg` is.
-- It lives in one OneDrive folder under one departing person's account.
+**It is now tracked in this repository** (2026-09-21). It used to live in one
+OneDrive folder under one person's account, un-backed-up and un-synced, which
+meant deprovisioning that account would have restarted the project from zero.
+Tracking it gives it three things it did not have: a backup, version history,
+and sync between the review machine and any other.
 
-Everything else in this project can be rebuilt from code. This cannot. If the
-account is deprovisioned before the file is moved, the project restarts from
-zero.
+What that means in practice:
 
-### Action, before anything else
+- **It is the only file un-ignored under `correction/data/`.** See
+  `.gitignore` — the CWNS text exports and the old `.gdb` stay out.
+- **Git cannot merge it.** It is a binary GPKG. Pull before closing a round,
+  commit and push right after. `close_round.py` warns if the branch is behind
+  its remote, but that check reads already-fetched refs, so it cannot see a
+  push you have not fetched yet.
+- **One layer, not a stack.** `update_master_locations.py` replaces the
+  `CWNS_Locations_YYYYMMDD` layer rather than appending a new one, so the file
+  stays ~10 MB instead of growing by that much every round. Git holds the
+  history: `git log` the path, `git checkout <sha>` to get any earlier version.
+  This replaces the old `MASTER_LAYER` pinning for reproducing a past build.
 
-1. Copy it somewhere the team controls and the departing account does not.
-2. Copy it a second time somewhere else.
-3. Establish whose it is going forward and write that down.
-4. `TODO(handoff)`: record the agreed permanent location here.
+### Still worth doing
 
-The same reasoning applies, less urgently, to:
+Git is a backup, not *the* backup, and this repo is on a personal account.
+`TODO(handoff)`: put a copy somewhere the team controls and record where here.
+A repo under an EPA organization would solve the account-deprovisioning
+problem properly; a personal account only moves it.
+
+The same reasoning applies to:
 
 | File | Why it matters |
 |---|---|
@@ -120,19 +128,31 @@ mirror and HPC), so the same verdict could yield two different points.
 | Change | |
 |---|---|
 | Master moved `.gdb` → `.gpkg` | so the review loop can write the file it reads |
-| `update_master_locations.py` | new — folds verdicts into the master as a dated layer |
+| `update_master_locations.py` | new — folds verdicts into the master's single dated layer |
+| Master tracked in git | the one file un-ignored under `correction/data/`; one layer, git holds history |
 | `close_round.py` | new — one command for the whole local round-close |
 | `11_ingest_review_log.py` + `.slurm` | **deleted** |
 | `build_training_bins.py --review-gpkg` | **removed** |
 | `MASTER_GDB`/`MASTER_LAYER` | → `MASTER_GPKG` + `latest_master_layer()` |
 | `candidate_recall_failures.parquet` | moved from 11 to the local round-close |
 
-**Also fixed in the process** (bugs in the R prototype `pull_reviews.R` that
-this replaced): corrections were being written as the *reported* coordinate;
-`truth_outside_candidates` verdicts were dropped entirely; geometry was
-rebuilt from the reported point, regressing previously corrected rows; and
-the layer-date sort was a no-op because the format string didn't match the
-layer names.
+**Also fixed in the process** — three real bugs in the R prototype
+`pull_reviews.R` that this replaced:
+
+1. `Corrected_X/Y` was set to the **reported** coordinate for every
+   `candidate_correct` verdict. `plants.latitude/longitude` in `app.db` is
+   the reported location, not the answer; the answer is a parcel id that has
+   to be resolved. So each correction recorded the location it was correcting.
+2. `truth_outside_candidates` verdicts were dropped entirely — the most
+   expensive verdicts to produce, and the only ones carrying an exact
+   reviewer-clicked coordinate.
+3. Geometry was rebuilt from the reported point for the whole layer, which
+   regressed every previously corrected row.
+
+A fourth, about the layer-date sort, was reported and is **not** a bug: the
+layer names are `MMDDYYYY` and `lubridate::mdy()` parses those correctly.
+What was actually stale was `config.py`'s `MASTER_LAYER =
+"CWNS_Locations_20260820"`, a `YYYYMMDD` name matching no layer in the file.
 
 **Not changed:** the hard-negative path. `06b_build_rerank_training.py`
 already derived hard negatives from the master's corrections layer, with a
@@ -145,8 +165,9 @@ the discipline of running `01e` before it.
 
 **Week 1 — don't change anything.**
 Read [01_ORIENTATION.md](01_ORIENTATION.md) and
-[04_REVIEW_LOOP.md](04_REVIEW_LOOP.md). Get HPC access working. Back up the
-master. Run `build_test_bundle.py --state OH` and step through the pipeline
+[04_REVIEW_LOOP.md](04_REVIEW_LOOP.md). Get HPC access working. Get the
+master somewhere the team controls — it is in git, but on a personal
+account. Run `build_test_bundle.py --state OH` and step through the pipeline
 locally against the fixture.
 
 **Week 2 — review a round.**
