@@ -6,9 +6,15 @@ load_training_plant_ids() and 02_feature_engineering.py's
 build_stage1_training()/build_stage2_training() already expect -- 'classes'
 and 'corrections' layers, same column contract as before. This replaces
 however that file was built previously; going forward, THIS script + the
-master Updates.gdb (specifically the dated CWNS_Locations_YYYYMMDD layer
-produced by update_master_locations.R) is the single source of truth for
-what's correct/incorrect/corrected.
+master Updates.gpkg (specifically the NEWEST dated CWNS_Locations_YYYYMMDD
+layer, written by review_app/sync/update_master_locations.py) is the single
+source of truth for what's correct/incorrect/corrected.
+
+The master moved from Updates.gdb to Updates.gpkg on 2026-09-21 so the
+local review loop can write back into the same file it reads. With no
+--layer given, this script resolves the newest dated layer via
+config.latest_master_layer(), so each training build automatically picks
+up the most recent round of review.
 
 Bin definitions (confirmed 2026-08-20 session):
     Correct     : Verified == "Yes" & Original_Correct == "Yes"
@@ -38,16 +44,21 @@ build_stage2_training() already assumes when it reprojects them.
 ENVIRONMENT: plain venv (geopandas + pyogrio can read OpenFileGDB layers
 directly -- no arcgispro-py3-clone / GDAL MrSID dependency needed for this,
 unlike the imagery-reading scripts). Works identically on the local Windows
-machine or after uploading Updates.gdb to the HPC.
+machine or after uploading Updates.gpkg to the HPC.
 
 Usage:
-    python build_training_bins.py --gdb "C:/Users/AMURRA02/OneDrive - Environmental Protection Agency (EPA)/Github/Location_Correction/data/Updates.gdb" --layer CWNS_Locations_20260820 --out training_locations.gpkg
+    python build_training_bins.py --out training_locations.gpkg
+    python build_training_bins.py --master /path/to/Updates.gpkg --layer CWNS_Locations_20260820 --out training_locations.gpkg
 """
 import argparse
 import sys
+from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import config as C
 
 REQUIRED_COLUMNS = [
     "CWNS_ID", "Verified", "Original_Correct", "Corrected",
@@ -107,23 +118,41 @@ def make_point_gdf(df: pd.DataFrame, x_col: str, y_col: str, extra_cols: list[st
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--gdb", required=True, help="path to Updates.gdb")
-    ap.add_argument("--layer", required=True, help="dated CWNS_Locations layer name, e.g. CWNS_Locations_20260820")
+    # --master/--layer are both optional now (2026-09-21): the master moved
+    # from Updates.gdb to Updates.gpkg, and the local review loop writes a
+    # NEW dated layer into it after every round. Defaulting to
+    # config.latest_master_layer() means a normal training build
+    # automatically picks up the most recent round of review instead of
+    # needing the layer name retyped -- and forgetting to retype it was a
+    # silent way to train on stale labels.
+    ap.add_argument("--master", "--gdb", dest="master", default=None,
+                     help="path to the master locations file (gpkg). "
+                          "Defaults to config.MASTER_GPKG. --gdb is accepted "
+                          "as a legacy alias and still works against a .gdb, "
+                          "in which case --layer is required.")
+    ap.add_argument("--layer", default=None,
+                     help="dated CWNS_Locations layer name, e.g. "
+                          "CWNS_Locations_20260820. Defaults to the newest "
+                          "dated layer in the master gpkg. Pin it to freeze "
+                          "training labels at a known version.")
     ap.add_argument("--out", default="training_locations.gpkg",
                      help="output gpkg path. Point config.py's TRAINING_GPKG at this file "
                           "(or overwrite the existing one at that path) once you're happy "
                           "with the diagnostic counts below.")
-    ap.add_argument("--review-gpkg", default=None,
-                     help="path to review_derived_locations.gpkg from "
-                          "11_ingest_review_log.py (2026-08-27+). Unions its classes/"
-                          "corrections rows in on top of the Updates.gdb-derived ones. "
-                          "Updates.gdb wins on any CWNS_ID appearing in both -- it's the "
-                          "stated single source of truth; a review verdict on an "
-                          "already-labeled plant is informational, not an automatic "
-                          "override. Every dropped conflict is printed explicitly.")
     args = ap.parse_args()
 
-    gdf = load_master(args.gdb, args.layer)
+    master = Path(args.master) if args.master else C.MASTER_GPKG
+    layer = args.layer or C.MASTER_LAYER
+    if layer is None:
+        if master.suffix.lower() != ".gpkg":
+            raise SystemExit(
+                f"--layer is required for a non-gpkg master ({master}). Only "
+                f"the gpkg layout supports resolving the newest dated layer "
+                f"automatically.")
+        layer = C.latest_master_layer(master)
+        print(f"Resolved newest master layer: {layer}")
+
+    gdf = load_master(str(master), layer)
     verified = gdf[gdf["Verified"].fillna("No") == "Yes"].copy()
     unverified = gdf[gdf["Verified"].fillna("No") != "Yes"].copy()
     print(f"\nVerified: {len(verified)}  |  Unverified: {len(unverified)}")
@@ -180,47 +209,6 @@ def main():
               f"in 'classes' at all -- check the Original_Correct/Corrected/Verified "
               f"combination for these rows, this shouldn't normally happen given "
               f"corrections is built as a subset of the Incorrect bin.")
-
-    # ---- Union with review-loop-derived rows, if provided ----
-    if args.review_gpkg:
-        print(f"\nUnioning review-derived rows from {args.review_gpkg} ...")
-        import geopandas as gpd
-
-        def union_layer(base_gdf, layer_name):
-            try:
-                review_gdf = gpd.read_file(args.review_gpkg, layer=layer_name)
-            except Exception as e:
-                print(f"  {layer_name}: could not read from review gpkg ({e}) -- skipping")
-                return base_gdf
-            review_gdf["CWNS_ID"] = review_gdf["CWNS_ID"].astype(str)
-
-            conflict_ids = set(review_gdf["CWNS_ID"]) & set(base_gdf["CWNS_ID"])
-            if conflict_ids:
-                print(f"  {layer_name}: {len(conflict_ids)} CWNS_ID(s) already present "
-                      f"from Updates.gdb -- Updates.gdb wins, review verdict dropped for: "
-                      f"{sorted(conflict_ids)}")
-                review_gdf = review_gdf[~review_gdf["CWNS_ID"].isin(conflict_ids)]
-
-            if len(review_gdf) == 0:
-                return base_gdf
-            combined = pd.concat([base_gdf, review_gdf], ignore_index=True)
-            combined = gpd.GeoDataFrame(combined, geometry="geometry", crs=base_gdf.crs)
-            print(f"  {layer_name}: +{len(review_gdf)} review-derived row(s) "
-                  f"({len(base_gdf)} -> {len(combined)})")
-            return combined
-
-        classes_gdf = union_layer(classes_gdf, "classes")
-        corrections_gdf = union_layer(corrections_gdf, "corrections")
-
-        # Re-run the same sanity check as above, now that review rows are in --
-        # a review-derived row could theoretically create a Correct/Incorrect
-        # collision if something upstream is broken, and this is the one place
-        # that would go undetected otherwise.
-        overlap = set(classes_gdf.loc[classes_gdf["class"] == "Correct", "CWNS_ID"]) & \
-                  set(classes_gdf.loc[classes_gdf["class"] == "Incorrect", "CWNS_ID"])
-        assert not overlap, (
-            f"{len(overlap)} CWNS_ID(s) appear as BOTH Correct and Incorrect after "
-            f"unioning review data -- investigate before writing")
 
     # ---- Write ----
     print(f"\nWriting {args.out} ...")

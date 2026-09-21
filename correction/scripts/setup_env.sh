@@ -99,7 +99,7 @@ echo
 echo "Remaining manual steps before running the pipeline:"
 echo "  1. (keyword lists already populated in config.py)"
 echo "  2. Upload CWNS text exports        -> $ROOT/data/cwns/"
-echo "  3. Upload Updates.gdb              -> $ROOT/data/training/"
+echo "  3. Upload Updates.gpkg             -> $ROOT/data/training/"
 echo "  4. Upload census gdb + OSM gpkg    -> $ROOT/data/reference/"
 echo "  5. Upload trained best.pt          -> $ROOT/models/object_detection/"
 echo "  6. Run build_training_bins.py to produce data/training/training_locations.gpkg"

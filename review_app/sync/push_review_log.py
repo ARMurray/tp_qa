@@ -10,18 +10,24 @@ REVIEW_LOOP_PLAN.md Phase 4 requirement #3 (holdout routing):
     outgoing/review_log_candidates_round{N}.parquet
         Non-holdout CANDIDATE-level rows -- every candidate shown to the
         reviewer for candidate_pick plants, not just the one selected.
-        REQUIRED for 11_ingest_review_log.py: per REVIEW_LOOP_PLAN.md Phase 5,
-        Stage 2b training needs the selected candidate as label=1 and every
-        OTHER shown candidate as label=0 -- the rejected candidates are the
-        distribution-matched hard negatives the whole review loop exists to
-        produce. Without this file there is nothing to build negatives from.
-        (Missing entirely from an earlier version of this script -- confirmed
-        2026-08-26 while writing 11_ingest_review_log.py and realizing the
-        plant-level export alone couldn't supply what it needed.)
+
+        A RECORD OF WHAT WAS ON SCREEN, NOT A TRAINING INPUT (revised
+        2026-09-21). This file was originally written to supply Stage 2b's
+        hard negatives -- the rejected candidates the review loop exists to
+        produce. It is deliberately not wired into training, because
+        06b_build_rerank_training.py already builds that distribution, and
+        builds it better: the app shows TOP_K_SHOWN (5) candidates, while
+        06b reconstructs the full top-20 pool from stage2_candidates.parquet
+        and labels the true parcel 1 and its ~19 competitors 0.
+
+        Feeding this file in as well would create a second path for the same
+        information to reach training, off a strictly poorer candidate pool.
+        Kept because knowing what the reviewer actually saw when they decided
+        is worth having, and cannot be reconstructed later.
 
     outgoing/holdout_truth_round{N}.parquet
         Holdout verdicts. Needs manual merging into holdout_truth.parquet on
-        HPC. NOT fed into training, never touched by 11_ingest_review_log.py.
+        HPC. NOT fed into training, ever, by anything.
 
 Only exports plants reviewed since the last export for that round (tracked
 via an export-log table), so re-running mid-session doesn't re-export
@@ -174,8 +180,8 @@ def main():
         holdout_out.to_parquet(out_path, index=False)
         print(f"  {out_path.name}: {len(holdout_out)} row(s) total")
         print(f"  NOTE: this needs to be merged into holdout_truth.parquet on HPC "
-              f"manually -- it is NOT training data and must not go through "
-              f"11_ingest_review_log.py.")
+              f"manually -- it is NOT training data and must never reach "
+              f"any training script.")
 
     with db.get_conn() as conn:
         now = datetime.now(timezone.utc).isoformat()

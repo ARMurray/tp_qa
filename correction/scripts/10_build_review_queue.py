@@ -212,9 +212,8 @@ def load_plant_display_info(plant_summary: pd.DataFrame) -> pd.DataFrame:
 def load_previously_reviewed_ids() -> set:
     """Every CWNS_ID that appears in ANY previously-uploaded review_log_round*
     or holdout_truth_round* parquet, regardless of round -- these are the
-    same files sync/push_review_log.py already writes and you already
-    MobaXterm-upload for 11_ingest_review_log.py, so this needs no new
-    plumbing. Covers every verdict type including needs_info: a plant that
+    same files review_app/sync/close_round.py already writes into
+    data/outgoing/, so this needs no new plumbing. Covers every verdict type including needs_info: a plant that
     was reviewed and skipped as needs_info still shouldn't silently
     resurface in the very next round's random/uncertain draw -- if you want
     to deliberately re-queue it, that's a choice to make explicitly, not a

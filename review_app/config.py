@@ -63,3 +63,17 @@ TOP_K_SHOWN = 5   # must match 10_build_review_queue.py's TOP_K_SHOWN
 
 for d in (INCOMING_DIR, OUTGOING_DIR):
     d.mkdir(parents=True, exist_ok=True)
+
+# ---------------------------------------------------------------------------
+# Master CWNS locations file (added 2026-09-21)
+# ---------------------------------------------------------------------------
+# The single source of truth for what's verified correct / incorrect /
+# corrected. sync/update_master_locations.py reads the newest dated
+# CWNS_Locations layer here and writes a new one after each review round;
+# build_training_bins.py on the HPC reads the same file to build training
+# bins. Was a .gdb -- moved to .gpkg so the same file can be read AND
+# written by the same tooling.
+MASTER_GPKG = Path(
+    r"C:\Users\AMURRA02\OneDrive - Environmental Protection Agency (EPA)"
+    r"\Github\Location_Correction\data\Updates.gpkg"
+)

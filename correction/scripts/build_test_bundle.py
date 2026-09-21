@@ -242,11 +242,12 @@ def collect_cwns():
 def collect_training():
     log("\n--- Training labels ---")
     copy_file(C.TRAINING_GPKG, BUNDLE / "data" / "training")
-    # Updates.gdb is a directory, and only build_training_bins.py reads it.
-    if C.MASTER_GDB.exists():
-        n = copy_tree(C.MASTER_GDB, BUNDLE / "data" / "training" / C.MASTER_GDB.name)
-        log(f"    {C.MASTER_GDB.name}: {n} files "
-            f"({dir_size_mb(BUNDLE / 'data' / 'training' / C.MASTER_GDB.name):.1f} MB)")
+    # The master is a single .gpkg file now, not a .gdb directory (2026-09-21)
+    # -- a plain copy_file, no tree walk. Only build_training_bins.py reads it.
+    if C.MASTER_GPKG.exists():
+        copy_file(C.MASTER_GPKG, BUNDLE / "data" / "training")
+        log(f"    {C.MASTER_GPKG.name}: "
+            f"{C.MASTER_GPKG.stat().st_size / 1e6:.1f} MB")
 
 
 def collect_parcels(state: str, geoids: list[str]):
@@ -580,7 +581,7 @@ tpqa_test/
   selected_plants.csv       exactly which plants are in this bundle
   data/
     cwns/                   CWNS source tables (whole, unmodified)
-    training/               training_locations.gpkg (+ Updates.gdb if present)
+    training/               training_locations.gpkg (+ Updates.gpkg if present)
     parcels/state={state}/       Regrid county files (whole, unmodified)
     nlcd_features/          01a output, filtered to these plants' candidates
     nlcd/                   NLCD raster, clipped to the counties above

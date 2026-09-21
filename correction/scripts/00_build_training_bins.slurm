@@ -9,30 +9,28 @@
 #SBATCH --ntasks=1
 #SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/00_bins_%A.log
 
-# Builds data/training/training_locations.gpkg from the uploaded Updates.gdb,
-# optionally unioning in review-derived rows from 11_ingest_review_log.py
-# (Updates.gdb wins on any CWNS_ID conflict -- see build_training_bins.py's
-# own printed diagnostics for exactly which rows that affects, if any).
+# Builds data/training/training_locations.gpkg from the uploaded Updates.gpkg.
+#
+# Review verdicts reach this file through the MASTER, not through a separate
+# review feed: review_app/sync/close_round.py writes them into Updates.gpkg
+# as a new dated layer before it is uploaded. The old second path
+# (11_ingest_review_log.py + --review-gpkg) was deleted 2026-09-21 -- one
+# source of truth, one derivation.
 #
 #   sbatch 00_build_training_bins.slurm
-#   sbatch --export=LAYER="CWNS_Locations_20260901" 00_build_training_bins.slurm
-#   sbatch --export=REVIEWGPKG=1 00_build_training_bins.slurm
-#
-# REVIEWGPKG=1 points --review-gpkg at the standard path
-# 11_ingest_review_log.py always writes to
-# (data/training/review/review_derived_locations.gpkg) -- no need to spell
-# the path out yourself unless it's been moved.
+#   sbatch --export=LAYER="CWNS_Locations_20260901" 00_build_training_bins.slurm   # pin an older layer
 #
 # Small/fast job -- debug partition is fine.
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python \"$SCRIPTS/build_training_bins.py\" \
-    --gdb   \"$ROOT/data/training/Updates.gdb\" \
-    --layer \"${LAYER:-CWNS_Locations_20260820}\" \
-    --out   \"$ROOT/data/training/training_locations.gpkg\""
-[ "${REVIEWGPKG:-0}" = "1" ] && \
-    CMD="$CMD --review-gpkg \"$ROOT/data/training/review/review_derived_locations.gpkg\""
+    --master \"$ROOT/data/training/Updates.gpkg\" \
+    --out    \"$ROOT/data/training/training_locations.gpkg\""
+# No --layer by default: build_training_bins.py resolves the newest dated
+# CWNS_Locations layer in the gpkg, which is the one carrying the most
+# recent round of review. Set LAYER to pin an older one deliberately.
+[ -n "${LAYER:-}" ] && CMD="$CMD --layer \"$LAYER\""
 
 echo "Running: $CMD"
 eval "$CMD"

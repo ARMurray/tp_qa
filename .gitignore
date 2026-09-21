@@ -8,3 +8,6 @@ detection/.venv/
 correction/testing/
 detection/data/correction/models/
 detection/data/
+# Python bytecode
+__pycache__/
+*.pyc

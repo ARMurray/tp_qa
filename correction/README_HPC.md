@@ -15,7 +15,7 @@ stays local (`tp_qa/detection/`); only the trained `best.pt` comes here.
   data/
     cwns/                   PHYSICAL_LOCATION.txt, FACILITY_TYPES.txt,
                             DISCHARGES.csv, POPULATION_WASTEWATER.txt
-    training/               Updates.gdb (uploaded), training_locations.gpkg (built)
+    training/               Updates.gpkg (uploaded), training_locations.gpkg (built)
     reference/              census gdb, Wastewater_Plants.gpkg
     nlcd_features/          01a output
     od_features/            01b output: tiles/ detections/ objects/ plants/
@@ -39,7 +39,7 @@ Then, before anything will run:
    feature *values*, so a mismatch shows up as quietly different model results,
    not an error.
 2. Upload the CWNS text exports to `data/cwns/`.
-3. Upload `Updates.gdb` to `data/training/` and confirm `MASTER_LAYER` in
+3. Upload `Updates.gpkg` to `data/training/` and confirm `MASTER_GPKG` in
    config.py matches the current dated layer name.
 4. Upload the census gdb and OSM gpkg to `data/reference/`. 02 runs without
    them but silently produces empty census/name-match features, which look

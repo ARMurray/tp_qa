@@ -4,3 +4,8 @@ pandas>=2.0
 pyarrow>=14.0
 duckdb>=0.10
 pydantic>=2.0
+
+# sync/update_master_locations.py only -- GPKG read/write for the master
+# CWNS locations file. Not needed to run the review app itself.
+geopandas>=1.0
+pyogrio>=0.7

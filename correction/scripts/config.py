@@ -11,7 +11,7 @@ Layout under ROOT (/work/GRDVULN/correction):
     logs/             all SLURM .log output
     data/
         cwns/         CWNS text exports (PHYSICAL_LOCATION.txt, etc)
-        training/     training_locations.gpkg + Updates.gdb upload
+        training/     training_locations.gpkg + Updates.gpkg upload
         nlcd_outputs/ 01a per-state parcel/NLCD parquet
         od_output/    01b's four tables (tiles/detections/objects/plants)
         features/     02's output parquet tables
@@ -47,7 +47,7 @@ OD_MODEL_DIR = MODELS_DIR / "object_detection"       # best.pt from detection/ l
 
 # --- data subdirectories ---------------------------------------------------
 CWNS_DIR           = DATA_DIR / "cwns"           # PHYSICAL_LOCATION.txt, FACILITY_TYPES.txt, DISCHARGES.csv, POPULATION_WASTEWATER.txt
-TRAINING_DIR       = DATA_DIR / "training"       # training_locations.gpkg, Updates.gdb
+TRAINING_DIR       = DATA_DIR / "training"       # training_locations.gpkg, Updates.gpkg
 NLCD_OUTPUT_DIR    = DATA_DIR / "nlcd_features"  # 01a output: nlcd_{STATE}_k{K}.parquet
 OD_OUTPUT_DIR      = DATA_DIR / "od_features"    # 01b output: tiles/ detections/ objects/ plants/
                                                     # (reported/possibly-wrong locations)
@@ -78,8 +78,8 @@ CENSUS_GDB = Path("/work/GRDVULN/data/Census/tlgdb_2022_a_us_substategeo.gdb")
 # ===========================================================================
 # 3. TRAINING LABELS
 # ===========================================================================
-# Built by build_training_bins.py from the dated CWNS_Locations layer in
-# Updates.gdb. Layers: 'classes' (Correct/Incorrect, geometry = reported
+# Built by build_training_bins.py from the newest dated CWNS_Locations layer
+# in Updates.gpkg. Layers: 'classes' (Correct/Incorrect, geometry = reported
 # Original_X/Y), 'corrections' (Original_X/Y + Corrected_X/Y), 'unverified'.
 TRAINING_GPKG              = TRAINING_DIR / "training_locations.gpkg"
 TRAINING_LAYER_CLASSES     = "classes"
@@ -88,8 +88,66 @@ TRAINING_LAYER_UNVERIFIED  = "unverified"
 
 # The master manual-correction file, uploaded from the local machine. Only
 # build_training_bins.py reads this; everything else reads TRAINING_GPKG.
-MASTER_GDB   = TRAINING_DIR / "Updates.gdb"
-MASTER_LAYER = "CWNS_Locations_20260820"
+#
+# GPKG, not GDB (changed 2026-09-21). The local review loop's
+# review_app/sync/update_master_locations.py now WRITES a new dated
+# CWNS_Locations layer into this same file after each review round, so
+# every completed review compounds into the next training build. A gdb
+# could be read but not written by that tooling, which is why each round's
+# verdicts previously had to land somewhere else.
+MASTER_GPKG = TRAINING_DIR / "Updates.gpkg"
+
+# Layer naming convention inside MASTER_GPKG: CWNS_Locations_YYYYMMDD.
+# YYYYMMDD sorts lexicographically in date order, which is what makes
+# "newest layer" a reliable question to ask -- keep it.
+MASTER_LAYER_PREFIX = "CWNS_Locations_"
+MASTER_LAYER_RE = r"^CWNS_Locations_(\d{8})(_v\d+)?$"
+
+# Pin this to a specific layer name to freeze the training labels at a known
+# version (reproducing an old run, bisecting a regression). Left None, the
+# build resolves the NEWEST dated layer at run time, which is what you want
+# normally -- that's the one carrying the most recent round of review.
+MASTER_LAYER = None
+
+
+def latest_master_layer(gpkg_path=None) -> str:
+    """Newest dated CWNS_Locations layer in MASTER_GPKG.
+
+    Sorted by the PARSED date, never by whatever order the driver happens
+    to list layers in. Raises if the file has no conforming layer rather
+    than falling back to an arbitrary one -- training on last month's
+    labels because a name didn't match is a silent, expensive failure.
+
+    Same-day re-runs get a _vN suffix (see update_master_locations.py), so
+    the sort key is (date, full name): _v2 sorts after the unsuffixed
+    layer written earlier the same day.
+    """
+    import re
+    from datetime import datetime
+
+    import pyogrio
+
+    path = Path(gpkg_path) if gpkg_path else MASTER_GPKG
+    if not path.exists():
+        raise FileNotFoundError(f"Master gpkg not found: {path}")
+
+    names = [str(n) for n in pyogrio.list_layers(path)[:, 0]]
+    dated = []
+    for n in names:
+        m = re.match(MASTER_LAYER_RE, n)
+        if not m:
+            continue
+        for fmt in ("%Y%m%d", "%m%d%Y"):   # tolerate legacy %m%d%Y layers
+            try:
+                dated.append((datetime.strptime(m.group(1), fmt).date(), n))
+                break
+            except ValueError:
+                continue
+    if not dated:
+        raise ValueError(
+            f"No {MASTER_LAYER_PREFIX}YYYYMMDD layers in {path}. Found: {names}")
+    dated.sort()
+    return dated[-1][1]
 
 # ===========================================================================
 # 4. REFERENCE LAYERS (optional -- 02 degrades gracefully if absent, but
