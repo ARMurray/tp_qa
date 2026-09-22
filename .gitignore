@@ -21,6 +21,7 @@ detection/.venv/
 correction/testing/
 detection/data/correction/models/
 detection/data/
+<<<<<<< Updated upstream
 # Python bytecode
 __pycache__/
 *.pyc
@@ -37,3 +38,6 @@ docs/img/_fig.tmp.html
 
 # Scratch output from diagnostic and verification runs
 correction/temp/
+=======
+correction/logs/
+>>>>>>> Stashed changes
