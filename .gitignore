@@ -21,23 +21,4 @@ detection/.venv/
 correction/testing/
 detection/data/correction/models/
 detection/data/
-<<<<<<< Updated upstream
-# Python bytecode
-__pycache__/
-*.pyc
-
-# close_round rebuilds this from the tracked master every time it runs, so a
-# committed copy is a multi-MB binary carrying nothing the master doesn't
-# already have. The per-round verdict exports beside it ARE worth keeping --
-# they are the audit trail of what a reviewer saw and decided, and cannot be
-# regenerated once app.db moves on.
-review_app/data/outgoing/training_locations.gpkg
-
-# Scratch HTML the PNG renderer writes on its way to the image
-docs/img/_fig.tmp.html
-
-# Scratch output from diagnostic and verification runs
-correction/temp/
-=======
 correction/logs/
->>>>>>> Stashed changes
