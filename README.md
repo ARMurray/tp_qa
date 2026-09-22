@@ -24,6 +24,7 @@ measures the models and permanently grows their training data.
 |---|---|
 | Understand what this is | [docs/01_ORIENTATION.md](docs/01_ORIENTATION.md) |
 | Run something today | [docs/05_RUNBOOK.md](docs/05_RUNBOOK.md) |
+| See the whole thing at once | [docs/pipeline-map.html](docs/pipeline-map.html) |
 | Fix something that broke | [docs/06_TROUBLESHOOTING.md](docs/06_TROUBLESHOOTING.md) |
 | Take this project over | [docs/08_HANDOFF.md](docs/08_HANDOFF.md) |
 

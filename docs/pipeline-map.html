@@ -1,0 +1,1184 @@
+<title>tp_qa Pipeline Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,400;0,600;0,800;1,400&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  --ground:#F2F4F1; --surface:#FFFFFF; --ink:#12211F; --muted:#5A6B66;
+  --line:#D6DDD8; --line-soft:#E6EBE7;
+  --corr:#0E7C6B; --det:#B4761E; --rev:#3D5A99; --diag:#6E7A76;
+  --corr-bg:#E3EFEC; --det-bg:#F4EADA; --rev-bg:#E4E9F3; --diag-bg:#E9EDEB;
+  --danger:#B03A2E; --warn:#C9821A;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:#0E1614; --surface:#16211F; --ink:#E6EDEA; --muted:#93A5A0;
+    --line:#2A3835; --line-soft:#1F2C2A;
+    --corr:#4FC3AC; --det:#E0A44E; --rev:#8FA9DE; --diag:#93A5A0;
+    --corr-bg:#122A26; --det-bg:#2A2013; --rev-bg:#151E30; --diag-bg:#1A2220;
+    --danger:#E2705F; --warn:#E0A44E;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:#0E1614; --surface:#16211F; --ink:#E6EDEA; --muted:#93A5A0;
+  --line:#2A3835; --line-soft:#1F2C2A;
+  --corr:#4FC3AC; --det:#E0A44E; --rev:#8FA9DE; --diag:#93A5A0;
+  --corr-bg:#122A26; --det-bg:#2A2013; --rev-bg:#151E30; --diag-bg:#1A2220;
+  --danger:#E2705F; --warn:#E0A44E;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--sans);
+  font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1180px; margin:0 auto; padding-inline:20px; padding-block:0 72px; }
+code { font-family:var(--mono); font-size:0.92em; }
+
+header.top { border-bottom:1px solid var(--line); background:var(--surface); }
+header.top .wrap { padding-block:36px 26px; }
+.eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--corr); margin:0 0 10px; }
+h1 { font-size:clamp(28px,4.4vw,44px); line-height:1.08; font-weight:800; letter-spacing:-0.022em;
+  margin:0 0 12px; text-wrap:balance; }
+.lede { font-size:17px; color:var(--muted); max-width:66ch; margin:0 0 20px; }
+.meta { display:flex; flex-wrap:wrap; gap:8px 20px; font-family:var(--mono); font-size:12px; color:var(--muted); }
+.meta b { color:var(--ink); font-weight:600; }
+
+h2 { font-size:23px; font-weight:800; letter-spacing:-0.015em; margin:56px 0 6px; text-wrap:balance;
+  scroll-margin-top:84px; }
+.blurb { color:var(--muted); max-width:68ch; margin:0 0 24px; }
+h3 { margin:0; font-size:16px; font-weight:600; }
+
+figure { margin:0 0 34px; }
+.figscroll { overflow-x:auto; background:var(--surface); border:1px solid var(--line);
+  border-radius:10px; padding:14px; }
+svg { display:block; min-width:680px; width:100%; height:auto; color:var(--ink); }
+svg .node rect { fill:var(--surface); stroke:var(--line); stroke-width:1.5; }
+svg .node text { font-family:var(--mono); font-size:12px; fill:var(--ink); text-anchor:middle; }
+svg .node text.sub { font-size:10.5px; fill:var(--muted); font-family:var(--sans); }
+svg .node.dashed rect { stroke-dasharray:5 4; fill:none; }
+svg .node.emph-det rect { stroke:var(--det); stroke-width:2.25; }
+svg .node.emph-corr rect { stroke:var(--corr); stroke-width:2.25; }
+svg .node.emph-rev rect { stroke:var(--rev); stroke-width:2.25; }
+svg .node.warn rect { stroke:var(--danger); stroke-width:1.75; stroke-dasharray:5 4; fill:none; }
+svg .edge line, svg .edge path { stroke:currentColor; stroke-width:1.5; fill:none; opacity:.55; }
+svg .edge.det-e line, svg .edge.det-e path { stroke:var(--det); opacity:.95; stroke-width:2; }
+svg .edge.rev-e line, svg .edge.rev-e path { stroke:var(--rev); opacity:.95; stroke-width:2; }
+svg text.lane { font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; }
+svg text.elabel { font-family:var(--sans); font-size:10.5px; fill:var(--muted); text-anchor:middle; }
+svg text.note { font-family:var(--sans); font-size:11.5px; fill:var(--muted); }
+svg .det-t { fill:var(--det); } svg .corr-t { fill:var(--corr); }
+svg .rev-t { fill:var(--rev); } svg .danger-t { fill:var(--danger); }
+figcaption { font-size:13.5px; color:var(--muted); margin-top:10px; max-width:76ch; }
+figcaption strong { color:var(--ink); }
+
+.callout { border-left:3px solid var(--danger); background:var(--surface); padding:14px 18px;
+  border-radius:0 8px 8px 0; margin:0 0 34px; }
+.callout h4 { margin:0 0 6px; font-size:14px; font-weight:600; color:var(--danger); }
+.callout p { margin:0 0 8px; font-size:14px; } .callout p:last-child { margin:0; }
+
+.toolbar { position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--ground);
+  border-bottom:1px solid var(--line); padding-block:12px; margin-bottom:8px; }
+.toolbar .row { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+#q { flex:1 1 220px; min-width:0; font-family:var(--mono); font-size:13px; padding:9px 12px;
+  border:1px solid var(--line); border-radius:7px; background:var(--surface); color:var(--ink); }
+#q:focus-visible { outline:2px solid var(--corr); outline-offset:1px; }
+.chips { display:flex; flex-wrap:wrap; gap:6px; }
+.chip { font-family:var(--mono); font-size:11px; padding:6px 11px; border-radius:20px; cursor:pointer;
+  border:1px solid var(--line); background:var(--surface); color:var(--muted); }
+.chip[aria-pressed="true"] { color:var(--surface); background:var(--ink); border-color:var(--ink); }
+.chip:focus-visible { outline:2px solid var(--corr); outline-offset:1px; }
+#count { font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+
+.card { background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--diag);
+  border-radius:0 9px 9px 0; padding:16px 18px; margin-bottom:12px; scroll-margin-top:96px; }
+.card.corr { border-left-color:var(--corr); } .card.det { border-left-color:var(--det); }
+.card.rev { border-left-color:var(--rev); } .card.diag { border-left-color:var(--diag); }
+.card-h { display:flex; flex-wrap:wrap; gap:4px 14px; align-items:baseline; }
+.path { font-family:var(--mono); font-size:11px; color:var(--muted); margin:0; }
+.desc { margin:8px 0 0; max-width:74ch; }
+.slurm { margin:10px 0 0; font-size:12.5px; color:var(--muted); }
+.tag { font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  background:var(--corr-bg); color:var(--corr); padding:2px 7px; border-radius:4px; }
+.noargs { margin:10px 0 0; font-size:13px; color:var(--muted); font-style:italic; }
+
+.tw { overflow-x:auto; margin-top:12px; }
+table { border-collapse:collapse; width:100%; min-width:560px; font-size:13px; }
+th { text-align:left; font-family:var(--mono); font-size:10.5px; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--muted); font-weight:600;
+  border-bottom:1px solid var(--line); padding:0 12px 7px 0; }
+td { padding:8px 12px 8px 0; border-bottom:1px solid var(--line-soft); vertical-align:top; }
+tr:last-child td { border-bottom:none; }
+td.flag code { color:var(--corr); font-weight:600; white-space:nowrap; }
+td.kind { font-family:var(--mono); font-size:11.5px; color:var(--muted); white-space:nowrap; }
+td.dflt code { font-size:11.5px; color:var(--muted); white-space:nowrap; }
+td.hlp { color:var(--ink); min-width:240px; }
+.req { font-family:var(--mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--danger); margin-left:6px; }
+.nohelp { color:var(--muted); font-style:italic; }
+.choices { display:block; font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:3px; }
+.lane-sec[hidden] { display:none !important; }
+footer { border-top:1px solid var(--line); margin-top:56px; padding-top:20px;
+  font-size:13px; color:var(--muted); }
+@media (max-width:640px) { .wrap { padding-inline:16px; } h2 { margin-top:40px; } }
+@media (prefers-reduced-motion:reduce) { * { animation:none!important; transition:none!important; } }
+</style>
+
+<header class="top"><div class="wrap">
+  <p class="eyebrow">tp_qa &#183; CWNS treatment plant location correction</p>
+  <h1>Pipeline Map</h1>
+  <p class="lede">Every script in the project, the order they run in, where the branches are,
+  and what each argument does. Generated from the scripts themselves, so the argument tables
+  cannot drift from what the code actually accepts.</p>
+  <div class="meta">
+    <span><b>63</b> scripts</span>
+    <span><b>181</b> arguments</span>
+    <span><b>3</b> subsystems</span>
+    <span>as of <b>2026-09-21</b></span>
+  </div>
+</div></header>
+
+<div class="wrap">
+
+<h2>How it fits together</h2>
+<p class="blurb">Three subsystems. <code>detection/</code> and <code>review_app/</code> run on the
+local workstation; <code>correction/</code> runs on the HPC. Nothing moves between the two machines
+automatically &mdash; every transfer is a deliberate file copy.</p>
+
+<div class="figscroll">
+<figure>
+<svg viewBox="0 0 1060 560" role="img" preserveAspectRatio="xMidYMid meet"
+     aria-label="The tp_qa cycle across three subsystems: detection produces best.pt which feeds the correction pipeline's detection steps; correction produces a review queue; the review app produces both new training labels that return to the correction pipeline and new NAIP tiles that return to detection.">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+    <marker id="ahd" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--det)"/>
+    </marker>
+    <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--rev)"/>
+    </marker>
+  </defs>
+
+  <rect x="8" y="24"  width="1044" height="128" rx="10" fill="var(--det-bg)"/>
+  <rect x="8" y="196" width="1044" height="128" rx="10" fill="var(--corr-bg)"/>
+  <rect x="8" y="368" width="1044" height="128" rx="10" fill="var(--rev-bg)"/>
+
+  <text x="24" y="44"  class="lane det-t">detection/ &#183; local</text>
+  <text x="24" y="216" class="lane corr-t">correction/ &#183; HPC</text>
+  <text x="24" y="388" class="lane rev-t">review_app/ &#183; local</text>
+
+  <g class="node">
+    <rect x="130" y="62"  width="168" height="52" rx="6"/>
+    <text x="214" y="84">02_extract_tiles</text><text x="214" y="102" class="sub">fetch NAIP, cut tiles</text>
+  </g>
+  <g class="node dashed">
+    <rect x="352" y="62"  width="150" height="52" rx="6"/>
+    <text x="427" y="84">Label Studio</text><text x="427" y="102" class="sub">manual annotation</text>
+  </g>
+  <g class="node">
+    <rect x="556" y="62"  width="168" height="52" rx="6"/>
+    <text x="640" y="84">04_train_model</text><text x="640" y="102" class="sub">YOLOv8s</text>
+  </g>
+  <g class="node emph-det">
+    <rect x="778" y="62"  width="150" height="52" rx="6"/>
+    <text x="853" y="84">best.pt</text><text x="853" y="102" class="sub">the detector</text>
+  </g>
+
+  <g class="node">
+    <rect x="76"  y="234" width="158" height="52" rx="6"/>
+    <text x="155" y="256">build_training_bins</text><text x="155" y="274" class="sub">labels</text>
+  </g>
+  <g class="node">
+    <rect x="272" y="234" width="158" height="52" rx="6"/>
+    <text x="351" y="256">01a &#183; 01b &#183; 01c &#183; 01e</text><text x="351" y="274" class="sub">parcels + detection</text>
+  </g>
+  <g class="node">
+    <rect x="468" y="234" width="158" height="52" rx="6"/>
+    <text x="547" y="256">02_feature_engineering</text><text x="547" y="274" class="sub">feature tables</text>
+  </g>
+  <g class="node">
+    <rect x="664" y="234" width="158" height="52" rx="6"/>
+    <text x="743" y="256">03 &#183; 04 &#183; 06/07 &#183; 06b/07b</text><text x="743" y="274" class="sub">four models</text>
+  </g>
+  <g class="node">
+    <rect x="860" y="234" width="158" height="52" rx="6"/>
+    <text x="939" y="256">05 &#8594; 05b &#8594; 10</text><text x="939" y="274" class="sub">infer, rank, queue</text>
+  </g>
+
+  <g class="node">
+    <rect x="828" y="406" width="190" height="52" rx="6"/>
+    <text x="923" y="428">queue_loader &#8594; app</text><text x="923" y="446" class="sub">a human decides</text>
+  </g>
+  <g class="node emph-rev">
+    <rect x="452" y="406" width="190" height="52" rx="6"/>
+    <text x="547" y="428">close_round</text><text x="547" y="446" class="sub">one command</text>
+  </g>
+  <g class="node">
+    <rect x="76"  y="406" width="190" height="52" rx="6"/>
+    <text x="171" y="428">training_locations.gpkg</text><text x="171" y="446" class="sub">upload to HPC</text>
+  </g>
+
+  <g class="edge">
+    <line x1="298" y1="88" x2="346" y2="88" marker-end="url(#ah)"/>
+    <line x1="502" y1="88" x2="550" y2="88" marker-end="url(#ah)"/>
+    <line x1="724" y1="88" x2="772" y2="88" marker-end="url(#ah)"/>
+    <line x1="234" y1="260" x2="266" y2="260" marker-end="url(#ah)"/>
+    <line x1="430" y1="260" x2="462" y2="260" marker-end="url(#ah)"/>
+    <line x1="626" y1="260" x2="658" y2="260" marker-end="url(#ah)"/>
+    <line x1="822" y1="260" x2="854" y2="260" marker-end="url(#ah)"/>
+    <path d="M 939 286 L 939 400" marker-end="url(#ah)"/>
+    <line x1="828" y1="432" x2="648" y2="432" marker-end="url(#ah)"/>
+    <line x1="452" y1="432" x2="272" y2="432" marker-end="url(#ah)"/>
+  </g>
+
+  <g class="edge det-e">
+    <path d="M 853 114 L 853 150 L 351 150 L 351 228" marker-end="url(#ahd)"/>
+  </g>
+  <g class="edge rev-e">
+    <path d="M 171 406 L 171 340 L 155 340 L 155 292" marker-end="url(#ahr)"/>
+    <path d="M 500 406 L 500 340 L 214 340 L 214 170 L 214 120" marker-end="url(#ahr)"/>
+  </g>
+
+  <text x="864" y="168" class="elabel det-t">best.pt &#8594; 01b / 01c / 01e</text>
+  <text x="952" y="348" class="elabel">review_queue_round{N}.parquet</text>
+  <text x="742" y="424" class="elabel">verdicts land in app.db</text>
+  <text x="358" y="424" class="elabel">exports + folds into the master</text>
+  <text x="182" y="332" class="elabel rev-t">new labels</text>
+  <text x="228" y="332" class="elabel rev-t">new NAIP tiles for every parcel reviewed</text>
+  <text x="24" y="534" class="note">The loop is the point. Each pass through it adds verified locations to the master and annotated tiles to the detector.</text>
+</svg>
+<figcaption><strong>Figure 1 &middot; The cycle.</strong> Three subsystems, two return paths. Review output splits: new
+<em>labels</em> go back to the correction pipeline, new <em>tiles</em> go back to the detector. The detector branch is
+optional on any given pass &mdash; but taking it invalidates every existing detection output, which is what
+<code>check_od_freshness.py</code> exists to catch.</figcaption>
+</figure>
+</div>
+
+<div class="callout">
+  <h4>The branch that costs the most to get wrong</h4>
+  <p>Retraining the detector is optional on any given pass. But a new <code>best.pt</code> makes
+  <em>every</em> existing detection output stale &mdash; <code>01b</code>, <code>01c</code> and
+  <code>01e</code> all have to re-run before <code>02_feature_engineering</code>, or the feature
+  tables silently mix outputs from two different models.</p>
+  <p><code>check_od_freshness.py</code> exists to catch exactly this. Run it. It is the cheapest
+  step in the pipeline and the one that prevents the most expensive kind of mistake.</p>
+</div>
+
+<div class="figscroll">
+<figure>
+<svg viewBox="0 0 1000 620" role="img" preserveAspectRatio="xMidYMid meet"
+     aria-label="Dependency order inside the correction pipeline: build_training_bins feeds 01a, 01b, 01c and 01e, which with check_od_freshness feed 02_feature_engineering, which feeds the four training scripts, which feed inference, the review queue and holdout scoring.">
+  <defs>
+    <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+    <marker id="a2w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--danger)"/>
+    </marker>
+  </defs>
+
+  <g class="node"><rect x="380" y="20" width="240" height="44" rx="6"/>
+    <text x="500" y="47">build_training_bins</text></g>
+
+  <g class="node"><rect x="40"  y="108" width="176" height="44" rx="6"/><text x="128" y="135">01a_extract_parcels</text></g>
+  <g class="node"><rect x="252" y="108" width="176" height="44" rx="6"/><text x="340" y="135">01b_run_object_detection</text></g>
+  <g class="node"><rect x="464" y="108" width="176" height="44" rx="6"/><text x="552" y="135">01c_od_corrected</text></g>
+  <g class="node emph-corr"><rect x="676" y="108" width="176" height="44" rx="6"/><text x="764" y="135">01e_od_candidates</text></g>
+  <g class="node dashed"><rect x="874" y="108" width="110" height="44" rx="6"/><text x="929" y="135">01d_topup</text></g>
+
+  <g class="node warn"><rect x="356" y="184" width="288" height="40" rx="6"/>
+    <text x="500" y="209">check_od_freshness &#183; preflight</text></g>
+
+  <g class="node"><rect x="380" y="250" width="240" height="44" rx="6"/>
+    <text x="500" y="277">02_feature_engineering</text></g>
+
+  <g class="node"><rect x="24"  y="342" width="164" height="44" rx="6"/><text x="106" y="369">03_train_stage1</text></g>
+  <g class="node"><rect x="212" y="342" width="164" height="44" rx="6"/><text x="294" y="369">04_train_stage2</text></g>
+  <g class="node"><rect x="400" y="342" width="164" height="44" rx="6"/><text x="482" y="369">06_build_stage2b</text></g>
+  <g class="node emph-corr"><rect x="588" y="342" width="164" height="44" rx="6"/><text x="670" y="369">06b_build_rerank</text></g>
+
+  <g class="node"><rect x="400" y="410" width="164" height="40" rx="6"/><text x="482" y="435">07_train_stage2b</text></g>
+  <g class="node emph-corr"><rect x="588" y="410" width="164" height="40" rx="6"/><text x="670" y="435">07b_train_rerank</text></g>
+
+  <g class="node"><rect x="96"  y="486" width="190" height="44" rx="6"/>
+    <text x="191" y="508">05_run_inference</text><text x="191" y="524" class="sub">array &#8594; merge_05_shards</text></g>
+  <g class="node"><rect x="330" y="486" width="164" height="44" rx="6"/><text x="412" y="513">05b_rerank</text></g>
+  <g class="node"><rect x="538" y="486" width="190" height="44" rx="6"/><text x="633" y="513">10_build_review_queue</text></g>
+  <g class="node"><rect x="772" y="486" width="190" height="44" rx="6"/><text x="867" y="513">12_score_holdout</text></g>
+
+  <g class="edge">
+    <path d="M 440 64 L 128 96 L 128 102" marker-end="url(#a2)"/>
+    <path d="M 470 64 L 340 100" marker-end="url(#a2)"/>
+    <path d="M 530 64 L 552 100" marker-end="url(#a2)"/>
+    <path d="M 560 64 L 764 100" marker-end="url(#a2)"/>
+    <path d="M 128 152 L 128 264 L 374 264" marker-end="url(#a2)"/>
+    <path d="M 340 152 L 340 200 L 350 200" marker-end="url(#a2)"/>
+    <path d="M 552 152 L 552 178" marker-end="url(#a2)"/>
+    <path d="M 764 152 L 764 264 L 626 264" marker-end="url(#a2)"/>
+    <path d="M 500 224 L 500 244" marker-end="url(#a2)"/>
+    <path d="M 440 294 L 106 336" marker-end="url(#a2)"/>
+    <path d="M 470 294 L 294 336" marker-end="url(#a2)"/>
+    <path d="M 500 294 L 482 336" marker-end="url(#a2)"/>
+    <path d="M 545 294 L 670 336" marker-end="url(#a2)"/>
+    <path d="M 482 386 L 482 404" marker-end="url(#a2)"/>
+    <path d="M 670 386 L 670 404" marker-end="url(#a2)"/>
+    <path d="M 294 386 L 294 440 L 191 440 L 191 480" marker-end="url(#a2)"/>
+    <path d="M 670 450 L 670 466 L 412 466 L 412 480" marker-end="url(#a2)"/>
+    <path d="M 286 508 L 324 508" marker-end="url(#a2)"/>
+    <path d="M 494 508 L 532 508" marker-end="url(#a2)"/>
+    <path d="M 728 508 L 766 508" marker-end="url(#a2)"/>
+  </g>
+
+  <text x="640" y="186" class="elabel danger-t">stale detection output stops the run here</text>
+  <text x="792" y="278" class="elabel corr-t">01e is what the re-ranker needs</text>
+  <text x="24" y="596" class="note">Both build&#8594;train pairs are independent of each other. Within a pair, the build must finish first.</text>
+</svg>
+<figcaption><strong>Figure 2 &middot; Order inside <code>correction/</code>.</strong> Arrows are "must finish before".
+<code>01e_run_od_candidates</code> is highlighted because it is the step most easily skipped: nothing errors without it,
+<code>06b</code> just quietly drops every plant whose candidates have no detection output, and that round's hard
+negatives never reach the re-ranker.</figcaption>
+</figure>
+</div>
+<div class="figscroll">
+<figure>
+<svg viewBox="0 0 940 340" role="img" preserveAspectRatio="xMidYMid meet"
+     aria-label="The object detection labelling branch: review output or plant sampling feeds site selection, then tile extraction, manual annotation in Label Studio, dataset preparation, and model training, producing best.pt which is uploaded to the HPC.">
+  <defs>
+    <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g class="node emph-rev"><rect x="20" y="36" width="190" height="52" rx="6"/>
+    <text x="115" y="58">extract_review_tiles</text><text x="115" y="76" class="sub">from the review round</text></g>
+  <g class="node emph-rev"><rect x="20" y="118" width="190" height="52" rx="6"/>
+    <text x="115" y="140">find_false_top_picks</text><text x="115" y="158" class="sub">where rank 1 was wrong</text></g>
+  <g class="node"><rect x="20" y="200" width="190" height="52" rx="6"/>
+    <text x="115" y="222">plants / TRI sample</text><text x="115" y="240" class="sub">cold start</text></g>
+
+  <g class="node"><rect x="282" y="118" width="164" height="52" rx="6"/>
+    <text x="364" y="140">01_sample_sites</text><text x="364" y="158" class="sub">--source</text></g>
+  <g class="node"><rect x="282" y="36" width="164" height="52" rx="6"/>
+    <text x="364" y="58">02_extract_tiles</text><text x="364" y="76" class="sub">NAIP &#8594; PNG + NDWI</text></g>
+  <g class="node dashed"><rect x="518" y="36" width="150" height="52" rx="6"/>
+    <text x="593" y="58">Label Studio</text><text x="593" y="76" class="sub">draw boxes</text></g>
+  <g class="node"><rect x="518" y="118" width="150" height="52" rx="6"/>
+    <text x="593" y="140">03_prepare_dataset</text><text x="593" y="158" class="sub">match + split</text></g>
+  <g class="node"><rect x="518" y="200" width="150" height="52" rx="6"/>
+    <text x="593" y="222">04_train_model</text><text x="593" y="240" class="sub">YOLOv8s</text></g>
+  <g class="node emph-det"><rect x="740" y="200" width="170" height="52" rx="6"/>
+    <text x="825" y="222">best.pt</text><text x="825" y="240" class="sub">upload to HPC</text></g>
+
+  <g class="edge">
+    <path d="M 210 62 L 240 62 L 240 138 L 276 138" marker-end="url(#a3)"/>
+    <path d="M 210 144 L 276 144" marker-end="url(#a3)"/>
+    <path d="M 210 226 L 240 226 L 240 150 L 276 150" marker-end="url(#a3)"/>
+    <path d="M 364 118 L 364 94" marker-end="url(#a3)"/>
+    <path d="M 446 62 L 512 62" marker-end="url(#a3)"/>
+    <path d="M 593 88 L 593 112" marker-end="url(#a3)"/>
+    <path d="M 593 170 L 593 194" marker-end="url(#a3)"/>
+    <path d="M 668 226 L 734 226" marker-end="url(#a3)"/>
+  </g>
+
+  <text x="24" y="300" class="note">Only re-enter this branch when the detector should improve. Doing so makes every existing detection output stale.</text>
+</svg>
+<figcaption><strong>Figure 3 &middot; The labelling branch.</strong> Three ways in. The two highlighted ones are driven by
+review: tiles for every parcel a reviewer actually looked at, and the plants where the model's top pick was wrong &mdash;
+which is the most efficient labelling you can do, because it targets exactly what the detector is getting wrong.</figcaption>
+</figure>
+</div>
+<div class="figscroll">
+<figure>
+<svg viewBox="0 0 940 330" role="img" preserveAspectRatio="xMidYMid meet"
+     aria-label="close_round runs four steps in order: push_review_log exports verdicts and routes holdout, update_master_locations folds them into the master, build_training_bins rebuilds the training layers, and extract_review_tiles pulls NAIP tiles for the detector.">
+  <defs>
+    <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <g class="node emph-rev"><rect x="20" y="130" width="150" height="56" rx="6"/>
+    <text x="95" y="153">close_round</text><text x="95" y="171" class="sub">--round N</text></g>
+
+  <g class="node"><rect x="238" y="22" width="206" height="52" rx="6"/>
+    <text x="341" y="44">1 &#183; push_review_log</text><text x="341" y="62" class="sub">audit trail + holdout routing</text></g>
+  <g class="node emph-corr"><rect x="238" y="94" width="206" height="52" rx="6"/>
+    <text x="341" y="116">2 &#183; update_master_locations</text><text x="341" y="134" class="sub">makes the review permanent</text></g>
+  <g class="node"><rect x="238" y="166" width="206" height="52" rx="6"/>
+    <text x="341" y="188">3 &#183; build_training_bins</text><text x="341" y="206" class="sub">gated on step 2</text></g>
+  <g class="node"><rect x="238" y="238" width="206" height="52" rx="6"/>
+    <text x="341" y="260">4 &#183; extract_review_tiles</text><text x="341" y="278" class="sub">slow; --skip-tiles to defer</text></g>
+
+  <g class="node"><rect x="540" y="22" width="180" height="52" rx="6"/>
+    <text x="630" y="44">holdout_truth_round{N}</text><text x="630" y="62" class="sub">merge BY HAND</text></g>
+  <g class="node"><rect x="540" y="94" width="180" height="52" rx="6"/>
+    <text x="630" y="116">Updates.gpkg</text><text x="630" y="134" class="sub">commit + push</text></g>
+  <g class="node"><rect x="540" y="166" width="180" height="52" rx="6"/>
+    <text x="630" y="188">training_locations.gpkg</text><text x="630" y="206" class="sub">upload to HPC</text></g>
+  <g class="node"><rect x="540" y="238" width="180" height="52" rx="6"/>
+    <text x="630" y="260">detection/data/tiles/</text><text x="630" y="278" class="sub">ready to label</text></g>
+
+  <g class="edge">
+    <path d="M 170 146 L 200 146 L 200 48 L 232 48" marker-end="url(#a4)"/>
+    <path d="M 170 152 L 200 152 L 200 120 L 232 120" marker-end="url(#a4)"/>
+    <path d="M 170 164 L 200 164 L 200 192 L 232 192" marker-end="url(#a4)"/>
+    <path d="M 170 170 L 200 170 L 200 264 L 232 264" marker-end="url(#a4)"/>
+    <path d="M 444 48 L 534 48" marker-end="url(#a4)"/>
+    <path d="M 444 120 L 534 120" marker-end="url(#a4)"/>
+    <path d="M 444 192 L 534 192" marker-end="url(#a4)"/>
+    <path d="M 444 264 L 534 264" marker-end="url(#a4)"/>
+  </g>
+
+  <text x="760" y="48"  class="elabel danger-t">never into training</text>
+  <text x="760" y="120" class="elabel">git can't merge it</text>
+  <text x="760" y="192" class="elabel">the only file the HPC needs</text>
+  <text x="760" y="264" class="elabel">back to Figure 3</text>
+</svg>
+<figcaption><strong>Figure 4 &middot; What <code>close_round</code> does.</strong> Four steps, four destinations. Step 3 is
+gated on step 2 &mdash; training bins rebuilt from a master that failed to update are last round's labels wearing a fresh
+timestamp, which nothing downstream would report.</figcaption>
+</figure>
+</div>
+
+<h2>Every script, every argument</h2>
+<p class="blurb">Ordered the way you would run them. Search matches script names and paths;
+the chips filter by subsystem.</p>
+
+<div class="toolbar"><div class="row">
+  <input id="q" type="search" placeholder="Filter scripts&hellip;" aria-label="Filter scripts">
+  <div class="chips" role="group" aria-label="Filter by subsystem">
+    <button class="chip" data-f="all" aria-pressed="true">all</button>
+    <button class="chip" data-f="det" aria-pressed="false">detection/</button>
+    <button class="chip" data-f="corr" aria-pressed="false">correction/</button>
+    <button class="chip" data-f="rev" aria-pressed="false">review_app/</button>
+    <button class="chip" data-f="diag" aria-pressed="false">diagnostics</button>
+  </div>
+  <span id="count"></span>
+</div></div>
+
+<section class='lane-sec' data-lane='det'><h2 id='sec-det'>detection/ — the object-detection model</h2><p class='blurb'>Runs locally. Everything here exists to produce one file: <code>best.pt</code>. You only re-enter this branch when you want the detector to get better — typically after a review round has deposited fresh tiles worth labelling.</p><article class='card det' id='01_sample_sites' data-name='01_sample_sites detection/pipeline/01_sample_sites.py'>
+<header class='card-h'>
+<h3><code>01_sample_sites</code></h3>
+<p class='path'>detection/pipeline/01_sample_sites.py</p>
+</header>
+<p class='desc'>Choose which plant sites to pull imagery for. Three sources: known plants, TRI facilities, or sites the review app flagged as model misses.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--source</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;plants&#x27;</code></td><td class='hlp'>which site source(s) to sample (default: plants) <span class='choices'>choices: plants, review, tri, all</span></td></tr>
+<tr><td class='flag'><code>--n</code></td><td class='kind'>int</td><td class='dflt'><code>DEFAULT_N_SITES (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--n-tri</code></td><td class='kind'>int</td><td class='dflt'><code>DEFAULT_N_TRI (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--review-csv</code></td><td class='kind'>Path</td><td class='dflt'><code>—</code></td><td class='hlp'>output of find_false_top_picks.py</td></tr>
+<tr><td class='flag'><code>--flat-region-cap</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card det' id='02_extract_tiles' data-name='02_extract_tiles detection/pipeline/02_extract_tiles.py'>
+<header class='card-h'>
+<h3><code>02_extract_tiles</code></h3>
+<p class='path'>detection/pipeline/02_extract_tiles.py</p>
+</header>
+<p class='desc'>Fetch NAIP imagery for those sites and cut it into labelling tiles (RGB PNG + NDWI GeoTIFF).</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--source</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;all&#x27;</code></td><td class='hlp'>which sample layer(s) to extract (default: all present) <span class='choices'>choices: plants, review, tri, all</span></td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>report the tile count without fetching anything</td></tr>
+<tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>cap total tiles fetched (applied after counting)</td></tr></tbody></table></div>
+</article>
+<article class='card det' id='03_prepare_dataset' data-name='03_prepare_dataset detection/pipeline/03_prepare_dataset.py'>
+<header class='card-h'>
+<h3><code>03_prepare_dataset</code></h3>
+<p class='path'>detection/pipeline/03_prepare_dataset.py</p>
+</header>
+<p class='desc'>Match the Label Studio YOLO export back to its source tiles and split into train/val.</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card det' id='04_train_model' data-name='04_train_model detection/pipeline/04_train_model.py'>
+<header class='card-h'>
+<h3><code>04_train_model</code></h3>
+<p class='path'>detection/pipeline/04_train_model.py</p>
+</header>
+<p class='desc'>Train YOLOv8s on the annotated tiles. Produces best.pt — the file the whole correction pipeline consumes.</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card det' id='05_run_inference' data-name='05_run_inference detection/pipeline/05_run_inference.py'>
+<header class='card-h'>
+<h3><code>05_run_inference</code></h3>
+<p class='path'>detection/pipeline/05_run_inference.py</p>
+</header>
+<p class='desc'>Run the trained detector over a state and write corrected coordinates. The detection side's own inference, separate from correction/'s.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>05_run_inference.slurm</code> · env vars: <code>TOPK</code></p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card det' id='06_build_map' data-name='06_build_map detection/pipeline/06_build_map.py'>
+<header class='card-h'>
+<h3><code>06_build_map</code></h3>
+<p class='path'>detection/pipeline/06_build_map.py</p>
+</header>
+<p class='desc'>Build a standalone MapLibre web map from the state pipeline's output.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--inference-dir</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>folder containing detections/state=XX/*.parquet and plants/state=XX/*.parquet</td></tr>
+<tr><td class='flag'><code>--plants-gpkg</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--plants-layer</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--output</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>output HTML path (default: &lt;inference-dir&gt;/facility_map.html)</td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='det-h'><h2 id='sec-det-h'>detection/ — helpers and repairs</h2><p class='blurb'>Not part of the normal order. Each was written for a specific mess and kept because the mess recurs.</p><article class='card det' id='convert_tiles_to_500m' data-name='convert_tiles_to_500m detection/pipeline/convert_tiles_to_500m.py'>
+<header class='card-h'>
+<h3><code>convert_tiles_to_500m</code></h3>
+<p class='path'>detection/pipeline/convert_tiles_to_500m.py</p>
+</header>
+<p class='desc'>Re-cut already-labelled 200m tiles into 500m tiles, remapping every bounding box through real-world coordinates.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--source-root</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>override where existing labeled 200m tiles are read from (expects &lt;root&gt;/data/tile_metadata.csv and &lt;root&gt;/annotation/ls_export/labels/). Defaults to config.py&#x27;s own DATA_DIR/ANNOTATION_DIR -- now that REPO_ROOT resolves correctly (fixed 2026-08-28), this shouldn&#x27;t be needed for normal use, only if you&#x27;re pointing at a different tree deliberately.</td></tr>
+<tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>process only the first N groups -- test before running everything</td></tr>
+<tr><td class='flag'><code>--cwns-ids-file</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>text file, one CWNS_ID per line -- scope to just these plants</td></tr></tbody></table></div>
+</article>
+<article class='card det' id='fold_in_500m' data-name='fold_in_500m detection/pipeline/fold_in_500m.py'>
+<header class='card-h'>
+<h3><code>fold_in_500m</code></h3>
+<p class='path'>detection/pipeline/fold_in_500m.py</p>
+</header>
+<p class='desc'>Copy the converted 500m tiles into the live labelling folders.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>show what would happen without touching any files</td></tr></tbody></table></div>
+</article>
+<article class='card det' id='reconstruct_tile_metadata' data-name='reconstruct_tile_metadata detection/pipeline/reconstruct_tile_metadata.py'>
+<header class='card-h'>
+<h3><code>reconstruct_tile_metadata</code></h3>
+<p class='path'>detection/pipeline/reconstruct_tile_metadata.py</p>
+</header>
+<p class='desc'>Rebuild tile_metadata.csv for older rounds whose metadata was never written.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--out</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;reconstructed&#x27;</code></td><td class='hlp'>output folder (relative to this script) -- gets data/tile_metadata.csv and annotation/ls_export/labels/ with clean filenames, ready for convert_tiles_to_500m.py --source-root</td></tr></tbody></table></div>
+</article>
+<article class='card det' id='diagnose_label_inventory' data-name='diagnose_label_inventory detection/pipeline/diagnose_label_inventory.py'>
+<header class='card-h'>
+<h3><code>diagnose_label_inventory</code></h3>
+<p class='path'>detection/pipeline/diagnose_label_inventory.py</p>
+</header>
+<p class='desc'>Partition the label export and report which annotations are genuinely unaccounted for.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--csv</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>write the unconverted-label detail to this path</td></tr></tbody></table></div>
+</article>
+<article class='card det' id='diagnose_label_matching' data-name='diagnose_label_matching detection/pipeline/diagnose_label_matching.py'>
+<header class='card-h'>
+<h3><code>diagnose_label_matching</code></h3>
+<p class='path'>detection/pipeline/diagnose_label_matching.py</p>
+</header>
+<p class='desc'>Explain why labels failed to match their source tiles, by trying two matching strategies.</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card det' id='check_duplicate_detections' data-name='check_duplicate_detections detection/pipeline/check_duplicate_detections.py'>
+<header class='card-h'>
+<h3><code>check_duplicate_detections</code></h3>
+<p class='path'>detection/pipeline/check_duplicate_detections.py</p>
+</header>
+<p class='desc'>Check whether multiple same-class detections on one plant are overlap artifacts or real.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--cwns</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>inspect one plant in detail</td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='setup'><h2 id='sec-setup'>correction/ — one-time setup</h2><p class='blurb'>Run once per cluster, and in the holdout's case once <em>ever</em>.</p><article class='card corr' id='setup_env.sh' data-name='setup_env.sh correction/scripts/setup_env.sh'>
+<header class='card-h'>
+<h3><code>setup_env.sh</code></h3>
+<p class='path'>correction/scripts/setup_env.sh</p>
+</header>
+<p class='desc'>Build the shared HPC venv. Run once, on a login node, before any job.</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card corr' id='09_build_holdout' data-name='09_build_holdout correction/scripts/09_build_holdout.py'>
+<header class='card-h'>
+<h3><code>09_build_holdout</code></h3>
+<p class='path'>correction/scripts/09_build_holdout.py</p>
+</header>
+<p class='desc'>Sample the frozen evaluation holdout ONCE and freeze it. Never re-run.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>09_build_holdout.slurm</code> · env vars: <code>APPEND</code>, <code>COHORT</code>, <code>DRYRUN</code>, <code>FORCE</code>, <code>NCORRECT</code>, <code>NCORRECTIONS</code>, <code>NINCORRECT</code>, <code>NUNLABELED</code>, <code>SEED</code>, <code>STATES</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--n-corrections</code></td><td class='kind'>int</td><td class='dflt'><code>50</code></td><td class='hlp'>known-misplaced plants. The headline recall@1 slice. Each is a correction Stage 2b will not train on.</td></tr>
+<tr><td class='flag'><code>--n-correct</code></td><td class='kind'>int</td><td class='dflt'><code>150</code></td><td class='hlp'>known-correct plants, for the false-move rate. Cheap: there are ~2000 and Stage 1 has plenty.</td></tr>
+<tr><td class='flag'><code>--n-incorrect</code></td><td class='kind'>int</td><td class='dflt'><code>0</code></td><td class='hlp'>known-wrong-but-unresolved. Normally 0: as of 2026-08-24 every Incorrect plant in the classes layer also has a correction, so this bin is empty.</td></tr>
+<tr><td class='flag'><code>--n-unlabeled</code></td><td class='kind'>int</td><td class='dflt'><code>75</code></td><td class='hlp'>randomly drawn UNLABELED plants -- the deployment distribution, and the only slice that estimates the true national error rate. Each needs a one-time review before it scores.</td></tr>
+<tr><td class='flag'><code>--seed</code></td><td class='kind'>int</td><td class='dflt'><code>20260824</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--cohort</code></td><td class='kind'>str</td><td class='dflt'><code>A (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--append-cohort</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>add a NEW cohort without disturbing the existing holdout. The legitimate way to grow it.</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--force-resample</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>overwrite the manifest. DESTROYS comparability with every score recorded so far. Use --append-cohort instead unless you truly mean this.</td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='corr'><h2 id='sec-corr'>correction/ — labels and features</h2><p class='blurb'>The per-cycle rebuild. Everything downstream reads what this stage writes.</p><article class='card corr' id='build_training_bins' data-name='build_training_bins correction/scripts/build_training_bins.py'>
+<header class='card-h'>
+<h3><code>build_training_bins</code></h3>
+<p class='path'>correction/scripts/build_training_bins.py</p>
+</header>
+<p class='desc'>Turn the master Updates.gpkg into training_locations.gpkg — the classes / corrections / unverified layers every model reads.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--master, --gdb</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>path to the master locations file (gpkg). Defaults to config.MASTER_GPKG. --gdb is accepted as a legacy alias and still works against a .gdb, in which case --layer is required.</td></tr>
+<tr><td class='flag'><code>--layer</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>dated CWNS_Locations layer name, e.g. CWNS_Locations_20260820. Defaults to the newest dated layer in the master gpkg. Pin it to freeze training labels at a known version.</td></tr>
+<tr><td class='flag'><code>--out</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;training_locations.gpkg&#x27;</code></td><td class='hlp'>output gpkg path. Point config.py&#x27;s TRAINING_GPKG at this file (or overwrite the existing one at that path) once you&#x27;re happy with the diagnostic counts below.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='01a_extract_parcels' data-name='01a_extract_parcels correction/scripts/01a_extract_parcels.py'>
+<header class='card-h'>
+<h3><code>01a_extract_parcels</code></h3>
+<p class='path'>correction/scripts/01a_extract_parcels.py</p>
+</header>
+<p class='desc'>H3 k-ring search around each reported point; pull candidate parcels and compute NLCD land-cover stats. Array job, one task per state.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>01a_extract_parcels.slurm</code> · env vars: <code>FULLUNIVERSE</code>, <code>NORESUME</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated STATE_CODE filter, e.g. OH,PA</td></tr>
+<tr><td class='flag'><code>--k-rings</code></td><td class='kind'>int</td><td class='dflt'><code>C.K_RINGS (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--no-resume</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>reprocess states even if output already exists</td></tr>
+<tr><td class='flag'><code>--no-correction-seeds</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>do NOT seed the search window from corrected coordinates (reproduces pre-2026-08-24 behavior; use only to regenerate a historical run for comparison)</td></tr>
+<tr><td class='flag'><code>--full-universe</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>process ALL treatment plants, not just those in training_locations.gpkg (use once a trained Stage 1 model exists to decide who needs Stage 2 -- not recommended during training/development)</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='01b_run_object_detection' data-name='01b_run_object_detection correction/scripts/01b_run_object_detection.py'>
+<header class='card-h'>
+<h3><code>01b_run_object_detection</code></h3>
+<p class='path'>correction/scripts/01b_run_object_detection.py</p>
+</header>
+<p class='desc'>Run best.pt on NAIP tiles covering each plant's REPORTED parcel. Streams imagery from Planetary Computer. Resumable.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>01b_run_object_detection.slurm</code> · env vars: <code>FULLUNIVERSE</code>, <code>LIMIT</code>, <code>NORESUME</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated 2-letter STATE_CODE values, e.g. OH,PA. Omit to process every state in the plant universe.</td></tr>
+<tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>process only the first N plants (testing)</td></tr>
+<tr><td class='flag'><code>--weights</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--models-dir</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>where to look for detection weights. Defaults to models/object_detection/ -- deliberately NOT models/, which is where 03/04 write the stage1/stage2 models.</td></tr>
+<tr><td class='flag'><code>--conf</code></td><td class='kind'>float</td><td class='dflt'><code>C.CONF_THRESHOLD (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--iou</code></td><td class='kind'>float</td><td class='dflt'><code>C.IOU_THRESHOLD (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--nms-dist</code></td><td class='kind'>float</td><td class='dflt'><code>C.NMS_DISTANCE_M (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--workers</code></td><td class='kind'>int</td><td class='dflt'><code>C.NAIP_WORKERS (constant)</code></td><td class='hlp'>concurrent NAIP fetch threads. Tested up to 47 with roughly linear scaling on this cluster&#x27;s network path (2026-08-20 session) -- if you bump this much higher, watch the failure count in the summary for signs of rate-limiting.</td></tr>
+<tr><td class='flag'><code>--device</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;cpu&#x27;</code></td><td class='hlp'>&#x27;cpu&#x27; (default) or &#x27;cuda&#x27; -- inference runs sequentially in the main thread regardless; only the NAIP fetch is threaded.</td></tr>
+<tr><td class='flag'><code>--full-universe</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>process ALL treatment plants, not just those carrying training labels. Only meaningful once a trained Stage 1 model exists to decide who needs correcting at inference time -- not for training/development runs.</td></tr>
+<tr><td class='flag'><code>--no-resume</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>reprocess plants even if already present in the plants/ Parquet table for that state. Default (resume ON) skips any CWNS_ID already written by a prior run/attempt.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='01c_run_od_corrected_locations' data-name='01c_run_od_corrected_locations correction/scripts/01c_run_od_corrected_locations.py'>
+<header class='card-h'>
+<h3><code>01c_run_od_corrected_locations</code></h3>
+<p class='path'>correction/scripts/01c_run_od_corrected_locations.py</p>
+</header>
+<p class='desc'>Same detection, but at the CORRECTED (true) location of every corrections-bin plant. Separate output root by design.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>01c_run_od_corrected_locations.slurm</code> · env vars: <code>LIMIT</code>, <code>NORESUME</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>process only the first N corrections (testing)</td></tr>
+<tr><td class='flag'><code>--weights</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--models-dir</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--conf</code></td><td class='kind'>float</td><td class='dflt'><code>C.CONF_THRESHOLD (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--iou</code></td><td class='kind'>float</td><td class='dflt'><code>C.IOU_THRESHOLD (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--nms-dist</code></td><td class='kind'>float</td><td class='dflt'><code>C.NMS_DISTANCE_M (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--workers</code></td><td class='kind'>int</td><td class='dflt'><code>C.NAIP_WORKERS (constant)</code></td><td class='hlp'>concurrent NAIP fetch threads.</td></tr>
+<tr><td class='flag'><code>--device</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;cpu&#x27;</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--no-resume</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='01d_nlcd_topup' data-name='01d_nlcd_topup correction/scripts/01d_nlcd_topup.py'>
+<header class='card-h'>
+<h3><code>01d_nlcd_topup</code></h3>
+<p class='path'>correction/scripts/01d_nlcd_topup.py</p>
+</header>
+<p class='desc'>Compute NLCD stats for a specific parcel list, for parcels that fell outside 01a's original sweep.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>01d_nlcd_topup.slurm</code> · env vars: <code>DRYRUN</code>, <code>UUIDS_FILE</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--uuids-file</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>CSV with columns state,ll_uuid (default: data/diagnostics/missing_parcels_topup.csv from 08)</td></tr>
+<tr><td class='flag'><code>--k-rings</code></td><td class='kind'>int</td><td class='dflt'><code>C.K_RINGS (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='01e_run_od_candidates' data-name='01e_run_od_candidates correction/scripts/01e_run_od_candidates.py'>
+<header class='card-h'>
+<h3><code>01e_run_od_candidates</code></h3>
+<p class='path'>correction/scripts/01e_run_od_candidates.py</p>
+</header>
+<p class='desc'>Run detection on Stage 2a's top-K CANDIDATE parcels. Required by the re-ranker — 06b silently drops any plant missing this.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>01e_run_od_candidates.slurm</code> · env vars: <code>BINS</code>, <code>DRYRUN</code>, <code>NORESUME</code>, <code>SCOPE</code>, <code>STATES</code>, <code>TOPK</code>, <code>WORKERS</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--top-k</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'>candidates per plant to run OD on (default 20, the same cap 05 stores)</td></tr>
+<tr><td class='flag'><code>--all</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>every plant in stage2_candidates, not just holdout. This is the national job -- ~240k tiles. Do the holdout first.</td></tr>
+<tr><td class='flag'><code>--holdout-bins</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;corrections&#x27;</code></td><td class='hlp'>comma-separated holdout bins (default: corrections)</td></tr>
+<tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated filter</td></tr>
+<tr><td class='flag'><code>--batch-size</code></td><td class='kind'>int</td><td class='dflt'><code>200</code></td><td class='hlp'>candidate parcels prepared per batch</td></tr>
+<tr><td class='flag'><code>--workers</code></td><td class='kind'>int</td><td class='dflt'><code>32</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--conf</code></td><td class='kind'>float</td><td class='dflt'><code>0.25</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--iou</code></td><td class='kind'>float</td><td class='dflt'><code>0.7</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--nms-dist</code></td><td class='kind'>float</td><td class='dflt'><code>15.0</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--device</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;cpu&#x27;</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--weights</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--no-resume</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>report the work without fetching any imagery</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='check_od_freshness' data-name='check_od_freshness correction/scripts/check_od_freshness.py'>
+<header class='card-h'>
+<h3><code>check_od_freshness</code></h3>
+<p class='path'>correction/scripts/check_od_freshness.py</p>
+</header>
+<p class='desc'>Preflight for 02. Fails if any detection output predates the currently deployed best.pt.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>check_od_freshness.slurm</code> · env vars: <code>ACTION</code>, <code>ALLOW</code>, <code>MODELTIME</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--model</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>explicit best.pt (default: newest under OD_MODEL_DIR)</td></tr>
+<tr><td class='flag'><code>--model-time</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>override the model timestamp, YYYY-MM-DD (use when scp -p preserved the source mtime)</td></tr>
+<tr><td class='flag'><code>--allow</code></td><td class='kind'>str</td><td class='dflt'><code>[]</code></td><td class='hlp'>states permitted to be stale (e.g. AK HI PR -- outside NAIP/CONUS coverage and not reprocessable)</td></tr>
+<tr><td class='flag'><code>--delete</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>delete stale partitions</td></tr>
+<tr><td class='flag'><code>--quarantine</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>move stale partitions to od_features_stale/ instead</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='02_feature_engineering' data-name='02_feature_engineering correction/scripts/02_feature_engineering.py'>
+<header class='card-h'>
+<h3><code>02_feature_engineering</code></h3>
+<p class='path'>correction/scripts/02_feature_engineering.py</p>
+</header>
+<p class='desc'>Build every feature table. ONE job across all states, comma-separated — not an array.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>02_feature_engineering.slurm</code> · env vars: <code>FULL_UNIVERSE</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--full-universe</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='train'><h2 id='sec-train'>correction/ — training the four models</h2><p class='blurb'>The two build→train pairs are independent of each other; within a pair, order matters.</p><article class='card corr' id='03_train_stage1' data-name='03_train_stage1 correction/scripts/03_train_stage1.py'>
+<header class='card-h'>
+<h3><code>03_train_stage1</code></h3>
+<p class='path'>correction/scripts/03_train_stage1.py</p>
+</header>
+<p class='desc'>Stage 1: is this plant's reported location correct?</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>03_train_stage1.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--n-iter</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'>random search iterations (R used grid size=20)</td></tr>
+<tr><td class='flag'><code>--n-jobs</code></td><td class='kind'>int</td><td class='dflt'><code>-1</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--allow-no-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>proceed even if the holdout manifest is missing. Only for deliberate pre-holdout runs -- normally a missing manifest should stop the job.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='04_train_stage2' data-name='04_train_stage2 correction/scripts/04_train_stage2.py'>
+<header class='card-h'>
+<h3><code>04_train_stage2</code></h3>
+<p class='path'>correction/scripts/04_train_stage2.py</p>
+</header>
+<p class='desc'>Stage 2a: given it's wrong, which nearby parcel is the real one?</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>04_train_stage2.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--neg-ratio</code></td><td class='kind'>int</td><td class='dflt'><code>50</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--n-iter</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--n-jobs</code></td><td class='kind'>int</td><td class='dflt'><code>-1</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--allow-no-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>proceed even if the holdout manifest is missing. Only for deliberate pre-holdout runs -- normally a missing manifest should stop the job.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='06_build_stage2b_training' data-name='06_build_stage2b_training correction/scripts/06_build_stage2b_training.py'>
+<header class='card-h'>
+<h3><code>06_build_stage2b_training</code></h3>
+<p class='path'>correction/scripts/06_build_stage2b_training.py</p>
+</header>
+<p class='desc'>Pair each correction's reported parcel (label 0) against its corrected parcel (label 1).</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>06_build_stage2b_training.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--allow-no-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>proceed even if the holdout manifest is missing. Only for deliberate pre-holdout runs -- normally a missing manifest should stop the job.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='07_train_stage2b' data-name='07_train_stage2b correction/scripts/07_train_stage2b.py'>
+<header class='card-h'>
+<h3><code>07_train_stage2b</code></h3>
+<p class='path'>correction/scripts/07_train_stage2b.py</p>
+</header>
+<p class='desc'>Stage 2b: the detection-aware final selection model.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>07_train_stage2b.slurm</code> · env vars: <code>ALLOWNOHOLDOUT</code>, <code>NITER</code>, <code>NJOBS</code>, <code>NOOD</code>, <code>SEED</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--n-iter</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--n-jobs</code></td><td class='kind'>int</td><td class='dflt'><code>-1</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--seed</code></td><td class='kind'>int</td><td class='dflt'><code>42</code></td><td class='hlp'>random_state for the RF and the train/test split. At n in the hundreds a single seed&#x27;s test metrics are noisy -- run 3-5 seeds and report the spread before trusting any specific figure.</td></tr>
+<tr><td class='flag'><code>--no-od</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>train without any od_* feature. Establishes the non-OD baseline so OD&#x27;s contribution can be measured as the detector improves -- NOT a test of whether Stage 2b should exist. Writes _noOD artifacts so it never overwrites the real model.</td></tr>
+<tr><td class='flag'><code>--allow-no-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>proceed even if the holdout manifest is missing. Only for deliberate pre-holdout runs -- normally a missing manifest should stop the job.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='06b_build_rerank_training' data-name='06b_build_rerank_training correction/scripts/06b_build_rerank_training.py'>
+<header class='card-h'>
+<h3><code>06b_build_rerank_training</code></h3>
+<p class='path'>correction/scripts/06b_build_rerank_training.py</p>
+</header>
+<p class='desc'>One row per candidate parcel: 1 for the true parcel, 0 for the ~19 competitors. This is where review data pays off most.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>06b_build_rerank_training.slurm</code> · env vars: <code>DROPNOPOS</code>, <code>DRYRUN</code>, <code>TOPK</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--top-k</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'>candidates per plant (must match what 01e fetched)</td></tr>
+<tr><td class='flag'><code>--drop-no-positive</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>exclude plants whose true parcel is not in the pool. Off by default -- those plants are real and their negatives teach what a near-miss looks like.</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--allow-no-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='07b_train_rerank' data-name='07b_train_rerank correction/scripts/07b_train_rerank.py'>
+<header class='card-h'>
+<h3><code>07b_train_rerank</code></h3>
+<p class='path'>correction/scripts/07b_train_rerank.py</p>
+</header>
+<p class='desc'>Train the Stage 2a re-ranker on that distribution-matched set.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>07b_train_rerank.slurm</code> · env vars: <code>DROPNOPOS</code>, <code>NITER</code>, <code>NOOD</code>, <code>SEED</code>, <code>TESTFRAC</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--n-iter</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--n-jobs</code></td><td class='kind'>int</td><td class='dflt'><code>-1</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--seed</code></td><td class='kind'>int</td><td class='dflt'><code>42</code></td><td class='hlp'>a single seed&#x27;s test metrics are noisy at this n -- run 3-5 and report the spread before trusting one</td></tr>
+<tr><td class='flag'><code>--no-od</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>train without any od_* feature. THE key ablation here: if recall@1 is unchanged, OD is contributing nothing at the candidate level and the whole 01e fetch cost is unjustified. Writes _noOD artifacts.</td></tr>
+<tr><td class='flag'><code>--drop-no-positive-pools</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>train only on pools containing the true parcel. Off by default: near-miss pools are real at inference and teach what a plausible-but-wrong parcel looks like.</td></tr>
+<tr><td class='flag'><code>--test-frac</code></td><td class='kind'>float</td><td class='dflt'><code>0.25</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--allow-no-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='infer'><h2 id='sec-infer'>correction/ — inference, review queue, scoring</h2><p class='blurb'>Produces the batch a human reviews, and the one honest measurement of whether any of this is working.</p><article class='card corr' id='05_run_inference' data-name='05_run_inference correction/scripts/05_run_inference.py'>
+<header class='card-h'>
+<h3><code>05_run_inference</code></h3>
+<p class='path'>correction/scripts/05_run_inference.py</p>
+</header>
+<p class='desc'>Stage 1 → Stage 2a over the full universe. Run as a per-state array; the national single job runs out of memory.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>05_run_inference.slurm</code> · env vars: <code>TOPK</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated, e.g. --states OH,MS,DE. Must already have full-universe 05_plant_features.parquet/10_parcel_features.parquet from 02_feature_engineering.py --full-universe, and 01a NLCD output, for these states.</td></tr>
+<tr><td class='flag'><code>--top-k</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'>max candidates kept per flagged plant in the output table (default 20 -- REVIEW_LOOP_PLAN.md&#x27;s K=5 is the REVIEWED count, not the stored candidate-pool size; keep this larger so candidate_recall can be measured against a real pool).</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='merge_05_shards' data-name='merge_05_shards correction/scripts/merge_05_shards.py'>
+<header class='card-h'>
+<h3><code>merge_05_shards</code></h3>
+<p class='path'>correction/scripts/merge_05_shards.py</p>
+</header>
+<p class='desc'>Concatenate the array's per-state output into the flat files the queue builder reads.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>merge_05_shards.slurm</code> · env vars: <code>ALLOWMISSING</code>, <code>DRYRUN</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>space- or comma-separated list the array was run for</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--allow-missing</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>merge anyway when a state produced no shard</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='05b_rerank_candidates' data-name='05b_rerank_candidates correction/scripts/05b_rerank_candidates.py'>
+<header class='card-h'>
+<h3><code>05b_rerank_candidates</code></h3>
+<p class='path'>correction/scripts/05b_rerank_candidates.py</p>
+</header>
+<p class='desc'>Apply the re-ranker, writing rerank_score alongside stage2_prob_correct so the two orderings can be compared.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>05b_rerank_candidates.slurm</code> · env vars: <code>NOFALLBACK</code>, <code>NOOD</code>, <code>TOPK</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--no-od</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>use the ablation model and skip the OD join. The deployable-today path when 01e --all has not finished -- worth about 60%% of the full gain.</td></tr>
+<tr><td class='flag'><code>--top-k</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'>must match what 06b/07b trained on</td></tr>
+<tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated filter</td></tr>
+<tr><td class='flag'><code>--no-fallback</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>do not fall back to Stage 2a ordering for pools where nothing fired</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='10_build_review_queue' data-name='10_build_review_queue correction/scripts/10_build_review_queue.py'>
+<header class='card-h'>
+<h3><code>10_build_review_queue</code></h3>
+<p class='path'>correction/scripts/10_build_review_queue.py</p>
+</header>
+<p class='desc'>Assemble the batch a human will review. Excludes every previously-reviewed plant.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>10_build_review_queue.slurm</code> · env vars: <code>BATCHSIZE</code>, <code>MODELVERSION</code>, <code>SEED</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>must match the states 05_run_inference.py was run for</td></tr>
+<tr><td class='flag'><code>--round</code> <span class='req'>required</span></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>review round number. Round 1 includes the holdout slice; later rounds should not re-queue holdout plants.</td></tr>
+<tr><td class='flag'><code>--batch-size</code></td><td class='kind'>int</td><td class='dflt'><code>150</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--model-version</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>tag for provenance. Defaults to today&#x27;s date if omitted -- there is no formal model-versioning scheme yet (round_manifest.json doesn&#x27;t exist yet either, see TPQA_MASTER_REFERENCE.md S4 Phase 7).</td></tr>
+<tr><td class='flag'><code>--seed</code></td><td class='kind'>int</td><td class='dflt'><code>42</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--allow-partial-rerank</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>proceed even if some states with flagged plants have no reranked candidates (those plants get empty candidate lists). Off by default -- the script exits instead.</td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='check_review_queue_scores' data-name='check_review_queue_scores correction/scripts/check_review_queue_scores.py'>
+<header class='card-h'>
+<h3><code>check_review_queue_scores</code></h3>
+<p class='path'>correction/scripts/check_review_queue_scores.py</p>
+</header>
+<p class='desc'>Confirm the queue actually carries both stage2a and stage2b scores before you ship it.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>check_review_queue_scores.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--round</code> <span class='req'>required</span></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card corr' id='12_score_holdout' data-name='12_score_holdout correction/scripts/12_score_holdout.py'>
+<header class='card-h'>
+<h3><code>12_score_holdout</code></h3>
+<p class='path'>correction/scripts/12_score_holdout.py</p>
+</header>
+<p class='desc'>Score the frozen holdout. The only honest read on whether the cycle improved anything.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>12_score_holdout.slurm</code> · env vars: <code>BINS</code>, <code>COHORT</code>, <code>NOOD</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--no-od</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>score stage2_candidates_reranked_noOD.parquet</td></tr>
+<tr><td class='flag'><code>--bins</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;corrections,correct&#x27;</code></td><td class='hlp'>holdout bins to score (default: corrections,correct)</td></tr>
+<tr><td class='flag'><code>--cohort</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>restrict to one cohort</td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='rev'><h2 id='sec-rev'>review_app/ — the review loop</h2><p class='blurb'>Runs locally. This is the part that compounds: every verdict becomes a permanent training label and a set of NAIP tiles for the detector.</p><article class='card rev' id='pull_round.sh' data-name='pull_round.sh review_app/sync/pull_round.sh'>
+<header class='card-h'>
+<h3><code>pull_round.sh</code></h3>
+<p class='path'>review_app/sync/pull_round.sh</p>
+</header>
+<p class='desc'>Template for copying a round's queue down from the HPC. Placeholders — never confirmed working.</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card rev' id='queue_loader' data-name='queue_loader review_app/backend/queue_loader.py'>
+<header class='card-h'>
+<h3><code>queue_loader</code></h3>
+<p class='path'>review_app/backend/queue_loader.py</p>
+</header>
+<p class='desc'>Import review_queue_round{N}.parquet into the local SQLite store. Refuses to clobber in-progress reviews.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--round</code> <span class='req'>required</span></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--force</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--update-metadata</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='backend.app' data-name='backend.app review_app/backend/app.py'>
+<header class='card-h'>
+<h3><code>backend.app</code></h3>
+<p class='path'>review_app/backend/app.py</p>
+</header>
+<p class='desc'>The review UI itself. Run with uvicorn; open localhost:8000.</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card rev' id='enrich_local' data-name='enrich_local review_app/enrich_local.py'>
+<header class='card-h'>
+<h3><code>enrich_local</code></h3>
+<p class='path'>review_app/enrich_local.py</p>
+</header>
+<p class='desc'>Backfill population and discharge columns onto the local plants table from the CWNS text files.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--round</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>only enrich this review round. Default: all rounds.</td></tr>
+<tr><td class='flag'><code>--force</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>overwrite even plants that already have pop_served set. Default: only backfill where pop_served IS NULL.</td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='close_round' data-name='close_round review_app/sync/close_round.py'>
+<header class='card-h'>
+<h3><code>close_round</code></h3>
+<p class='path'>review_app/sync/close_round.py</p>
+</header>
+<p class='desc'>ONE command to close a round: export, fold into the master, rebuild bins, extract tiles, then print what to upload.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--round</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>round to close. Omit to close every reviewed round found in app.db (catch-up).</td></tr>
+<tr><td class='flag'><code>--all</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>pass --all to push_review_log (re-export every reviewed plant for this round, not just new ones)</td></tr>
+<tr><td class='flag'><code>--include-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>pass through to update_master_locations. Read that script&#x27;s docstring before using it.</td></tr>
+<tr><td class='flag'><code>--skip-bins</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>don&#x27;t rebuild training_locations.gpkg locally (build it on HPC with 00_build_training_bins.slurm)</td></tr>
+<tr><td class='flag'><code>--skip-tiles</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>don&#x27;t fetch NAIP tiles. The slow step -- skip it when re-running to fix something downstream.</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>print every command without running any of them</td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='update_master_locations' data-name='update_master_locations review_app/sync/update_master_locations.py'>
+<header class='card-h'>
+<h3><code>update_master_locations</code></h3>
+<p class='path'>review_app/sync/update_master_locations.py</p>
+</header>
+<p class='desc'>Fold verdicts into the master Updates.gpkg. The step that makes a review permanent.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--master</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>path to Updates.gpkg. Defaults to config.MASTER_GPKG.</td></tr>
+<tr><td class='flag'><code>--layer</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>source layer to build on. Defaults to the newest dated CWNS_Locations layer in the master.</td></tr>
+<tr><td class='flag'><code>--out-layer</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>layer name to write. Defaults to CWNS_Locations_&lt;today&gt;, suffixed if it exists.</td></tr>
+<tr><td class='flag'><code>--round</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>only fold in verdicts from this review round. Default: every reviewed plant in app.db.</td></tr>
+<tr><td class='flag'><code>--include-holdout</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>also write holdout plants&#x27; verdicts. Off by default -- read this script&#x27;s docstring first.</td></tr>
+<tr><td class='flag'><code>--keep-layers</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>append a new dated layer instead of replacing the existing one. The master is versioned in git now, so accumulating layers pays for the same history twice -- see write_single_layer(). Here for a deliberate local snapshot, not routine use.</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>report what would change and write nothing.</td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='push_review_log' data-name='push_review_log review_app/sync/push_review_log.py'>
+<header class='card-h'>
+<h3><code>push_review_log</code></h3>
+<p class='path'>review_app/sync/push_review_log.py</p>
+</header>
+<p class='desc'>Export verdicts to parquet and route holdout verdicts away from the training feed.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--round</code> <span class='req'>required</span></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--all</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>re-export every reviewed plant for this round, not just ones not yet exported</td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='migrate_master_to_gpkg' data-name='migrate_master_to_gpkg review_app/sync/migrate_master_to_gpkg.py'>
+<header class='card-h'>
+<h3><code>migrate_master_to_gpkg</code></h3>
+<p class='path'>review_app/sync/migrate_master_to_gpkg.py</p>
+</header>
+<p class='desc'>One-time: seed the master .gpkg from the legacy .gdb. Skips a newer layer that lost columns.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--gdb</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>source .gdb. Defaults to MASTER_GPKG&#x27;s sibling Updates.gdb.</td></tr>
+<tr><td class='flag'><code>--layer</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>source layer. Defaults to the newest dated layer that carries the required schema -- not simply the newest, see pick_seed_layer().</td></tr>
+<tr><td class='flag'><code>--reconcile-from</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>merge this layer&#x27;s non-null values on top of the seed. For a newer layer that has real curation but dropped columns. Nulls never overwrite.</td></tr>
+<tr><td class='flag'><code>--out</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>destination .gpkg. Defaults to config.MASTER_GPKG.</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='extract_review_tiles' data-name='extract_review_tiles review_app/analysis/extract_review_tiles.py'>
+<header class='card-h'>
+<h3><code>extract_review_tiles</code></h3>
+<p class='path'>review_app/analysis/extract_review_tiles.py</p>
+</header>
+<p class='desc'>Pull NAIP tiles for every parcel the reviewer saw into the detection labelling inventory. This is the bridge back to detection/.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--detection-root</code></td><td class='kind'>Path</td><td class='dflt'><code>DETECTION_PIPELINE_DIR_DEFAULT (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--reported-only</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>tile only reported-location parcels, skip candidates</td></tr>
+<tr><td class='flag'><code>--candidates-only</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>tile only candidate parcels, skip reported locations</td></tr>
+<tr><td class='flag'><code>--overlap-frac</code></td><td class='kind'>float</td><td class='dflt'><code>0.3</code></td><td class='hlp'>collapse two same-plant parcels into one site when their geometries overlap by more than this fraction of the smaller parcel&#x27;s area (default: 0.3)</td></tr>
+<tr><td class='flag'><code>--check-labels</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>report which reviewed plants already have a labeled parcel (informational, doesn&#x27;t skip fetching)</td></tr>
+<tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>—</code></td><td class='hlp'>cap the number of NEW tiles fetched, for a test run</td></tr>
+<tr><td class='flag'><code>--dry-run</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>report the tile count without fetching anything</td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='find_false_top_picks' data-name='find_false_top_picks review_app/analysis/find_false_top_picks.py'>
+<header class='card-h'>
+<h3><code>find_false_top_picks</code></h3>
+<p class='path'>review_app/analysis/find_false_top_picks.py</p>
+</header>
+<p class='desc'>List every plant where the model's rank-1 candidate was wrong — feeds 01_sample_sites for targeted labelling.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--out</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;false_top_picks.csv&#x27;</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--min-rank-gap</code></td><td class='kind'>int</td><td class='dflt'><code>1</code></td><td class='hlp'>only include candidate_correct cases where the correct candidate&#x27;s rank is at least this much worse than 1 (default 1 = any non-top-1 correct pick)</td></tr></tbody></table></div>
+</article>
+<article class='card rev' id='dedupe_existing_tiles' data-name='dedupe_existing_tiles review_app/analysis/dedupe_existing_tiles.py'>
+<header class='card-h'>
+<h3><code>dedupe_existing_tiles</code></h3>
+<p class='path'>review_app/analysis/dedupe_existing_tiles.py</p>
+</header>
+<p class='desc'>Clean duplicate tiles out of the detection inventory.</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--detection-root</code></td><td class='kind'>Path</td><td class='dflt'><code>DETECTION_PIPELINE_DIR_DEFAULT (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--iou-threshold</code></td><td class='kind'>float</td><td class='dflt'><code>0.6</code></td><td class='hlp'>bbox IoU above which two different-parcel tiles for the same plant count as duplicates (default: 0.6)</td></tr>
+<tr><td class='flag'><code>--all-sources</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>check every tile, not just review_reported/review_candidate</td></tr>
+<tr><td class='flag'><code>--apply</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>actually delete files and rewrite tile_metadata.csv (default is a dry run / report only)</td></tr></tbody></table></div>
+</article></section><section class='lane-sec' data-lane='diag'><h2 id='sec-diag'>Diagnostics</h2><p class='blurb'>None of these are in the run order. Reach for them when a number looks wrong, or <em>before</em> changing a modelling decision.</p><article class='card diag' id='08_diagnose_candidate_coverage' data-name='08_diagnose_candidate_coverage correction/scripts/08_diagnose_candidate_coverage.py'>
+<header class='card-h'>
+<h3><code>08_diagnose_candidate_coverage</code></h3>
+<p class='path'>correction/scripts/08_diagnose_candidate_coverage.py</p>
+</header>
+<p class='desc'>Do corrections fall inside the k-ring window at all? Gates every Stage 2b data decision.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>08_diagnose_candidate_coverage.slurm</code> · env vars: <code>STATES</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated STATE_CODE filter (default: all)</td></tr>
+<tr><td class='flag'><code>--k-rings</code></td><td class='kind'>int</td><td class='dflt'><code>C.K_RINGS (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='08b_analyze_ring_misses' data-name='08b_analyze_ring_misses correction/scripts/08b_analyze_ring_misses.py'>
+<header class='card-h'>
+<h3><code>08b_analyze_ring_misses</code></h3>
+<p class='path'>correction/scripts/08b_analyze_ring_misses.py</p>
+</header>
+<p class='desc'>Would raising K_RINGS actually help?</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>08b_analyze_ring_misses.slurm</code> · env vars: <code>CURK</code>, <code>KS</code>, <code>RECKM</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--coverage-file</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>default: data/diagnostics/correction_coverage.parquet</td></tr>
+<tr><td class='flag'><code>--records-error-km</code></td><td class='kind'>float</td><td class='dflt'><code>50.0</code></td><td class='hlp'>above this distance a miss is treated as a records error, not a radius problem (default 50)</td></tr>
+<tr><td class='flag'><code>--candidate-ks</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;20,22,25,30,35,40,50&#x27;</code></td><td class='hlp'>comma-separated k values to price in the recovery curve</td></tr>
+<tr><td class='flag'><code>--current-k</code></td><td class='kind'>int</td><td class='dflt'><code>C.K_RINGS (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='diagnose_candidate_od' data-name='diagnose_candidate_od correction/scripts/diagnose_candidate_od.py'>
+<header class='card-h'>
+<h3><code>diagnose_candidate_od</code></h3>
+<p class='path'>correction/scripts/diagnose_candidate_od.py</p>
+</header>
+<p class='desc'>Does detection discriminate among top-20 candidates? (Yes: 46.4% vs 9.0%.)</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_candidate_od.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='diagnose_stage1_attrition' data-name='diagnose_stage1_attrition correction/scripts/diagnose_stage1_attrition.py'>
+<header class='card-h'>
+<h3><code>diagnose_stage1_attrition</code></h3>
+<p class='path'>correction/scripts/diagnose_stage1_attrition.py</p>
+</header>
+<p class='desc'>Where do plants drop out of Stage 1?</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_stage1_attrition.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='diagnose_od_class_shift' data-name='diagnose_od_class_shift correction/scripts/diagnose_od_class_shift.py'>
+<header class='card-h'>
+<h3><code>diagnose_od_class_shift</code></h3>
+<p class='path'>correction/scripts/diagnose_od_class_shift.py</p>
+</header>
+<p class='desc'>How much signal depends on detection, before swapping in new weights?</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_od_class_shift.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--weights</code></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>explicit best.pt (default: newest in OD_MODEL_DIR)</td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='inspect_model_features' data-name='inspect_model_features correction/scripts/inspect_model_features.py'>
+<header class='card-h'>
+<h3><code>inspect_model_features</code></h3>
+<p class='path'>correction/scripts/inspect_model_features.py</p>
+</header>
+<p class='desc'>What was each deployed model ACTUALLY fitted on? Catches the high-cardinality one-hot trap.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>inspect_model_features.slurm</code> · env vars: <code>STAGES</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--stages</code></td><td class='kind'>str</td><td class='dflt'><code>&#x27;stage1,stage2,stage2b&#x27;</code></td><td class='hlp'>comma-separated subset of: stage1, stage2, stage2b</td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='list_training_states' data-name='list_training_states correction/scripts/list_training_states.py'>
+<header class='card-h'>
+<h3><code>list_training_states</code></h3>
+<p class='path'>correction/scripts/list_training_states.py</p>
+</header>
+<p class='desc'>Which states are in the training universe, with counts. Run before submitting a big job.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>list_training_states.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='diagnose_01b_output' data-name='diagnose_01b_output correction/scripts/diagnose_01b_output.py'>
+<header class='card-h'>
+<h3><code>diagnose_01b_output</code></h3>
+<p class='path'>correction/scripts/diagnose_01b_output.py</p>
+</header>
+<p class='desc'>Summary stats on one state's detection output.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_01b_output.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--state</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>2-letter STATE_CODE, e.g. OH</td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='diagnose_fetch_failures' data-name='diagnose_fetch_failures correction/scripts/diagnose_fetch_failures.py'>
+<header class='card-h'>
+<h3><code>diagnose_fetch_failures</code></h3>
+<p class='path'>correction/scripts/diagnose_fetch_failures.py</p>
+</header>
+<p class='desc'>Read the fetch_error string written for every tile that failed to download.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_fetch_failures.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--state</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='diagnose_parcel_duplicates' data-name='diagnose_parcel_duplicates correction/scripts/diagnose_parcel_duplicates.py'>
+<header class='card-h'>
+<h3><code>diagnose_parcel_duplicates</code></h3>
+<p class='path'>correction/scripts/diagnose_parcel_duplicates.py</p>
+</header>
+<p class='desc'>Track down row inflation in 02's parcel-features join.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_parcel_duplicates.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'>comma-separated, e.g. --states OH,MS,DE</td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='diagnose_bytearray_columns' data-name='diagnose_bytearray_columns correction/scripts/diagnose_bytearray_columns.py'>
+<header class='card-h'>
+<h3><code>diagnose_bytearray_columns</code></h3>
+<p class='path'>correction/scripts/diagnose_bytearray_columns.py</p>
+</header>
+<p class='desc'>Find the bytearray value that crashes OneHotEncoder.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_bytearray_columns.slurm</code> · no env vars</p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='diagnose_scoreable_dtypes' data-name='diagnose_scoreable_dtypes correction/scripts/diagnose_scoreable_dtypes.py'>
+<header class='card-h'>
+<h3><code>diagnose_scoreable_dtypes</code></h3>
+<p class='path'>correction/scripts/diagnose_scoreable_dtypes.py</p>
+</header>
+<p class='desc'>Inspect runtime-constructed dtypes that break inference.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>diagnose_scoreable_dtypes.slurm</code> · env vars: <code>LIMIT</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--states</code> <span class='req'>required</span></td><td class='kind'>str</td><td class='dflt'><code>—</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--limit</code></td><td class='kind'>int</td><td class='dflt'><code>20</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr></tbody></table></div>
+</article>
+<article class='card diag' id='check_competition_losses' data-name='check_competition_losses correction/scripts/check_competition_losses.py'>
+<header class='card-h'>
+<h3><code>check_competition_losses</code></h3>
+<p class='path'>correction/scripts/check_competition_losses.py</p>
+</header>
+<p class='desc'>Of the plants Stage 1 flagged, how many ended with no ranked top pick?</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>check_competition_losses.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='check_location_type' data-name='check_location_type correction/scripts/check_location_type.py'>
+<header class='card-h'>
+<h3><code>check_location_type</code></h3>
+<p class='path'>correction/scripts/check_location_type.py</p>
+</header>
+<p class='desc'>Audit the single-row-per-CWNS_ID assumption in the CWNS reads.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>check_location_type.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='check_location_type_overlap' data-name='check_location_type_overlap correction/scripts/check_location_type_overlap.py'>
+<header class='card-h'>
+<h3><code>check_location_type_overlap</code></h3>
+<p class='path'>correction/scripts/check_location_type_overlap.py</p>
+</header>
+<p class='desc'>Follow-up: 26% of PHYSICAL_LOCATION rows are not LOCATION_TYPE 'Point'.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>check_location_type_overlap.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='inspect_stage2_columns' data-name='inspect_stage2_columns correction/scripts/inspect_stage2_columns.py'>
+<header class='card-h'>
+<h3><code>inspect_stage2_columns</code></h3>
+<p class='path'>correction/scripts/inspect_stage2_columns.py</p>
+</header>
+<p class='desc'>Trace a STATE_CODE_x merge-suffix collision in the Stage 2 table.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>inspect_stage2_columns.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='inspect_deployed_02' data-name='inspect_deployed_02 correction/scripts/inspect_deployed_02.py'>
+<header class='card-h'>
+<h3><code>inspect_deployed_02</code></h3>
+<p class='path'>correction/scripts/inspect_deployed_02.py</p>
+</header>
+<p class='desc'>Print the actually-deployed version of a function from the running copy of 02.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>inspect_deployed_02.slurm</code> · no env vars</p>
+<p class='noargs'>No command-line arguments — run it as-is.</p>
+</article>
+<article class='card diag' id='build_test_bundle' data-name='build_test_bundle correction/scripts/build_test_bundle.py'>
+<header class='card-h'>
+<h3><code>build_test_bundle</code></h3>
+<p class='path'>correction/scripts/build_test_bundle.py</p>
+</header>
+<p class='desc'>Assemble a self-contained fixture copy of the pipeline so you can debug in seconds instead of one sbatch per hypothesis.</p>
+<p class='slurm'><span class='tag'>sbatch</span> <code>build_test_bundle.slurm</code> · env vars: <code>CLEAN</code>, <code>NCOUNTIES</code>, <code>NORASTER</code>, <code>NPLANTS</code>, <code>STATE</code></p>
+<div class='tw'><table><thead><tr><th>Argument</th><th>Type</th><th>Default</th><th>What it does</th></tr></thead><tbody><tr><td class='flag'><code>--state</code></td><td class='kind'>str</td><td class='dflt'><code>OH (constant)</code></td><td class='hlp'><span class='nohelp'>no help text in the script</span></td></tr>
+<tr><td class='flag'><code>--n-plants</code></td><td class='kind'>int</td><td class='dflt'><code>30</code></td><td class='hlp'>target plant count (all labelled plants in the chosen counties are taken regardless; this tops up with unlabelled)</td></tr>
+<tr><td class='flag'><code>--n-counties</code></td><td class='kind'>int</td><td class='dflt'><code>2</code></td><td class='hlp'>how many counties to draw plants from. More counties = more labels but a bigger parcel-data payload.</td></tr>
+<tr><td class='flag'><code>--no-raster</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>skip the NLCD raster clip (saves size; 01a/01d then can&#x27;t be run locally)</td></tr>
+<tr><td class='flag'><code>--clean</code></td><td class='kind'>flag</td><td class='dflt'><code>—</code></td><td class='hlp'>delete any existing bundle first</td></tr></tbody></table></div>
+</article></section>
+
+<footer>
+  <p>Argument tables extracted directly from each script's <code>argparse</code> definitions.
+  Where a row says <em>no help text in the script</em>, that is accurate &mdash; the flag works,
+  it just has no documented description. Script docstrings remain the authority on <em>why</em>
+  anything works the way it does.</p>
+  <p>Companion to <code>docs/</code> in the repo: 05_RUNBOOK.md for commands,
+  06_TROUBLESHOOTING.md for failures, 08_HANDOFF.md for what is not in the code.</p>
+</footer>
+</div>
+
+<script>
+(function () {
+  var q = document.getElementById('q');
+  var count = document.getElementById('count');
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var secs = Array.prototype.slice.call(document.querySelectorAll('.lane-sec'));
+  var filter = 'all';
+
+  function laneOf(card) {
+    if (card.classList.contains('det')) return 'det';
+    if (card.classList.contains('corr')) return 'corr';
+    if (card.classList.contains('rev')) return 'rev';
+    return 'diag';
+  }
+
+  function apply() {
+    var term = (q.value || '').trim().toLowerCase();
+    var shown = 0;
+    cards.forEach(function (c) {
+      var okLane = filter === 'all' || laneOf(c) === filter;
+      var okTerm = !term || (c.getAttribute('data-name') || '').indexOf(term) !== -1;
+      var vis = okLane && okTerm;
+      c.hidden = !vis;
+      if (vis) shown++;
+    });
+    secs.forEach(function (s) {
+      var any = Array.prototype.some.call(s.querySelectorAll('.card'), function (c) { return !c.hidden; });
+      s.hidden = !any;
+    });
+    count.textContent = shown + ' of ' + cards.length + ' scripts';
+  }
+
+  q.addEventListener('input', apply);
+  chips.forEach(function (b) {
+    b.addEventListener('click', function () {
+      filter = b.getAttribute('data-f');
+      chips.forEach(function (o) { o.setAttribute('aria-pressed', String(o === b)); });
+      apply();
+    });
+  });
+  apply();
+})();
+</script>
