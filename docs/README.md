@@ -31,6 +31,7 @@ run.
 | 4 | [04_REVIEW_LOOP.md](04_REVIEW_LOOP.md) | The review app, and how a verdict becomes training data |
 | 5 | [05_RUNBOOK.md](05_RUNBOOK.md) | **The operational runbook.** Start-to-finish commands for a full cycle |
 | — | [pipeline-map.html](pipeline-map.html) | **Visual map.** Every script, the run order, the branches, and all 181 arguments. Open it in a browser. |
+| — | [NEXT_STEPS.md](NEXT_STEPS.md) | **Resume here.** Point-in-time checklist for the round 1–2 fold-back, dated 2026-09-21. Delete it once done. |
 | 6 | [06_TROUBLESHOOTING.md](06_TROUBLESHOOTING.md) | Failures that have actually happened, and what they meant |
 | 7 | [07_OPEN_ITEMS.md](07_OPEN_ITEMS.md) | Known gaps, pending decisions, what to do next |
 | 8 | [08_HANDOFF.md](08_HANDOFF.md) | What only lived in one person's head |
