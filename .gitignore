@@ -31,3 +31,6 @@ __pycache__/
 # they are the audit trail of what a reviewer saw and decided, and cannot be
 # regenerated once app.db moves on.
 review_app/data/outgoing/training_locations.gpkg
+
+# Scratch HTML the PNG renderer writes on its way to the image
+docs/img/_fig.tmp.html
