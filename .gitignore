@@ -34,3 +34,6 @@ review_app/data/outgoing/training_locations.gpkg
 
 # Scratch HTML the PNG renderer writes on its way to the image
 docs/img/_fig.tmp.html
+
+# Scratch output from diagnostic and verification runs
+correction/temp/
