@@ -120,43 +120,6 @@ def restrict_to_holdout(cands: pd.DataFrame, bins: list[str]) -> pd.DataFrame:
     return out
 
 
-def restrict_to_training_corrections(cands: pd.DataFrame) -> pd.DataFrame:
-    """Candidates belonging to corrections-layer plants that are NOT in the
-    holdout -- the plants a re-ranker is allowed to train on.
-
-    The corrections layer is the only source of a known true parcel for
-    training: classes-layer 'Correct' plants have their true location at the
-    reported point, which Stage 2a excludes from the candidate pool by
-    construction, so they can never contribute a positive row here.
-    """
-    import geopandas as gpd
-    from holdout import MANIFEST_PATH
-
-    corr = gpd.read_file(C.TRAINING_GPKG, layer=C.TRAINING_LAYER_CORRECTIONS)
-    corr_ids = set(corr["CWNS_ID"].astype(str))
-    print(f"  Corrections layer: {len(corr_ids)} plant(s)")
-
-    if MANIFEST_PATH.exists():
-        man = pd.read_parquet(MANIFEST_PATH)
-        held = set(man["CWNS_ID"].astype(str))
-        corr_ids -= held
-        print(f"  Excluding {len(held)} holdout plant(s) -> {len(corr_ids)} trainable")
-    else:
-        print("  WARNING: no holdout manifest found. Proceeding with ALL "
-              "corrections -- if a holdout is created later, anything trained "
-              "on this data is contaminated.")
-
-    out = cands[cands["CWNS_ID"].isin(corr_ids)].copy()
-    print(f"  Candidates for those plants: {len(out)} "
-          f"across {out['CWNS_ID'].nunique()} plant(s)")
-    n_missing = len(corr_ids) - out["CWNS_ID"].nunique()
-    if n_missing > 0:
-        print(f"  NOTE: {n_missing} trainable correction(s) have no Stage 2a "
-              f"candidates at all -- Stage 1 did not flag them, or K_RINGS "
-              f"produced nothing. They cannot contribute a row either way.")
-    return out
-
-
 def load_parcel_geoms(con, state: str, uuids: list[str]) -> pd.DataFrame:
     """Candidate parcel geometries by ll_uuid, projected to PROJECTED_CRS.
 
@@ -203,10 +166,6 @@ def main():
                     help="every plant in stage2_candidates, not just holdout. "
                          "This is the national job -- ~240k tiles. Do the "
                          "holdout first.")
-    ap.add_argument("--training-corrections", action="store_true",
-                    help="corrections-layer plants MINUS the holdout -- the "
-                         "scope for building re-rank training data. Mutually "
-                         "exclusive with --all.")
     ap.add_argument("--holdout-bins", default="corrections",
                     help="comma-separated holdout bins (default: corrections)")
     ap.add_argument("--states", default=None, help="comma-separated filter")
@@ -224,13 +183,7 @@ def main():
                     help="report the work without fetching any imagery")
     args = ap.parse_args()
 
-    # Training-scope output goes to its own root. Keeping it apart from the
-    # holdout's means a later --no-resume rebuild of one cannot quietly
-    # discard the other, and makes it obvious at a glance which rows a model
-    # was allowed to see.
-    out_root = (C.DATA_DIR / "od_features_candidates_train"
-                if args.training_corrections
-                else C.DATA_DIR / "od_features_candidates")
+    out_root = C.DATA_DIR / "od_features_candidates"
     print("=== 01e_run_od_candidates.py ===")
     print(f"output: {out_root}")
 
@@ -239,16 +192,11 @@ def main():
     print(f"  {len(cands)} candidate(s) across {cands['CWNS_ID'].nunique()} plant(s) "
           f"(top {args.top_k} each)")
 
-    if args.all and args.training_corrections:
-        print("ERROR: --all and --training-corrections are mutually exclusive.")
-        sys.exit(2)
-    if args.training_corrections:
-        cands = restrict_to_training_corrections(cands)
-    elif not args.all:
+    if not args.all:
         bins = [b.strip() for b in args.holdout_bins.split(",")]
         cands = restrict_to_holdout(cands, bins)
     else:
-        print("  --all: no scope restriction")
+        print("  --all: no holdout restriction")
 
     if args.states:
         keep = [s.strip() for s in args.states.split(",")]

@@ -72,6 +72,10 @@ def load_master(gdb_path: str, layer: str) -> gpd.GeoDataFrame:
     print(f"Loading {layer} from {gdb_path} ...")
     gdf = gpd.read_file(gdb_path, layer=layer)
     print(f"  Loaded {len(gdf)} rows")
+    
+    # Treatment plants have the best information. For now, we'll keep this filter in place.
+    gdf = gdf[gdf["FACILITY_TYPE"] == "Treatment Plant"].copy()
+    print(f"  Filtered to treatment plants: {len(gdf)} rows")
 
     missing = [c for c in REQUIRED_COLUMNS if c not in gdf.columns]
     if missing:
