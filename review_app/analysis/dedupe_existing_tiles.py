@@ -8,6 +8,21 @@ boxes substantially overlap -- duplicates of the kind
 dedupe_overlapping_sites() in extract_review_tiles.py now prevents going
 forward, for whatever already got downloaded before that fix existed.
 
+SEE ALSO detection/pipeline/dedupe_tiles_by_content.py, which finds a
+DIFFERENT class of duplicate and is usually the one to run first:
+
+    this script  compares bounding boxes from tile_metadata.csv, WITHIN one
+        CWNS_ID, and clusters by IoU. Catches tiles that overlap heavily
+        without being identical -- the same lagoon at two tile offsets.
+        Blind to anything with no row in tile_metadata.csv, and blind to
+        duplication ACROSS plants because of the per-CWNS_ID grouping.
+
+    by_content  hashes the image files themselves. Catches exact duplicates
+        wherever they come from, including across plants and including tiles
+        the metadata never recorded. Measured 2026-09-22: 3.5% of the
+        labelled inventory was byte-identical duplication, every group
+        same-plant / different-parcel-uuid.
+
 WHY THIS EXISTS
     Confirmed 2026-09-16: extract_review_tiles.py tiled two Regrid parcel
     records that physically overlap for the same plant (adjoining

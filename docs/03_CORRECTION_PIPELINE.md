@@ -59,6 +59,7 @@ build_training_bins.py     master Updates.gpkg -> training_locations.gpkg
 | `01d_nlcd_topup.py` | NLCD stats for a specific parcel list, appended to 01a's output — for parcels that fell outside the original k-ring sweep. |
 | `01e_run_od_candidates.py` | OD on Stage 2a's top-K candidate parcels. Keyed `(CWNS_ID, ll_uuid)`. **Required by the re-ranker.** |
 | `04_train_model.py` (detection) | Copies `best.pt` to `correction/models/object_detection/` automatically on success — see below. |
+| `dedupe_tiles_by_content.py` (detection) | Deduplicates the labelling inventory by image hash. Quarantines rather than deletes, and never drops a labelled tile whose annotation disagrees with its duplicate. |
 | `02_feature_engineering.py` | Builds all feature tables. **Per-state array** — each task writes a shard with `--shard`. |
 | `02b_merge_feature_shards.py` | Unions those shards into the flat files everything downstream reads. Validates all tables before writing any. |
 | `03_train_stage1.py` | Stage 1 classifier. |
