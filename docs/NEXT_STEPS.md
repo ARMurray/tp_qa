@@ -255,9 +255,15 @@ Not yet exercised against real data.
 ```bash
 cd /work/GRDVULN/tp_qa/correction/scripts
 
-JID=$(sbatch --parsable 02_feature_engineering.slurm)
-sbatch --dependency=afterok:$JID 02b_merge_feature_shards.slurm
+sbatch 02_feature_engineering.slurm
+# prints: Submitted batch job 1234567
+sbatch --dependency=afterok:1234567 02b_merge_feature_shards.slurm
 ```
+
+> Written as two steps because `JID=$(...)` is bash-only syntax and the HPC
+> login shell may be `tcsh`. Copy the job id from the first command's output.
+> In bash, `JID=$(sbatch --parsable ...)` chains it in one line.
+
 
 Each task writes a shard under `data/feature_shards/state=XX/`; `02b` unions
 them into the flat files 03/04/05/06/06b/10 read by name. `afterok` means the

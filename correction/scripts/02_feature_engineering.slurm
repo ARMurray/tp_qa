@@ -21,8 +21,17 @@
 # THE MERGE IS PART OF THE JOB, NOT AN AFTERTHOUGHT. Submit both together so
 # it cannot be forgotten:
 #
-#   JID=$(sbatch --parsable 02_feature_engineering.slurm)
-#   sbatch --dependency=afterok:$JID 02b_merge_feature_shards.slurm
+#   sbatch 02_feature_engineering.slurm
+#     -> prints "Submitted batch job 1234567"
+#   sbatch --dependency=afterok:1234567 02b_merge_feature_shards.slurm
+#
+#   Written as two literal steps rather than JID=$(sbatch --parsable ...)
+#   because $(...) is bash syntax and this cluster's login shell may be tcsh,
+#   where it silently does the wrong thing -- and the cost of finding out is a
+#   52-task array that finishes with nothing chained to it. In bash the
+#   one-liner is fine:
+#       JID=$(sbatch --parsable 02_feature_engineering.slurm)
+#       sbatch --dependency=afterok:$JID 02b_merge_feature_shards.slurm
 #
 # afterok means the merge only runs if EVERY array task succeeded, which is
 # exactly the condition under which merging is safe -- a merge over a partial

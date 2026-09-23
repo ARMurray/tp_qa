@@ -46,9 +46,15 @@ sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
 python check_od_freshness.py
 
 # Per-state array, then the merge. Submit them chained.
-JID=$(sbatch --parsable 02_feature_engineering.slurm)
-sbatch --dependency=afterok:$JID 02b_merge_feature_shards.slurm
+sbatch 02_feature_engineering.slurm
+# prints: Submitted batch job 1234567
+sbatch --dependency=afterok:1234567 02b_merge_feature_shards.slurm
 ```
+
+> Written as two steps because `JID=$(...)` is bash-only syntax and the HPC
+> login shell may be `tcsh`. Copy the job id from the first command's output.
+> In bash, `JID=$(sbatch --parsable ...)` chains it in one line.
+
 
 **`02` is a per-state array, and the merge is part of the job.** Each task
 writes a shard under `data/feature_shards/state=XX/`; `02b` unions them into
