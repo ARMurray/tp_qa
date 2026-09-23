@@ -39,7 +39,9 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch merge_05_shards.slurm \"AL AR AZ\"}"
+# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
+# --export or positional arg is needed. Override for a subset as shown above.
+STATES_ARG="${1:-$DEFAULT_STATES}"
 
 CMD="python $SCRIPTS/merge_05_shards.py --states \"$STATES_ARG\""
 [ -n "${DRYRUN:-}" ]       && CMD="$CMD --dry-run"

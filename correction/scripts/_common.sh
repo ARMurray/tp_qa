@@ -46,3 +46,32 @@ echo "------------------------------------------"
 # Fail the job if any command in the pipeline fails, rather than marching on
 # and writing partial output that looks like a successful run.
 set -o pipefail
+
+# ==============================================================================
+# DEFAULT_STATES -- the training universe, so the array wrappers do not need a
+# 250-character --export on every submission.
+# ==============================================================================
+# Every per-state array job wants the same list, and passing it by hand meant
+# either a shell variable or a long inline paste. Both fail on this cluster:
+# the login shell is tcsh, where `export VAR=...` is a syntax error and
+# `VAR=$(...)` does not mean what it looks like. Keeping the list here, in the
+# file every wrapper already sources, removes the question entirely --
+# `sbatch --array=0-51%6 01b_run_object_detection.slurm` with no --export at
+# all.
+#
+# 52 entries: 50 states + DC + PR. That is the full training universe as of
+# 2026-09-23 -- 2,690 verified plants, every one of these states represented.
+# `python list_training_states.py` prints the live per-state counts; if it ever
+# reports a state not listed here, add it AND bump the --array upper bound,
+# because the two have to agree.
+#
+# Override for a subset the usual way, which still works:
+#   sbatch --array=0-2 --export=STATES="OH MS DE" 01b_run_object_detection.slurm
+DEFAULT_STATES="AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY"
+DEFAULT_STATES_N=52
+
+# Comma-separated form. The array jobs take spaces (one state per task); the
+# single jobs that build one combined table take commas. That split is real --
+# see 01a's header -- so both forms live here rather than each wrapper
+# reformatting the list itself.
+DEFAULT_STATES_CSV="${DEFAULT_STATES// /,}"

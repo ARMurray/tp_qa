@@ -27,7 +27,9 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch 10_build_review_queue.slurm \"OH,MS,DE\" 1}"
+# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
+# --export or positional arg is needed. Override for a subset as shown above.
+STATES_ARG="${1:-$DEFAULT_STATES_CSV}"
 ROUND_ARG="${2:?ERROR: pass round number as the second positional arg, e.g. sbatch 10_build_review_queue.slurm \"OH,MS,DE\" 1}"
 
 CMD="python $SCRIPTS/10_build_review_queue.py --states $STATES_ARG --round $ROUND_ARG"

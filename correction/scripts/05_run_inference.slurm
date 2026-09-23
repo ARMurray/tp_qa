@@ -38,7 +38,9 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch 05_run_inference.slurm \"OH,MS,DE\"}"
+# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
+# --export or positional arg is needed. Override for a subset as shown above.
+STATES_ARG="${1:-$DEFAULT_STATES_CSV}"
 
 CMD="python $SCRIPTS/05_run_inference.py --states $STATES_ARG"
 [ -n "${TOPK:-}" ] && CMD="$CMD --top-k $TOPK"

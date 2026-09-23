@@ -36,7 +36,7 @@ Skip this step entirely on the very first cycle — there is no review yet.
 cd /work/GRDVULN/tp_qa/correction/scripts
 
 # Only for plants NEW to the corrections bin this round:
-sbatch --array=0-N --export=STATES="OH PA ..." 01a_extract_parcels.slurm
+sbatch --array=0-51%6 01a_extract_parcels.slurm
 sbatch 01c_run_od_corrected_locations.slurm
 
 # REQUIRED for the re-ranker. Do not skip.
@@ -96,7 +96,7 @@ before the train. The two *pairs* are independent of each other.
 
 ```bash
 # Per-state array. The national single job OOMs.
-sbatch --array=0-N --export=STATES="OH PA ..." 05_run_inference_array.slurm
+sbatch --array=0-51%8 05_run_inference_array.slurm
 python merge_05_shards.py
 
 sbatch 05b_rerank_candidates.slurm

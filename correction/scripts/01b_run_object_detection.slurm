@@ -48,7 +48,9 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-STATES=${STATES:?ERROR: set STATES, e.g. --export=STATES="OH PA"}
+# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
+# --export or positional arg is needed. Override for a subset as shown above.
+STATES="${STATES:-$DEFAULT_STATES}"
 read -ra STATE_ARR <<< "$STATES"
 IDX=${SLURM_ARRAY_TASK_ID:-0}
 STATE=${STATE_ARR[$IDX]}

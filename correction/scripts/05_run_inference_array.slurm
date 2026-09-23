@@ -38,7 +38,9 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-STATES_ARG="${1:?ERROR: pass states as a positional arg, e.g. sbatch --array=0-47%8 05_run_inference_array.slurm \"AL AR AZ\"}"
+# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
+# --export or positional arg is needed. Override for a subset as shown above.
+STATES_ARG="${1:-$DEFAULT_STATES}"
 read -ra STATE_LIST <<< "$STATES_ARG"
 STATE="${STATE_LIST[$SLURM_ARRAY_TASK_ID]}"
 
