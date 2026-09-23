@@ -18,6 +18,8 @@
 #   sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm         # re-rank TRAINING data
 #   sbatch --export=SCOPE="all",STATES="OH,WI,KS" 01e_run_od_candidates.slurm
 #
+# SCOPE: all | train | queue | unset (holdout)
+# (original note follows)
 # SCOPE:
 #   (unset)  holdout bins only -- default, 880 parcels, ~10 min. The
 #            evaluation set. Writes to data/od_features_candidates/.
@@ -69,11 +71,24 @@ case "${SCOPE:-holdout}" in
         fi
         CMD="$CMD --training-corrections"
         ;;
+    queue)
+        # Detection on exactly the parcels a review queue will SHOW, so the
+        # review app can display detection stats and tile selection afterwards
+        # can tell a false positive from a parcel nobody examined.
+        #   sbatch --export=SCOPE="queue",ROUND=3 01e_run_od_candidates.slurm
+        # Then RE-RUN 10_build_review_queue.slurm with the same --seed so the
+        # stats get attached to the queue file.
+        if [ -z "${ROUND:-}" ]; then
+            echo "ERROR: SCOPE=queue needs ROUND, e.g. --export=SCOPE=queue,ROUND=3"
+            exit 1
+        fi
+        CMD="$CMD --from-queue \"$ROOT/data/review_queue/review_queue_round${ROUND}.parquet\""
+        ;;
     holdout)
         [ -n "${BINS:-}" ] && CMD="$CMD --holdout-bins $BINS"
         ;;
     *)
-        echo "ERROR: SCOPE must be all, train, or unset (holdout)."
+        echo "ERROR: SCOPE must be all, train, queue, or unset (holdout)."
         exit 2
         ;;
 esac

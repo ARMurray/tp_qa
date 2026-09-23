@@ -160,8 +160,17 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
     a misleading zero. An absent detection and a detection of nothing are
     different things, and od_ran is what separates them.
     """
+    # Queue root FIRST: it is the one written specifically for this purpose, by
+    # 01e --from-queue, and it is the only one that covers the uncertain/random
+    # slices at all. The other two are read as a fallback because a plant that
+    # happens to be in the holdout or corrections bins may already have a
+    # result there, and recomputing it would be waste.
+    #
+    # Ordering matters because of the keep="last" dedup below: later frames win,
+    # so the fallbacks are listed after the queue root, not before.
     roots = [C.DATA_DIR / "od_features_candidates_train" / "candidates",
-             C.DATA_DIR / "od_features_candidates" / "candidates"]
+             C.DATA_DIR / "od_features_candidates" / "candidates",
+             C.DATA_DIR / "od_features_candidates_queue" / "candidates"]
     frames = []
     for root in roots:
         if not root.exists():

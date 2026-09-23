@@ -54,11 +54,23 @@ SCOPE IT SMALL FIRST
     the honest test of whether re-ranking with OD moves recall@1 at all.
     Only widen to --all once that answers yes.
 
+THREE SCOPES, THREE OUTPUT ROOTS, NEVER SHARED
+    --training-corrections -> od_features_candidates_train/
+        Feeds 06b, which trains the re-ranker. Contains NO holdout plants.
+    --from-queue           -> od_features_candidates_queue/
+        Feeds the review app's candidate cards and, after the round, tile
+        selection. CONTAINS holdout plants, because a review queue has a
+        holdout slice -- which is precisely why it cannot share a root with
+        the training scope. See restrict_to_queue().
+    (default / --all)      -> od_features_candidates/
+        The holdout's own candidates, for scoring.
+
 Usage:
     python 01e_run_od_candidates.py --dry-run
     python 01e_run_od_candidates.py                       # holdout corrections
     python 01e_run_od_candidates.py --holdout-bins corrections,correct
     python 01e_run_od_candidates.py --all --states OH,MS  # everything, scoped
+    python 01e_run_od_candidates.py --from-queue ../data/review_queue/review_queue_round3.parquet
 """
 import argparse
 import importlib.util
@@ -117,6 +129,75 @@ def restrict_to_holdout(cands: pd.DataFrame, bins: list[str]) -> pd.DataFrame:
     out = cands[cands["CWNS_ID"].isin(set(keep["CWNS_ID"]))].copy()
     print(f"  Candidates for those plants: {len(out)} "
           f"across {out['CWNS_ID'].nunique()} plant(s)")
+    return out
+
+
+def restrict_to_queue(cands: pd.DataFrame, queue_path: Path) -> pd.DataFrame:
+    """Keep only the exact (CWNS_ID, ll_uuid) pairs a review queue will show.
+
+    WHY THIS SCOPE EXISTS
+        The other scopes cover holdout plants, corrections plants, or the
+        whole country. A review queue is none of those: its 'uncertain' and
+        'random' slices are drawn from ALL scored plants, so its parcels sit
+        in no existing bucket, and the only scope that covers them is --all
+        -- the national job, ~240k tiles.
+
+        The queue shows TOP_K_SHOWN (5) candidates per plant, so for a
+        150-plant round that is ~750 parcels. Running OD on exactly those is
+        tractable in a way the national job is not, and it is what lets the
+        review app show detection stats while the reviewer decides, and lets
+        tile selection afterwards tell a false positive from a parcel nobody
+        looked at.
+
+    PAIRS, NOT PLANTS. Restricting by CWNS_ID alone would pull in every
+    candidate for those plants up to --top-k (20 by default), quadrupling the
+    work to compute detections on parcels the reviewer will never see.
+
+    OUTPUT GOES TO ITS OWN ROOT, and that is not tidiness -- it is the
+    holdout. A review queue deliberately contains a holdout slice. If these
+    rows landed in od_features_candidates_train/, 06b_build_rerank_training.py
+    reads that root to build the re-ranker's training set, and the re-ranker
+    would train on candidates belonging to the plants it is later scored
+    against. That is the one failure this pipeline is most careful about, and
+    it would be completely silent.
+    """
+    if not queue_path.exists():
+        print(f"ERROR: {queue_path} not found.\n"
+              f"  Build the queue first (10_build_review_queue.py), then run "
+              f"this, then re-run 10 so the detection stats get attached.")
+        sys.exit(2)
+
+    q = pd.read_parquet(queue_path)
+    if "review_task" in q.columns:
+        q = q[q["review_task"] == "candidate_pick"]
+    q = q[q["ll_uuid"].notna() & (q["ll_uuid"].astype(str) != "")]
+    q["CWNS_ID"] = q["CWNS_ID"].astype(str)
+    q["ll_uuid"] = q["ll_uuid"].astype(str)
+    wanted = set(zip(q["CWNS_ID"], q["ll_uuid"]))
+    print(f"  Queue {queue_path.name}: {len(wanted)} shown candidate parcel(s) "
+          f"across {q['CWNS_ID'].nunique()} plant(s)")
+
+    cands = cands.copy()
+    cands["ll_uuid"] = cands["ll_uuid"].astype(str)
+    keys = list(zip(cands["CWNS_ID"], cands["ll_uuid"]))
+    out = cands[[k in wanted for k in keys]].copy()
+
+    # A queue parcel missing from stage2_candidates means the two were built
+    # from different inference runs, and the detection stats would come back
+    # patchy with no indication why.
+    found = set(zip(out["CWNS_ID"], out["ll_uuid"]))
+    missing = wanted - found
+    if missing:
+        print(f"  WARNING: {len(missing)} of {len(wanted)} queue parcel(s) are "
+              f"not in stage2_candidates.parquet.")
+        print(f"    Either the queue and the candidate file come from different "
+              f"inference runs, or --top-k is lower than the queue's deepest "
+              f"rank. Those parcels get no detection stats and will look to "
+              f"tile selection like parcels nobody examined.")
+        for cw, uu in sorted(missing)[:5]:
+            print(f"    {cw}  {uu}")
+
+    print(f"  Running detection on {len(out)} parcel(s)")
     return out
 
 
@@ -207,6 +288,14 @@ def main():
                     help="corrections-layer plants MINUS the holdout -- the "
                          "scope for building re-rank training data. Mutually "
                          "exclusive with --all.")
+    ap.add_argument("--from-queue", type=Path, default=None,
+                    help="path to a review_queue_round{N}.parquet. Runs "
+                         "detection on exactly the candidate parcels that "
+                         "queue will SHOW, so the review app can display "
+                         "detection stats and tile selection afterwards can "
+                         "tell a false positive from an unexamined parcel. "
+                         "Writes to its own output root -- see "
+                         "restrict_to_queue().")
     ap.add_argument("--holdout-bins", default="corrections",
                     help="comma-separated holdout bins (default: corrections)")
     ap.add_argument("--states", default=None, help="comma-separated filter")
@@ -228,9 +317,18 @@ def main():
     # holdout's means a later --no-resume rebuild of one cannot quietly
     # discard the other, and makes it obvious at a glance which rows a model
     # was allowed to see.
-    out_root = (C.DATA_DIR / "od_features_candidates_train"
-                if args.training_corrections
-                else C.DATA_DIR / "od_features_candidates")
+    # Three roots, three audiences, deliberately never shared:
+    #   _train  -> 06b trains the re-ranker from it. Must contain NO holdout.
+    #   _queue  -> the review app and tile selection. CONTAINS holdout plants,
+    #              because a queue has a holdout slice, which is exactly why it
+    #              must not be the same root as _train.
+    #   (base)  -> the holdout's own candidates, for scoring.
+    if args.training_corrections:
+        out_root = C.DATA_DIR / "od_features_candidates_train"
+    elif args.from_queue:
+        out_root = C.DATA_DIR / "od_features_candidates_queue"
+    else:
+        out_root = C.DATA_DIR / "od_features_candidates"
     print("=== 01e_run_od_candidates.py ===")
     print(f"output: {out_root}")
 
@@ -239,11 +337,16 @@ def main():
     print(f"  {len(cands)} candidate(s) across {cands['CWNS_ID'].nunique()} plant(s) "
           f"(top {args.top_k} each)")
 
-    if args.all and args.training_corrections:
-        print("ERROR: --all and --training-corrections are mutually exclusive.")
+    n_scopes = sum(bool(x) for x in (args.all, args.training_corrections, args.from_queue))
+    if n_scopes > 1:
+        print("ERROR: --all, --training-corrections and --from-queue are "
+              "mutually exclusive -- each writes a different output root for a "
+              "different consumer.")
         sys.exit(2)
     if args.training_corrections:
         cands = restrict_to_training_corrections(cands)
+    elif args.from_queue:
+        cands = restrict_to_queue(cands, args.from_queue)
     elif not args.all:
         bins = [b.strip() for b in args.holdout_bins.split(",")]
         cands = restrict_to_holdout(cands, bins)

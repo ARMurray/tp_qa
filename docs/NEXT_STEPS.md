@@ -199,19 +199,39 @@ never examined.
 
 ### What has to happen for the false-positive half to work
 
-**`01e` must run before `10_build_review_queue`.** The queue is what carries
-detection results to the local machine; if 01e has not run, the candidates
-arrive with null detection columns and only verified true locations get
-tiled. The script warns when that happens.
+The queue is what carries detection results to the local machine. Without
+them, candidates arrive with null detection columns, the cards say "not run",
+and only verified true locations get tiled. The script warns when that
+happens.
 
-This needs no reordering — 01e and 10 both read `data/inference/`, so 01e
-slots in between `merge_05_shards` and `10`:
+**Build the queue, detect on it, then rebuild the queue.** Three steps, not
+two — and not the "01e then 10" I said earlier, which was wrong:
 
 ```bash
-sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
-# then, after it finishes:
-sbatch 10_build_review_queue.slurm
+sbatch 10_build_review_queue.slurm                              # 1. pick plants
+sbatch --export=SCOPE="queue",ROUND=3 01e_run_od_candidates.slurm  # 2. detect on them
+sbatch 10_build_review_queue.slurm                              # 3. attach the stats
 ```
+
+Step 1 has to come first because 01e needs to know *which* parcels to examine,
+and that is what the queue decides. Step 3 reruns with the same `--seed`, so
+it picks the identical plants and the join finds the results.
+
+**Why not one of the existing scopes?** `--training-corrections` covers
+corrections-bin plants and the default covers the holdout. A queue's
+`uncertain` and `random` slices are drawn from *all scored plants*, so its
+parcels are in neither, and the only scope that reached them was `--all` —
+the national job, ~240k tiles. `--from-queue` restricts to the exact
+(CWNS_ID, ll_uuid) pairs the queue will **show**: 150 plants × 5 shown
+candidates ≈ 750 parcels. Pairs, not plants — restricting by plant would pull
+all 20 candidates each and quadruple the work for parcels nobody sees.
+
+**It writes to its own output root** (`od_features_candidates_queue/`), and
+that is a correctness requirement rather than tidiness. A review queue
+deliberately contains a holdout slice. If those rows landed in
+`od_features_candidates_train/`, `06b` reads that root to build the
+re-ranker's training set — and the re-ranker would train on candidates
+belonging to the very plants it is later scored against. Silently.
 
 ### Still unexercised
 
