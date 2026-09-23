@@ -175,6 +175,32 @@ def sec_od_output(r):
         _part_counts(root, label, r)
 
 
+def sec_freshness(r):
+    """check_od_freshness's own verdict, which is the question that matters
+    most right after a detector swap: resume is keyed on CWNS_ID presence, not
+    on which model produced the row, so a re-run after deploying new weights
+    skips everything and leaves the old model's detections in place."""
+    import importlib.util
+    path = Path(__file__).resolve().parent / "check_od_freshness.py"
+    if not path.exists():
+        r.p("  check_od_freshness.py not found")
+        return
+    spec = importlib.util.spec_from_file_location("cof", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    import sys as _sys
+    argv = _sys.argv
+    _sys.argv = ["check_od_freshness"]
+    try:
+        mod.main()
+    except SystemExit as e:
+        r.p("")
+        r.p(f"  (exited {e.code} -- nonzero here means stale partitions, "
+            f"which is the point of the check)")
+    finally:
+        _sys.argv = argv
+
+
 def sec_nlcd(r):
     if not C.NLCD_OUTPUT_DIR.exists():
         r.p("  (absent)")
@@ -234,7 +260,8 @@ def main():
     r.section("2. CONFIGURED PATHS", sec_paths)
     r.section("3. DEPLOYED DETECTOR", sec_model)
     r.section("4. PARCEL COVERAGE vs TRAINING UNIVERSE", sec_parcel_coverage)
-    r.section("5. 01a NLCD OUTPUT", sec_nlcd)
+    r.section("5. DETECTION FRESHNESS vs DEPLOYED MODEL", sec_freshness)
+    r.section("5b. 01a NLCD OUTPUT", sec_nlcd)
     r.section("6. DETECTION OUTPUT", sec_od_output)
     r.section("7. FEATURE TABLES", sec_features)
     r.section("8. RECENT JOB LOGS", sec_logs)
