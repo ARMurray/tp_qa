@@ -51,7 +51,13 @@ CAND_COLS = ["CWNS_ID", "candidate_rank", "ll_uuid", "stage2a_score", "stage2b_s
              "owner", "lbcs_activity", "lbcs_ownership", "lbcs_function",
              "lbcs_structure", "lbcs_site", "ll_gisacre", "ll_bldg_count",
              "dominant_class_group", "has_ww_keyword", "osm_ww",
-             "data_quality_score", "rerank_fallback"]
+             "data_quality_score", "rerank_fallback",
+             # Detection stats per candidate parcel, from 01e via
+             # 10_build_review_queue.py's attach_candidate_od(). Null when 01e
+             # had not run for these plants -- od_ran is what distinguishes
+             # "no detection" from "never looked".
+             "od_ran", "od_has_detection", "od_n_objects",
+             "od_max_confidence", "od_dominant_class"]
 
 
 def _insert_plant(conn, r):
@@ -79,6 +85,24 @@ def _bool_or_none(v):
     return int(bool(v))
 
 
+def _int_or_none(v):
+    if v is None or (isinstance(v, float) and pd.isna(v)):
+        return None
+    return int(v)
+
+
+def _float_or_none(v):
+    if v is None or (isinstance(v, float) and pd.isna(v)):
+        return None
+    return float(v)
+
+
+def _str_or_none(v):
+    if v is None or (isinstance(v, float) and pd.isna(v)):
+        return None
+    return str(v)
+
+
 def _insert_candidate(conn, r):
     conn.execute("""
         INSERT INTO candidates (cwns_id, candidate_rank, ll_uuid,
@@ -86,8 +110,11 @@ def _insert_candidate(conn, r):
             owner, lbcs_activity, lbcs_ownership, lbcs_function,
             lbcs_structure, lbcs_site, ll_gisacre, ll_bldg_count,
             dominant_class_group, has_ww_keyword, osm_ww, data_quality_score,
-            rerank_fallback)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            rerank_fallback,
+            od_ran, od_has_detection, od_n_objects, od_max_confidence,
+            od_dominant_class)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+                ?, ?, ?, ?, ?)
     """, (str(r["CWNS_ID"]), int(r["candidate_rank"]), r["ll_uuid"],
           r.get("stage2a_score"), r.get("stage2b_score"), r.get("score_margin"), r.get("distance_m"),
           _bool_or_none(r.get("within_1km")), _bool_or_none(r.get("within_5km")),
@@ -95,7 +122,10 @@ def _insert_candidate(conn, r):
           r.get("lbcs_function"), r.get("lbcs_structure"), r.get("lbcs_site"),
           r.get("ll_gisacre"), r.get("ll_bldg_count"), r.get("dominant_class_group"),
           _bool_or_none(r.get("has_ww_keyword")), _bool_or_none(r.get("osm_ww")),
-          r.get("data_quality_score"), _bool_or_none(r.get("rerank_fallback"))))
+          r.get("data_quality_score"), _bool_or_none(r.get("rerank_fallback")),
+          _bool_or_none(r.get("od_ran")), _bool_or_none(r.get("od_has_detection")),
+          _int_or_none(r.get("od_n_objects")), _float_or_none(r.get("od_max_confidence")),
+          _str_or_none(r.get("od_dominant_class"))))
 
 
 def load_round(round_num: int, force: bool = False, update_metadata: bool = False):

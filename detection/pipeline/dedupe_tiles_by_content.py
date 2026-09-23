@@ -276,6 +276,12 @@ def main():
     ap.add_argument("--near-duplicates", action="store_true",
                     help="also report dHash near-matches. Report only -- "
                          "never acted on, see the docstring.")
+    ap.add_argument("--purge-unlabeled", action="store_true",
+                    help="ALSO remove every tile that has no label file at "
+                         "all. Resets the inventory to exactly what has been "
+                         "labelled, on the basis that future tiles arrive by "
+                         "targeted selection rather than bulk extraction. "
+                         "Read the docstring before using this.")
     ap.add_argument("--apply", action="store_true",
                     help="move redundant tiles to tiles/_duplicates/")
     ap.add_argument("--delete", action="store_true",
@@ -371,9 +377,35 @@ def main():
 
         plan.append((keeper, [f for f in g if f != keeper]))
 
-    n_move = sum(len(drop) for _, drop in plan)
+    # ---- optional: drop everything that was never labelled ----------------
+    # Deliberately AFTER the duplicate pass, so a tile that is unlabelled but
+    # is the chosen keeper of a group containing a labelled copy is not
+    # double-counted. In practice the keeper is always the labelled one when
+    # any exists, so the two sets are disjoint -- but relying on that rather
+    # than enforcing it would be fragile.
+    purged = []
+    if args.purge_unlabeled:
+        already_going = {f for _, drop in plan for f in drop}
+        keepers = {k for k, _ in plan}
+        conflict_files = {f for g, _ in conflicts for f in g}
+        for f, meta in info.items():
+            if meta["labeled"] or f in already_going or f in conflict_files:
+                continue
+            if f in keepers:
+                # unlabelled, but the representative of a duplicate group in
+                # which nothing was labelled -- the whole group goes
+                pass
+            purged.append(f)
+        plan = [(k, d) for k, d in plan if k not in set(purged)]
+
+    n_move = sum(len(drop) for _, drop in plan) + len(purged)
     print(f"\n--- plan ---")
-    print(f"  {len(plan)} group(s) resolvable -> {n_move} tile(s) redundant")
+    print(f"  {len(plan)} group(s) resolvable -> "
+          f"{sum(len(d) for _, d in plan)} redundant duplicate(s)")
+    if args.purge_unlabeled:
+        n_labeled = sum(1 for m in info.values() if m["labeled"])
+        print(f"  --purge-unlabeled: {len(purged)} never-labelled tile(s) to remove")
+        print(f"    ({n_labeled} of {len(info)} tiles carry a label)")
     if agreed:
         print(f"  {agreed} of those had the same image labelled more than once with")
         print(f"  IDENTICAL boxes -- duplicate effort, not a disagreement, so one")
@@ -412,8 +444,12 @@ def main():
                 "delete" if args.delete else "quarantine",
                 "hash": "bytes" if args.fast else "pixels", "groups": []}
     moved = 0
-    for keeper, drop in plan:
-        rec = {"keep": keeper.name, "dropped": []}
+    work = [(keeper, drop) for keeper, drop in plan]
+    if purged:
+        work.append((None, purged))
+    for keeper, drop in work:
+        rec = {"keep": keeper.name if keeper else "(unlabelled purge)",
+               "dropped": []}
         for f in drop:
             targets = [f]
             nd = find_ndwi(info[f]["tile_id"], ndwi_dir)

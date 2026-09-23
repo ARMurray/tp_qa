@@ -22,10 +22,25 @@ WHAT THIS ADDS
     'source' in the metadata records review_reported/review_candidate,
     preferring review_reported when both apply.
 
-    Does NOT tile truth_outside_candidates points -- those are a bare
-    lat/lon the reviewer clicked on the map, with no associated parcel.
-    Guessing a parcel boundary there would tile something never actually
-    shown to anyone.
+TARGETED SELECTION IS NOW THE DEFAULT (2026-09-23)
+    The behaviour described above -- tile the reported parcel plus every
+    candidate -- is what --all-candidates still does, and it is where the
+    unmanageable inventory came from: roughly 3,000 tiles per 150-plant
+    round, of which 872 of the 1,004 eventually labelled turned out to be
+    empty. Most of that volume is parcels the detector ignored and the
+    reviewer rejected, where the model already agrees with the reviewer and
+    the tile teaches nothing.
+
+    The default now tiles only two things: wherever the reviewer established
+    the plant actually is, and parcels where the detector found
+    infrastructure but the reviewer said it was not the plant. See
+    load_targeted_sites() for the full reasoning.
+
+    That includes truth_outside_candidates clicks, which the old behaviour
+    skipped entirely for want of a parcel. They are now tiled from a
+    synthetic square centred on the click -- the same fallback 01b uses when
+    it will not trust a parcel boundary. A verified true location is worth
+    labelling whether or not Regrid has a polygon for it.
 
 WHERE GEOMETRY COMES FROM
     backend.parcels.get_parcel_context() -- the SAME live DuckDB lookup
@@ -124,7 +139,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-from shapely.geometry import shape
+from shapely.geometry import Point, shape
 
 # review_app/config.py + backend/ -- one level up from analysis/.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -228,13 +243,132 @@ def load_reviewed_sites(reported_only: bool, candidates_only: bool) -> pd.DataFr
     return dedup
 
 
+def load_targeted_sites(point_halfwidth_m: float) -> pd.DataFrame:
+    """Sites worth labelling after a review round, rather than every parcel
+    the reviewer saw.
+
+    Two categories, and nothing else:
+
+      VERIFIED TRUE LOCATION -- wherever the reviewer established the plant
+      actually is. Three ways that happens:
+          candidate_correct         the selected candidate parcel
+          reported_correct          the reported parcel
+          truth_outside_candidates  a clicked lat/lon with no parcel at all,
+                                    tiled from a synthetic square (see below)
+      These are the positive examples. Worth labelling whether or not the
+      detector fired: if it did, the label confirms it; if it did not, the
+      label is a miss it needs to learn from.
+
+      DETECTION ON A PARCEL THAT WAS NOT THE ANSWER -- a candidate where the
+      detector found infrastructure and the reviewer said this is not the
+      plant. A false positive, and the most informative thing a round
+      produces: a specific, confirmed case of the model seeing treatment
+      infrastructure where there is none.
+
+    DELIBERATELY EXCLUDED: candidates with no detection that were not
+    selected. The detector and the reviewer already agree there is nothing
+    there, so labelling one confirms what the model knows. That category is
+    the overwhelming bulk of what the old "tile every candidate" behaviour
+    produced -- measured 2026-09-22, 872 of 1,004 existing labels are empty
+    -- and dropping it is the whole point of this function.
+
+    ALSO EXCLUDED: needs_info plants entirely. Without a verdict there is no
+    ground truth, so a detection on one of their candidates cannot be called
+    a false positive. It might be the plant.
+    """
+    conn = sqlite3.connect(C.APP_DB_PATH)
+    plants = pd.read_sql_query(
+        "SELECT cwns_id, state_code, reported_ll_uuid, plant_verdict, "
+        "       selected_ll_uuid, truth_latitude, truth_longitude "
+        "FROM plants WHERE reviewed = 1", conn)
+    cands = pd.read_sql_query(
+        "SELECT cwns_id, candidate_rank, ll_uuid, od_ran, od_has_detection, "
+        "       od_n_objects, od_max_confidence FROM candidates "
+        "WHERE ll_uuid IS NOT NULL AND ll_uuid != ''", conn)
+    conn.close()
+
+    plants["cwns_id"] = plants["cwns_id"].astype(str)
+    cands["cwns_id"] = cands["cwns_id"].astype(str)
+    print(f"{len(plants)} reviewed plant(s) in {C.APP_DB_PATH.name}")
+
+    rows, n_point, truth_parcel = [], 0, {}
+    for _, p in plants.iterrows():
+        v, cw, st = p["plant_verdict"], p["cwns_id"], p["state_code"]
+        if v == "candidate_correct" and p["selected_ll_uuid"]:
+            truth_parcel[cw] = str(p["selected_ll_uuid"])
+            rows.append(dict(cwns_id=cw, st=st, ll_uuid=str(p["selected_ll_uuid"]),
+                             role="verified_true", lat=None, lon=None))
+        elif v == "reported_correct" and p["reported_ll_uuid"]:
+            truth_parcel[cw] = str(p["reported_ll_uuid"])
+            rows.append(dict(cwns_id=cw, st=st, ll_uuid=str(p["reported_ll_uuid"]),
+                             role="verified_true", lat=None, lon=None))
+        elif v == "truth_outside_candidates":
+            if pd.isna(p["truth_latitude"]) or pd.isna(p["truth_longitude"]):
+                print(f"  WARNING: {cw} is truth_outside_candidates with no "
+                      f"clicked point -- skipped")
+                continue
+            # No parcel exists for a clicked point, so tile a synthetic square
+            # centred on it. Same fallback shape 01b uses when it will not
+            # trust a parcel boundary (CAPPED_PARCEL_FALLBACK_HALFWIDTH_M).
+            rows.append(dict(cwns_id=cw, st=st, ll_uuid="",
+                             role="verified_true_point",
+                             lat=float(p["truth_latitude"]),
+                             lon=float(p["truth_longitude"])))
+            n_point += 1
+
+    verdicts = plants.set_index("cwns_id")["plant_verdict"].to_dict()
+    st_by_cwns = plants.set_index("cwns_id")["state_code"].to_dict()
+
+    n_fp = 0
+    for _, c in cands.iterrows():
+        cw = c["cwns_id"]
+        if verdicts.get(cw) in (None, "needs_info"):
+            continue
+        if not bool(c["od_has_detection"]):
+            continue
+        if truth_parcel.get(cw) == str(c["ll_uuid"]):
+            continue                      # it fired on the right parcel: a TP,
+                                          # already captured as verified_true
+        st = st_by_cwns.get(cw)
+        if st is None:
+            continue
+        rows.append(dict(cwns_id=cw, st=st, ll_uuid=str(c["ll_uuid"]),
+                         role="detection_not_selected", lat=None, lon=None))
+        n_fp += 1
+
+    n_true = sum(1 for r in rows if r["role"].startswith("verified_true"))
+    print(f"  {n_true} verified true location(s) ({n_point} from a clicked point)")
+    print(f"  {n_fp} detection(s) on a parcel that was not the answer")
+
+    if cands["od_ran"].isna().all() and len(cands):
+        print("  WARNING: no candidate carries detection results. 01e had not run "
+              "when this queue was built, so no false positives can be identified "
+              "-- only verified true locations will be tiled.")
+
+    if not rows:
+        return pd.DataFrame(columns=["cwns_id", "st", "ll_uuid", "role", "lat", "lon"])
+
+    df = pd.DataFrame(rows)
+    df["point_halfwidth_m"] = point_halfwidth_m
+    dedup = df.drop_duplicates(subset=["cwns_id", "ll_uuid", "role"])
+    dedup = dedup.sort_values("role").drop_duplicates(subset=["cwns_id", "ll_uuid"],
+                                                      keep="first")
+    print(f"  {len(dedup)} distinct site(s) to tile "
+          f"(was {len(cands) + len(plants)} under tile-every-candidate)")
+    return dedup.reset_index(drop=True)
+
+
 def resolve_geometries(sites: pd.DataFrame, projected_crs) -> gpd.GeoDataFrame:
     """backend.parcels.get_parcel_context() -- same live lookup the review
     app itself uses, so what gets tiled matches what the reviewer saw.
     Reprojects to detection's PROJECTED_CRS to feed generate_tile_grid()
     directly."""
+    sites = sites.copy()
+    has_points = "lat" in sites.columns and sites["lat"].notna().any()
+    parcel_sites = sites[sites["ll_uuid"].astype(bool)] if "lat" in sites.columns else sites
+
     geoms = {}
-    for state, grp in sites.groupby("st"):
+    for state, grp in parcel_sites.groupby("st"):
         ctx = parcels.get_parcel_context(state, grp["ll_uuid"].unique().tolist())
         n_found = 0
         for uuid, entry in ctx.items():
@@ -243,8 +377,16 @@ def resolve_geometries(sites: pd.DataFrame, projected_crs) -> gpd.GeoDataFrame:
                 n_found += 1
         print(f"  {state}: resolved {n_found}/{grp['ll_uuid'].nunique()} parcel(s)")
 
-    sites = sites.copy()
-    sites["geometry"] = [geoms.get((r.st, r.ll_uuid)) for r in sites.itertuples()]
+    def geom_for(r):
+        # A clicked point has no parcel to look up. Represent it as the bare
+        # Point here and square it off after reprojection, where a half-width
+        # in metres actually means something -- buffering in degrees would
+        # give a different real-world size at every latitude.
+        if getattr(r, "lat", None) is not None and not pd.isna(getattr(r, "lat", None)):
+            return Point(r.lon, r.lat)
+        return geoms.get((r.st, r.ll_uuid))
+
+    sites["geometry"] = [geom_for(r) for r in sites.itertuples()]
     n_missing = int(sites["geometry"].isna().sum())
     if n_missing:
         print(f"  {n_missing} site(s) had no matching parcel in the local "
@@ -254,7 +396,18 @@ def resolve_geometries(sites: pd.DataFrame, projected_crs) -> gpd.GeoDataFrame:
         sites = sites.dropna(subset=["geometry"])
 
     gdf = gpd.GeoDataFrame(sites, geometry="geometry", crs="EPSG:4326")
-    return gdf.to_crs(projected_crs)
+    gdf = gdf.to_crs(projected_crs)
+
+    if has_points:
+        hw = float(gdf["point_halfwidth_m"].iloc[0]) if "point_halfwidth_m" in gdf.columns else 250.0
+        is_pt = gdf.geometry.geom_type == "Point"
+        if is_pt.any():
+            # cap_style=3 -> a square, not a circle: the tile grid is square,
+            # and a round buffer just adds corners that tile to nothing.
+            gdf.loc[is_pt, "geometry"] = gdf.loc[is_pt, "geometry"].buffer(hw, cap_style=3)
+            print(f"  {int(is_pt.sum())} clicked point(s) squared off to "
+                  f"{hw * 2:.0f}m boxes for tiling")
+    return gdf
 
 
 # ===========================================================================
@@ -413,6 +566,16 @@ def main():
                     default=DETECTION_PIPELINE_DIR_DEFAULT,
                     help=f"path to detection/pipeline/ "
                          f"(default: {DETECTION_PIPELINE_DIR_DEFAULT})")
+    ap.add_argument("--all-candidates", action="store_true",
+                    help="LEGACY: tile the reported parcel plus every candidate "
+                         "shown, regardless of verdict or detections. This is "
+                         "what produced ~3,000 tiles per round, most of them "
+                         "empty. The default is targeted selection -- see "
+                         "load_targeted_sites().")
+    ap.add_argument("--point-halfwidth-m", type=float, default=250.0,
+                    help="half-width of the synthetic square tiled around a "
+                         "truth_outside_candidates click, which has no parcel. "
+                         "250m -> a 500m box, matching one tile's footprint.")
     ap.add_argument("--reported-only", action="store_true",
                     help="tile only reported-location parcels, skip candidates")
     ap.add_argument("--candidates-only", action="store_true",
@@ -440,7 +603,15 @@ def main():
     print(f"          and {DC.NDWI_DIR}")
     print(f"Metadata:     {DC.METADATA_CSV}")
 
-    sites = load_reviewed_sites(args.reported_only, args.candidates_only)
+    if args.all_candidates:
+        sites = load_reviewed_sites(args.reported_only, args.candidates_only)
+    else:
+        if args.reported_only or args.candidates_only:
+            raise SystemExit(
+                "--reported-only / --candidates-only only apply to "
+                "--all-candidates. Targeted selection chooses by verdict and "
+                "detection, not by which list a parcel came from.")
+        sites = load_targeted_sites(args.point_halfwidth_m)
     if sites.empty:
         print("Nothing to tile.")
         return

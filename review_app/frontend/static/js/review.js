@@ -266,7 +266,29 @@ function buildCandidatePopup(c) {
     if (c.lbcs_ownership_desc) lines.push(`Ownership: ${c.lbcs_ownership_desc}`);
     if (c.ll_gisacre != null) lines.push(`Size: ${c.ll_gisacre.toFixed(2)} acres`);
     if (c.zoning_type) lines.push(`Zoning: ${c.zoning_type}`);
+    lines.push(buildDetectionLine(c));
     return lines.join("<br>");
+}
+
+
+// Detection summary for one candidate parcel, from 01e via the review queue.
+//
+// od_ran === 0 and od_ran == null mean different things and are shown
+// differently on purpose. "Detector found nothing here" is evidence a
+// reviewer can weigh; "the detector never looked here" is not, and showing
+// the second as if it were the first would quietly argue against a parcel
+// that was simply never examined.
+function buildDetectionLine(c) {
+    if (c.od_ran == null) return '<span class="od od-unknown">detector: not run</span>';
+    if (!c.od_ran)         return '<span class="od od-unknown">detector: no result</span>';
+    if (!c.od_has_detection || !c.od_n_objects) {
+        return '<span class="od od-none">detector: nothing found</span>';
+    }
+    const n = c.od_n_objects;
+    const conf = (c.od_max_confidence != null)
+        ? ` &middot; max ${(c.od_max_confidence * 100).toFixed(0)}%` : "";
+    const cls = c.od_dominant_class ? ` &middot; ${c.od_dominant_class}` : "";
+    return `<span class="od od-hit">detector: ${n} object${n === 1 ? "" : "s"}${conf}${cls}</span>`;
 }
 
 function buildCandidateDetailLine(c) {
@@ -274,7 +296,8 @@ function buildCandidateDetailLine(c) {
     if (c.owner) bits.push(c.owner);
     if (c.lbcs_activity_desc) bits.push(c.lbcs_activity_desc);
     if (c.ll_gisacre != null) bits.push(`${c.ll_gisacre.toFixed(1)} ac`);
-    return bits.length ? bits.join(" &middot; ") : "<i>No parcel attribute data</i>";
+    const attrs = bits.length ? bits.join(" &middot; ") : "<i>No parcel attribute data</i>";
+    return `${attrs}<br>${buildDetectionLine(c)}`;
 }
 
 function buildReportedPopup(ctx) {

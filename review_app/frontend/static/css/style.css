@@ -212,3 +212,11 @@ html, body, #app { height: 100%; margin: 0; font-family: -apple-system, Segoe UI
     font-weight: bold; font-size: 0.8em;
     border: 2px solid white;
 }
+
+
+/* Detection summary on a candidate card. Colour carries the same three-way
+   distinction the text does: found something / found nothing / never looked. */
+.od { font-size: 0.85em; }
+.od-hit     { color: #B4761E; font-weight: 600; }
+.od-none    { color: #5A6B66; }
+.od-unknown { color: #98A5A1; font-style: italic; }

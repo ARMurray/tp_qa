@@ -102,6 +102,14 @@ CREATE TABLE IF NOT EXISTS candidates (
     osm_ww                               INTEGER,
     data_quality_score                    REAL,
 
+    -- Detection stats from 01e, shown to the reviewer. od_ran distinguishes
+    -- "looked and found nothing" from "never looked"; NULL means unknown.
+    od_ran                                   INTEGER,
+    od_has_detection                            INTEGER,
+    od_n_objects                                   INTEGER,
+    od_max_confidence                                 REAL,
+    od_dominant_class                                    TEXT,
+
     FOREIGN KEY (cwns_id) REFERENCES plants(cwns_id)
 );
 
@@ -129,6 +137,16 @@ CANDIDATES_MIGRATION_COLS = [
     ("dominant_class_group", "TEXT"), ("has_ww_keyword", "INTEGER"),
     ("osm_ww", "INTEGER"), ("data_quality_score", "REAL"),
     ("stage2b_score", "REAL"), ("rerank_fallback", "INTEGER"),
+    # Detection stats per candidate parcel (added 2026-09-23), carried from
+    # 01e by 10_build_review_queue.py. Shown to the reviewer while deciding,
+    # and used afterwards to choose which tiles are worth labelling next.
+    #
+    # od_ran is NOT redundant with od_n_objects == 0: a parcel where the
+    # detector looked and found nothing is a different thing from one it
+    # never looked at, and only the first is evidence. Null means unknown.
+    ("od_ran", "INTEGER"), ("od_has_detection", "INTEGER"),
+    ("od_n_objects", "INTEGER"), ("od_max_confidence", "REAL"),
+    ("od_dominant_class", "TEXT"),
 ]
 
 

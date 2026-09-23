@@ -127,6 +127,82 @@ def build_candidate_pick_rows(plant_summary: pd.DataFrame,
     cand = cand.merge(margins, on="CWNS_ID", how="left")
     cand = cand.drop(columns=["_rank_score"])
     cand["review_task"] = "candidate_pick"
+    cand = attach_candidate_od(cand)
+    return cand
+
+
+# Detection summary carried through to the reviewer, per candidate parcel.
+# Deliberately a short list: n objects and max confidence are what a human
+# can actually weigh while deciding, and the dominant class says what the
+# detector thinks it saw. The full od_* feature set (per-class counts, tile
+# fractions) belongs in training tables, not on screen.
+OD_DISPLAY_COLS = ["od_ran", "od_has_detection", "od_n_objects",
+                   "od_max_confidence", "od_dominant_class"]
+
+
+def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
+    """Join 01e's per-candidate detection results onto the queue rows.
+
+    WHY THIS IS HERE: the reviewer needs to see whether the detector fired on
+    a candidate, and the tile-selection step after a review round needs the
+    same fact to decide what is worth labelling next (a parcel that fired but
+    was NOT chosen is a false positive, which is the most informative thing
+    the round can produce). Both happen on the local machine, and neither can
+    reach the HPC's od_features_candidates_train/. So it travels with the
+    queue.
+
+    ORDERING: this requires 01e to have run BEFORE the queue is built. That
+    works out -- 01e and this script both read data/inference/, so 01e slots
+    between 05 (+ merge_05_shards) and 10 with no reordering.
+
+    MISSING OD IS NOT AN ERROR. If 01e has not run for these plants the
+    columns come through null and the review app shows "not run" rather than
+    a misleading zero. An absent detection and a detection of nothing are
+    different things, and od_ran is what separates them.
+    """
+    roots = [C.DATA_DIR / "od_features_candidates_train" / "candidates",
+             C.DATA_DIR / "od_features_candidates" / "candidates"]
+    frames = []
+    for root in roots:
+        if not root.exists():
+            continue
+        for f in sorted(root.rglob("*.parquet"), key=lambda p: p.stat().st_mtime):
+            try:
+                frames.append(pd.read_parquet(f))
+            except Exception as e:
+                print(f"  WARNING: could not read {f.name}: {e}")
+
+    if not frames:
+        print("  No 01e candidate detection output found -- queue will carry no "
+              "detection stats. Run 01e before 10 if the reviewer should see them.")
+        for c in OD_DISPLAY_COLS:
+            cand[c] = None
+        return cand
+
+    od = pd.concat(frames, ignore_index=True)
+    od["CWNS_ID"] = od["CWNS_ID"].astype(str)
+    od["ll_uuid"] = od["ll_uuid"].astype(str)
+    # mtime-sorted, keep last: same resume/reflush dedup every other reader of
+    # these append-only dirs uses.
+    od = od.drop_duplicates(subset=["CWNS_ID", "ll_uuid"], keep="last")
+    keep = ["CWNS_ID", "ll_uuid"] + [c for c in OD_DISPLAY_COLS if c in od.columns]
+    missing = [c for c in OD_DISPLAY_COLS if c not in od.columns]
+    if missing:
+        print(f"  NOTE: 01e output has no {missing} -- older run? Those will be null.")
+
+    n_before = len(cand)
+    cand["CWNS_ID"] = cand["CWNS_ID"].astype(str)
+    cand["ll_uuid"] = cand["ll_uuid"].astype(str)
+    cand = cand.merge(od[keep], on=["CWNS_ID", "ll_uuid"], how="left")
+    assert len(cand) == n_before, \
+        "detection join changed the row count -- duplicate (CWNS_ID, ll_uuid) in 01e output"
+    for c in missing:
+        cand[c] = None
+
+    n_hit = int(cand["od_has_detection"].fillna(False).astype(bool).sum())
+    n_known = int(cand["od_ran"].notna().sum())
+    print(f"  Detection stats attached: {n_known}/{len(cand)} candidate(s) have "
+          f"an 01e result, {n_hit} fired")
     return cand
 
 
