@@ -1,4 +1,4 @@
-# Resume here — snapshot, 2026-09-22
+# Resume here — snapshot, 2026-09-23
 
 Point-in-time checklist. **Once these steps are done this file is history** —
 [05_RUNBOOK.md](05_RUNBOOK.md) is the durable version and stays correct for
@@ -38,22 +38,38 @@ engineering. Since then, on the repo side:
 |---|---|
 | `02` is now a per-state array | writes shards; `02b` merges them |
 | `best.pt` deploys itself | `04_train_model.py` copies it to `correction/models/object_detection/` |
-| Tile dedup exists | `detection/pipeline/dedupe_tiles_by_content.py` |
+| Tile dedup + purge | `detection/pipeline/dedupe_tiles_by_content.py` |
+| Targeted tile selection | `extract_review_tiles.py` picks by verdict + detections |
+| Detection stats in review | candidate cards show objects / max confidence |
 | NAIP tiles untracked | repo stopped growing; history not yet rewritten |
 
-None of the new pipeline code has run against real data yet. That is what
-tomorrow is for.
+The pieces are verified individually against real data wherever that was
+possible locally. **None of it has run end-to-end on the HPC or through a
+real review round.** That is what the next session is for.
 
 ---
 
-## 1. Deduplicate the labelling inventory
+## 1. Reset the labelling inventory
+
+Keep everything labelled, collapse labelled duplicates to one copy, and
+remove every tile that was never labelled — the new baseline, now that
+future tiles arrive by targeted selection rather than bulk extraction.
 
 ```bash
-python detection/pipeline/dedupe_tiles_by_content.py
+python detection/pipeline/dedupe_tiles_by_content.py --purge-unlabeled
 ```
 
-Report only. `--apply` moves duplicates to `tiles/_duplicates/` and writes a
-manifest; `--delete` opts into real deletion. Start with the report.
+Report only. Add `--apply` to act, which **quarantines to
+`tiles/_duplicates/`** and writes a manifest of every file moved; `--delete`
+opts into real deletion. Start with the report and read the counts.
+
+Verified against the real 1,004-tile set with 600 labels: 565 survive, all
+labelled, zero duplicate content, 439 quarantined.
+
+Duplicate keepers are chosen **deterministically** (lexicographically first),
+not randomly — the labels are identical so it makes no difference which, and
+two runs agreeing is worth more. If two copies were ever labelled
+*differently*, that group is refused rather than guessed at.
 
 ### What I measured, and what it means
 
@@ -92,83 +108,93 @@ is. Which brings us to:
 
 ---
 
-## 2. Filtering the labelling pool by detection hits — your idea, and I think you're right
+## 2. Targeted tile selection — built, needs a real round to exercise
 
-You proposed using detection hits to decide which tiles enter the labelling
-pool after each review round, instead of taking every candidate. That is
-hard-negative mining, and it is the right instinct. Here is the shape of it,
-plus the one thing that blocks it today.
+Tile selection after a review round no longer takes every candidate parcel.
+It takes two things:
 
-### The four quadrants
+- **the verified true location**, however the reviewer established it — the
+  selected candidate, the reported parcel, or a clicked lat/lon
+- **parcels where the detector fired but the reviewer said it was not the
+  plant** — confirmed false positives
 
-For every candidate parcel of every reviewed plant, two facts are known: did
-the detector fire there, and did the reviewer say it was the plant.
+Everything else is dropped. A candidate the detector ignored and the reviewer
+rejected is one where the model already agrees with you, and labelling it
+confirms what it knows. That category was the bulk of the old behaviour, and
+it is where 872 of the 1,004 existing labels went.
 
-"Positive" here means *this parcel is the treatment plant*.
+`needs_info` plants are excluded entirely: with no verdict there is no ground
+truth, so a detection on one of their candidates cannot be called a false
+positive. It might be the plant.
 
-| | Reviewer: **is** the plant | Reviewer: **not** the plant |
-|---|---|---|
-| **Detector fired** | **true positive** — correct hit, some value | **FALSE POSITIVE** — saw infrastructure that isn't a plant. The gold. |
-| **Detector silent** | **FALSE NEGATIVE** — walked past a real plant. The gold. | **true negative** — correct pass, teaches least |
+**Clicked points are now tiled**, which the old code skipped for want of a
+parcel — a synthetic square centred on the click, buffered after reprojection
+so the half-width means the same thing at every latitude. A verified true
+location is worth labelling whether or not Regrid has a polygon for it.
 
-The false positives are exactly what you said you value: tiles that should be
-empty where the detector sees infrastructure anyway. The false negatives are
-the mirror — real plants it walked past.
+Run against the real `app.db` (300 reviewed plants, rounds 1–2):
 
-The bottom-right cell is the bulk, and it is where the 5,000 came from. Those
-are parcels the detector ignored and the reviewer rejected: the model already
-agrees with you. Labelling them confirms what it already knows, and it is
-where most of those 872 empty labels went.
+```
+212 verified true locations (28 from a clicked point)
+  0 detections on a parcel that was not the answer
+212 sites to tile (was 1,735)
+```
 
-### Proposed rule
+That zero is correct: rounds 1–2 were queued before detection results could
+be attached, so no false positives are identifiable in them. The script says
+so rather than silently reporting zero.
 
-Take every false positive and false negative, take the true positives, and
-**cap** true negatives at a sample rather than all of them.
+`--all-candidates` restores the old behaviour if you ever need it.
 
-A true negative is a tile of a field or a parking lot that got pulled in only
-because it was a Stage 2a candidate for some plant: you open it, there is
-nothing, you save an empty label. YOLO does need background examples so it
-does not hallucinate infrastructure everywhere — but you already have 872,
-and the thousandth empty field teaches roughly nothing the hundredth did not.
+### No per-session budget — settled 2026-09-23
 
-False positives are the opposite: rare, and each one is a specific thing the
-detector is wrong about.
+An earlier draft of this file proposed capping each round at ~150 tiles with
+a priority allocation across the four quadrants. **Decided against.** The
+point is fewer tiles with more impact, not a fixed number of them; if a round
+yields 700 tiles and they are all signal, that is a good round. Selection
+already does the work that mattered.
 
-If the quadrants split anything like I would expect, this cuts the per-round
-pool by most of its volume while *improving* what is in it.
+Recording it so it does not get reopened as an obvious improvement.
 
-### What blocks it today
+### Detection stats now show in the review app
 
-**The detection results never reach the review app.** I checked:
+While deciding, each candidate card shows what the detector found on that
+parcel: `3 objects · max 87% · clarifier`.
 
-- `10_build_review_queue.py` has zero `od_` references
-- `app.db`'s `candidates` table has no OD columns — `stage2a_score`,
-  `stage2b_score`, `distance_m`, LBCS fields, but nothing about detections
+Three states, not two, and the distinction is deliberate:
 
-The data exists. `01e_run_od_candidates.py` writes
-`od_features_candidates_train/` keyed by `(CWNS_ID, ll_uuid)` with `od_ran`,
-`od_has_detection`, `od_n_objects` and the per-class counts. It just never
-crosses to the machine where tile selection happens.
+| Shown | Means |
+|---|---|
+| `3 objects · max 87% · clarifier` | detector examined it and found infrastructure |
+| `nothing found` | detector examined it and found nothing — this is evidence |
+| `not run` | detector never looked — this is **not** evidence |
 
-So this is a three-hop plumbing change, not a one-script change:
+Collapsing the last two would quietly argue against a parcel that was simply
+never examined.
 
-1. `10_build_review_queue.py` joins 01e's candidate OD output onto the
-   candidate rows and carries `od_has_detection` / `od_n_objects` into the
-   queue parquet
-2. `queue_loader.py` adds them to `CAND_COLS` and the `candidates` schema
-3. `extract_review_tiles.py` gains the quadrant filter
+### What has to happen for the false-positive half to work
 
-Step 1 has a scheduling wrinkle worth knowing before committing to this:
-`01e` currently runs with `SCOPE="train"` *after* a review round, to feed the
-re-ranker. For the queue to carry OD hits, candidate detection has to have run
-**before** the queue is built — which is `SCOPE="holdout"` or a full run at
-inference time. Worth checking whether the timing already works out for the
-plants that end up in a queue, or whether 01e needs to run earlier in the
-cycle.
+**`01e` must run before `10_build_review_queue`.** The queue is what carries
+detection results to the local machine; if 01e has not run, the candidates
+arrive with null detection columns and only verified true locations get
+tiled. The script warns when that happens.
 
-**Nothing here is built.** Say the word and I will, but I would rather you
-look at the quadrant table first and tell me whether the keep/drop split
-matches how you actually want to spend labelling time.
+This needs no reordering — 01e and 10 both read `data/inference/`, so 01e
+slots in between `merge_05_shards` and `10`:
+
+```bash
+sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
+# then, after it finishes:
+sbatch 10_build_review_queue.slurm
+```
+
+### Still unexercised
+
+None of this has run end-to-end on a real round. Specifically untested:
+`attach_candidate_od()` against real 01e output, the review UI rendering, and
+the synthetic-square tiling of a clicked point actually fetching imagery.
+The pieces are verified individually against real data where that was
+possible locally.
 
 ---
 
