@@ -37,6 +37,16 @@ correction/temp/
 detection/.venv/
 detection/data/
 
+# reconstruct_tile_metadata.py writes to "--out reconstructed", a RELATIVE
+# path, so its output lands in whatever directory you happened to run it from.
+# It is derived -- re-runnable from the tiles and labels on disk -- and
+# committing it scatters copies at different paths depending on cwd.
+#
+# detection/pipeline/reconstructed/ is already tracked from an earlier run and
+# stays that way; a gitignore rule does not untrack what is already in. This
+# only stops NEW ones being picked up.
+reconstructed/
+
 # The YOLO training set, built by 03_prepare_dataset.py from data/tiles/ plus
 # the Label Studio export. ~1.2 GB of NAIP imagery, regenerated from scratch
 # every time the dataset is rebuilt, and only ever used on the machine that
