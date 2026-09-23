@@ -1,7 +1,18 @@
+# ===========================================================================
+# correction/
+# ===========================================================================
 correction/models/*
+# ...except the deployed detector. This is how the HPC gets the model:
+# 04_train_model.py copies it here after every training run, and the archive
+# of every past model stays in detection/models/runs/ (which is ignored).
 !correction/models/object_detection/
 !correction/models/object_detection/best.pt
+
 correction/archive/
+correction/logs/
+correction/testing/
+correction/.venv/
+
 correction/data/*
 # ...EXCEPT the master locations file. It is the accumulated result of
 # months of manual verification and the one artifact here that cannot be
@@ -16,9 +27,44 @@ correction/data/*
 !correction/data/training/
 correction/data/training/*
 !correction/data/training/Updates.gpkg
-correction/.venv/
+
+# Scratch output from diagnostic and verification runs
+correction/temp/
+
+# ===========================================================================
+# detection/
+# ===========================================================================
 detection/.venv/
-correction/testing/
-detection/data/correction/models/
 detection/data/
-correction/logs/
+
+# The YOLO training set, built by 03_prepare_dataset.py from data/tiles/ plus
+# the Label Studio export. ~1.2 GB of NAIP imagery, regenerated from scratch
+# every time the dataset is rebuilt, and only ever used on the machine that
+# trains the model. It was committed by accident on 2026-09-22 and took the
+# repository from 181 MB to 1.2 GB -- untracked again the same day.
+detection/dataset_filtered/
+
+# ===========================================================================
+# review_app/
+# ===========================================================================
+# close_round rebuilds this from the tracked master every time it runs, so a
+# committed copy is a multi-MB binary carrying nothing the master doesn't
+# already have. The per-round verdict exports beside it ARE worth keeping --
+# they are the audit trail of what a reviewer saw and decided, and cannot be
+# regenerated once app.db moves on.
+review_app/data/outgoing/training_locations.gpkg
+
+# ===========================================================================
+# docs/
+# ===========================================================================
+# Scratch HTML the PNG renderer writes on its way to the image
+docs/img/_fig.tmp.html
+
+# ===========================================================================
+# Editors, notebooks, bytecode
+# ===========================================================================
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.bak-*
+Untitled*.ipynb
