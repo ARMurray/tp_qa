@@ -311,6 +311,7 @@ def main():
 
     labeled_stems = load_labeled_stems(annotation_dir)
     print(f"{len(labeled_stems)} label file(s) on disk")
+    n_label_files = len(labeled_stems)
 
     info = {}
     exact = defaultdict(list)
@@ -406,6 +407,26 @@ def main():
         n_labeled = sum(1 for m in info.values() if m["labeled"])
         print(f"  --purge-unlabeled: {len(purged)} never-labelled tile(s) to remove")
         print(f"    ({n_labeled} of {len(info)} tiles carry a label)")
+
+        # Cross-check the matcher against the label files themselves. is_labeled
+        # is a SUBSTRING test, because Label Studio exports carry hash prefixes
+        # around the tile id -- so it can be wrong in both directions, and the
+        # two directions have very different consequences.
+        if n_label_files:
+            if n_labeled < n_label_files:
+                print(f"\n  *** WARNING: {n_labeled} tiles matched a label, but "
+                      f"{n_label_files} label files exist. ***")
+                print(f"  {n_label_files - n_labeled} label(s) matched no tile, which")
+                print(f"  can mean labelled tiles are about to be purged as unlabelled.")
+                print(f"  DO NOT --apply until you know why. Check whether the export")
+                print(f"  filenames still contain the tile id.")
+            elif n_labeled > n_label_files:
+                print(f"\n  note: {n_labeled} tiles matched a label but only "
+                      f"{n_label_files} label files exist.")
+                print(f"  {n_labeled - n_label_files} tile(s) match a label belonging to")
+                print(f"  another tile -- the substring test is many-to-one. They will be")
+                print(f"  KEPT and show up as unlabelled next time. Harmless: this")
+                print(f"  direction keeps too much, never too little.")
     if agreed:
         print(f"  {agreed} of those had the same image labelled more than once with")
         print(f"  IDENTICAL boxes -- duplicate effort, not a disagreement, so one")
