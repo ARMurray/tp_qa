@@ -276,7 +276,7 @@ def with_retry(fn, *args, max_retries=5, base_delay=8, **kwargs):
     "You have exceeded a rate limit" during a STAC item search.
 
     Does NOT fix the underlying concurrency pressure by itself -- pair with
-    a SLURM array throttle (--array=0-51%N) and/or a free PC_SDK_SUBSCRIPTION_KEY
+    a SLURM array throttle (--array=0-50%N) and/or a free PC_SDK_SUBSCRIPTION_KEY
     (https://planetarycomputer.developer.azure-api.net/, auto-detected from
     the environment by the planetary_computer package, no code change
     needed here) to actually raise the ceiling rather than just retrying

@@ -7,7 +7,7 @@
 #SBATCH --account=grdvuln
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --array=0-51
+#SBATCH --array=0-50
 #SBATCH --output=/work/GRDVULN/tp_qa/correction/logs/02_%A_%a.log
 
 # Feature engineering, ONE STATE PER ARRAY TASK.
@@ -48,7 +48,11 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-STATES=(AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY)
+# Index -> state comes from _common.sh's DEFAULT_STATES, not a local copy.
+# This file used to keep its own, which is the list that decides which state
+# each array index means -- so a copy that drifted would not error, it would
+# silently shard the wrong state under the wrong name.
+read -ra STATES <<< "$DEFAULT_STATES"
 
 if [ "${SLURM_ARRAY_TASK_ID}" -ge "${#STATES[@]}" ]; then
     echo "ERROR: array index ${SLURM_ARRAY_TASK_ID} is past the end of the"

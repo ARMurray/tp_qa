@@ -249,27 +249,65 @@ def main():
 
     print(f"\nMerging {len(states)} state(s)")
 
+    # ---- PHASE 1: build and validate EVERY table, writing nothing ----
+    #
+    # Both helpers return (ok, dataframe) and deliberately do not write. A
+    # run that wrote 10_parcel_features and then refused on
+    # 14_stage1_training would leave the flat files describing two different
+    # runs, and nothing downstream checks for that.
+    #
+    # NOTE (2026-09-23): the original test here was `if not merge_file(...)`,
+    # which is ALWAYS False -- a 2-tuple is truthy however the merge went.
+    # It also passed args.dry_run to helpers that take no such parameter, so
+    # this raised TypeError before it could do damage. Had it not, the run
+    # would have printed 'merge complete' having written nothing at all.
+    # Unpack the result explicitly; never truth-test it.
+    built: dict[str, pd.DataFrame] = {}
     ok = True
     for name, key in SHARD_FILES.items():
-        if not merge_file(name, key, states, args.dry_run):
+        good, df = merge_file(name, key, states)
+        if good:
+            built[name] = df
+        else:
             ok = False
-    if not merge_parcel_features(states, args.dry_run):
+
+    good, parcels = merge_parcel_features(states)
+    if good:
+        built['10_parcel_features.parquet'] = parcels
+    else:
         ok = False
 
-    print("\n" + "=" * 60)
-    if ok:
-        print("=== merge complete ===")
-        if not args.dry_run:
-            print("\nNEXT: sbatch 03_train_stage1.slurm / 04_train_stage2.slurm")
-            print("      sbatch 06_build_stage2b_training.slurm  -> 07_train_stage2b.slurm")
-            print("      sbatch 06b_build_rerank_training.slurm -> 07b_train_rerank.slurm")
-    else:
-        print("=== merge FAILED -- NOTHING WAS WRITTEN ===")
-        print("The existing flat files are untouched, so they are still")
-        print("whatever the last good run left. Fix the shards and re-run.")
-        print("Nothing downstream should run until this is clean: no training")
-        print("script checks whether its inputs cover every state.")
+    print()
+    print('=' * 60)
+
+    if not ok:
+        print('=== merge FAILED -- NOTHING WAS WRITTEN ===')
+        print('The existing flat files are untouched, so they are still')
+        print('whatever the last good run left. Fix the shards and re-run.')
+        print('Nothing downstream should run until this is clean: no')
+        print('training script checks whether its inputs cover every state.')
         sys.exit(1)
+
+    if args.dry_run:
+        print('=== --dry-run: validated, wrote nothing ===')
+        for name, df in built.items():
+            print(f'  would write {name:<34} {len(df):>9,} rows, '
+                  f'{len(df.columns)} cols')
+        return
+
+    # ---- PHASE 2: every table validated, so write them all ----
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    for name, df in built.items():
+        dest = OUT_DIR / name
+        df.to_parquet(dest, index=False)
+        print(f'  wrote {dest.name:<34} {len(df):>9,} rows, '
+              f'{len(df.columns)} cols, {dest.stat().st_size / 1e6:.1f} MB')
+
+    print()
+    print('=== merge complete ===')
+    print('NEXT: sbatch 03_train_stage1.slurm / 04_train_stage2.slurm')
+    print('      sbatch 06_build_stage2b_training.slurm  -> 07_train_stage2b.slurm')
+    print('      sbatch 06b_build_rerank_training.slurm -> 07b_train_rerank.slurm')
 
 
 if __name__ == "__main__":

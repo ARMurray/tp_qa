@@ -56,14 +56,22 @@ set -o pipefail
 # the login shell is tcsh, where `export VAR=...` is a syntax error and
 # `VAR=$(...)` does not mean what it looks like. Keeping the list here, in the
 # file every wrapper already sources, removes the question entirely --
-# `sbatch --array=0-51%6 01b_run_object_detection.slurm` with no --export at
+# `sbatch --array=0-50%6 01b_run_object_detection.slurm` with no --export at
 # all.
 #
-# 52 entries: 50 states + DC + PR. That is the full training universe as of
-# 2026-09-23 -- 2,690 verified plants, every one of these states represented.
-# `python list_training_states.py` prints the live per-state counts; if it ever
-# reports a state not listed here, add it AND bump the --array upper bound,
-# because the two have to agree.
+# 51 entries: 49 states + PR. `python list_training_states.py` prints the live
+# per-state counts; if it ever reports a state not listed here, add it AND bump
+# the --array upper bound, because the two have to agree.
+#
+# DC IS DELIBERATELY EXCLUDED (2026-09-23). The District has exactly one
+# treatment plant, Blue Plains, and its location is already known -- so it
+# contributes nothing to training while costing a full array task. It was also
+# the state that exposed the empty-shard crash in 02: no labelled plant fell
+# inside a parcel, build_stage1_training built a column-less DataFrame, and the
+# task died with KeyError: 'CWNS_ID'. That bug is fixed independently (a state
+# with zero matches now yields an empty shard), so this exclusion is a
+# modelling decision, not a workaround -- do not re-add DC expecting it to
+# help.
 #
 # THIS IS THE LABEL UNIVERSE, NOT THE PARCEL STORE. A state is in this list
 # because it has labelled plants -- which says nothing about whether Regrid
@@ -79,8 +87,8 @@ set -o pipefail
 #
 # Override for a subset the usual way, which still works:
 #   sbatch --array=0-2 --export=STATES="OH MS DE" 01b_run_object_detection.slurm
-DEFAULT_STATES="AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY"
-DEFAULT_STATES_N=52
+DEFAULT_STATES="AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY"
+DEFAULT_STATES_N=51
 
 # Comma-separated form. The array jobs take spaces (one state per task); the
 # single jobs that build one combined table take commas. That split is real --

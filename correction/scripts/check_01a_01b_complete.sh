@@ -3,9 +3,9 @@
 # check_01a_01b_complete.sh
 # ==============================================================================
 # Verifies a nationwide 01a/01b array run actually completed cleanly across
-# all 52 states before trusting it enough to run 02 against it. Checks:
+# all 51 states before trusting it enough to run 02 against it. Checks:
 #   1. sacct state for every array task (catches FAILED/TIMEOUT/OOM/CANCELLED)
-#   2. output actually exists for all 52 states on both sides
+#   2. output actually exists for all 51 states on both sides
 #   3. names the specific missing states (not just a count) for easy rerun
 #   4. per-state fetch-failure counts from 01b logs, to spot rough states
 #
@@ -14,13 +14,13 @@
 # ==============================================================================
 set -uo pipefail
 
-ROOT=/work/GRDVULN/correction
+ROOT=/work/GRDVULN/tp_qa/correction   # must match _common.sh and config.ROOT
 
-# The 52 states/territories in the training universe, per
+# The 51 states/territories in the training universe, per
 # list_training_states.py's 2026-08-21 output. If the training universe
 # changes (rebuilt training_locations.gpkg with a different plant set),
 # re-run that script and update this list.
-EXPECTED_STATES=(AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA \
+EXPECTED_STATES=(AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA \
     MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN \
     TX UT VA VT WA WI WV WY)
 

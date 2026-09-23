@@ -669,8 +669,21 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
         matched = point_in_parcel_lookup(con, state, pts)
         if len(matched):
             reported.append(matched)
-    reported_parcels = pd.concat(reported, ignore_index=True) if reported else pd.DataFrame()
-    reported_parcels = reported_parcels.drop_duplicates(subset="CWNS_ID")
+    # Empty-but-correctly-shaped fallback, matching build_stage2_training's
+    # handling of the same case. A bare pd.DataFrame() has NO columns, and
+    # drop_duplicates(subset=...) passes silently on an empty frame, so the
+    # failure surfaced one line later as KeyError: 'CWNS_ID' in the merge --
+    # confirmed on DC, 2026-09-23. Columns are point_in_parcel_lookup's
+    # output: pts.* (CWNS_ID, class, h3_res9, geom_wkb) plus ll_uuid.
+    #
+    # A state can legitimately land here: no labelled plant falls inside any
+    # parcel. That must produce an EMPTY shard, not a dead array task, or 02b
+    # refuses the merge for a missing shard and the whole national run stops
+    # on a state with nothing to contribute.
+    reported_parcels = (pd.concat(reported, ignore_index=True) if reported
+                        else pd.DataFrame(columns=["CWNS_ID", "class",
+                                                   "h3_res9", "geom_wkb",
+                                                   "ll_uuid"]))
     print(f"  Reported parcels found: {len(reported_parcels)}")
 
     stage1 = reported_parcels.merge(

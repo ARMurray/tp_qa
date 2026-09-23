@@ -29,7 +29,9 @@
 # afterok is the right dependency: merging a partial array produces a file
 # that looks fine and silently omits whole states.
 #
-# STATES defaults to the same 52-element list 02's array uses. Override when
+# STATES defaults to _common.sh's DEFAULT_STATES -- the same 51-element list
+# 02's array uses. This used to keep its own copy, which is how a list gets
+# to disagree with itself. Override when
 # the array covered a subset:
 #
 #   sbatch --export=STATES="OH PA WI" 02b_merge_feature_shards.slurm
@@ -44,7 +46,6 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-DEFAULT_STATES="AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY"
 
 CMD="python \"$SCRIPTS/02b_merge_feature_shards.py\""
 
