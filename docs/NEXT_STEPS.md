@@ -104,10 +104,12 @@ plus the one thing that blocks it today.
 For every candidate parcel of every reviewed plant, two facts are known: did
 the detector fire there, and did the reviewer say it was the plant.
 
+"Positive" here means *this parcel is the treatment plant*.
+
 | | Reviewer: **is** the plant | Reviewer: **not** the plant |
 |---|---|---|
-| **Detector fired** | true positive — some value | **FALSE POSITIVE — the gold** |
-| **Detector silent** | **FALSE NEGATIVE — the gold** | true negative — teaches least |
+| **Detector fired** | **true positive** — correct hit, some value | **FALSE POSITIVE** — saw infrastructure that isn't a plant. The gold. |
+| **Detector silent** | **FALSE NEGATIVE** — walked past a real plant. The gold. | **true negative** — correct pass, teaches least |
 
 The false positives are exactly what you said you value: tiles that should be
 empty where the detector sees infrastructure anyway. The false negatives are
@@ -120,9 +122,17 @@ where most of those 872 empty labels went.
 
 ### Proposed rule
 
-Take every FP and FN, take TPs, and **cap** true negatives at a sample rather
-than all of them. YOLO does need background examples — but you already have
-872, and thousands more have sharply diminishing returns.
+Take every false positive and false negative, take the true positives, and
+**cap** true negatives at a sample rather than all of them.
+
+A true negative is a tile of a field or a parking lot that got pulled in only
+because it was a Stage 2a candidate for some plant: you open it, there is
+nothing, you save an empty label. YOLO does need background examples so it
+does not hallucinate infrastructure everywhere — but you already have 872,
+and the thousandth empty field teaches roughly nothing the hundredth did not.
+
+False positives are the opposite: rare, and each one is a specific thing the
+detector is wrong about.
 
 If the quadrants split anything like I would expect, this cuts the per-round
 pool by most of its volume while *improving* what is in it.
