@@ -78,7 +78,41 @@ AUGMENT_CONFIG = dict(
 # oxidation_pond and (implicitly) any lagoon-scale class are excluded here
 # because they need a larger tile size than this model's 200m tiles support --
 # that's a separate future model, not something this filter can fix.
-KEEP_CLASSES = ["aeration_basin", "clarifier", "digester"]
+# Classes to train on. EMPTY = all of them, straight from C.DATASET_YAML with
+# no filtered copy built -- which is also why this is [] rather than the six
+# names spelled out: naming them would trigger build_filtered_dataset() and
+# duplicate the whole ~1.2 GB dataset for no benefit.
+#
+# WAS ["aeration_basin", "clarifier", "digester"] until 2026-09-23. Annotation
+# counts at the time of that change, across 1,004 label files (132 with boxes,
+# 872 deliberate empties):
+#
+#     clarifier          264 boxes / 73 tiles     was trained
+#     oxidation_pond     138 boxes / 67 tiles     was NOT
+#     aeration_basin     105 boxes / 59 tiles     was trained
+#     digester            82 boxes / 29 tiles     was trained
+#     chlorine_contact    29 boxes / 22 tiles     was NOT
+#     drying_bed          10 boxes /  6 tiles     was NOT
+#
+# oxidation_pond is the one that mattered: more instances than digester and
+# more tiles than aeration_basin, excluded the whole time, and the dominant
+# infrastructure at small plants -- exactly the plants the correction pipeline
+# is worst at. chlorine_contact at 22 tiles is thin but sits in the same range
+# as digester's 29.
+#
+# WATCH drying_bed. Six tiles is below where a YOLO class can learn anything,
+# so expect its detections to be unreliable at first -- which matters because
+# correction's models consume od_has_drying_bed / od_n_drying_bed as features.
+# It is included so that new labels count immediately rather than needing
+# another config change, and because targeted tile selection now accumulates
+# examples where they actually occur. If 07/07b show it carrying weight before
+# the count is up around 25+ tiles, that weight is noise: re-check then.
+#
+# correction/scripts/config.py's CLASSES already lists all six and always has
+# -- it fixes the od_* FEATURE SCHEMA independently of what the detector was
+# trained on. So those columns have existed all along, with three of them
+# permanently False. Nothing changes there.
+KEEP_CLASSES = []
 FILTERED_DATASET_DIR = C.DATASET_DIR.parent / "dataset_filtered"
 # ---------------------------------------------------------------------------
 

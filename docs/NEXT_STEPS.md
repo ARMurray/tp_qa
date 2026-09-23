@@ -225,6 +225,11 @@ possible locally.
 
 ## 3. Run the feature-engineering array
 
+> **Do the detector retrain (section 4) FIRST.** The class list changed on
+> 2026-09-23, so the deployed detector is superseded and every detection
+> output is stale. Running `02` before re-running `01b` / `01c` / `01e` means
+> redoing `02`, all four model trainings, and inference.
+
 Not yet exercised against real data.
 
 ```bash
@@ -267,14 +272,58 @@ sbatch 12_score_holdout.slurm
 
 ---
 
-## 4. The new detector
+## 4. Retrain the detector on all six classes — DO THIS BEFORE SECTION 3
 
-`04_train_model.py` now deploys `best.pt` itself on success — no manual copy.
-Commit and push that file so the HPC picks it up.
+`KEEP_CLASSES` in `04_train_model.py` restricted training to
+`aeration_basin`, `clarifier`, `digester`. It is now `[]` — all six.
 
-**A new detector makes every existing detection output stale.** Re-run `01b`,
-`01c` and `01e`, then `check_od_freshness.py`, *before* `02`. Mixing two
-models' output in one feature table is silent.
+Annotation counts when that changed, across 1,004 label files (132 with
+boxes, 872 deliberate empties):
+
+| class | boxes | tiles | was trained |
+|---|---|---|---|
+| clarifier | 264 | 73 | ✓ |
+| **oxidation_pond** | **138** | **67** | ✗ |
+| aeration_basin | 105 | 59 | ✓ |
+| digester | 82 | 29 | ✓ |
+| **chlorine_contact** | **29** | **22** | ✗ |
+| **drying_bed** | **10** | **6** | ✗ |
+
+`oxidation_pond` is the one that mattered — more instances than digester,
+more tiles than aeration_basin, excluded the whole time, and the dominant
+infrastructure at small plants, which is exactly where the correction
+pipeline performs worst.
+
+**Watch `drying_bed`.** Six tiles is below where a YOLO class learns
+anything, so expect unreliable detections at first. That matters because the
+correction models consume `od_has_drying_bed` / `od_n_drying_bed` as
+features. It is in so new labels count immediately and because targeted tile
+selection now accumulates examples where they occur — but if `07` / `07b`
+show it carrying weight before the count is near 25+ tiles, that weight is
+noise.
+
+`correction/scripts/config.py`'s `CLASSES` already listed all six and always
+has; it fixes the `od_*` feature schema independently of what the detector was
+trained on. Three of those columns have simply been permanently False.
+Nothing changes there.
+
+```bash
+cd detection
+python pipeline/03_prepare_dataset.py    # only if you have labelled since the last run
+python pipeline/04_train_model.py
+```
+
+Empty `KEEP_CLASSES` trains straight from `dataset.yaml` with no filtered
+copy, which also stops the ~1.2 GB duplication into `dataset_filtered/`.
+
+`04` deploys `best.pt` itself on success — no manual copy. Commit and push
+that file so the HPC picks it up.
+
+**Then re-run `01b`, `01c`, `01e` and `check_od_freshness.py` before `02`.**
+A new detector makes every existing detection output stale, and mixing two
+models' output in one feature table is silent. This does mean losing the
+`01b`/`01c`/`01e` runs done with the 3-class model — unavoidable, and far
+cheaper now than after `02` plus four trainings.
 
 > The deploy uses `shutil.copy`, not `copy2`, deliberately. `copy2` preserves
 > the source mtime, which would make a brand-new model look old to
