@@ -49,7 +49,30 @@ real review round.** That is what the next session is for.
 
 ---
 
-## 1. Reset the labelling inventory
+## 1. Reset the labelling inventory — ✅ DONE 2026-09-23
+
+```
+6,814 tiles -> 1,003
+   35 exact duplicates
+5,776 never labelled
+```
+
+A follow-up `--near-duplicates` pass over the survivors found **zero** near
+matches too. So duplication was never the problem — 35 files out of 6,814,
+all inside the labelled subset. Volume was, and 5,776 tiles had been fetched,
+stored and never looked at.
+
+The impression that the inventory was full of duplicates came from two things
+that are not duplication: one plant (`08000000031`) contributing 27 of the 35,
+which clusters while labelling and feels like many more, and thousands of
+empty fields that look alike without being the same tile. That is the
+argument for targeted selection over better dedup.
+
+Remaining: run `reconstruct_tile_metadata.py`, since ~5,800 rows of
+`tile_metadata.csv` now point at files that are gone.
+
+<details>
+<summary>How it was run</summary>
 
 Keep everything labelled, collapse labelled duplicates to one copy, and
 remove every tile that was never labelled — the new baseline, now that
@@ -70,6 +93,8 @@ Duplicate keepers are chosen **deterministically** (lexicographically first),
 not randomly — the labels are identical so it makes no difference which, and
 two runs agreeing is worth more. If two copies were ever labelled
 *differently*, that group is refused rather than guessed at.
+
+</details>
 
 ### What I measured, and what it means
 

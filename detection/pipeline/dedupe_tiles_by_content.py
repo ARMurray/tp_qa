@@ -42,13 +42,25 @@ WHAT THE DUPLICATION ACTUALLY LOOKED LIKE (measured, 2026-09-22)
     cross-plant duplicates in that sample, no train/val leakage, and all 17
     groups carried identical labels.
 
-    That sample is the LABELLED subset, though, and it may already have been
-    filtered. The unlabelled bulk is much larger and was never measured.
-    Cross-plant duplication is plausible there on the same mechanism --
-    extract_review_tiles.py tiles every candidate parcel of every reviewed
-    plant, and its dedupe_overlapping_sites() only looks within one plant --
-    so this script reports the same-plant / cross-plant split rather than
-    assuming the labelled pattern holds.
+    THE FULL INVENTORY, measured on the real machine 2026-09-23:
+
+        6,814 tiles -> 1,003 after --purge-unlabeled
+           35 exact duplicates
+        5,776 never labelled
+
+    So duplication was never the problem -- 35 redundant files out of 6,814,
+    all of them inside the labelled subset. VOLUME was the problem, and
+    5,776 of those tiles had been fetched, stored and never looked at.
+
+    A follow-up pass with --near-duplicates over the 1,003 survivors found
+    ZERO near-matches as well. The impression that the inventory was full of
+    duplicates came from two things that are not duplication: one plant
+    (08000000031) contributing 27 of the 35, which clusters while labelling
+    and feels like many more; and thousands of empty fields that look alike
+    without being the same tile.
+
+    That is the argument for targeted selection rather than better dedup.
+    See extract_review_tiles.py's load_targeted_sites().
 
 LABELS ARE NEVER DESTROYED
     A tile with a label file is never moved or deleted, full stop. If a
