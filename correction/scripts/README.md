@@ -44,7 +44,7 @@ round-over-round comparison the project has produced. Don't.
 | 2 | `01a_extract_parcels` | array, **space**-separated states |
 | 3 | `01b_run_object_detection` | detection at reported locations |
 | 4 | `01c_run_od_corrected_locations` | detection at corrected locations |
-| 5 | `01e_run_od_candidates_array.slurm` `SCOPE=train` | **feeds the re-ranker — skipping it is silent** |
+| 5 | `01e_run_od_candidates.slurm` `SCOPE=train` | **feeds the re-ranker — skipping it is silent** |
 | 6 | `check_od_freshness` | preflight; fails on detection output older than the deployed model |
 | 7 | `02_feature_engineering` | array, one state per task, `--shard` |
 | 8 | `02b_merge_feature_shards` | chain with `--dependency=afterok` |
@@ -54,11 +54,18 @@ round-over-round comparison the project has produced. Don't.
 | 12 | `05_run_inference_array.slurm` + `merge_05_shards` | **after** training; the single job OOMs nationally |
 | 13 | `05b_rerank_candidates` | needs `07b`'s model |
 | 14 | `10_build_review_queue` | picks the plants |
-| 15 | `01e_run_od_candidates_array.slurm` `SCOPE=queue,ROUND=N` | detection on the parcels that queue shows |
+| 15 | `01e_run_od_candidates.slurm` `SCOPE=queue,ROUND=N` | detection on the parcels that queue shows |
 | 16 | `10_build_review_queue` again | same `--seed`; attaches the detection stats |
 | 17 | `12_score_holdout` | the only honest read on whether any of it worked |
 
 Then the round goes to the review app, and `close_round.py` brings it back.
+
+**There are two 01e wrappers and they are not interchangeable.**
+`01e_run_od_candidates.slurm` is the one that takes `SCOPE` — `train`,
+`queue`, or unset for the holdout. `01e_run_od_candidates_array.slurm`
+hardcodes `--all` and exists only to split the *national* run across states,
+taking its state list as a positional argument rather than `--export`. Steps 5
+and 15 above need the scoped one.
 
 `01d_nlcd_topup` is a gap-filler, not a step: NLCD stats for a specific parcel
 list that fell outside `01a`'s sweep.
