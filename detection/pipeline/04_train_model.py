@@ -230,6 +230,38 @@ def main():
         print(f"ERROR: expected best.pt at {best} but it doesn't exist.")
         return
 
+    # ---- Deploy to the correction pipeline -------------------------------
+    # Copy, don't ask. A manual copy is the step that gets forgotten, and
+    # forgetting it means 01b/01c/01e keep running the previous model while
+    # everything downstream looks perfectly normal. Nothing is lost:
+    # RUNS_DIR keeps every run's weights, so this is only a pointer to
+    # whichever one is deployed.
+    #
+    # shutil.copy, NOT copy2 -- and this matters more than it looks.
+    # check_od_freshness.py decides whether existing detection output is
+    # stale by comparing each partition's mtime against the deployed model's,
+    # and its docstring warns that anything preserving the SOURCE mtime
+    # (scp -p, rsync -t) makes a freshly deployed model look old. copy2
+    # preserves mtime and would do exactly that, so the freshness check would
+    # pass on detection output produced by the previous weights. copy stamps
+    # the copy with now, which is the deploy time -- what that check assumes.
+    try:
+        C.DEPLOY_MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(best, C.DEPLOY_MODEL_PATH)
+        print(f"\nDeployed to correction pipeline: {C.DEPLOY_MODEL_PATH}")
+        print(f"  size: {C.DEPLOY_MODEL_PATH.stat().st_size / 1e6:.1f} MB")
+        print("  Every existing detection output is now STALE. Before the next")
+        print("  02_feature_engineering run, re-run 01b / 01c / 01e and then")
+        print("  check_od_freshness.py, or the feature tables will mix outputs")
+        print("  from two different models.")
+        print(f"  This file is tracked in git -- commit and push it so the HPC")
+        print(f"  picks it up.")
+    except OSError as e:
+        # Not fatal: the model trained fine and is safe under RUNS_DIR. Only
+        # the deploy copy failed, and that is recoverable by hand.
+        print(f"\nWARNING: could not deploy to {C.DEPLOY_MODEL_PATH}: {e}")
+        print(f"  Copy it manually from {best} before running 01b/01c/01e.")
+
     print("\nValidating with best weights...")
     metrics = YOLO(str(best)).val(
         data=str(data_yaml), imgsz=MODEL_IMGSZ, device=device, plots=True,

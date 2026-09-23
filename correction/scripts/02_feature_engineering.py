@@ -808,22 +808,59 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
 # ===========================================================================
 # Main
 # ===========================================================================
+def feature_out(name: str, shard_state: str | None):
+    """Where a given output file goes: the flat path, or this state's shard.
+
+    In shard mode the plant-keyed outputs are per-state and get unioned by
+    02b_merge_feature_shards.py afterwards. Without --shard nothing changes,
+    so a single-job run and build_test_bundle keep working exactly as before.
+    """
+    if shard_state is None:
+        return C.FEATURES_OUTPUT_DIR / name
+    d = C.FEATURE_SHARD_DIR / f"state={shard_state}"
+    d.mkdir(parents=True, exist_ok=True)
+    return d / name
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--states", type=str, default=None)
     ap.add_argument("--full-universe", action="store_true")
+    ap.add_argument("--shard", action="store_true",
+                    help="write this state's outputs to FEATURE_SHARD_DIR/"
+                         "state=XX/ instead of the flat filenames, for running "
+                         "02 as a per-state SLURM array. Requires exactly one "
+                         "--states value. Run 02b_merge_feature_shards.py "
+                         "afterwards -- without it, the flat files downstream "
+                         "reads are whatever the last run left behind.")
     args = ap.parse_args()
     states = [s.strip() for s in args.states.split(",")] if args.states else None
 
+    # Exactly one state in shard mode. Allowing several would make
+    # "which state is this shard" ambiguous, and stage1/stage2 are built
+    # across the whole state_list at once rather than per state, so there
+    # would be nothing sensible to split them on.
+    shard_state = None
+    if args.shard:
+        if not states or len(states) != 1:
+            raise SystemExit(
+                "--shard requires exactly one --states value (got "
+                f"{states!r}). The array wrapper passes one state per task.")
+        shard_state = states[0]
+
     C.ensure_dirs()
-    print("=== 02_feature_engineering.py ===\n")
+    print("=== 02_feature_engineering.py ===")
+    if shard_state:
+        print(f"SHARD MODE: writing to {C.FEATURE_SHARD_DIR / f'state={shard_state}'}")
+        print("Run 02b_merge_feature_shards.py once every task has finished.")
+    print()
 
     con = duckdb.connect()
     con.execute("INSTALL spatial; LOAD spatial; SET enable_geoparquet_conversion = false;")
 
     # ---- PART 1 ----
     plant_features = build_plant_features(states, training_only=not args.full_universe)
-    plant_features.to_parquet(C.FEATURES_OUTPUT_DIR / "05_plant_features.parquet", index=False)
+    plant_features.to_parquet(feature_out("05_plant_features.parquet", shard_state), index=False)
 
     # ---- PART 2 ----
     print("\nPART 2: Building parcel features")
@@ -889,7 +926,16 @@ def main():
     parcel_features = pd.concat(parcel_frames, ignore_index=True).drop_duplicates(subset="ll_uuid") \
         if parcel_frames else pd.DataFrame()
     del parcel_frames
-    parcel_features.to_parquet(C.FEATURES_OUTPUT_DIR / "10_parcel_features.parquet", index=False)
+    # NOT written in shard mode. Each task's union covers only its own state,
+    # so 52 tasks would take turns overwriting one file with one state's
+    # parcels each. The per-state cache directory above is the real shard here,
+    # and 02b_merge_feature_shards.py rebuilds the flat file from it --
+    # filtered to the requested states, never globbed (see the long note above
+    # about the 5.47x row inflation that globbing caused on 2026-08-25).
+    if shard_state is None:
+        parcel_features.to_parquet(C.FEATURES_OUTPUT_DIR / "10_parcel_features.parquet", index=False)
+    else:
+        print("  (shard mode: 10_parcel_features.parquet is left to the merge step)")
     print(f"\nParcel features combined: {len(parcel_features)} rows")
 
     # ---- OD features from 01b (Stage 1 only -- see module docstring) ----
@@ -951,10 +997,10 @@ def main():
 
     # ---- PART 3 ----
     stage1 = build_stage1_training(con, plant_features, parcel_features, od_features)
-    stage1.to_parquet(C.FEATURES_OUTPUT_DIR / "14_stage1_training.parquet", index=False)
+    stage1.to_parquet(feature_out("14_stage1_training.parquet", shard_state), index=False)
 
     stage2 = build_stage2_training(con, plant_features, parcel_features, states)
-    stage2.to_parquet(C.FEATURES_OUTPUT_DIR / "15_stage2_training.parquet", index=False)
+    stage2.to_parquet(feature_out("15_stage2_training.parquet", shard_state), index=False)
 
     con.close()
     print(f"\n=== 02_feature_engineering.py complete ===")

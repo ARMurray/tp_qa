@@ -58,7 +58,9 @@ build_training_bins.py     master Updates.gpkg -> training_locations.gpkg
 | `01c_run_od_corrected_locations.py` | Same, for corrections-bin plants' **true** locations. Separate output root by design. |
 | `01d_nlcd_topup.py` | NLCD stats for a specific parcel list, appended to 01a's output — for parcels that fell outside the original k-ring sweep. |
 | `01e_run_od_candidates.py` | OD on Stage 2a's top-K candidate parcels. Keyed `(CWNS_ID, ll_uuid)`. **Required by the re-ranker.** |
-| `02_feature_engineering.py` | Builds all feature tables. Single job across all states (comma-separated), not an array. |
+| `04_train_model.py` (detection) | Copies `best.pt` to `correction/models/object_detection/` automatically on success — see below. |
+| `02_feature_engineering.py` | Builds all feature tables. **Per-state array** — each task writes a shard with `--shard`. |
+| `02b_merge_feature_shards.py` | Unions those shards into the flat files everything downstream reads. Validates all tables before writing any. |
 | `03_train_stage1.py` | Stage 1 classifier. |
 | `04_train_stage2.py` | Stage 2a candidate ranker. |
 | `05_run_inference.py` | Stage 1 → Stage 2a over the full universe. Run as a per-state array (`05_run_inference_array.slurm`) — the national single job OOMs. |
@@ -116,14 +118,35 @@ reasonable early task for a new owner.
 sbatch --array=0-1 --export=STATES="OH PA" 01a_extract_parcels.slurm
 ```
 
-**02 is a single job** and takes a comma-separated list, because it builds one
-combined feature table:
+**02 is also an array now** (changed 2026-09-22 — a national single job took
+too long), one state per task, followed by a merge:
 
 ```bash
-sbatch --export=STATES="OH,PA" 02_feature_engineering.slurm
+JID=$(sbatch --parsable 02_feature_engineering.slurm)
+sbatch --dependency=afterok:$JID 02b_merge_feature_shards.slurm
 ```
 
-Getting this backwards fails in a confusing way rather than an obvious one.
+Getting the array/single distinction backwards fails in a confusing way rather
+than an obvious one.
+
+### Why the merge step exists
+
+02 writes five outputs. Only one — `10_parcel_features_by_state/` — was
+already keyed by state. The other four are fixed filenames, so running 02 as
+an array without `--shard` has all 52 tasks overwrite the same four files and
+the last to finish wins. Nothing errors; 03 and 04 train on one state's data.
+
+`--shard` redirects the plant-keyed outputs to
+`data/feature_shards/state=XX/`, and `02b_merge_feature_shards.py` unions
+them back. Same pattern as `05_run_inference_array.slurm` +
+`merge_05_shards.py`, which solved this first.
+
+**Concatenation is valid here, and that was checked rather than assumed:**
+`build_stage1_training` groups by `STATE_CODE`; `build_stage2_training` reads
+each state's own `nlcd_{state}` file for its candidate pool; `add_name_matching`
+is row-wise; nothing normalises, ranks or aggregates across plants. A plant's
+candidates already came only from its own state, so sharding loses nothing.
+If that ever stops being true, the merge stops being correct silently.
 
 ---
 

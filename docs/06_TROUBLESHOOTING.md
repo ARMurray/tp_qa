@@ -84,6 +84,15 @@ attributes separate trivially. See [01_ORIENTATION.md](01_ORIENTATION.md).
 The re-ranker (`06b`/`07b`) measures the question you actually care about.
 `diagnose_candidate_od.py` has the numbers.
 
+### `check_od_freshness` passes but the detector was just retrained
+
+`04_train_model.py` deploys `best.pt` with `shutil.copy`, which stamps the
+copy with the current time. If someone changes that to `copy2`, or copies it
+by hand with `scp -p` / `rsync -t`, the source mtime is preserved and a
+brand-new model looks old — so the freshness check passes over detection
+output produced by the *previous* weights. The check's own docstring warns
+about this. `touch` the deployed file if you ever land in that state.
+
 ### A round of review produced no improvement in the re-ranker
 
 Most likely `01e_run_od_candidates.py` was not re-run with `SCOPE="train"`.
@@ -92,6 +101,27 @@ round's hard negatives never reached training and nothing errored.
 
 Check: `06b`'s log prints how many candidates had OD output and across how
 many plants. Compare to the plant count you expected.
+
+### Feature tables only cover one state
+
+02 ran as an array without `--shard`, or `02b_merge_feature_shards.py` never
+ran. All 52 tasks write the same four filenames, so the last task to finish
+wins. Check `05_plant_features.parquet`'s `STATE_CODE` values:
+
+```python
+import pandas as pd
+print(pd.read_parquet("data/features/05_plant_features.parquet").STATE_CODE.value_counts())
+```
+
+One state means the merge is missing. Re-run `02b_merge_feature_shards.py`
+— the shards are still under `data/feature_shards/`, so nothing is lost.
+
+### `MISSING shard for N state(s)` from 02b
+
+Those array tasks failed or never ran. The merge refuses rather than writing a
+table that silently omits them. Check `logs/02_<jobid>_<taskid>.log` for the
+named states, re-run just those (`sbatch --array=35 02_feature_engineering.slurm`),
+then re-merge. Nothing was written, so the existing flat files are untouched.
 
 ### Training class counts are too small to train on
 

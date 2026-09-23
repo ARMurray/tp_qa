@@ -51,6 +51,19 @@ DATASET_YAML    = REPO_ROOT / "dataset.yaml"
 RUNS_DIR = REPO_ROOT / "models" / "runs"
 RUN_NAME        = "wwtp_v2"   # 04 trains into runs/{RUN_NAME}; 05 loads its best.pt
 
+# Where the CORRECTION pipeline picks the trained detector up from. 04 copies
+# best.pt here at the end of every successful training run, so there is one
+# deployed model and it is always the newest one -- rather than a manual copy
+# that can be forgotten, which leaves 01b/01c/01e silently running last
+# month's weights.
+#
+# Nothing is lost by overwriting: every run's weights stay under RUNS_DIR,
+# which is the archive. This is a pointer to whichever of them is deployed.
+#
+# It is tracked in git (the one exception under correction/models/), which is
+# also how the HPC gets the model if it is a clone.
+DEPLOY_MODEL_PATH = REPO_ROOT.parent / "correction" / "models" / "object_detection" / "best.pt"
+
 # Pipeline artifacts
 SAMPLE_GPKG     = SAMPLES_DIR / "training_sample_round2.gpkg"  # written by 01
 SAMPLE_LAYER_PLANTS = "plants"

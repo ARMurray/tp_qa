@@ -45,11 +45,28 @@ sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
 # Preflight: fails if any OD partition predates the deployed best.pt
 python check_od_freshness.py
 
-# ONE job, comma-separated states
-sbatch --export=STATES="OH,PA,..." 02_feature_engineering.slurm
+# Per-state array, then the merge. Submit them chained.
+JID=$(sbatch --parsable 02_feature_engineering.slurm)
+sbatch --dependency=afterok:$JID 02b_merge_feature_shards.slurm
 ```
 
-Check the class counts at the end of 02's log before going further. If Stage
+**`02` is a per-state array, and the merge is part of the job.** Each task
+writes a shard under `data/feature_shards/state=XX/`; `02b` unions them into
+the flat files that 03/04/05/06/06b/10 all read by name. `afterok` means the
+merge runs only if every task succeeded — which is exactly when merging is
+safe, since a merge over a partial array produces a well-formed file that
+silently omits states.
+
+Re-running one failed state:
+
+```bash
+sbatch --array=35 02_feature_engineering.slurm    # just OH
+sbatch 02b_merge_feature_shards.slurm              # then re-merge
+```
+
+Without the merge, the flat files stay as the previous run left them.
+
+Check the class counts at the end of 02b's log before going further. If Stage
 1 has single-digit Incorrect rows or Stage 2 has single-digit positives,
 nothing downstream is trainable and you need more states or more review.
 
@@ -235,9 +252,20 @@ python pipeline/03_prepare_dataset.py
 python pipeline/04_train_model.py
 ```
 
-Then copy the new `best.pt` to HPC `models/object_detection/` and run
-`check_od_freshness.py` before the next `02_feature_engineering` — stale OD
-partitions produced by the *old* weights will otherwise be silently mixed in.
+`04_train_model.py` **deploys `best.pt` itself** on success, copying it to
+`correction/models/object_detection/best.pt` — no manual step. Nothing is
+lost: every run's weights stay under `detection/models/runs/`, which is the
+archive; the deployed copy is just a pointer to whichever one is current.
+
+Commit and push that file so the HPC picks it up, then re-run `01b`, `01c`
+and `01e` and check `check_od_freshness.py` before the next
+`02_feature_engineering`. A new detector makes every existing detection
+output stale, and mixing two models' output in one feature table is silent.
+
+> The deploy uses `shutil.copy`, not `copy2`, on purpose. `copy2` preserves
+> the source mtime, which would make a brand-new model look old to
+> `check_od_freshness.py` — the same trap its docstring warns about for
+> `scp -p` and `rsync -t`.
 
 Note that `extract_review_tiles.py` (step 4 of `close_round`) has already been
 feeding the labeling inventory every round, so there should be new material
@@ -252,6 +280,8 @@ These are the ones that fail silently rather than loudly.
 | Trap | Consequence |
 |---|---|
 | Skipping `01e` before `06b` | Re-ranker silently gets no hard negatives from this round |
+| Skipping `02b` after the `02` array | Feature tables stay as the last run left them — 03/04 train on stale or single-state data |
+| Running `02` as an array without `--shard` | All 52 tasks write the same four filenames; last to finish wins |
 | Running `02` with stale OD partitions | Features mix old and new model outputs. `check_od_freshness.py` catches it — run it |
 | Space vs comma separated `STATES` | 01a/01b are arrays (space); 02 is single (comma) |
 | Re-running `09_build_holdout.py` | Destroys every round-over-round comparison, undetectably |

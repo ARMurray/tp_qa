@@ -61,6 +61,19 @@ OD_OUTPUT_DIR_CORRECTED = DATA_DIR / "od_features_corrected"  # 01c output: same
 FEATURES_OUTPUT_DIR = DATA_DIR / "features"      # 02 output: 05_/10_/14_/15_*.parquet
 REFERENCE_DIR      = DATA_DIR / "reference"      # census gdb, OSM gpkg
 
+# 02 run as a per-state ARRAY writes here instead of straight to
+# FEATURES_OUTPUT_DIR, and 02b_merge_feature_shards.py unions the shards back
+# into the flat filenames every downstream script reads by name.
+#
+# Same shape and same reasoning as DATA_DIR/"inference_shards" for 05 (see
+# merge_05_shards.py): rather than teach 03/04/05/06/06b/10 about shards, the
+# array writes shards and one merge step recombines them into exactly the
+# layout those scripts already expect.
+#
+# 10_parcel_features has no shard dir of its own -- FEATURES_OUTPUT_DIR /
+# "10_parcel_features_by_state" already is one, and predates this.
+FEATURE_SHARD_DIR  = DATA_DIR / "feature_shards"  # state=XX/05_,14_,15_*.parquet
+
 # ===========================================================================
 # 2. EXTERNAL INPUTS  (shared, outside ROOT)
 # ===========================================================================
@@ -324,5 +337,6 @@ def ensure_dirs():
     parcel/NLCD stores."""
     for d in (SCRIPTS_DIR, LOGS_DIR, DATA_DIR, MODELS_DIR, OD_MODEL_DIR,
               CWNS_DIR, TRAINING_DIR, NLCD_OUTPUT_DIR, OD_OUTPUT_DIR,
-              OD_OUTPUT_DIR_CORRECTED, FEATURES_OUTPUT_DIR, REFERENCE_DIR):
+              OD_OUTPUT_DIR_CORRECTED, FEATURES_OUTPUT_DIR, FEATURE_SHARD_DIR,
+              REFERENCE_DIR):
         d.mkdir(parents=True, exist_ok=True)
