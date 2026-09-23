@@ -634,6 +634,32 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
     classes = classes.merge(plant_features[["CWNS_ID", "STATE_CODE"]], on="CWNS_ID", how="left")
     print(f"  Classes: {len(classes)}")
 
+    # A labelled plant with no STATE_CODE cannot be looked up in any per-state
+    # parcel query, so the dropna below removes it from training entirely.
+    # Report it: this used to be a silent loss, and a label that was paid for
+    # by human review deserves better than vanishing between two files.
+    #
+    # The cause is that plant_features comes from PHYSICAL_LOCATION.txt, which
+    # is a smaller export than the master locations file -- 30,881 rows against
+    # the master's 32,296. Measured 2026-09-23: 112 verified plants were absent
+    # from it, 5.0% of the Correct bin. All 112 were in
+    # POPULATION_WASTEWATER_CONFIRMED, so they are real facilities, just not in
+    # that particular export; and all 112 were Original_Correct == "Yes", with
+    # ZERO corrections affected -- the scarce, expensive label type is safe.
+    #
+    # Not worth fixing by plumbing STATE_CODE through from the master: it would
+    # add examples only to the already-dominant Correct class, which is the
+    # opposite of what Stage 1's class balance needs. Worth KNOWING, which is
+    # what this does.
+    n_no_state = int(classes["STATE_CODE"].isna().sum())
+    if n_no_state:
+        lost = classes[classes["STATE_CODE"].isna()]
+        by_class = lost["class"].value_counts().to_dict() if "class" in lost.columns else {}
+        print(f"  NOTE: {n_no_state} labelled plant(s) have no STATE_CODE and are "
+              f"dropped from Stage 1 training: {by_class}")
+        print(f"        They are in the label file but not in PHYSICAL_LOCATION.txt, "
+              f"which is a smaller export. See this function's comment.")
+
     reported = []
     for state, grp in classes.dropna(subset=["STATE_CODE"]).groupby("STATE_CODE"):
         pts = pd.DataFrame({
