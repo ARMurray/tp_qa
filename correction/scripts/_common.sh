@@ -65,6 +65,18 @@ set -o pipefail
 # reports a state not listed here, add it AND bump the --array upper bound,
 # because the two have to agree.
 #
+# THIS IS THE LABEL UNIVERSE, NOT THE PARCEL STORE. A state is in this list
+# because it has labelled plants -- which says nothing about whether Regrid
+# parcels for it were ever downloaded to PARCEL_BASE. If they were not, 01b
+# and 01c resolve no parcel for any plant there and quietly count every one
+# into "No parcel found" while exiting 0.
+#
+#   python check_parcel_coverage.py
+#
+# reports exactly which training states have no parcel data, how many plants
+# that silently costs, and prints a usable state list to override with. Run it
+# before widening the state list, not after.
+#
 # Override for a subset the usual way, which still works:
 #   sbatch --array=0-2 --export=STATES="OH MS DE" 01b_run_object_detection.slurm
 DEFAULT_STATES="AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY"
