@@ -84,6 +84,13 @@ decision — never as part of the sequence:
 `check_location_type_overlap`, `inspect_stage2_columns`, `inspect_deployed_02`,
 `check_01a_01b_complete`.
 
+`collect_diagnostics` writes a text snapshot of this machine's pipeline state
+to `correction/diagnostics/`, which is not gitignored — run it as a job,
+commit the file, push. That is the working channel for getting cluster state to
+a machine that cannot see the cluster. `check_parcel_coverage` is the narrower
+check it wraps: which states have Regrid parcels at all, against the states
+that have labelled plants.
+
 `build_test_bundle` assembles a self-contained fixture so the pipeline can be
 debugged in seconds instead of one `sbatch` per hypothesis. It is a fixture,
 not a training set — a model trained on it must never be treated as real.
