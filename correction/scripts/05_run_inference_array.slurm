@@ -38,9 +38,11 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
-# --export or positional arg is needed. Override for a subset as shown above.
-STATES_ARG="${1:-$DEFAULT_STATES}"
+# Defaults to _common.sh's INFERENCE_STATES (48: DEFAULT_STATES minus AK, HI,
+# PR, which have no NAIP) so no positional arg is needed:
+#   sbatch --array=0-47%8 05_run_inference_array.slurm
+# Override for a subset as shown above.
+STATES_ARG="${1:-$INFERENCE_STATES}"
 read -ra STATE_LIST <<< "$STATES_ARG"
 STATE="${STATE_LIST[$SLURM_ARRAY_TASK_ID]}"
 

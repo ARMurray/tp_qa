@@ -41,7 +41,9 @@ source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 # Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
 # --export or positional arg is needed. Override for a subset as shown above.
-STATES_ARG="${1:-$DEFAULT_STATES}"
+# INFERENCE_STATES, matching 05_run_inference_array.slurm's default -- not
+# DEFAULT_STATES, whose AK/HI/PR are never inferred on and would fail the merge.
+STATES_ARG="${1:-$INFERENCE_STATES}"
 
 CMD="python $SCRIPTS/merge_05_shards.py --states \"$STATES_ARG\""
 [ -n "${DRYRUN:-}" ]       && CMD="$CMD --dry-run"

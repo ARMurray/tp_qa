@@ -434,11 +434,16 @@ def main():
                           "(default 20 -- REVIEW_LOOP_PLAN.md's K=5 is the REVIEWED count, "
                           "not the stored candidate-pool size; keep this larger so "
                           "candidate_recall can be measured against a real pool).")
+    ap.add_argument("--out-dir", type=str, default=None,
+                     help="write plant_summary.parquet/stage2_candidates.parquet "
+                          "here instead of DATA_DIR/inference. Lets a per-state "
+                          "SLURM array shard its output without 48 tasks racing "
+                          "on the same two filenames.")
     args = ap.parse_args()
     states = [s.strip() for s in args.states.split(",")]
 
     C.ensure_dirs()
-    inference_dir = C.DATA_DIR / "inference"
+    inference_dir = Path(args.out_dir) if args.out_dir else C.DATA_DIR / "inference"
     inference_dir.mkdir(parents=True, exist_ok=True)
 
     print("=== 05_run_inference.py ===")
@@ -455,6 +460,16 @@ def main():
     print("\nLoading plant/parcel features (from 02_feature_engineering.py --full-universe)...")
     plant_features = pd.read_parquet(C.FEATURES_OUTPUT_DIR / "05_plant_features.parquet")
     parcel_features = pd.read_parquet(C.FEATURES_OUTPUT_DIR / "10_parcel_features.parquet")
+    # Narrow to the requested states before anything else touches this frame.
+    # It is the national table (77.7M rows on 2026-09-04) and was previously
+    # loaded in full even for a single-state run, which is most of this
+    # script's resident memory. The `state` column is already dropped at each
+    # merge site downstream, so filtering on it here changes nothing else.
+    if "state" in parcel_features.columns:
+        n_before = len(parcel_features)
+        parcel_features = parcel_features[parcel_features["state"].isin(states)]
+        print(f"  Parcel features narrowed to {states}: "
+              f"{n_before} -> {len(parcel_features)} rows")
     missing_states = set(states) - set(plant_features["STATE_CODE"].dropna().unique())
     if missing_states:
         print(f"  WARNING: {missing_states} not present in 05_plant_features.parquet -- "
@@ -518,8 +533,19 @@ def main():
     print(f"  Plants scored          : {len(stage1_out)}")
     print(f"  Flagged for Stage 2     : {len(flagged)}")
     print(f"  Plants with >=1 candidate: {int((stage1_out['n_candidates'] > 0).sum())}")
-    print(f"  Plants with 0 candidates : {int((stage1_out['n_candidates'] == 0).sum())} "
-          f"(flagged but no parcel survived K_RINGS + reported-parcel exclusion)")
+    # Count zero-candidate plants among FLAGGED plants only. Unflagged plants
+    # also carry n_candidates == 0 (from the fillna above) but were never
+    # eligible for Stage 2, so counting them here overstated the figure and
+    # mislabelled it -- the CA run reported 141, which was simply 494 total
+    # minus 353 flagged. 10_build_review_queue.py splits candidate_pick from
+    # confirm_reported on exactly this distinction.
+    _flagged_mask = stage1_out["trigger_reason"] != "none"
+    n_flagged_no_cands = int((_flagged_mask & (stage1_out["n_candidates"] == 0)).sum())
+    n_unflagged = int((~_flagged_mask).sum())
+    print(f"  Flagged w/ 0 candidates  : {n_flagged_no_cands} "
+          f"(no parcel survived K_RINGS + reported-parcel exclusion)")
+    print(f"  Not flagged (Stage 1 ok) : {n_unflagged} "
+          f"(no candidates by design -- confirm_reported task in 10)")
     print(f"\nWritten: {summary_path}")
     print(f"Written: {cand_path}")
 

@@ -95,3 +95,20 @@ DEFAULT_STATES_N=51
 # see 01a's header -- so both forms live here rather than each wrapper
 # reformatting the list itself.
 DEFAULT_STATES_CSV="${DEFAULT_STATES// /,}"
+
+# ==============================================================================
+# INFERENCE_STATES -- DEFAULT_STATES minus AK, HI and PR (48 entries)
+# ==============================================================================
+# Used by 05_run_inference_array.slurm and merge_05_shards.slurm only.
+#
+# NAIP is CONUS-only, so AK, HI and PR have no imagery and no detection output
+# (see check_od_freshness.py's 2026-09-03 note). They stay in DEFAULT_STATES
+# because their labelled plants still train Stage 1/2, but they are not
+# inferred on. Keeping them in the inference list made merge_05_shards refuse
+# the whole national merge for three states that were never meant to run.
+#
+# The two lists have to be separate rather than one derived at each use site:
+# the array index -> state mapping is positional, so --array=0-47 must match
+# THIS list's length.
+INFERENCE_STATES="AL AR AZ CA CO CT DE FL GA IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA VT WA WI WV WY"
+INFERENCE_STATES_N=48
