@@ -151,8 +151,10 @@ def main():
     print(f"Corrections-bin plants: {len(corrections)}")
 
     # ---- ll_uuid lookup for both coordinate sets, per state ----
-    con = duckdb.connect()
-    con.execute("INSTALL spatial; LOAD spatial; SET enable_geoparquet_conversion = false;")
+    # capped to the SLURM allocation -- a bare duckdb.connect() sizes itself
+    # from the NODE'S physical RAM and gets OOM-killed instead of spilling.
+    # See config.duckdb_connect (added after 08 died at 32G, 2026-09-24).
+    con = C.duckdb_connect()
 
     reported_matches, corrected_matches = [], []
     for state, grp in corrections.groupby("STATE_CODE"):

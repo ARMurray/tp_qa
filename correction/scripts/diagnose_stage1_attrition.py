@@ -73,8 +73,10 @@ def main():
         dropped_rows = dropped_rows.drop(columns=["STATE_CODE"], errors="ignore").merge(
             loc, on="CWNS_ID", how="left")
 
-    con = duckdb.connect()
-    con.execute("INSTALL spatial; LOAD spatial; SET enable_geoparquet_conversion = false;")
+    # capped to the SLURM allocation -- a bare duckdb.connect() sizes itself
+    # from the NODE'S physical RAM and gets OOM-killed instead of spilling.
+    # See config.duckdb_connect (added after 08 died at 32G, 2026-09-24).
+    con = C.duckdb_connect()
 
     no_parcel_at_all = 0
     found_some_parcel = 0

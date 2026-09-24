@@ -176,9 +176,10 @@ def main():
         if len(need):
             print(f"\n  {need['CWNS_ID'].nunique()} plant(s) have no resolved "
                   f"true_ll_uuid -- checking containment geometrically")
-            con = duckdb.connect()
-            con.execute("INSTALL spatial; LOAD spatial; "
-                        "SET enable_geoparquet_conversion = false;")
+            # capped to the SLURM allocation -- a bare duckdb.connect() sizes itself
+            # from the NODE'S physical RAM and gets OOM-killed instead of spilling.
+            # See config.duckdb_connect (added after 08 died at 32G, 2026-09-24).
+            con = C.duckdb_connect()
             hits = resolve_containment(con, need)
             con.close()
             if hits:

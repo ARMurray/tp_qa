@@ -340,3 +340,76 @@ def ensure_dirs():
               OD_OUTPUT_DIR_CORRECTED, FEATURES_OUTPUT_DIR, FEATURE_SHARD_DIR,
               REFERENCE_DIR):
         d.mkdir(parents=True, exist_ok=True)
+
+# ===========================================================================
+# 10. DuckDB connection
+# ===========================================================================
+def duckdb_memory_mb(fraction: float = 0.7) -> int | None:
+    """Megabytes DuckDB may use, derived from this job's SLURM allocation.
+
+    Returns None off-SLURM, where DuckDB's own default is fine.
+    """
+    import os
+
+    per_node = os.environ.get("SLURM_MEM_PER_NODE")
+    if per_node and per_node.isdigit():
+        total = int(per_node)
+    else:
+        per_cpu = os.environ.get("SLURM_MEM_PER_CPU")
+        cpus = os.environ.get("SLURM_CPUS_ON_NODE") or os.environ.get("SLURM_CPUS_PER_TASK")
+        if per_cpu and per_cpu.isdigit() and cpus and cpus.isdigit():
+            total = int(per_cpu) * int(cpus)
+        else:
+            return None
+    # Leave headroom: pandas frames, geopandas, Python sets and the driver all
+    # live in the same cgroup and DuckDB knows nothing about them.
+    return max(int(total * fraction), 1024)
+
+
+def duckdb_connect(spatial: bool = True, fraction: float = 0.7):
+    """A DuckDB connection that respects the SLURM memory allocation.
+
+    WHY THIS EXISTS (2026-09-24)
+        duckdb.connect() with no memory_limit defaults to ~80% of the NODE'S
+        PHYSICAL RAM. It has no idea a cgroup exists. On a compute node with
+        hundreds of GB, DuckDB will happily plan and allocate far past a
+        --mem=32G allocation, and SLURM kills the process. The symptom is an
+        OOM kill partway through a large state with no DuckDB error at all,
+        which reads like "needs more memory" -- so the natural response is to
+        raise --mem, which moves the wall without removing it.
+
+        08_diagnose_candidate_coverage was OOM-killed at 32G this way. Every
+        other DuckDB user in this pipeline had the same latent bug; 02's slurm
+        header still carries the scar ("MEMORY: 64G, down from the 200G a
+        single national job needed").
+
+        Setting memory_limit from SLURM_MEM_PER_NODE makes DuckDB spill to disk
+        instead of overrunning the cgroup. Spilling is slower than RAM and much
+        faster than being killed at minute six.
+
+    Also caps threads to the allocation. DuckDB otherwise starts one thread per
+    CORE VISIBLE ON THE NODE, each with its own buffers -- 128 threads inside an
+    8-CPU allocation is both slower and far heavier than 8.
+    """
+    import duckdb
+
+    con = duckdb.connect()
+    mb = duckdb_memory_mb(fraction)
+    if mb:
+        con.execute(f"SET memory_limit='{mb}MB'")
+    threads = _os_env_int("SLURM_CPUS_PER_TASK")
+    if threads:
+        con.execute(f"SET threads={threads}")
+    if spatial:
+        con.execute("INSTALL spatial; LOAD spatial;")
+    # Never let the reader reinterpret a WKB blob column as geometry -- the
+    # pipeline stores WKB and converts explicitly with ST_GeomFromWKB.
+    con.execute("SET enable_geoparquet_conversion = false")
+    return con
+
+
+def _os_env_int(name: str):
+    import os
+
+    v = os.environ.get(name)
+    return int(v) if v and v.isdigit() else None

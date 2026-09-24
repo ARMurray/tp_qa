@@ -67,8 +67,10 @@ def main():
     loc["h3_res9"] = loc.apply(lambda r: h3.latlng_to_cell(r["LATITUDE"], r["LONGITUDE"], 9), axis=1)
     print(f"Sample: {len(loc)} plants")
 
-    con = duckdb.connect()
-    con.execute("INSTALL spatial; LOAD spatial; SET enable_geoparquet_conversion = false;")
+    # capped to the SLURM allocation -- a bare duckdb.connect() sizes itself
+    # from the NODE'S physical RAM and gets OOM-killed instead of spilling.
+    # See config.duckdb_connect (added after 08 died at 32G, 2026-09-24).
+    con = C.duckdb_connect()
 
     reported = []
     for state, grp in loc.groupby("STATE_CODE"):

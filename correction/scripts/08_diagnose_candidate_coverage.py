@@ -171,8 +171,11 @@ def main():
     print()
 
     # ---- Per-state lookups ----
-    con = duckdb.connect()
-    con.execute("INSTALL spatial; LOAD spatial; SET enable_geoparquet_conversion = false;")
+    # C.duckdb_connect, not duckdb.connect: the bare call defaults to ~80% of
+    # the NODE'S physical RAM and ignores the cgroup, so it overruns --mem and
+    # gets OOM-killed rather than spilling. This script was killed at 32G that
+    # way on 2026-09-24. See config.duckdb_connect.
+    con = C.duckdb_connect()
 
     rep_ll, cor_ll, window_rows = [], [], []
     all_plants = extract_lib.load_treatment_plants(states_filter, training_only=True)

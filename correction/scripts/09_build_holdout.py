@@ -188,8 +188,10 @@ def lookup_true_parcels(pool: pd.DataFrame) -> pd.DataFrame:
         pool["true_ll_uuid"] = None
         return pool
 
-    con = duckdb.connect()
-    con.execute("INSTALL spatial; LOAD spatial; SET enable_geoparquet_conversion = false;")
+    # capped to the SLURM allocation -- a bare duckdb.connect() sizes itself
+    # from the NODE'S physical RAM and gets OOM-killed instead of spilling.
+    # See config.duckdb_connect (added after 08 died at 32G, 2026-09-24).
+    con = C.duckdb_connect()
     frames = []
     failed_states: list[tuple[str, int, str]] = []
     for state, grp in have.groupby("STATE_CODE"):
