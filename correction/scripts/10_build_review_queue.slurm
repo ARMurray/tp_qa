@@ -13,13 +13,22 @@
 # output. See script docstring for the Stage2b->Stage2a substitution and the
 # two review-task-type design (candidate_pick / confirm_reported).
 #
-#   sbatch 10_build_review_queue.slurm "OH,MS,DE" 1
-#   sbatch --export=BATCHSIZE="150" 10_build_review_queue.slurm "OH,MS,DE" 1
+#   sbatch --export=ROUND=3 10_build_review_queue.slurm          # all 48 states
+#   sbatch --export=ROUND=3,BATCHSIZE=150 10_build_review_queue.slurm
+#   sbatch --export=ROUND=3 10_build_review_queue.slurm "OH,MS,DE"   # subset
 #
-# Positional args (STATES then ROUND) -- same comma-truncation reasoning as
-# 02/05's wrappers: --export=STATES="OH,MS,DE" gets silently truncated at the
-# first comma by sbatch's own parser. Round is positional too rather than
-# --export for consistency, even though it has no commas to truncate.
+# ROUND is required. STATES defaults to _common.sh's INFERENCE_STATES -- the
+# 48 states 05_run_inference_array covers, so it matches what was inferred.
+# A subset is a comma list, POSITIONAL, because sbatch's --export splits on
+# commas and would truncate it. The old form, positional states then round
+# (sbatch 10_build_review_queue.slurm "OH,MS,DE" 1), still works.
+#
+# PRIOR-ROUND EXCLUSION: 10 skips every plant in
+# data/review_log_incoming/review_log_round*.parquet and
+# holdout_truth_round*.parquet. Those files come from the review machine via
+# git (review_app/data/outgoing/), so this wrapper copies them from the repo
+# before running -- nothing to do by hand. Pull first so the copies are
+# current.
 #
 # Requires 05_run_inference.py to have already run for these exact states --
 # reads data/inference/plant_summary.parquet and stage2_candidates.parquet
@@ -27,10 +36,25 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
-# --export or positional arg is needed. Override for a subset as shown above.
-STATES_ARG="${1:-$DEFAULT_STATES_CSV}"
-ROUND_ARG="${2:?ERROR: pass round number as the second positional arg, e.g. sbatch 10_build_review_queue.slurm \"OH,MS,DE\" 1}"
+ROUND_ARG="${ROUND:-${2:-}}"
+if [ -z "$ROUND_ARG" ]; then
+    echo "ERROR: set the round, e.g. sbatch --export=ROUND=3 10_build_review_queue.slurm"
+    exit 1
+fi
+STATES_ARG="${1:-${INFERENCE_STATES// /,}}"
+
+# Prior-round verdicts, from the repo copy of the review machine's outgoing/.
+REPO_OUTGOING="$ROOT/../review_app/data/outgoing"
+INCOMING="$ROOT/data/review_log_incoming"
+mkdir -p "$INCOMING"
+n_copied=0
+for f in "$REPO_OUTGOING"/review_log_round*.parquet "$REPO_OUTGOING"/holdout_truth_round*.parquet; do
+    [ -e "$f" ] || continue
+    case "$(basename "$f")" in review_log_candidates_*) continue ;; esac
+    cp -f "$f" "$INCOMING"/ && n_copied=$((n_copied + 1))
+done
+echo "Prior-round review files copied into $INCOMING: $n_copied"
+[ "$n_copied" -eq 0 ] && echo "WARNING: none found in $REPO_OUTGOING -- earlier rounds' plants can be re-queued."
 
 CMD="python $SCRIPTS/10_build_review_queue.py --states $STATES_ARG --round $ROUND_ARG"
 [ -n "${BATCHSIZE:-}" ]     && CMD="$CMD --batch-size $BATCHSIZE"
