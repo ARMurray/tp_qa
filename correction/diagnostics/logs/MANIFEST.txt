@@ -1,11 +1,11 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-09-24T17:32:50
+when    : 2026-09-24T17:47:19
 source  : /work/GRDVULN/tp_qa/correction/logs
 selected: 10_* (latest 1)
 
-  10_review_queue_7493171.log               0 KB ->       0 KB  (job wrote it 2026-09-24T17:30)
+  10_review_queue_7493185.log               3 KB ->       3 KB  (job wrote it 2026-09-24T17:42)
 
-total copied: 0 KB
+total copied: 3 KB
 
 Originals are untouched. This directory is not gitignored.
