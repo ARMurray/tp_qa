@@ -1,0 +1,45 @@
+==========================================
+Node:    r7n15
+Job ID:  7492224
+CPUs:    4
+Started: Thu Sep 24 12:37:55 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python "/work/GRDVULN/tp_qa/correction/scripts/02b_merge_feature_shards.py" --states "AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY"
+=== 02b_merge_feature_shards.py ===
+Shards: /work/GRDVULN/tp_qa/correction/data/feature_shards
+Output: /work/GRDVULN/tp_qa/correction/data/features
+
+Merging 51 state(s)
+
+--- 05_plant_features.parquet ---
+  51 shard(s) -> 16,430 rows, 18 columns
+
+--- 14_stage1_training.parquet ---
+  51 shard(s) -> 2,510 rows, 86 columns
+  ERROR: 192 duplicate CWNS_ID value(s). States are disjoint, so this means a task ran with the wrong state or a stale shard survived. Examples: ['01200100002', '01200100006', '06009074002', '09000520001', '15000003021']
+
+--- 15_stage2_training.parquet ---
+  6 state(s) produced zero rows (fine -- e.g. a state with no corrections has no Stage 2 candidates): ['AK', 'AL', 'AZ', 'ME', 'NJ', 'RI']
+  WARNING: 6 state(s) are missing columns other states have. They will be NaN in the merged table:
+    AK: ['centroid_lat', 'centroid_lng', 'h3_index_9']
+    AL: ['centroid_lat', 'centroid_lng', 'h3_index_9']
+    AZ: ['centroid_lat', 'centroid_lng', 'h3_index_9']
+    ME: ['centroid_lat', 'centroid_lng', 'h3_index_9']
+    NJ: ['centroid_lat', 'centroid_lng', 'h3_index_9']
+  51 shard(s) -> 4,528,534 rows, 60 columns
+
+--- 10_parcel_features.parquet (from 10_parcel_features_by_state) ---
+  cache holds 52 state file(s) from earlier runs; using only this run's 51, as it must
+  51 state(s) -> 77,679,378 unique parcels
+
+============================================================
+=== merge FAILED -- NOTHING WAS WRITTEN ===
+The existing flat files are untouched, so they are still
+whatever the last good run left. Fix the shards and re-run.
+Nothing downstream should run until this is clean: no
+training script checks whether its inputs cover every state.
+Finished: Thu Sep 24 12:39:01 EDT 2026
+
