@@ -254,8 +254,21 @@ def main():
     # How unusual this candidate's detection is WITHIN its own pool. A
     # detection is far more telling when it is the only one among 20 than
     # when 18 of 20 fired.
-    train["od_fired_share_of_pool"] = np.where(
-        fired > 0, train["od_has_detection"].astype(float) / fired, 0.0)
+    #
+    # Plain float arrays and np.divide(where=), NOT `np.where(fired > 0,
+    # detected / fired, 0.0)`. np.where evaluates BOTH branches, so the
+    # division runs over zero-fire pools too. That used to be harmless -- a
+    # float64 division by zero is inf, and np.where discards it -- but when
+    # od_has_detection arrives as an OBJECT column (it did on 2026-09-24,
+    # from 01e output written by the six-class detector), the groupby sum is
+    # object-dtype Python ints and pandas does the division element by
+    # element in Python, which raises ZeroDivisionError. This is also exactly
+    # how 05b's add_derived computes the column, so the two stay in parity.
+    fired_arr = fired.to_numpy(dtype=float)
+    detected_arr = train["od_has_detection"].astype(float).to_numpy()
+    share = np.zeros(len(train), dtype=float)
+    np.divide(detected_arr, fired_arr, out=share, where=(fired_arr > 0))
+    train["od_fired_share_of_pool"] = share
 
     # ---- spatial CV coordinates ------------------------------------------
     # From the CANDIDATE parcel's own location, not the plant's reported

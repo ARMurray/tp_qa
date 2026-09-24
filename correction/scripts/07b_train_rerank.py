@@ -135,6 +135,9 @@ def main():
                          "parcel looks like.")
     ap.add_argument("--test-frac", type=float, default=0.25)
     ap.add_argument("--allow-no-holdout", action="store_true")
+    ap.add_argument("--allow-stale-table", action="store_true",
+                    help="train even if 17_rerank_training.parquet is older "
+                         "than the deployed Stage 2a model")
     args = ap.parse_args()
 
     tag = "_noOD" if args.no_od else ""
@@ -146,6 +149,23 @@ def main():
     path = C.FEATURES_OUTPUT_DIR / "17_rerank_training.parquet"
     if not path.exists():
         print(f"ERROR: {path} not found. Run 06b_build_rerank_training.py first.")
+        sys.exit(2)
+
+    # A re-rank table older than the deployed Stage 2a model was built from a
+    # DIFFERENT Stage 2a's candidates and scores -- stage2a_rank and
+    # stage2_prob_correct are features here. On 2026-09-24 06b crashed and 07b,
+    # submitted alongside it, trained happily on the 2026-09-08 table and
+    # overwrote the model. Refuse instead.
+    s2_model = C.MODELS_DIR / "stage2_rf_model.joblib"
+    if s2_model.exists() and path.stat().st_mtime < s2_model.stat().st_mtime \
+            and not args.allow_stale_table:
+        import datetime as _dt
+        ts = lambda p: _dt.datetime.fromtimestamp(p.stat().st_mtime).isoformat(timespec="minutes")
+        print(f"ERROR: {path.name} ({ts(path)}) is older than {s2_model.name} "
+              f"({ts(s2_model)}).\n"
+              f"  It was built from a previous Stage 2a's candidates. Re-run "
+              f"06b_build_rerank_training.py and check it finished, or pass "
+              f"--allow-stale-table if this is deliberate.")
         sys.exit(2)
 
     print("Loading re-rank training data...")
