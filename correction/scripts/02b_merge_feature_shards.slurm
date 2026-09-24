@@ -40,6 +40,15 @@
 # Naming the states is better than ALLPRESENT: --all-present cannot tell a
 # state whose task failed from one you never asked for.
 #
+# Merge only some tables (by number prefix) and leave the rest on disk as-is:
+#
+#   sbatch --export=TABLES="05 10" 02b_merge_feature_shards.slurm
+#
+# That is the FULL_UNIVERSE refresh for inference: 05 reads only
+# 05_plant_features and 10_parcel_features, and the training tables (14, 15)
+# should stay the ones the deployed models were fitted on. Spaces, not
+# commas -- sbatch --export splits on commas.
+#
 # MEMORY: 128G. This holds the concatenated 10_parcel_features in memory,
 # which was 77.7M rows nationally as of 2026-09-04 and is the largest single
 # object anywhere in the pipeline.
@@ -55,6 +64,7 @@ else
     CMD="$CMD --states \"${STATES:-$DEFAULT_STATES}\""
 fi
 
+[ -n "${TABLES:-}" ] && CMD="$CMD --tables \"$TABLES\""
 [ -n "${DRYRUN:-}" ] && CMD="$CMD --dry-run"
 
 echo "Running: $CMD"

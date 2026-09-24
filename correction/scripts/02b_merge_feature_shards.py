@@ -138,7 +138,7 @@ def merge_file(name: str, unique_key: str | None, states: list[str]):
         print("  genuinely have no data.")
         return False, None
 
-    frames, empties, all_cols = [], [], []
+    frames, empties, all_cols, shard_of = [], [], [], []
     for st, p in present:
         df = read_one(p)
         all_cols.append((st, set(df.columns)))
@@ -146,6 +146,7 @@ def merge_file(name: str, unique_key: str | None, states: list[str]):
             empties.append(st)
         else:
             frames.append(df)
+            shard_of.extend([st] * len(df))
 
     if empties:
         print(f"  {len(empties)} state(s) produced zero rows (fine -- e.g. a "
@@ -182,9 +183,45 @@ def merge_file(name: str, unique_key: str | None, states: list[str]):
             print(f"  ERROR: {dupes} duplicate {unique_key} value(s). States are "
                   f"disjoint, so this means a task ran with the wrong state or a "
                   f"stale shard survived. Examples: {sorted(set(ex))[:5]}")
+            describe_duplicates(merged, unique_key, shard_of)
             return False, None
 
     return True, merged
+
+
+def describe_duplicates(merged: pd.DataFrame, key: str, shard_of: list[str]):
+    """Say WHERE duplicates come from, so the refusal is diagnosable from the
+    log alone (added 2026-09-24, after a full-universe 02 produced 192
+    duplicate CWNS_IDs in 14_stage1_training with no way to tell why).
+
+    Within one shard means 02 itself emitted two rows for a plant -- e.g. a
+    reported point intersecting two overlapping parcels. Across shards means
+    the same plant was assigned to two states. The columns whose values
+    differ between the duplicate rows point at the join that fanned out.
+    """
+    d = merged.assign(_shard=shard_of)
+    dup = d[d[key].duplicated(keep=False)]
+    per_id = dup.groupby(key)["_shard"].nunique()
+    n_across = int((per_id > 1).sum())
+    print(f"  {len(per_id)} {key}(s) duplicated: {len(per_id) - n_across} within "
+          f"a single shard, {n_across} across shards")
+    print(f"  by shard: {dup.groupby('_shard')[key].nunique().sort_values(ascending=False).head(10).to_dict()}")
+    print(f"  rows per duplicated {key}: {dup.groupby(key).size().value_counts().to_dict()}")
+
+    differing: dict[str, int] = {}
+    for _, g in dup.drop(columns="_shard").groupby(key):
+        for c in g.columns:
+            try:
+                if g[c].astype(str).nunique(dropna=False) > 1:
+                    differing[c] = differing.get(c, 0) + 1
+            except Exception:
+                continue
+    if differing:
+        top = sorted(differing.items(), key=lambda kv: -kv[1])[:12]
+        print(f"  columns that differ between duplicate rows (count of {key}s): {dict(top)}")
+    else:
+        print("  duplicate rows are IDENTICAL in every column -- a plain repeat, "
+              "not a fan-out from a join")
 
 
 def merge_parcel_features(states: list[str]):
@@ -229,8 +266,27 @@ def main():
                     help="merge whatever shards exist instead of naming them. "
                          "Convenient, but it cannot tell a state that failed "
                          "from one you never asked for -- prefer --states.")
+    ap.add_argument("--tables", type=str, default=None,
+                    help="merge only these tables, by number prefix: e.g. "
+                         "'05,10' for the two inference reads 05_run_inference "
+                         "needs. Default: all four. Tables not named are left "
+                         "exactly as they are on disk. Use this when the "
+                         "training tables must stay the ones the deployed "
+                         "models were fitted on (a FULL_UNIVERSE re-run of 02 "
+                         "for inference, after training).")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+
+    all_tables = list(SHARD_FILES) + ["10_parcel_features.parquet"]
+    if args.tables:
+        want = {t.strip() for t in args.tables.replace(" ", ",").split(",") if t.strip()}
+        chosen = [n for n in all_tables if n.split("_", 1)[0] in want]
+        unknown = want - {n.split("_", 1)[0] for n in all_tables}
+        if unknown or not chosen:
+            raise SystemExit(f"--tables: unknown prefix(es) {sorted(unknown)}; "
+                             f"choose from {[n.split('_', 1)[0] for n in all_tables]}")
+    else:
+        chosen = all_tables
 
     print("=== 02b_merge_feature_shards.py ===")
     print(f"Shards: {SHARD_ROOT}")
@@ -248,6 +304,10 @@ def main():
         raise SystemExit(f"No shards found under {SHARD_ROOT}. Did the array run?")
 
     print(f"\nMerging {len(states)} state(s)")
+    if len(chosen) < len(all_tables):
+        print(f"--tables: merging {chosen}")
+        print(f"          leaving untouched: "
+              f"{[n for n in all_tables if n not in chosen]}")
 
     # ---- PHASE 1: build and validate EVERY table, writing nothing ----
     #
@@ -265,17 +325,20 @@ def main():
     built: dict[str, pd.DataFrame] = {}
     ok = True
     for name, key in SHARD_FILES.items():
+        if name not in chosen:
+            continue
         good, df = merge_file(name, key, states)
         if good:
             built[name] = df
         else:
             ok = False
 
-    good, parcels = merge_parcel_features(states)
-    if good:
-        built['10_parcel_features.parquet'] = parcels
-    else:
-        ok = False
+    if "10_parcel_features.parquet" in chosen:
+        good, parcels = merge_parcel_features(states)
+        if good:
+            built['10_parcel_features.parquet'] = parcels
+        else:
+            ok = False
 
     print()
     print('=' * 60)
@@ -305,6 +368,10 @@ def main():
 
     print()
     print('=== merge complete ===')
+    if len(chosen) < len(all_tables):
+        print('Partial merge (--tables). If this was the FULL_UNIVERSE refresh for')
+        print('inference, NEXT is the 05_run_inference_array -- no retraining.')
+        return
     print('NEXT: sbatch 03_train_stage1.slurm / 04_train_stage2.slurm')
     print('      sbatch 06_build_stage2b_training.slurm  -> 07_train_stage2b.slurm')
     print('      sbatch 06b_build_rerank_training.slurm -> 07b_train_rerank.slurm')
