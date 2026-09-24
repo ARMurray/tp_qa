@@ -1,0 +1,13 @@
+collect_logs.py
+host    : a0n15
+when    : 2026-09-23T21:32:25
+source  : /work/GRDVULN/tp_qa/correction/logs
+selected: 04_* (latest 3)
+
+  04_7480611.log                            3 KB ->       3 KB  (job wrote it 2026-09-23T20:46)
+  04_7412848.log                            3 KB ->       3 KB  (job wrote it 2026-09-04T17:59)
+  04_7406612.log                            3 KB ->       3 KB  (job wrote it 2026-08-27T16:46)
+
+total copied: 10 KB
+
+Originals are untouched. This directory is not gitignored.
