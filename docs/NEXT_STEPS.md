@@ -1,5 +1,10 @@
 # Resume here — snapshot, 2026-09-23
 
+> **Superseded for the modelling thread by
+> [RESUME_20260924.md](RESUME_20260924.md).** The detection retrain and the tile
+> inventory reset described here are done. Read the newer file first; this one
+> is kept for the sections still marked open.
+
 Point-in-time checklist. **Once these steps are done this file is history** —
 [05_RUNBOOK.md](05_RUNBOOK.md) is the durable version and stays correct for
 every future round.

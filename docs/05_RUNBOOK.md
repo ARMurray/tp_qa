@@ -225,6 +225,55 @@ python correction/scripts/build_training_bins.py \
 No `--layer` needed — it resolves the newest dated layer. Pass `--layer` to
 pin an older one deliberately.
 
+### Get cluster state to a machine that cannot see the cluster
+
+The HPC and whatever machine is doing the analysis share no filesystem, and the
+login console is not always somewhere things can be run interactively. Git works
+in both directions, so two scripts write text into
+`correction/diagnostics/`, which is **deliberately not gitignored** (unlike
+`logs/` and `data/`).
+
+**State snapshot** — what exists on disk, what the deployed detector is, parcel
+coverage, detection inventory, feature tables, log tails:
+
+```bash
+sbatch collect_diagnostics.slurm
+```
+
+**Whole job logs** — when the question is what a run *printed*, not what exists:
+
+```bash
+sbatch --export=TRAINING=1 collect_logs.slurm
+```
+
+`--training` takes the newest log for each of `03`, `04`, `06`, `06b`, `07`,
+`07b` and `12` — per pattern, so `12`'s single log is not crowded out by two runs
+of `04`. One call captures a round's whole modelling picture. Comparing those
+across rounds is what exposed the spatial-CV fold imbalance; no single run made
+it visible.
+
+For anything else, name a pattern. Note `PATTERN` **replaces** the training
+preset rather than adding to it, and `CLEAR=1` wipes earlier copies — so two
+batches means two calls, with `CLEAR` on the first only:
+
+```bash
+sbatch --export=PATTERN="08_*",LATEST=1 collect_logs.slurm
+```
+
+Then, **from a login node** — the job cannot push for you:
+
+```bash
+cd /work/GRDVULN/tp_qa
+git add correction/diagnostics/
+git commit -m "diagnostics"
+git push
+```
+
+Progress-bar output is collapsed to its final frame and anything over 512 KB is
+truncated from the middle, keeping head and tail — inputs are at the top, results
+at the bottom. Every truncation says so inside the copy. Originals in
+`correction/logs/` are never touched.
+
 ### Test the pipeline without the HPC
 
 ```bash

@@ -91,11 +91,53 @@ and that is now what the split measures.
 among their candidates, so they contribute only negatives and cannot be learned
 from. That is a candidate-**recall** ceiling — no amount of model tuning
 recovers a plant whose answer was never offered.
-`candidate_recall_failures.parquet` says whether they are k-ring misses or
-parcel-store gaps.
 
-Worth reading before investing in model architecture: if recall is the binding
-constraint, a better classifier cannot reach those plants at all.
+**Measured 2026-09-24** by `08_diagnose_candidate_coverage.py` over all 452
+corrections:
+
+| cause | plants | share |
+|---|---|---|
+| usable | 413 | **91.4%** |
+| (a) outside the k=18 search window | 32 | 7.1% |
+| (b) no parcel at the corrected point — Regrid gap | 6 | 1.3% |
+| (d) lost in `02` PART 2's join | 1 | 0.2% |
+
+So the ceiling is 91.4%, and the three causes have very different prices. (d) is
+one plant and already written to `missing_parcels_topup.csv` for `01d`. (b) is a
+data wall. Only (a) carries a real decision, and `08`'s inline suggestion —
+"k=238 would capture 95%", at ~175× the candidate pool — is a heuristic its own
+author disowns: a 948-ring miss is ~295 km, a plant recorded in the wrong
+county, which no radius fixes. Run `08b_analyze_ring_misses.py`, which splits
+near misses from records errors, before touching `K_RINGS`.
+
+Note: `candidate_recall_failures.parquet` is a *different* population — it counts
+`truth_outside_candidates` review verdicts, i.e. recall failures against the five
+candidates the app showed. Useful, but not the cause split.
+
+Worth settling before investing in model architecture: if recall is the binding
+constraint, a better classifier cannot reach those plants at all. Deciding that
+needs a valid `12_score_holdout` run — see the note below on why the existing
+one is unusable.
+
+### The 2026-09-09 `12_score_holdout` log is unusable
+
+It reports `With NO candidates: 50` and `0% candidate recall`, with `nan`
+everywhere downstream. That is not a finding about the model. The log's own
+command line reads:
+
+```
+Running: python /work/GRDVULN/correction/scripts/12_score_holdout.py
+```
+
+— missing the `tp_qa` path segment, so it ran from a different tree and found no
+inference output. The same typo was still sitting in
+`check_01a_01b_complete.sh` until 2026-09-23. The current `12` wrapper sources
+the right `_common.sh`, so that log simply predates the fix.
+
+**There is therefore no valid holdout score on record.** Getting one needs
+`05_run_inference_array` → `merge_05_shards` → `05b_rerank_candidates` → `12`,
+in that order, and it is the number that decides whether the models or candidate
+recall are the binding constraint.
 
 ## Decisions that need a human
 

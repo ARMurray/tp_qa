@@ -216,15 +216,28 @@ NAIP_WORKERS = 32
 # 6. CANDIDATE SEARCH (01a / 02)
 # ===========================================================================
 # k=18 rings. NOTE: "~10km" in earlier comments was the DIAMETER, not the
-# radius -- H3 res-9 cells are ~174 m on edge, so adjacent centers sit ~302 m
-# apart and k=18 is a search RADIUS of roughly 5.4 km. Mean correction distance
-# is ~5.05 km, i.e. the average correction lands near the window boundary.
-# Measure before changing: 08_diagnose_candidate_coverage.py reports the
-# observed meters-per-ring and how many corrections fall outside. This matches
-# the R pipeline's standard per HPC_NOTES.md.
-# HPC_NOTES.md. This drives 01a's candidate extraction AND Stage 2's
-# candidate set size -- the local OH run produced 73k Stage 2 candidates
-# off this radius, so it is not a knob to change casually.
+# radius. MEASURED by 08_diagnose_candidate_coverage.py on 2026-09-24 over 452
+# corrections: 309 observed metres per ring step, so k=18 is a search RADIUS of
+# about 5.6 km.
+#
+# An earlier version of this comment said "mean correction distance is ~5.05 km,
+# i.e. the average correction lands near the window boundary", which invites
+# raising K_RINGS. The full distribution says otherwise:
+#
+#     median 0.91 km    mean 3.90 km    p90 7.40 km    p95 13.63 km    max 331 km
+#
+# The mean is dragged by a long tail; the TYPICAL correction is under a
+# kilometre and sits well inside the window. Coverage measured 91.4% usable,
+# with 7.1% outside the window -- and 08's own "k=238 would capture 95% of
+# those" is a heuristic its author explicitly disowns, because a 948-ring miss
+# is ~295 km, a plant recorded in the wrong county, not a radius failure.
+# Run 08b_analyze_ring_misses.py before touching this number: it separates
+# near misses (a real radius question) from records errors (which need a second
+# coordinate source, not a bigger circle).
+#
+# This drives 01a's candidate extraction AND Stage 2's candidate set size --
+# the local OH run produced 73k Stage 2 candidates off this radius, and cost
+# scales ~k^2, so it is not a knob to change casually.
 K_RINGS = 18
 
 # Some Regrid parcels are digitization artifacts, not real parcels -- an

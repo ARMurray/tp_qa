@@ -141,6 +141,54 @@ The compute nodes' default `python3` is **3.6**. `_common.sh` runs a
 module-load loop to find a real one. If `module avail python` shows a version
 whose name isn't in that loop, add it.
 
+### A job is OOM-killed with no Python traceback and no DuckDB error
+
+Raising `--mem` is the wrong first move. It usually works once and fails again
+on a bigger state.
+
+`duckdb.connect()` with no `memory_limit` sizes itself at **~80% of the node's
+physical RAM**. It knows nothing about cgroups. On a compute node with hundreds
+of GB, DuckDB plans and allocates far past a `--mem=32G` allocation, and SLURM
+kills the process — with no error from DuckDB, because from its point of view
+nothing went wrong. The absence of a traceback is the tell.
+
+`08_diagnose_candidate_coverage` died this way at 32G on 2026-09-24, six minutes
+in. Fixed by `config.duckdb_connect()`, which every DuckDB user in the pipeline
+now goes through: it sets `memory_limit` from `SLURM_MEM_PER_NODE` at 70% (the
+rest is headroom for pandas, geopandas and Python sets sharing the cgroup, which
+DuckDB cannot see) and caps `threads` to `SLURM_CPUS_PER_TASK`. With a limit set,
+DuckDB spills to disk — slower than RAM, much faster than being killed.
+
+If you see this in a NEW script, check that it uses `C.duckdb_connect()` and not
+a bare `duckdb.connect()`:
+
+```bash
+grep -rn "duckdb.connect()" correction/scripts/
+```
+
+Only `config.py` (the helper itself) and `review_app/backend/parcels.py` (local,
+not under SLURM) should match.
+
+Two side effects worth expecting: steps that were oversubscribing threads may get
+**faster**, and a step that now spills will be slower but will finish.
+
+### A training log is thousands of lines of the same sklearn warning
+
+`SimpleImputer(strategy="median")` warns "Skipping features without any observed
+values" for an all-null column, on **every fit** — so a 20-iteration search over
+5 folds repeats it ~100 times per column. Stage 1's 2026-09-23 log was 1,124
+warning lines against 99 lines of content.
+
+Do not silence it by category. The message is real information: the columns were
+`od_max_conf_drying_bed` (zero observed values across the entire Stage 1 set,
+meaning that detection class never fired at a single reported location) and
+`od_max_conf_chlorine_contact`. `model_utils.report_empty_features()` now names
+them once with an explanation and filters only that exact message, so other
+sklearn warnings still come through.
+
+If a NEW all-null `od_*` column appears, treat it as a detector finding, not a
+nuisance: the class has weights but is producing nothing.
+
 ### `ERROR: venv not found at $ROOT/.venv`
 
 `setup_env.sh` has not been run, or was run on a compute node. Run it on a
@@ -170,6 +218,10 @@ it and watch 01b's fetch-failure count. `diagnose_fetch_failures.py` reads the
 
 They are estimates from local runs. Check actual usage with `seff <jobid>`
 after a run and adjust.
+
+But check the OOM entry above first. If the job uses DuckDB, the limit that
+matters may not be the one in the `.slurm` file at all, and raising `--mem`
+without capping DuckDB just moves the failure to a larger state.
 
 ---
 

@@ -171,8 +171,13 @@ def main():
               f"NO positive row -- their")
         print(f"  corrected parcel is not among their candidates. They add only "
               f"negatives.")
-        print(f"  This is a candidate-recall ceiling, not a model problem. See "
-              f"candidate_recall_failures.parquet.")
+        print(f"  This is a candidate-recall ceiling, not a model problem.")
+        print(f"  Run 08_diagnose_candidate_coverage.py for the cause split "
+              f"(outside the k-ring /")
+        print(f"  no parcel there / lost in a join), then "
+              f"08b_analyze_ring_misses.py before")
+        print(f"  considering K_RINGS. Measured 2026-09-24: 91.4% usable, 7.1% "
+              f"outside the window.")
 
     # ---- Coordinates for spatial CV ----
     plant_coords = pd.read_csv(C.CWNS_DIR / "PHYSICAL_LOCATION.txt",
