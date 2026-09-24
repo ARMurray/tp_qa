@@ -1,0 +1,11 @@
+==========================================
+Node:    r7n15
+Job ID:  7493171
+CPUs:    4
+Started: Thu Sep 24 17:30:41 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+/var/spool/slurm/job7493171/slurm_script: line 33: 2: ERROR: pass round number as the second positional arg, e.g. sbatch 10_build_review_queue.slurm "OH,MS,DE" 1
+
