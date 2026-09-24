@@ -31,7 +31,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config as C
 from holdout import exclude_holdout
 from model_utils import (build_preprocessor, spatial_cluster_folds, describe_folds,
-                         youden_threshold, compute_specificity)
+                         report_empty_features, youden_threshold,
+                         compute_specificity)
 
 # Same drop list as the R version's drop_cols -- IDs/keys/low-value geography
 # text that shouldn't be fed to the model directly (geography's SIGNAL is
@@ -119,6 +120,7 @@ def main():
     y = (y_raw == "Correct").astype(int).reset_index(drop=True)   # 1=Correct, 0=Incorrect
 
     print(f"  Model columns: {X.shape[1]}")
+    report_empty_features(X)
 
     # ---- Class weights (identical formula to the R version) ----
     n_correct = int((y == 1).sum())

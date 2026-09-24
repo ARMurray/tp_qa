@@ -43,7 +43,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config as C
 from holdout import exclude_holdout
 from model_utils import (build_preprocessor, spatial_cluster_folds, describe_folds,
-                         youden_threshold, compute_specificity)
+                         report_empty_features, youden_threshold,
+                         compute_specificity)
 
 # Scaffolding group -- see 03_train_stage1.py's DROP_COLS comment for the
 # general failure mode. Added 2026-08-25 from inspect_model_features.py:
@@ -153,10 +154,10 @@ def main():
           f"{raw_ratio:,.0f} candidate")
     print(f"  parcels per plant at inference. Every metric printed below is "
           f"computed at 1 : {args.neg_ratio},")
-    print(f"  so it does NOT describe deployment -- a {1 / (1 + args.neg_ratio):.1%} "
-          f"false-positive rate here is")
-    print(f"  ~{raw_ratio / (1 + args.neg_ratio):,.0f} false parcels per plant out "
-          f"there. 12_score_holdout.py is the honest read.")
+    print(f"  so it does NOT describe deployment. The scaling is printed with "
+          f"the metrics,")
+    print(f"  once the measured false-positive rate is known. "
+          f"12_score_holdout.py is the honest read.")
 
     # Plants with no positive row at all: their corrected parcel never made the
     # candidate set, so they contribute only negatives and cannot be learned
@@ -204,6 +205,7 @@ def main():
     X = X.reset_index(drop=True)
 
     print(f"  Model columns: {X.shape[1]}")
+    report_empty_features(X)
 
     # ---- CV folds ----
     print("\nSetting up cross-validation folds...")
@@ -291,8 +293,22 @@ def main():
     print(f"  roc_auc     : {roc_auc_score(y_test, y_pred_proba):.4f}")
     print(f"  accuracy    : {accuracy_score(y_test, y_pred):.4f}")
     print(f"  sensitivity : {(y_pred[y_test == 1] == 1).mean():.4f}")
-    print(f"  specificity : {compute_specificity(y_test.to_numpy(), y_pred, pos_label=1):.4f}")
+    spec = compute_specificity(y_test.to_numpy(), y_pred, pos_label=1)
+    print(f"  specificity : {spec:.4f}")
     print(f"  brier_class : {brier_score_loss(y_test, y_pred_proba):.4f}")
+
+    # What that specificity costs at deployment density. The false-positive
+    # rate is 1 - specificity, MEASURED here -- not the 1/(1+NEG_RATIO) class
+    # prevalence, which is a different quantity entirely and was briefly
+    # printed in its place.
+    fpr = 1.0 - spec
+    print(f"\n  Scaled to deployment: {fpr:.1%} false-positive rate against "
+          f"~{raw_ratio:,.0f} candidate")
+    print(f"  parcels per plant is roughly {raw_ratio * fpr:,.0f} false parcel(s) "
+          f"per plant ranked")
+    print(f"  above threshold. That is why rank-1 accuracy, not specificity, is "
+          f"the number")
+    print(f"  that matters -- see 12_score_holdout.py.")
 
     # 1/0 here is "this parcel is / is not the plant". It used to read
     # "1=Correct, 0=Incorrect", which is Stage 1's question, not Stage 2's.

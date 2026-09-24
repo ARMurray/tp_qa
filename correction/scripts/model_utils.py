@@ -29,6 +29,8 @@ Porting notes vs. the R (tidymodels/ranger) originals:
     (holdout fold is geographically contiguous, not a random sample) but a
     different underlying clustering algorithm than the R package uses.
 """
+import warnings
+
 import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
@@ -36,6 +38,48 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
+
+
+def report_empty_features(X: pd.DataFrame, quiet_after: bool = True) -> list:
+    """Name every all-missing column ONCE, then stop sklearn repeating it.
+
+    SimpleImputer(strategy="median") warns "Skipping features without any
+    observed values" for a column with no non-null value, and it warns on
+    EVERY fit -- so a 20-iteration search over 5 folds emits the same line
+    ~100 times per column. The 2026-09-23 Stage 1 log was 1,124 warning lines
+    against 99 lines of actual content, all of it the same two columns.
+
+    Blanket-silencing that would be wrong, because the message is real
+    information: od_max_conf_drying_bed had ZERO observed values across the
+    entire Stage 1 training set, meaning that detection class never fired at a
+    single reported location. That is worth seeing. It is worth seeing once.
+
+    So: report the columns here, with counts, then filter the repeat.
+
+    The columns are NOT dropped. sklearn already skips them, and keeping them
+    in the saved feature_columns means the model still lines up with inference
+    output that does carry the class -- and the day the detector starts firing
+    it, a retrain picks the column up with no schema change.
+    """
+    empty = [c for c in X.columns if X[c].isna().all()]
+    if empty:
+        print(f"\n  {len(empty)} feature(s) have NO observed values and cannot "
+              f"be imputed:")
+        for c in empty:
+            print(f"    {c}")
+        print("  sklearn skips them. They stay in the schema so a later retrain "
+              "picks them")
+        print("  up automatically -- but a feature that is never populated is "
+              "carrying no")
+        print("  signal today, and if it is an od_* column that means the class "
+              "never fired.")
+    if quiet_after:
+        # Only this exact message, only from the imputer. Anything else sklearn
+        # has to say still comes through.
+        warnings.filterwarnings(
+            "ignore", message="Skipping features without any observed values",
+            category=UserWarning)
+    return empty
 
 
 def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
