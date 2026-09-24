@@ -1,0 +1,121 @@
+==========================================
+Node:    r7n12
+Job ID:  7481020
+CPUs:    16
+Started: Wed Sep 23 22:43:45 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+=== 04_train_stage2.py: Stage 2 Model Training (Balanced Random Forest) ===
+NEG_RATIO: 50
+
+Loading Stage 2 training data...
+  [holdout] stage2a: removed 809382 rows / 50 plants (4528534 -> 3719152)
+  Total rows: 3719152
+  Positive labels: 353
+  Negative labels: 3718799
+  Plants: 395
+
+Sampling negatives with hard negative mining...
+  Positives: 353
+  Hard negatives sampled: 12355
+  Easy negatives sampled: 5295
+  Total training rows: 18003
+
+  Class distribution after negative sampling (1 : 50 by design, NOT balanced):
+    label 1 (this parcel IS the plant) :     353
+    label 0 (it is not)                :  17,650
+
+  For scale: the raw table is 1 : 10,535, i.e. about 10,535 candidate
+  parcels per plant at inference. Every metric printed below is computed at 1 : 50,
+  so it does NOT describe deployment -- a 2.0% false-positive rate here is
+  ~207 false parcels per plant out there. 12_score_holdout.py is the honest read.
+
+  NOTE: 42 of 395 plant(s) (10.6%) have NO positive row -- their
+  corrected parcel is not among their candidates. They add only negatives.
+  This is a candidate-recall ceiling, not a model problem. See candidate_recall_failures.parquet.
+  Model columns: 42
+
+Setting up cross-validation folds...
+  Spatial fold 1: train  14,421 (80.1%,   288 pos)  |  test   3,582 (19.9%,    65 pos)
+  Spatial fold 2: train  14,362 (79.8%,   293 pos)  |  test   3,641 (20.2%,    60 pos)
+  Spatial fold 3: train  14,416 (80.1%,   269 pos)  |  test   3,587 (19.9%,    84 pos)
+  Spatial fold 4: train  14,428 (80.1%,   306 pos)  |  test   3,575 (19.9%,    47 pos)
+  Spatial fold 5: train  14,385 (79.9%,   256 pos)  |  test   3,618 (20.1%,    97 pos)
+  Spatial folds: 5  |  Standard folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 0.5 minutes
+  Best SPATIAL ROC AUC: 0.9895
+
+========================================
+Tuning with STANDARD cross-validation...
+========================================
+  STANDARD CV complete in 0.5 minutes
+  Best STANDARD ROC AUC: 0.9909
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.990885
+0   Spatial  0.989531
+
+========================================
+Fitting final model on full training data...
+========================================
+  Grouped split by CWNS_ID: 294 plant(s) train / 98 test
+    train 13,214 rows (265 pos)  |  test 4,789 rows (88 pos)
+
+FINAL RESULTS SUMMARY
+Test set metrics:
+  roc_auc     : 0.9914
+  accuracy    : 0.9555
+  sensitivity : 0.9432
+  specificity : 0.9558
+  brier_class : 0.0334
+
+Confusion matrix (rows=truth, cols=predicted; 1=this parcel IS the plant, 0=it is not):
+[[4493  208]
+ [   5   83]]
+
+Computing feature importance...
+Top 20 features:
+            Variable  Importance  Importance_std
+       ll_bldg_count    0.003763        0.000481
+         log_gisacre    0.002522        0.000835
+        log_distance    0.002080        0.000720
+          ll_gisacre    0.002072        0.000719
+          distance_m    0.001943        0.000699
+        is_municipal    0.001920        0.001069
+      lbcs_ownership    0.001276        0.000731
+       bldg_per_acre    0.001264        0.000387
+          within_1km    0.001177        0.000256
+              osm_ww    0.000591        0.000021
+          pop_served    0.000437        0.000180
+  data_quality_score    0.000415        0.000111
+           lbcs_site    0.000204        0.000105
+           has_water    0.000156        0.000026
+       lbcs_activity    0.000117        0.000222
+dominant_class_group    0.000079        0.000057
+          within_5km    0.000075        0.000229
+            is_rural    0.000071        0.000028
+      lbcs_structure    0.000065        0.000081
+        total_pixels    0.000060        0.000281
+
+Running threshold analysis...
+  Optimal Stage 2 threshold (Youden J): 0.432
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.990885
+0   Spatial  0.989531
+Optimal threshold: 0.432
+
+Saving model...
+  stage2_rf_model.joblib saved: 20.5 MB
+
+=== Stage 2 training complete ===
+Finished: Wed Sep 23 22:45:17 EDT 2026
+
