@@ -1,0 +1,60 @@
+==========================================
+Node:    r7n15
+Job ID:  7493086
+CPUs:    8
+Started: Thu Sep 24 17:00:01 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/06b_build_rerank_training.py
+=== 06b_build_rerank_training.py ===
+
+Loading Stage 2a candidates...
+  214986 candidate(s) across 10752 plant(s)
+
+Resolving true parcels for corrections...
+  Corrections with usable coordinates: 452
+  True parcel resolved for 446/452 correction(s)
+
+Loading candidate OD features (01e --training-corrections)...
+  8499 candidate(s) with OD output across 380 plant(s)
+
+Candidates for corrections plants: 8315 across 416 plant(s)
+  [holdout] rerank-build: removed 920 rows / 46 plants (8315 -> 7395)
+  1 candidate(s) have no OD row -- 01e skipped them (no NAIP coverage, or no parcel geometry). Kept, with OD columns defaulted below; od_ran=False distinguishes them from parcels where detection genuinely found nothing.
+
+  True parcel present in the top-20: 311/370 plant(s) (84% candidate recall@20)
+Traceback (most recent call last):
+  File "/work/GRDVULN/tp_qa/correction/scripts/06b_build_rerank_training.py", line 309, in <module>
+    main()
+  File "/work/GRDVULN/tp_qa/correction/scripts/06b_build_rerank_training.py", line 258, in main
+    fired > 0, train["od_has_detection"].astype(float) / fired, 0.0)
+               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/ops/common.py", line 85, in new_method
+    return method(self, other)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/arraylike.py", line 214, in __truediv__
+    return self._arith_method(other, operator.truediv)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/series.py", line 6751, in _arith_method
+    return base.IndexOpsMixin._arith_method(self, other, op)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/base.py", line 1644, in _arith_method
+    result = ops.arithmetic_op(lvalues, rvalues, op)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/ops/array_ops.py", line 289, in arithmetic_op
+    res_values = _na_arithmetic_op(left, right, op)  # type: ignore[arg-type]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/ops/array_ops.py", line 220, in _na_arithmetic_op
+    result = func(left, right)
+             ^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/computation/expressions.py", line 252, in evaluate
+    return _evaluate(op, op_str, left_op, right_op)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pandas/core/computation/expressions.py", line 83, in _evaluate_standard
+    return op(left_op, right_op)
+           ^^^^^^^^^^^^^^^^^^^^^
+ZeroDivisionError: float division by zero
+Finished: Thu Sep 24 17:01:43 EDT 2026  (exit 1)
+
