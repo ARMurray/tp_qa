@@ -202,6 +202,14 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
     n_before = len(cand)
     cand["CWNS_ID"] = cand["CWNS_ID"].astype(str)
     cand["ll_uuid"] = cand["ll_uuid"].astype(str)
+    # The re-ranked candidates already carry these columns: 05b joins 01e's
+    # holdout output and FILLS the gaps (od_ran/od_has_detection -> False,
+    # od_n_* -> 0) because the model needs a value. Merging on top of them
+    # makes pandas suffix both sides _x/_y, leaving no plain od_has_detection
+    # (KeyError, 2026-09-24). Drop 05b's copies and take the raw 01e values,
+    # where null still means "never examined" -- the distinction the review
+    # card's "not run" relies on, and the one 05b's fill erases.
+    cand = cand.drop(columns=[c for c in OD_DISPLAY_COLS if c in cand.columns])
     cand = cand.merge(od[keep], on=["CWNS_ID", "ll_uuid"], how="left")
     assert len(cand) == n_before, \
         "detection join changed the row count -- duplicate (CWNS_ID, ll_uuid) in 01e output"
