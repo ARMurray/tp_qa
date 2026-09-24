@@ -84,6 +84,8 @@ decision — never as part of the sequence:
 `check_location_type_overlap`, `inspect_stage2_columns`, `inspect_deployed_02`,
 `check_01a_01b_complete`.
 
+`collect_logs` copies whole job logs into `correction/diagnostics/logs/`, which is also not gitignored, for when the question is about what a run actually printed rather than what exists on disk. It collapses progress bars, truncates from the middle with the cut announced in place, and never touches the originals.
+
 `collect_diagnostics` writes a text snapshot of this machine's pipeline state
 to `correction/diagnostics/`, which is not gitignored — run it as a job,
 commit the file, push. That is the working channel for getting cluster state to

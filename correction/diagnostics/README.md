@@ -41,6 +41,28 @@ rather than overwrite. Each covers:
 All read-only. It writes nothing but its own report, so it is safe to run
 while other jobs are going.
 
+## Whole logs: `logs/`
+
+`collect_diagnostics.py` includes only a 45-line tail of recent job logs --
+enough to see that something failed, never enough to see why. When the question
+is about the CONTENT of a run (fold sizes, class counts, a metrics table, a
+traceback in context), use the sibling script:
+
+```bash
+sbatch --export=PATTERN="04_*" collect_logs.slurm
+```
+
+It copies whole logs into `correction/diagnostics/logs/`, which is not
+gitignored either, and leaves `correction/logs/` untouched. Progress-bar output
+is collapsed to its final frame and anything over 512 KB is truncated from the
+middle -- head and tail kept, because the inputs are at the top and the results
+are at the bottom. Every truncation says so inside the copy, so a shortened log
+cannot be mistaken for a complete one.
+
+Clear them out with `--export=CLEAR=1` once the question they answered is
+settled; unlike the diagnostic snapshots, a stale log is more confusing than
+useful.
+
 ## Keep them or delete them?
 
 They are small and textual, and having a record of what the cluster looked
