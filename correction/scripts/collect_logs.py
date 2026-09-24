@@ -5,9 +5,15 @@ Copies SLURM job logs out of correction/logs/ (gitignored) into
 correction/diagnostics/logs/ (not gitignored), so a log can be committed and
 read on a machine that cannot see the cluster.
 
+    python collect_logs.py --training              # every model-training log
     python collect_logs.py --pattern "04_*"        # newest 3 Stage 2 logs
     python collect_logs.py --latest 8              # newest 8 of anything
     python collect_logs.py --job 48213             # every file for one job
+
+    --training is the one to reach for round over round: it takes the newest
+    log for EACH of 03, 04, 06, 06b, 07, 07b and 12, so one call captures the
+    whole modelling picture for a round. Comparing those across rounds is what
+    exposed the spatial-CV fold imbalance -- no single run made it obvious.
 
 WHY
     collect_diagnostics.py answers "what does the pipeline look like right
@@ -112,9 +118,38 @@ def truncate(lines, max_kb: int):
     return head + marker + tail, True
 
 
+# The logs that describe a MODEL, as opposed to a data-prep step: class
+# counts, fold construction, CV scores, the metrics table, feature importance,
+# thresholds, and the holdout score. These are the ones worth keeping round
+# over round -- reviewing them across three runs is what exposed the spatial-CV
+# fold imbalance, which no single run made obvious.
+TRAINING_PATTERNS = [
+    "03_*.log",          # Stage 1
+    "04_*.log",          # Stage 2a
+    "07_stage2b_*.log",  # Stage 2b
+    "07b_rerank_*.log",  # re-ranker
+    "06_s2b_*.log",      # Stage 2b training-set build
+    "06b_rerank_*.log",  # re-ranker training-set build
+    "12_holdout_*.log",  # the honest read
+]
+
+
 def select(args) -> list[Path]:
     if not C.LOGS_DIR.exists():
         raise SystemExit(f"No log directory at {C.LOGS_DIR}")
+    if args.training:
+        # Newest --latest per PATTERN, not overall: one run of 04 must not
+        # crowd out 12's only log. This is the round-over-round snapshot.
+        picked = []
+        for pat in TRAINING_PATTERNS:
+            hits = sorted(C.LOGS_DIR.glob(pat),
+                          key=lambda p: p.stat().st_mtime, reverse=True)
+            picked.extend(hits[:args.latest])
+        if not picked:
+            raise SystemExit(
+                f"No training logs in {C.LOGS_DIR}. Expected one of: "
+                f"{', '.join(TRAINING_PATTERNS)}")
+        return sorted(set(picked), key=lambda p: p.name)
     if args.job:
         hits = sorted(C.LOGS_DIR.glob(f"*{args.job}*"))
         if not hits:
@@ -139,6 +174,12 @@ def main():
     ap.add_argument("--job", default=None,
                     help="copy every log whose filename contains this job id, "
                          "ignoring --pattern and --latest")
+    ap.add_argument("--training", action="store_true",
+                    help="copy the newest --latest log for EACH model-training "
+                         "step (03, 04, 06, 06b, 07, 07b, 12) instead of using "
+                         "--pattern. The round-over-round snapshot: comparing "
+                         "these across runs is what surfaced the spatial-CV "
+                         "fold imbalance.")
     ap.add_argument("--max-kb", type=int, default=512,
                     help="per-file cap; over this the middle is dropped "
                          "(default 512)")
@@ -173,7 +214,12 @@ def main():
             old.unlink()
         print("  --clear: previous copies removed\n")
 
-    how = f"job {args.job}" if args.job else f"{args.pattern} (latest {args.latest})"
+    if args.training:
+        how = f"--training presets (latest {args.latest} each)"
+    elif args.job:
+        how = f"job {args.job}"
+    else:
+        how = f"{args.pattern} (latest {args.latest})"
     manifest = [
         "collect_logs.py",
         f"host    : {platform.node()}",

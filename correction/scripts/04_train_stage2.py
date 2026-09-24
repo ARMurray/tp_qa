@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import accuracy_score, roc_auc_score, brier_score_loss, confusion_matrix
-from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV
+from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, GroupShuffleSplit
 from sklearn.pipeline import Pipeline
 
 try:
@@ -42,7 +42,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config as C
 from holdout import exclude_holdout
-from model_utils import build_preprocessor, spatial_cluster_folds, youden_threshold, compute_specificity
+from model_utils import (build_preprocessor, spatial_cluster_folds, describe_folds,
+                         youden_threshold, compute_specificity)
 
 # Scaffolding group -- see 03_train_stage1.py's DROP_COLS comment for the
 # general failure mode. Added 2026-08-25 from inspect_model_features.py:
@@ -135,8 +136,42 @@ def main():
 
     print("\nSampling negatives with hard negative mining...")
     s2_balanced = sample_negatives(s2, args.neg_ratio)
-    print("\n  Balanced class distribution:")
-    print(s2_balanced["label"].value_counts())
+    # NOT a balanced distribution -- it is deliberately 1 : NEG_RATIO. The old
+    # header said "Balanced class distribution", which reads as "the classes are
+    # now even" and they are not, by design. The actual class balancing happens
+    # inside BalancedRandomForestClassifier's per-tree bootstrap
+    # (sampling_strategy="all"), not here.
+    n_pos = int((s2_balanced["label"] == 1).sum())
+    n_neg = int((s2_balanced["label"] == 0).sum())
+    print(f"\n  Class distribution after negative sampling "
+          f"(1 : {args.neg_ratio} by design, NOT balanced):")
+    print(f"    label 1 (this parcel IS the plant) : {n_pos:>7,}")
+    print(f"    label 0 (it is not)                : {n_neg:>7,}")
+    # Deployment ratio, which is the thing these metrics are NOT measured at.
+    raw_ratio = (s2["label"] == 0).sum() / max((s2["label"] == 1).sum(), 1)
+    print(f"\n  For scale: the raw table is 1 : {raw_ratio:,.0f}, i.e. about "
+          f"{raw_ratio:,.0f} candidate")
+    print(f"  parcels per plant at inference. Every metric printed below is "
+          f"computed at 1 : {args.neg_ratio},")
+    print(f"  so it does NOT describe deployment -- a {1 / (1 + args.neg_ratio):.1%} "
+          f"false-positive rate here is")
+    print(f"  ~{raw_ratio / (1 + args.neg_ratio):,.0f} false parcels per plant out "
+          f"there. 12_score_holdout.py is the honest read.")
+
+    # Plants with no positive row at all: their corrected parcel never made the
+    # candidate set, so they contribute only negatives and cannot be learned
+    # from. Worth naming -- it is candidate RECALL, and no amount of model
+    # tuning recovers a plant whose answer was never offered.
+    n_plants = s2["CWNS_ID"].nunique()
+    n_pos_plants = s2.loc[s2["label"] == 1, "CWNS_ID"].nunique()
+    if n_pos_plants < n_plants:
+        lost = n_plants - n_pos_plants
+        print(f"\n  NOTE: {lost} of {n_plants} plant(s) ({lost / n_plants:.1%}) have "
+              f"NO positive row -- their")
+        print(f"  corrected parcel is not among their candidates. They add only "
+              f"negatives.")
+        print(f"  This is a candidate-recall ceiling, not a model problem. See "
+              f"candidate_recall_failures.parquet.")
 
     # ---- Coordinates for spatial CV ----
     plant_coords = pd.read_csv(C.CWNS_DIR / "PHYSICAL_LOCATION.txt",
@@ -173,9 +208,11 @@ def main():
     # ---- CV folds ----
     print("\nSetting up cross-validation folds...")
     spatial_folds = spatial_cluster_folds(coords, n_splits=5, random_state=123)
-    for i, (tr, te) in enumerate(spatial_folds, 1):
-        print(f"  Spatial fold {i} train -- Correct: {(y.iloc[tr] == 1).sum()}, "
-              f"Incorrect: {(y.iloc[tr] == 0).sum()}")
+    # describe_folds prints TEST size and positive count per fold. The old
+    # print showed TRAINING counts only, which is how a fold scoring its ROC
+    # AUC on 10 positives went unnoticed across three runs -- see
+    # spatial_cluster_folds' docstring for the measurements.
+    describe_folds(spatial_folds, y, label="Spatial fold")
 
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     standard_folds = list(skf.split(X, y))
@@ -220,8 +257,26 @@ def main():
 
     # ---- Final fit ----
     print(f"\n{'=' * 40}\nFitting final model on full training data...\n{'=' * 40}")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.25, stratify=y, random_state=456)
+    # GROUPED by CWNS_ID, not a plain row split. Each plant contributes ~1 +
+    # NEG_RATIO rows that share every plant-level feature -- discharge,
+    # population, census, name matching -- and differ only in parcel
+    # attributes. A random row split therefore puts the SAME plant on both
+    # sides, and the reported metrics came out optimistic against the real task,
+    # which is ranking candidates for a plant never seen before. Grouping costs
+    # stratification, so the positive count in the test split is reported rather
+    # than guaranteed.
+    groups = s2_balanced["CWNS_ID"].reset_index(drop=True)
+    gss = GroupShuffleSplit(n_splits=1, test_size=0.25, random_state=456)
+    tr_idx, te_idx = next(gss.split(X, y, groups))
+    X_train, X_test = X.iloc[tr_idx], X.iloc[te_idx]
+    y_train, y_test = y.iloc[tr_idx], y.iloc[te_idx]
+    print(f"  Grouped split by CWNS_ID: {groups.iloc[tr_idx].nunique()} plant(s) "
+          f"train / {groups.iloc[te_idx].nunique()} test")
+    print(f"    train {len(X_train):,} rows ({int((y_train == 1).sum())} pos)  |  "
+          f"test {len(X_test):,} rows ({int((y_test == 1).sum())} pos)")
+    if int((y_test == 1).sum()) < 20:
+        print("    WARNING: few positives in the test split -- the metrics below "
+              "are noisy. Change random_state and re-run if this looks extreme.")
 
     best_params = spatial_search.best_params_
     final_pipeline = make_pipeline()
@@ -239,7 +294,10 @@ def main():
     print(f"  specificity : {compute_specificity(y_test.to_numpy(), y_pred, pos_label=1):.4f}")
     print(f"  brier_class : {brier_score_loss(y_test, y_pred_proba):.4f}")
 
-    print("\nConfusion matrix (rows=truth, cols=predicted; 1=Correct, 0=Incorrect):")
+    # 1/0 here is "this parcel is / is not the plant". It used to read
+    # "1=Correct, 0=Incorrect", which is Stage 1's question, not Stage 2's.
+    print("\nConfusion matrix (rows=truth, cols=predicted; "
+          "1=this parcel IS the plant, 0=it is not):")
     print(confusion_matrix(y_test, y_pred))
 
     # ---- Feature importance ----
@@ -267,7 +325,7 @@ def main():
     print("\nSaving model...")
     model_path = C.MODELS_DIR / "stage2_rf_model.joblib"
     joblib.dump(dict(pipeline=final_pipeline, feature_columns=list(X.columns),
-                     class_labels={1: "Correct", 0: "Incorrect"},
+                     class_labels={1: "IsPlant", 0: "NotPlant"},
                      neg_ratio=args.neg_ratio), model_path)
     joblib.dump(optimal_threshold, C.MODELS_DIR / "stage2_optimal_threshold.joblib")
     print(f"  {model_path.name} saved: {model_path.stat().st_size / 1e6:.1f} MB")

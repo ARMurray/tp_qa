@@ -30,7 +30,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config as C
 from holdout import exclude_holdout
-from model_utils import build_preprocessor, spatial_cluster_folds, youden_threshold, compute_specificity
+from model_utils import (build_preprocessor, spatial_cluster_folds, describe_folds,
+                         youden_threshold, compute_specificity)
 
 # Same drop list as the R version's drop_cols -- IDs/keys/low-value geography
 # text that shouldn't be fed to the model directly (geography's SIGNAL is
@@ -128,10 +129,20 @@ def main():
 
     # ---- CV fold construction ----
     print("\nSetting up cross-validation folds...")
+    # Stage 1 is one row per plant -- 02 dedups reported_parcels on CWNS_ID --
+    # so a row split is already a plant split and there is no grouping to do
+    # here. Assert it rather than assume it: if that ever stops being true the
+    # random test split below starts leaking, silently.
+    n_rows, n_plants = len(s1), s1["CWNS_ID"].nunique()
+    if n_rows != n_plants:
+        print(f"  WARNING: {n_rows} rows for {n_plants} plant(s). Stage 1 is "
+              f"supposed to be one row per plant; with duplicates, the random "
+              f"test split below puts the same plant on both sides.")
+
     spatial_folds = spatial_cluster_folds(coords, n_splits=5, random_state=123)
-    for i, (tr, te) in enumerate(spatial_folds, 1):
-        print(f"  Spatial fold {i} train -- Correct: {(y.iloc[tr] == 1).sum()}, "
-              f"Incorrect: {(y.iloc[tr] == 0).sum()}")
+    # describe_folds prints TEST size and positive count per fold, which the
+    # old train-only print hid -- see its docstring and spatial_cluster_folds'.
+    describe_folds(spatial_folds, y, label="Spatial fold")
 
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
     standard_folds = list(skf.split(X, y))

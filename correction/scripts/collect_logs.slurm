@@ -13,6 +13,7 @@
 # correction/diagnostics/logs/ (not gitignored), so a whole log can be
 # committed and read on a machine that cannot see the cluster.
 #
+#   sbatch --export=TRAINING=1 collect_logs.slurm               # all model logs
 #   sbatch collect_logs.slurm                                   # newest 3 logs
 #   sbatch --export=PATTERN="04_*" collect_logs.slurm           # Stage 2 logs
 #   sbatch --export=PATTERN="02_*",LATEST=6 collect_logs.slurm
@@ -24,6 +25,10 @@
 # exists so it works the same way as every other step here.
 #
 # Variables:
+#   TRAINING=1       newest LATEST log for EACH model-training step
+#                    (03, 04, 06, 06b, 07, 07b, 12), ignoring PATTERN.
+#                    The round-over-round snapshot -- use this one after
+#                    a training round rather than naming each pattern.
 #   PATTERN="04_*"   glob against correction/logs/ (default *.log)
 #   LATEST=3         how many of the newest matches to copy
 #   JOB=48213        every log whose name contains this job id; ignores
@@ -47,6 +52,7 @@
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
 CMD="python $SCRIPTS/collect_logs.py"
+[ -n "${TRAINING:-}" ]     && CMD="$CMD --training"
 [ -n "${PATTERN:-}" ]      && CMD="$CMD --pattern \"$PATTERN\""
 [ -n "${LATEST:-}" ]       && CMD="$CMD --latest $LATEST"
 [ -n "${JOB:-}" ]          && CMD="$CMD --job $JOB"

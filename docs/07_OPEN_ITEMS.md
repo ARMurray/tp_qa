@@ -25,6 +25,78 @@ default to restore.
 
 ---
 
+### Training metrics are measured at 1:50, deployment is ~1:10,500
+
+Stage 2's log reports `roc_auc: 0.99`, `specificity: 0.96`. Those are computed
+on the negative-downsampled set (`--neg-ratio 50`). The raw table is 3.7M
+candidate rows against 353 positives — about 10,500 candidate parcels per
+plant. A 3.6% false-positive rate at that scale is roughly **380 false parcels
+per plant**.
+
+So the Stage 2 numbers are not a statement about deployment, and never were.
+`12_score_holdout.py` is, because it scores rank-1 accuracy per plant. The
+threshold drifting 0.318 → 0.409 → 0.439 across three rounds is the same fact
+showing up a second way: Youden's J is tracking a prior set by `--neg-ratio`,
+not a model getting better.
+
+Do **not** "fix" this by raising `--neg-ratio` toward reality. 1:10,500 is not
+trainable; the top-K candidate step and the re-ranker are the parts of the
+design that deal with it. `04`'s log now prints the deployment ratio next to
+the training ratio, so the distinction is visible in place rather than needing
+to be rediscovered.
+
+### Spatial CV folds were rebuilt (2026-09-23) — old CV numbers aren't comparable
+
+`spatial_cluster_folds` was `KMeans(n_clusters=5)` with leave-one-cluster-out.
+Plants aren't uniformly distributed, so k=5 on US plant locations reliably made
+one huge cluster and one tiny one. Measured across three Stage 2 runs a month
+apart, cluster sizes were ~59 / 14 / 12 / 10 / 4 % of rows **every time** — the
+same shape, merely permuted in index. In the 2026-09-23 run, fold 1 trained on
+40% of the data and fold 3 computed its ROC AUC from **10 positives**, with
+`RandomizedSearchCV` weighting all five folds equally.
+
+It now clusters into `n_splits * 6` blocks and packs whole blocks into
+size-balanced folds, clustering on distinct locations so row counts cannot drag
+the centroids. On synthetic data shaped like the real thing, the old code
+produced two folds with *zero* positives; the new one gives five even folds of
+67–75 positives each.
+
+Two consequences worth knowing:
+
+- **`stage2_cv_comparison.parquet`, and any spatial CV score from before this
+  date, cannot be compared against one from after it.** Different folds,
+  different numbers. The `12_score_holdout` series is unaffected and stays
+  comparable.
+- Spatial separation is now *weaker per fold* — 30 small blocks means a held-out
+  block's nearest neighbours may sit in the training set, where 5 big regions
+  guaranteed they did not. That is the standard spatial-block-CV trade-off,
+  taken deliberately to get folds whose scores mean something.
+  `blocks_per_fold` tunes it.
+
+### Stage 2's reported metrics used to leak across the plant boundary
+
+The final fit used `train_test_split(stratify=y)` on rows. Each plant
+contributes 1 + `NEG_RATIO` rows sharing every plant-level feature — discharge,
+population, census, name matching — differing only in parcel attributes. So the
+same plant sat on both sides of the split; measured on the real shape, **all 395
+plants did**. Now `GroupShuffleSplit` on `CWNS_ID`.
+
+Expect the reported numbers to come down. That drop is the fix working, not a
+regression — the real task is ranking candidates for a plant never seen before,
+and that is now what the split measures.
+
+### 11% of Stage 2 plants have no positive row at all
+
+`Plants: 395` against `Positive labels: 353`: 42 plants' corrected parcel is not
+among their candidates, so they contribute only negatives and cannot be learned
+from. That is a candidate-**recall** ceiling — no amount of model tuning
+recovers a plant whose answer was never offered.
+`candidate_recall_failures.parquet` says whether they are k-ring misses or
+parcel-store gaps.
+
+Worth reading before investing in model architecture: if recall is the binding
+constraint, a better classifier cannot reach those plants at all.
+
 ## Decisions that need a human
 
 ### Weighting `confirmed_proposal` vs `independent`
