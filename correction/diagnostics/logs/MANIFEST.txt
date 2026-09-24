@@ -1,6 +1,6 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-09-23T22:49:15
+when    : 2026-09-24T00:58:43
 source  : /work/GRDVULN/tp_qa/correction/logs
 selected: --training presets (latest 3 each)
 
