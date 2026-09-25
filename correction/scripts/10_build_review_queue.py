@@ -177,7 +177,12 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
             continue
         for f in sorted(root.rglob("*.parquet"), key=lambda p: p.stat().st_mtime):
             try:
-                frames.append(pd.read_parquet(f))
+                # Provenance travels with each row (dropped before the queue is
+                # written): which root it came from, and whether the file
+                # predates the deployed best.pt -- i.e. whether it can have
+                # been produced by the current detector at all.
+                frames.append(pd.read_parquet(f).assign(
+                    _od_root=root.parent.name, _od_mtime=f.stat().st_mtime))
             except Exception as e:
                 print(f"  WARNING: could not read {f.name}: {e}")
 
@@ -194,7 +199,8 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
     # mtime-sorted, keep last: same resume/reflush dedup every other reader of
     # these append-only dirs uses.
     od = od.drop_duplicates(subset=["CWNS_ID", "ll_uuid"], keep="last")
-    keep = ["CWNS_ID", "ll_uuid"] + [c for c in OD_DISPLAY_COLS if c in od.columns]
+    keep = (["CWNS_ID", "ll_uuid"] + [c for c in OD_DISPLAY_COLS if c in od.columns]
+            + ["_od_root", "_od_mtime"])
     missing = [c for c in OD_DISPLAY_COLS if c not in od.columns]
     if missing:
         print(f"  NOTE: 01e output has no {missing} -- older run? Those will be null.")
@@ -221,6 +227,31 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
     print(f"  Detection stats attached: {n_known}/{len(cand)} candidate(s) have "
           f"an 01e result, {n_hit} fired")
     return cand
+
+
+def report_od_provenance(rows: pd.DataFrame) -> None:
+    """Where the QUEUED candidates' detection stats came from.
+
+    attach_candidate_od runs over every candidate before plants are chosen, so
+    its own count describes the national table. This one describes what the
+    reviewer will actually see. A result older than the deployed best.pt was
+    written by a previous detector -- 01e's resume cannot tell, and the
+    national od_features_candidates/ root can hold a whole --all run from one.
+    """
+    if "_od_root" not in rows.columns or rows.empty:
+        return
+    pts = sorted((C.MODELS_DIR / "object_detection").rglob("*.pt"),
+                 key=lambda p: p.stat().st_mtime, reverse=True)
+    model_mtime = pts[0].stat().st_mtime if pts else None
+    have = rows[rows["_od_root"].notna()]
+    print(f"\n  Queued candidates with detection stats: {len(have)}/{len(rows)}")
+    for root, n in have["_od_root"].value_counts().items():
+        print(f"    from {root:<32} {n}")
+    if model_mtime is not None and len(have):
+        stale = int((have["_od_mtime"] < model_mtime).sum())
+        print(f"    written BEFORE the deployed best.pt: {stale}"
+              + ("  <-- a previous detector's output; re-run 01e SCOPE=queue "
+                 "with NORESUME=1, then 10 again" if stale else ""))
 
 
 def build_confirm_reported_rows(plant_summary: pd.DataFrame,
@@ -474,6 +505,7 @@ def main():
     # ---- Assemble final queue: candidate_pick rows + confirm_reported rows,
     #      for exactly the selected plants, tagged with queue_slice/provenance ----
     cp = cand_pick_rows[cand_pick_rows["CWNS_ID"].isin(queue_plant_ids)].copy()
+    report_od_provenance(cp)
     cr = confirm_rows[confirm_rows["CWNS_ID"].isin(queue_plant_ids)].copy()
 
     # PARCEL_INFO_COLS: was silently dropped by an earlier version of this
@@ -490,7 +522,11 @@ def main():
     common_cols = ["CWNS_ID", "STATE_CODE", "ll_uuid", "candidate_rank",
                    "stage2a_score", "stage2b_score", "score_margin",
                    "rerank_fallback", "review_task"]
-    all_row_cols = common_cols + PARCEL_INFO_COLS
+    # OD_DISPLAY_COLS: attached by attach_candidate_od() and then dropped right
+    # here by an earlier version, which never listed them -- so every review
+    # card said "not run" and extract_review_tiles.py could not identify a
+    # single false positive (found 2026-09-25, first round with 01e results).
+    all_row_cols = common_cols + PARCEL_INFO_COLS + OD_DISPLAY_COLS
     for df in (cp, cr):
         for c in all_row_cols:
             if c not in df.columns:
