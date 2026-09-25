@@ -110,7 +110,24 @@ BUILD_BINS = REPO_ROOT / "correction" / "scripts" / "build_training_bins.py"
 TRAINING_GPKG_OUT = C.OUTGOING_DIR / "training_locations.gpkg"
 
 
-def run(label: str, argv: list[str], cwd: Path, dry_run: bool) -> bool:
+def detection_python() -> Path | None:
+    """The detection venv's interpreter, if it exists.
+
+    extract_review_tiles.py needs detection/'s environment (rasterio,
+    pystac-client, planetary-computer and 02_extract_tiles.py's fetch code),
+    which the review app's own environment does not have. Running it with
+    sys.executable -- the review app's Python -- fails on import. Found
+    2026-09-25: round 3's tiles never reached the labelling inventory.
+    """
+    venv = REPO_ROOT / "detection" / ".venv"
+    for cand in (venv / "Scripts" / "python.exe", venv / "bin" / "python"):
+        if cand.exists():
+            return cand
+    return None
+
+
+def run(label: str, argv: list[str], cwd: Path, dry_run: bool,
+        python: Path | None = None) -> bool:
     """Run one step. Returns False on failure.
 
     Steps are NOT run with check=True: a failure in the tile fetch (step 4,
@@ -124,7 +141,7 @@ def run(label: str, argv: list[str], cwd: Path, dry_run: bool) -> bool:
     if dry_run:
         print("  [--dry-run] not executed")
         return True
-    result = subprocess.run([sys.executable, *argv], cwd=str(cwd))
+    result = subprocess.run([str(python or sys.executable), *argv], cwd=str(cwd))
     if result.returncode != 0:
         print(f"\n  *** {label} FAILED (exit {result.returncode}) ***")
         return False
@@ -286,10 +303,17 @@ def main():
     # ---- 4. NAIP tiles for reviewed parcels ----------------------------
     if not args.skip_tiles:
         argv = ["-m", "analysis.extract_review_tiles"]
+        det_py = detection_python()
+        if det_py is None:
+            print("\n  WARNING: detection/.venv not found -- running the tile step "
+                  "with this Python, which usually lacks rasterio/pystac-client. "
+                  "If it fails, run it by hand with the detection environment.")
+        else:
+            print(f"\n  tile step uses the detection environment: {det_py}")
         if args.dry_run:
             argv.append("--dry-run")
         ok = run("4/4  extract_review_tiles -- NAIP into the detection inventory",
-                 argv, APP_ROOT, args.dry_run)
+                 argv, APP_ROOT, args.dry_run, python=det_py)
         results.append(("extract_review_tiles", ok, "detection/data/tiles/"))
     else:
         results.append(("extract_review_tiles", None, "skipped (--skip-tiles)"))

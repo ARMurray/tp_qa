@@ -153,6 +153,11 @@ def reclass_dominant_class(x):
     return DOMINANT_CLASS_MAP.get(int(x), "Other")
 
 
+# Population floor for this run (config.MIN_POP_SERVED unless --min-pop).
+# Module-level because build_stage1_training reads the classes layer itself
+# rather than taking the plant list; main() sets it before anything runs.
+POP_FLOOR = C.MIN_POP_SERVED
+
 PARCEL_WW_PATTERN = re.compile(
     r"\b(" + "|".join(C.PARCEL_WW_KEYWORDS) + r")\b", re.IGNORECASE
 )
@@ -172,7 +177,7 @@ def load_training_plant_ids() -> set[str]:
     return set(classes["CWNS_ID"].astype(str)) | set(corrections["CWNS_ID"].astype(str))
 
 
-def load_treatment_plants(states, training_only=True) -> pd.DataFrame:
+def load_treatment_plants(states, training_only=True, min_pop=None) -> pd.DataFrame:
     facility_types = pd.read_csv(C.CWNS_DIR / "FACILITY_TYPES.txt", dtype=str, encoding="latin1")
     treatment_ids = set(
         facility_types.loc[facility_types["FACILITY_TYPE"] == "Treatment Plant", "CWNS_ID"]
@@ -190,6 +195,10 @@ def load_treatment_plants(states, training_only=True) -> pd.DataFrame:
         loc = loc[loc["CWNS_ID"].isin(load_training_plant_ids())]
     if states:
         loc = loc[loc["STATE_CODE"].isin(states)]
+    # Population floor -- config.MIN_POP_SERVED. Applied to the plant set that
+    # everything below is built from, so Stage 1 and Stage 2 training and the
+    # inference-side plant features all see the same universe.
+    loc = C.apply_population_filter(loc, "02 plants", min_pop=min_pop)
     return loc.reset_index(drop=True), treatment_ids
 
 
@@ -291,9 +300,9 @@ def build_census_features(plants: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-def build_plant_features(states, training_only) -> pd.DataFrame:
+def build_plant_features(states, training_only, min_pop=None) -> pd.DataFrame:
     print("PART 1: Building plant features")
-    plants, treatment_ids = load_treatment_plants(states, training_only)
+    plants, treatment_ids = load_treatment_plants(states, training_only, min_pop)
     print(f"  Plants loaded: {len(plants)}")
 
     discharge = build_discharge_features(treatment_ids)
@@ -630,6 +639,11 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
     classes = gpd.read_file(C.TRAINING_GPKG, layer=C.TRAINING_LAYER_CLASSES)
     classes["CWNS_ID"] = classes["CWNS_ID"].astype(str)
     classes = classes.to_crs(4326)
+    # Drop labelled plants outside the population floor BEFORE the STATE_CODE
+    # merge. They are absent from plant_features by design, and letting them
+    # fall out there would count them into the "no STATE_CODE" note below,
+    # which is about a different export entirely.
+    classes = C.apply_population_filter(classes, "02 stage1 labels", min_pop=POP_FLOOR)
     classes["h3_res9"] = classes.geometry.apply(lambda g: h3.latlng_to_cell(g.y, g.x, 9))
     classes = classes.merge(plant_features[["CWNS_ID", "STATE_CODE"]], on="CWNS_ID", how="left")
     print(f"  Classes: {len(classes)}")
@@ -872,8 +886,14 @@ def main():
                          "--states value. Run 02b_merge_feature_shards.py "
                          "afterwards -- without it, the flat files downstream "
                          "reads are whatever the last run left behind.")
+    ap.add_argument("--min-pop", type=int, default=C.MIN_POP_SERVED,
+                    help="only plants serving MORE than this many residents "
+                         f"(default {C.MIN_POP_SERVED:,}; 0 disables). See "
+                         "config.MIN_POP_SERVED.")
     args = ap.parse_args()
     states = [s.strip() for s in args.states.split(",")] if args.states else None
+    global POP_FLOOR
+    POP_FLOOR = args.min_pop
 
     # Exactly one state in shard mode. Allowing several would make
     # "which state is this shard" ambiguous, and stage1/stage2 are built
@@ -900,7 +920,8 @@ def main():
     con = C.duckdb_connect()
 
     # ---- PART 1 ----
-    plant_features = build_plant_features(states, training_only=not args.full_universe)
+    plant_features = build_plant_features(states, training_only=not args.full_universe,
+                                          min_pop=POP_FLOOR)
     plant_features.to_parquet(feature_out("05_plant_features.parquet", shard_state), index=False)
 
     # ---- PART 2 ----

@@ -342,6 +342,58 @@ PARCEL_WW_KEYWORDS = [
 
 
 # ===========================================================================
+# 8b. PLANT UNIVERSE: minimum population served
+# ===========================================================================
+# Only plants serving MORE than this many residents
+# (POPULATION_WASTEWATER.txt, TOTAL_RES_POPULATION_2022) are trained on,
+# inferred on, queued for review or scored in the holdout. Decided 2026-09-25
+# after round 3: small plants are very hard to identify from the air, and all
+# 8 zero-population plants in that round came back needs_info -- CWNS covers
+# planned facilities too, some of which do not exist yet. needs_info ran 43%
+# for plants under 500 people against 0% over 10,000.
+#
+# Applied in exactly the places that define a plant set (02, 05, 12,
+# preflight_inference), all through apply_population_filter() below, so the
+# rule cannot drift between them. Pass --min-pop 0 to any of them to disable.
+# The holdout is filtered at SCORING time, never resampled.
+MIN_POP_SERVED = 1000
+
+
+def population_ok_ids(min_pop: int | None = None) -> set[str]:
+    """CWNS_IDs serving MORE than min_pop residents. Plants with no
+    population row, or a non-numeric one, are excluded: the rule cannot be
+    shown to hold for them."""
+    import pandas as pd
+
+    min_pop = MIN_POP_SERVED if min_pop is None else min_pop
+    df = pd.read_csv(CWNS_DIR / "POPULATION_WASTEWATER.txt",
+                     dtype={"CWNS_ID": str}, encoding="latin1")
+    # Same first-row-wins dedup as 02's build_population_features, so the
+    # filter and the pop_served feature always agree about a plant.
+    df = df[["CWNS_ID", "TOTAL_RES_POPULATION_2022"]].drop_duplicates(subset="CWNS_ID")
+    pop = pd.to_numeric(df["TOTAL_RES_POPULATION_2022"], errors="coerce")
+    return set(df.loc[pop > min_pop, "CWNS_ID"].astype(str))
+
+
+def apply_population_filter(df, stage: str, id_col: str = "CWNS_ID",
+                            min_pop: int | None = None):
+    """Drop plants at or below min_pop, printing what went. min_pop=0
+    disables the filter (it is still reported as disabled)."""
+    min_pop = MIN_POP_SERVED if min_pop is None else min_pop
+    if not min_pop:
+        print(f"  [population] {stage}: filter disabled (--min-pop 0)")
+        return df
+    ok = population_ok_ids(min_pop)
+    keep = df[id_col].astype(str).isin(ok)
+    n_plants = df[id_col].nunique()
+    n_drop = df.loc[~keep, id_col].nunique()
+    out = df.loc[keep].reset_index(drop=True)
+    print(f"  [population] {stage}: kept plants serving > {min_pop:,}: "
+          f"{n_plants - n_drop}/{n_plants} plants ({n_drop} removed)")
+    return out
+
+
+# ===========================================================================
 # 9. Directory creation
 # ===========================================================================
 def ensure_dirs():
