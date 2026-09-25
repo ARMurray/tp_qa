@@ -68,6 +68,12 @@ REPO_ROOT   <- here()
 # FIRST, before .Rproj or git root, so it settles this unambiguously.
 IMAGE_DIR   <- file.path(REPO_ROOT, "data", "tiles", "rgb", "png")
 OUTPUT_ROOT <- file.path(REPO_ROOT, "annotation", "ls_export")
+# Why each tile exists. extract_review_tiles.py records the selection role in
+# ll_uuid_alternates (verified_true / verified_true_point /
+# detection_not_selected). Optional: without it every tile shows "unknown".
+METADATA_CSV <- file.path(REPO_ROOT, "data", "tile_metadata.csv")
+# Plant names, for the plant table. Tracked in git on the correction side.
+FACILITIES_TXT <- file.path(REPO_ROOT, "..", "correction", "data", "cwns", "FACILITIES.txt")
 
 # all_images <- sort(list.files(IMAGE_DIR, pattern = "_500m_rgb\\.png$"))
 
@@ -132,6 +138,90 @@ if (N_LABELERS > 1) {
 
 label_path <- function(png_name) {
   file.path(LABEL_DIR, sub("\\.png$", ".txt", png_name))
+}
+
+# -----------------------------------------------------------------------------
+# Per-tile info: which plant it belongs to and why it was selected
+# -----------------------------------------------------------------------------
+# Tile file names are {CWNS_ID}_{ll_uuid}_rRR_cCC_rgb.png (TRI tiles:
+# TRI_{id}_...), so the plant is everything before the first underscore --
+# the same rule shard_of() uses. all_images is sorted, so a plant's tiles are
+# already contiguous and n / b step through one plant before the next.
+selection_label <- function(role, source) {
+  role <- ifelse(is.na(role), "", role)
+  source <- ifelse(is.na(source), "", source)
+  out <- ifelse(role == "verified_true", "True location",
+         ifelse(role == "verified_true_point", "True location (clicked)",
+         ifelse(role == "detection_not_selected", "False positive",
+         ifelse(grepl("^review", source), "Review (all candidates)",
+         ifelse(source %in% c("", "reconstructed"), "Earlier sample", source)))))
+  out
+}
+
+build_tile_info <- function(images) {
+  tile_id <- sub("_rgb\\.png$", "", images)
+  plant   <- ifelse(startsWith(tile_id, "TRI_"),
+                    sub("^(TRI_[^_]+)_.*$", "\\1", tile_id),
+                    sub("_.*$", "", tile_id))
+  # Short display name within the plant: first 8 characters of the parcel id
+  # plus the grid position ('6fcc5c83 r02_c02'). A plant can have several
+  # parcels, each with its own r02_c02, so the position alone is ambiguous.
+  rest    <- substring(tile_id, nchar(plant) + 2L)
+  parcel  <- sub("_r[0-9]+_c[0-9]+$", "", rest)
+  rc      <- ifelse(grepl("r[0-9]+_c[0-9]+$", tile_id),
+                    sub("^.*_(r[0-9]+_c[0-9]+)$", "\\1", tile_id), "")
+  pos     <- trimws(paste(substr(parcel, 1, 8), rc))
+  info <- data.frame(png = images, tile_id = tile_id, plant = plant,
+                     pos = pos, stringsAsFactors = FALSE)
+  info$selected_as <- "unknown"
+  if (file.exists(METADATA_CSV)) {
+    meta <- tryCatch(
+      utils::read.csv(METADATA_CSV, colClasses = "character")[
+        , c("tile_id", "source", "ll_uuid_alternates")],
+      error = function(e) NULL)
+    if (!is.null(meta)) {
+      meta <- meta[!duplicated(meta$tile_id, fromLast = TRUE), ]
+      m <- match(info$tile_id, meta$tile_id)
+      hit <- !is.na(m)
+      info$selected_as[hit] <- selection_label(meta$ll_uuid_alternates[m[hit]],
+                                               meta$source[m[hit]])
+    }
+  }
+  info
+}
+
+load_plant_names <- function() {
+  if (!file.exists(FACILITIES_TXT)) return(setNames(character(0), character(0)))
+  f <- tryCatch(utils::read.csv(FACILITIES_TXT, colClasses = "character"),
+                error = function(e) NULL)
+  if (is.null(f) || !all(c("CWNS_ID", "FACILITY_NAME") %in% names(f)))
+    return(setNames(character(0), character(0)))
+  f <- f[!duplicated(f$CWNS_ID), ]
+  setNames(f$FACILITY_NAME, f$CWNS_ID)
+}
+
+tile_info   <- build_tile_info(all_images)
+plant_names <- load_plant_names()
+
+# Counts over EVERY label file on disk, not just tiles still in IMAGE_DIR --
+# the question is what the detector will train on.
+label_counts <- function() {
+  files <- list.files(LABEL_DIR, pattern = "\\.txt$", full.names = TRUE)
+  per_class <- setNames(integer(length(CLASSES)), CLASSES)
+  tiles_with <- per_class
+  n_empty <- 0L
+  for (p in files) {
+    if (file.info(p)$size == 0) { n_empty <- n_empty + 1L; next }
+    ids <- suppressWarnings(as.integer(sub("\\s.*$", "",
+                                           trimws(readLines(p, warn = FALSE)))))
+    ids <- ids[!is.na(ids) & ids >= 0 & ids < length(CLASSES)]
+    if (length(ids) == 0) { n_empty <- n_empty + 1L; next }
+    tab <- tabulate(ids + 1L, nbins = length(CLASSES))
+    per_class <- per_class + tab
+    tiles_with <- tiles_with + as.integer(tab > 0)
+  }
+  list(boxes = per_class, tiles = tiles_with, n_files = length(files),
+       n_empty = n_empty)
 }
 
 is_done <- function(png_name) file.exists(label_path(png_name))
@@ -554,14 +644,28 @@ ui <- fluidPage(
     # ---- left: image browser -----------------------------------------------
     column(
       3,
-      div(class = "panel-head", "Tiles"),
-      selectInput("filter", NULL,
-                  choices = c("All tiles" = "all",
-                              "Not yet labeled" = "todo",
-                              "Labeled" = "done"),
-                  selected = "all", width = "100%"),
       div(class = "counter", textOutput("progress", inline = TRUE)),
-      br(), br(),
+      br(),
+      div(class = "panel-head", "Plants"),
+      fluidRow(
+        column(6, selectInput("plant_filter", NULL,
+                              choices = c("All plants" = "all",
+                                          "Has unlabeled tiles" = "todo",
+                                          "Fully labeled" = "done"),
+                              selected = "all", width = "100%")),
+        column(6, selectInput("sel_filter", NULL,
+                              choices = c("Any selection" = "all",
+                                          "True location" = "True location",
+                                          "True location (clicked)" = "True location (clicked)",
+                                          "False positive" = "False positive",
+                                          "Earlier sample" = "Earlier sample",
+                                          "Review (all candidates)" = "Review (all candidates)",
+                                          "unknown" = "unknown"),
+                              selected = "all", width = "100%"))
+      ),
+      DTOutput("plantlist"),
+      br(),
+      div(class = "panel-head", textOutput("plant_head", inline = TRUE)),
       DTOutput("imglist"),
       br(),
       fluidRow(
@@ -605,6 +709,10 @@ ui <- fluidPage(
       actionButton("del", "Delete selected box", width = "100%"),
       br(), br(),
       actionButton("clear", "Clear all boxes", width = "100%"),
+      tags$hr(),
+      div(class = "panel-head", "All labels so far"),
+      plotOutput("class_plot", height = "210px"),
+      div(class = "hint", textOutput("label_summary")),
       tags$hr(),
       div(class = "hint",
           tags$b("Draw"), " - drag on empty image.", br(),
@@ -818,51 +926,171 @@ server <- function(input, output, session) {
     push_boxes()
   }, ignoreNULL = FALSE)
 
-  # ---- image browser --------------------------------------------------------
-  list_df <- reactive({
+  # ---- plant + tile browser -------------------------------------------------
+  # Two tables: plants (filterable), and the tiles of the CURRENT plant. The
+  # current plant always follows the current tile, so n / b walking into the
+  # next plant moves the plant table's highlight with it.
+  #
+  # Loop guard: highlighting a row programmatically fires *_rows_selected.
+  # Both observers below ignore a selection that names what is already
+  # current, so a highlight never turns into a navigation.
+  current_plant <- reactive(tile_info$plant[rv$idx])
+
+  labeled_now <- reactive({
     rv$status_tick                      # recompute after each save
-    labeled <- vapply(all_images, is_done, logical(1))
-    df <- data.frame(
-      idx    = seq_along(all_images),
-      Status = ifelse(labeled, "labeled", "-"),
-      Tile   = sub("_rgb\\.png$", "", all_images),
-      stringsAsFactors = FALSE
-    )
-    switch(input$filter %||% "all",
-           todo = df[df$Status == "-", , drop = FALSE],
-           done = df[df$Status == "labeled", , drop = FALSE],
-           df)
+    vapply(all_images, is_done, logical(1))
   })
 
-  output$imglist <- renderDT({
-    df <- isolate(list_df())
+  plant_df <- reactive({
+    lab <- labeled_now()
+    ti  <- tile_info
+    ti$labeled <- lab
+    sf <- input$sel_filter %||% "all"
+    if (sf != "all") ti <- ti[ti$selected_as == sf, , drop = FALSE]
+    if (nrow(ti) == 0) {
+      return(data.frame(plant = character(), Plant = character(), Name = character(),
+                        Tiles = character(), Selected = character(),
+                        n = integer(), n_lab = integer(), stringsAsFactors = FALSE))
+    }
+    agg <- do.call(rbind, lapply(split(ti, ti$plant), function(g) {
+      data.frame(plant = g$plant[1], n = nrow(g), n_lab = sum(g$labeled),
+                 Selected = paste(sort(unique(g$selected_as)), collapse = ", "),
+                 stringsAsFactors = FALSE)
+    }))
+    agg <- agg[order(agg$plant), , drop = FALSE]
+    agg$Plant <- agg$plant
+    agg$Name  <- unname(ifelse(agg$plant %in% names(plant_names),
+                               plant_names[agg$plant], ""))
+    agg$Tiles <- sprintf("%d/%d", agg$n_lab, agg$n)
+    pf <- input$plant_filter %||% "all"
+    if (pf == "todo") agg <- agg[agg$n_lab < agg$n, , drop = FALSE]
+    if (pf == "done") agg <- agg[agg$n_lab == agg$n, , drop = FALSE]
+    rownames(agg) <- NULL
+    agg
+  })
+
+  plant_cols <- c("Plant", "Name", "Tiles", "Selected")
+
+  output$plantlist <- renderDT({
+    df <- isolate(plant_df())
     datatable(
-      df[, c("Status", "Tile")],
-      selection = "single", rownames = FALSE,
-      options = list(
-        pageLength = 15, lengthChange = FALSE, scrollX = TRUE,
-        dom = "ftip",
-        columnDefs = list(list(width = "70px", targets = 0))
-      )
-    ) |>
-      formatStyle("Status",
-                  color = styleEqual(c("labeled", "-"), c("#1e7d34", "#999")),
-                  fontWeight = "bold")
+      df[, plant_cols], selection = "single", rownames = FALSE,
+      options = list(pageLength = 8, lengthChange = FALSE, scrollX = TRUE,
+                     dom = "ftip", autoWidth = FALSE)
+    )
   }, server = TRUE)
+  plant_proxy <- dataTableProxy("plantlist")
 
-  img_proxy <- dataTableProxy("imglist")
-
-  observeEvent(list_df(), {
-    replaceData(img_proxy, list_df()[, c("Status", "Tile")],
+  observeEvent(plant_df(), {
+    replaceData(plant_proxy, plant_df()[, plant_cols],
                 resetPaging = FALSE, rownames = FALSE)
   }, ignoreInit = TRUE)
 
+  # Keep the plant table's highlight on the current plant.
+  observe({
+    df <- plant_df()
+    r  <- match(current_plant(), df$plant)
+    selectRows(plant_proxy, if (is.na(r)) NULL else r)
+  })
+
+  observeEvent(input$plantlist_rows_selected, {
+    r <- input$plantlist_rows_selected
+    df <- plant_df()
+    if (length(r) != 1 || r > nrow(df)) return()
+    p <- df$plant[r]
+    if (identical(p, current_plant())) return()
+    idx <- which(tile_info$plant == p)
+    sf <- input$sel_filter %||% "all"
+    if (sf != "all") idx <- idx[tile_info$selected_as[idx] == sf]
+    if (length(idx) == 0) return()
+    todo <- idx[!labeled_now()[idx]]
+    navigate_to(if (length(todo)) todo[1] else idx[1])   # first unlabeled tile
+  })
+
+  tile_df <- reactive({
+    lab <- labeled_now()
+    idx <- which(tile_info$plant == current_plant())
+    data.frame(
+      idx      = idx,
+      Status   = ifelse(lab[idx], "labeled", "-"),
+      Tile     = ifelse(nzchar(tile_info$pos[idx]), tile_info$pos[idx],
+                        tile_info$tile_id[idx]),
+      Selected = tile_info$selected_as[idx],
+      Boxes    = vapply(all_images[idx], function(nm) {
+        n <- n_boxes_on_disk(nm); if (is.na(n)) "" else as.character(n)
+      }, character(1), USE.NAMES = FALSE),
+      stringsAsFactors = FALSE
+    )
+  })
+
+  tile_cols <- c("Status", "Tile", "Selected", "Boxes")
+
+  output$imglist <- renderDT({
+    df <- isolate(tile_df())
+    datatable(
+      df[, tile_cols], selection = "single", rownames = FALSE,
+      options = list(pageLength = 9, lengthChange = FALSE, dom = "tip",
+                     ordering = FALSE)
+    ) |>
+      formatStyle("Status",
+                  color = styleEqual(c("labeled", "-"), c("#1e7d34", "#999")),
+                  fontWeight = "bold") |>
+      formatStyle("Selected",
+                  color = styleEqual(c("False positive", "True location",
+                                       "True location (clicked)"),
+                                     c("#b3261e", "#1e7d34", "#1e7d34")))
+  }, server = TRUE)
+  img_proxy <- dataTableProxy("imglist")
+
+  observeEvent(tile_df(), {
+    replaceData(img_proxy, tile_df()[, tile_cols],
+                resetPaging = FALSE, rownames = FALSE)
+    r <- match(rv$idx, tile_df()$idx)
+    selectRows(img_proxy, if (is.na(r)) NULL else r)
+  }, ignoreInit = TRUE)
+
+  observeEvent(rv$idx, {
+    r <- match(rv$idx, tile_df()$idx)
+    selectRows(img_proxy, if (is.na(r)) NULL else r)
+  })
+
   observeEvent(input$imglist_rows_selected, {
     r <- input$imglist_rows_selected
-    if (length(r) == 0) return()
-    target <- list_df()$idx[r]
-    if (length(target) != 1 || is.na(target)) return()
+    df <- tile_df()
+    if (length(r) != 1 || r > nrow(df)) return()
+    target <- df$idx[r]
+    if (is.na(target) || target == rv$idx) return()
     navigate_to(as.integer(target))
+  })
+
+  output$plant_head <- renderText({
+    p <- current_plant()
+    nm <- if (p %in% names(plant_names)) plant_names[[p]] else ""
+    sprintf("Tiles for %s%s", p, if (nzchar(nm)) paste0("  -  ", nm) else "")
+  })
+
+  # ---- label counts ---------------------------------------------------------
+  counts <- reactive({
+    rv$status_tick                      # refresh after each save
+    label_counts()
+  })
+
+  output$class_plot <- renderPlot({
+    k <- counts()
+    b <- rev(k$boxes)
+    op <- par(mar = c(3, 9, 0.5, 2.5), cex = 0.85)
+    on.exit(par(op))
+    mids <- barplot(b, horiz = TRUE, las = 1, col = CLASS_COLORS[names(b)],
+                    border = NA, xlim = c(0, max(1, max(b)) * 1.18),
+                    xlab = "boxes")
+    text(b, mids, labels = sprintf("%d  (%d tiles)", b, rev(k$tiles)[names(b)]),
+         pos = 4, cex = 0.8)
+  })
+
+  output$label_summary <- renderText({
+    k <- counts()
+    sprintf("%d label files: %d with boxes, %d confirmed empty.",
+            k$n_files, k$n_files - k$n_empty, k$n_empty)
   })
 
   # ---- readouts -------------------------------------------------------------
@@ -873,7 +1101,8 @@ server <- function(input, output, session) {
   })
 
   output$tile_name <- renderText({
-    sprintf("[%d of %d]  %s", rv$idx, length(all_images), current_png())
+    sprintf("[%d of %d]  %s   |  selected as: %s", rv$idx, length(all_images),
+            current_png(), tile_info$selected_as[rv$idx])
   })
 
   output$dirty_badge <- renderUI({
