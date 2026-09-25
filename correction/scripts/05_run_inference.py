@@ -88,7 +88,7 @@ add_name_matching = feat_eng.add_name_matching
 # ===========================================================================
 # Loading
 # ===========================================================================
-def load_full_universe_plants(states: list[str]) -> pd.DataFrame:
+def load_full_universe_plants(states: list[str], min_pop: int | None = None) -> pd.DataFrame:
     """Every treatment plant in the requested states, reported LAT/LON +
     STATE_CODE + h3_res9. Mirrors 02's load_treatment_plants(training_only=
     False) but standalone here since that function isn't cleanly separable
@@ -114,6 +114,8 @@ def load_full_universe_plants(states: list[str]) -> pd.DataFrame:
 
     loc = loc[["CWNS_ID", "STATE_CODE", "LATITUDE", "LONGITUDE", "point_location"]]
     loc = loc[loc["STATE_CODE"].isin(states)].reset_index(drop=True)
+    # Population floor -- config.MIN_POP_SERVED, the same rule 02 trained under.
+    loc = C.apply_population_filter(loc, "05 universe", min_pop=min_pop)
     loc["h3_res9"] = loc.apply(
         lambda r: h3.latlng_to_cell(r["LATITUDE"], r["LONGITUDE"], 9), axis=1)
     return loc
@@ -439,6 +441,9 @@ def main():
                           "here instead of DATA_DIR/inference. Lets a per-state "
                           "SLURM array shard its output without 48 tasks racing "
                           "on the same two filenames.")
+    ap.add_argument("--min-pop", type=int, default=C.MIN_POP_SERVED,
+                     help=f"only plants serving MORE than this many residents "
+                          f"(default {C.MIN_POP_SERVED:,}; 0 disables)")
     args = ap.parse_args()
     states = [s.strip() for s in args.states.split(",")]
 
@@ -454,7 +459,7 @@ def main():
     stage2_bundle, stage2_threshold = load_model("stage2")
 
     print("\nLoading full-universe plant list...")
-    plants = load_full_universe_plants(states)
+    plants = load_full_universe_plants(states, min_pop=args.min_pop)
     print(f"  {len(plants)} plants across {plants['STATE_CODE'].nunique()} state(s)")
 
     print("\nLoading plant/parcel features (from 02_feature_engineering.py --full-universe)...")

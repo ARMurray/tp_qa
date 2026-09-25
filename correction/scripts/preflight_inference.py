@@ -84,6 +84,9 @@ def load_universe(states: list[str]) -> pd.DataFrame:
     loc["LONGITUDE"] = pd.to_numeric(loc["LONGITUDE"], errors="coerce")
     loc = loc.dropna(subset=["LATITUDE", "LONGITUDE"]).drop_duplicates(subset="CWNS_ID")
     loc = loc[loc["STATE_CODE"].isin(states)].reset_index(drop=True)
+    # Same population floor 02 and 05 apply, or every coverage check below
+    # would count the filtered-out plants as missing.
+    loc = C.apply_population_filter(loc, "preflight universe")
     loc["h3_res9"] = [h3.latlng_to_cell(la, lo, 9)
                       for la, lo in zip(loc["LATITUDE"], loc["LONGITUDE"])]
     return loc[["CWNS_ID", "STATE_CODE", "h3_res9"]]

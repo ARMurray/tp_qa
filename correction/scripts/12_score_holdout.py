@@ -110,6 +110,10 @@ def main():
     ap.add_argument("--bins", default="corrections,correct",
                     help="holdout bins to score (default: corrections,correct)")
     ap.add_argument("--cohort", default=None, help="restrict to one cohort")
+    ap.add_argument("--min-pop", type=int, default=C.MIN_POP_SERVED,
+                    help=f"score only holdout plants serving MORE than this many "
+                         f"residents (default {C.MIN_POP_SERVED:,}; 0 disables). "
+                         f"Filters at scoring time -- the manifest is untouched.")
     args = ap.parse_args()
 
     tag = "_noOD" if args.no_od else ""
@@ -131,6 +135,12 @@ def main():
         print(f"Cohort {args.cohort} only")
     truth = pd.read_parquet(TRUTH_PATH)
     truth["CWNS_ID"] = truth["CWNS_ID"].astype(str)
+
+    # Population floor, applied to the frozen manifest at SCORING time only.
+    # Never resample the holdout to do this: a subset of a fixed sample stays
+    # comparable round over round, a new draw does not. Compare against a
+    # pre-filter score with --min-pop 0.
+    man = C.apply_population_filter(man, "12 holdout", min_pop=args.min_pop)
 
     print(f"\nManifest: {len(man)} plant(s)")
     for b, n in man["bin"].value_counts().items():
