@@ -65,6 +65,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
+import name_match as NM
 from holdout import exclude_holdout
 
 OD_TRAIN_ROOT = C.DATA_DIR / "od_features_candidates_train" / "candidates"
@@ -177,6 +178,16 @@ def main():
     # plants (a 0.4 in a weak pool may outrank a 0.7 in a strong one), while
     # rank is meaningful within the competition being resolved.
     cands["stage2a_rank"] = cands.groupby("CWNS_ID").cumcount() + 1
+    # Name-score context WITHIN the top 20 -- the competition the re-ranker
+    # actually resolves. name_match_score itself comes from 05 (computed there
+    # with the ring-wide name_pool_* context). 05b recomputes this with the
+    # same function, so the two stay in parity.
+    if "name_match_score" in cands.columns:
+        cands = NM.add_pool_features(cands, "name_top20")
+    else:
+        print("  NOTE: stage2_candidates has no name_match_score -- 05 predates "
+              "the name features. Re-run 05 before 06b, or the re-ranker trains "
+              "without them.")
     print(f"  {len(cands)} candidate(s) across {cands['CWNS_ID'].nunique()} plant(s)")
 
     # capped to the SLURM allocation -- a bare duckdb.connect() sizes itself

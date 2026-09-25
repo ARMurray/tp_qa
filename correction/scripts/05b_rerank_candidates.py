@@ -59,6 +59,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
+import name_match as NM
 
 OD_ROOT = C.DATA_DIR / "od_features_candidates" / "candidates"
 INFER_DIR = C.DATA_DIR / "inference"
@@ -107,6 +108,9 @@ def add_derived(df: pd.DataFrame, has_od: bool) -> pd.DataFrame:
     """Recreate 06b's derived columns. Order and arithmetic must match."""
     df = df.sort_values(["CWNS_ID", "stage2_prob_correct"], ascending=[True, False])
     df["stage2a_rank"] = df.groupby("CWNS_ID").cumcount() + 1
+    # Same top-20 name context 06b builds (name_match.add_pool_features).
+    if "name_match_score" in df.columns:
+        df = NM.add_pool_features(df, "name_top20")
 
     if not has_od:
         return df

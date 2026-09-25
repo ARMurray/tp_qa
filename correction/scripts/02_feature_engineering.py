@@ -48,6 +48,7 @@ from shapely import from_wkb
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config as C
+import name_match as NM
 
 # ===========================================================================
 # LBCS / ownership reclassification (exact port of the R case_when blocks)
@@ -714,6 +715,10 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
     ).merge(
         parcel_features.drop(columns=["state"], errors="ignore"), on="ll_uuid", how="left"
     )
+    # Owner vs the plant's FACILITY NAME -- on the reported parcel here: an
+    # owner that names the plant is strong evidence the reported point is
+    # right. Must run before add_name_matching, which drops the owner column.
+    stage1 = NM.add_name_features(stage1)
     stage1 = add_name_matching(stage1)
 
     if od_features is not None and len(od_features):
@@ -849,6 +854,12 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
     stage2 = stage2.merge(
         stage2_plants.drop(columns=["STATE_CODE", "LATITUDE", "LONGITUDE"], errors="ignore"),
         on="CWNS_ID", how="left")
+    # Owner vs facility name per candidate, plus pool context over the whole
+    # ring: the name identifies the OWNER, so 'best match, shared by 6
+    # parcels' must look different from 'best match, alone'. See
+    # name_match.py. Before add_name_matching, which drops the owner.
+    stage2 = NM.add_name_features(stage2)
+    stage2 = NM.add_pool_features(stage2, "name_pool")
     stage2 = add_name_matching(stage2)
 
     print(f"  Stage 2 training rows: {len(stage2)}")

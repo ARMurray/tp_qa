@@ -70,6 +70,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
+import name_match as NM
 
 # ---------------------------------------------------------------------------
 # Reuse 02_feature_engineering.py's join logic directly rather than
@@ -272,6 +273,8 @@ def run_stage1(con, plants: pd.DataFrame, plant_features: pd.DataFrame,
         else:
             print("  WARNING: no OD features available -- Stage 1 od_* columns will be all-default")
 
+        # Same name features 02 builds for Stage 1 training (name_match.py).
+        scoreable = NM.add_name_features(scoreable)
         scoreable = add_name_matching(scoreable)
         scoreable = add_projected_coords(scoreable)
 
@@ -391,6 +394,9 @@ def run_stage2a(flagged: pd.DataFrame, plant_features: pd.DataFrame,
         plant_features.drop(columns=["STATE_CODE", "LATITUDE", "LONGITUDE"], errors="ignore"),
         on="CWNS_ID", how="left")
 
+    # Same name + ring-pool features 02 builds for Stage 2a training.
+    cand_df = NM.add_name_features(cand_df)
+    cand_df = NM.add_pool_features(cand_df, "name_pool")
     cand_df = add_name_matching(cand_df)
     cand_df = add_projected_coords(cand_df)
 

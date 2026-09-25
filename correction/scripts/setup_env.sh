@@ -66,8 +66,9 @@ pip install --upgrade pip
 #                 needs the balanced-bootstrap mechanism specifically, per model_utils.py/
 #                 04_train_stage2.py docstrings), joblib
 #   bins builder: geopandas pyogrio (OpenFileGDB read)
+#   02/05       : rapidfuzz (name_match.py -- owner vs facility-name features)
 pip install \
-    numpy pandas pyarrow \
+    numpy pandas pyarrow rapidfuzz \
     duckdb h3 exactextract \
     geopandas shapely pyogrio pyproj rasterio \
     scikit-learn imbalanced-learn joblib \
