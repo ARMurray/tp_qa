@@ -28,6 +28,14 @@ correction/data/*
 correction/data/training/*
 !correction/data/training/Updates.gpkg
 
+# ...and the CWNS facility names (FACILITIES.txt, ~31k rows, public CWNS
+# data). The review app has always read it locally; the correction pipeline
+# needs it on the HPC for owner-name vs plant-name matching (2026-09-25).
+# The other CWNS exports stay out.
+!correction/data/cwns/
+correction/data/cwns/*
+!correction/data/cwns/FACILITIES.txt
+
 # Scratch output from diagnostic and verification runs
 correction/temp/
 
