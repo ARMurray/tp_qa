@@ -12,6 +12,9 @@ correction/archive/
 correction/logs/
 correction/testing/
 correction/.venv/
+# Hugging Face model cache (name_match_benchmark's embedding models, ~100 MB
+# each). HF_HOME points here from the .slurm wrappers; re-downloadable.
+correction/.hf_cache/
 
 correction/data/*
 # ...EXCEPT the master locations file. It is the accumulated result of
