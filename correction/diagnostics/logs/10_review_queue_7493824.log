@@ -1,0 +1,37 @@
+==========================================
+Node:    r7n05
+Job ID:  7493824
+CPUs:    4
+Started: Fri Sep 25 08:29:34 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Prior-round review files copied into /work/GRDVULN/tp_qa/correction/data/review_log_incoming: 3
+Running: python /work/GRDVULN/tp_qa/correction/scripts/10_build_review_queue.py --states AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY --round 3
+=== 10_build_review_queue.py ===
+States: AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY  |  Round: 3  |  Model version tag: unversioned-2026-09-25
+Using re-ranked (OD-aware) inference output
+
+Loaded 16198 scored plants, 214986 candidate rows
+  Excluding 300 plant(s) already reviewed in a prior round (300 total prior reviews found across all uploaded review_log/holdout_truth files)
+
+Loading plant display info (address/city/county, pop_served, discharge facts)...
+  Detection stats attached: 49942/52524 candidate(s) have an 01e result, 10651 fired
+
+Review tasks: 15898 plants -- 10506 candidate_pick, 5392 confirm_reported
+
+Holdout slice: 0 unreviewed unlabeled-bin plant(s) in this pilot's scope (skipped -- round > 1)
+
+Batch composition (target size 150):
+  holdout   : 0
+  uncertain : 105 (of 5737 eligible, target 105)
+  random    : 45 (target 45)
+
+=== Summary ===
+  Plants queued : 150
+  Queue rows    : 678 (660 candidate_pick, 18 confirm_reported)
+
+Written: /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round3.parquet
+Finished: Fri Sep 25 08:29:46 EDT 2026
+
