@@ -303,6 +303,8 @@ def main():
     # ---- 4. NAIP tiles for reviewed parcels ----------------------------
     if not args.skip_tiles:
         argv = ["-m", "analysis.extract_review_tiles"]
+        if args.round is not None:
+            argv += ["--round", str(args.round)]
         det_py = detection_python()
         if det_py is None:
             print("\n  WARNING: detection/.venv not found -- running the tile step "

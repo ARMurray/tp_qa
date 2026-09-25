@@ -139,7 +139,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import pandas as pd
-from shapely.geometry import Point, shape
+from shapely.geometry import Point, box, shape
 
 # review_app/config.py + backend/ -- one level up from analysis/.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -243,7 +243,8 @@ def load_reviewed_sites(reported_only: bool, candidates_only: bool) -> pd.DataFr
     return dedup
 
 
-def load_targeted_sites(point_halfwidth_m: float) -> pd.DataFrame:
+def load_targeted_sites(point_halfwidth_m: float,
+                        review_round: int | None = None) -> pd.DataFrame:
     """Sites worth labelling after a review round, rather than every parcel
     the reviewer saw.
 
@@ -280,7 +281,9 @@ def load_targeted_sites(point_halfwidth_m: float) -> pd.DataFrame:
     plants = pd.read_sql_query(
         "SELECT cwns_id, state_code, reported_ll_uuid, plant_verdict, "
         "       selected_ll_uuid, truth_latitude, truth_longitude "
-        "FROM plants WHERE reviewed = 1", conn)
+        "FROM plants WHERE reviewed = 1"
+        + (" AND review_round = ?" if review_round is not None else ""),
+        conn, params=[review_round] if review_round is not None else None)
     cands = pd.read_sql_query(
         "SELECT cwns_id, candidate_rank, ll_uuid, od_ran, od_has_detection, "
         "       od_n_objects, od_max_confidence FROM candidates "
@@ -289,6 +292,9 @@ def load_targeted_sites(point_halfwidth_m: float) -> pd.DataFrame:
 
     plants["cwns_id"] = plants["cwns_id"].astype(str)
     cands["cwns_id"] = cands["cwns_id"].astype(str)
+    if review_round is not None:
+        cands = cands[cands["cwns_id"].isin(set(plants["cwns_id"]))]
+        print(f"  --round {review_round}: restricted to that round's plants")
     print(f"{len(plants)} reviewed plant(s) in {C.APP_DB_PATH.name}")
 
     rows, n_point, truth_parcel = [], 0, {}
@@ -512,6 +518,21 @@ def build_tasks(gdf: gpd.GeoDataFrame, existing_ids: set, extract, catalog,
 
     for i, site in enumerate(gdf.itertuples(), start=1):
         grid = extract.generate_tile_grid(site.geometry)
+        # Keep only ring tiles that actually overlap the parcel.
+        #
+        # generate_tile_grid returns the full 3x3 ring (1.5 km x 1.5 km) as
+        # soon as a parcel overruns the single centred 500 m tile by any
+        # amount -- which most treatment parcels do. For a parcel that pokes
+        # out on one side, most of the ring is neighbouring land with nothing
+        # in it. On 2026-09-25 that turned ~325 review sites into several
+        # thousand tiles. The centre tile (row 2, col 2) is always kept: it is
+        # what resolve_item() fetches the NAIP item for, and it is the one
+        # tile guaranteed to hold the parcel's centroid.
+        n_ring = len(grid)
+        grid = [t for t in grid
+                if (t["row"] == 2 and t["col"] == 2)
+                or box(t["x_min"], t["y_min"], t["x_max"], t["y_max"]).intersects(site.geometry)]
+        stats["ring_tiles_dropped"] = stats.get("ring_tiles_dropped", 0) + (n_ring - len(grid))
         stats["ring" if len(grid) > 1 else "single"] += 1
         bboxes, centers = extract.tiles_to_wgs84(grid)
 
@@ -559,6 +580,99 @@ def build_tasks(gdf: gpd.GeoDataFrame, existing_ids: set, extract, catalog,
     return tasks, stats
 
 
+def prune_ring_tiles(DC, dry_run: bool) -> None:
+    """Move UNLABELLED review tiles that do not touch their own parcel out of
+    the inventory. The cleanup for runs made before build_tasks() filtered
+    the 3x3 ring (2026-09-25).
+
+    Only ever touches rows that are ALL of:
+      - source review_candidate / review_reported (this script's output --
+        never 02_extract_tiles.py's own sample tiles)
+      - a ring tile, not the centre tile (row 2, col 2)
+      - on a real parcel (clicked-point sites have no parcel to test against)
+      - with no label file in any labels*/ folder -- labelled work is never
+        moved, even if the tile turns out to be off-parcel
+      - whose parcel geometry was found; a tile that cannot be checked stays
+
+    Moves the PNG and NDWI into tiles/_pruned/, writes a manifest of every
+    file moved, backs up tile_metadata.csv and drops the moved rows from it.
+    Nothing is deleted: moving the files back and restoring the backup
+    undoes it completely.
+    """
+    import shutil
+    from datetime import datetime
+
+    meta_path = Path(DC.METADATA_CSV)
+    if not meta_path.exists():
+        print(f"No {meta_path} -- nothing to prune.")
+        return
+    meta = pd.read_csv(meta_path, dtype=str)
+    is_review = meta["source"].isin(["review_candidate", "review_reported"])
+    is_ring = ~((meta["tile_row"].astype(str).str.lstrip("0") == "2")
+                & (meta["tile_col"].astype(str).str.lstrip("0") == "2"))
+    has_parcel = meta["ll_uuid_primary"].fillna("").astype(str).str.len() > 0
+    cand = meta[is_review & is_ring & has_parcel].copy()
+    print(f"{len(meta)} tile(s) in metadata; {int(is_review.sum())} from review; "
+          f"{len(cand)} review ring tile(s) on a real parcel")
+
+    labelled = set()
+    for d in Path(DC.ANNOTATION_DIR).glob("labels*"):
+        if d.is_dir():
+            labelled |= {p.stem for p in d.glob("*.txt")}
+    cand = cand[~(cand["tile_id"] + "_rgb").isin(labelled)]
+    print(f"  {len(cand)} of them unlabelled ({len(labelled)} label file(s) found)")
+    if cand.empty:
+        return
+
+    drop_ids, unchecked = [], 0
+    for st, grp in cand.groupby("st"):
+        ctx = parcels.get_parcel_context(st, grp["ll_uuid_primary"].unique().tolist())
+        geoms = {u: shape(e["geometry"]) for u, e in ctx.items() if e.get("geometry")}
+        for r in grp.itertuples():
+            g = geoms.get(r.ll_uuid_primary)
+            if g is None:
+                unchecked += 1
+                continue
+            tile = box(float(r.bbox_xmin), float(r.bbox_ymin),
+                       float(r.bbox_xmax), float(r.bbox_ymax))
+            if not tile.intersects(g):
+                drop_ids.append(r.tile_id)
+    print(f"  {len(drop_ids)} do not touch their parcel -> prune"
+          + (f"  ({unchecked} could not be checked -- parcel not in the local "
+             f"Regrid mirror -- and are kept)" if unchecked else ""))
+    if not drop_ids:
+        return
+    if dry_run:
+        print("--dry-run: nothing moved.")
+        return
+
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    dest = Path(DC.TILES_DIR) / "_pruned" / stamp
+    (dest / "rgb").mkdir(parents=True, exist_ok=True)
+    (dest / "ndwi").mkdir(parents=True, exist_ok=True)
+    moved = []
+    rows = meta.set_index("tile_id").loc[drop_ids]
+    for tid, r in rows.iterrows():
+        for col, sub, fallback in (("rgb_path", "rgb", Path(DC.RGB_DIR) / f"{tid}_rgb.png"),
+                                   ("ndwi_path", "ndwi", Path(DC.NDWI_DIR) / f"{tid}_ndwi.tif")):
+            src = Path(r[col]) if isinstance(r[col], str) and r[col] else fallback
+            if not src.exists():
+                src = fallback
+            if src.exists():
+                shutil.move(str(src), str(dest / sub / src.name))
+                moved.append(dict(tile_id=tid, kind=sub, from_path=str(src),
+                                  to_path=str(dest / sub / src.name)))
+    pd.DataFrame(moved).to_csv(dest / "manifest.csv", index=False)
+    backup = meta_path.with_name(f"{meta_path.stem}.before-prune-{stamp}.csv")
+    shutil.copy2(meta_path, backup)
+    meta[~meta["tile_id"].isin(set(drop_ids))].to_csv(meta_path, index=False)
+    print(f"Moved {len(moved)} file(s) for {len(drop_ids)} tile(s) to {dest}")
+    print(f"  manifest : {dest / 'manifest.csv'}")
+    print(f"  metadata : {len(meta)} -> {len(meta) - len(drop_ids)} rows "
+          f"(backup {backup.name})")
+    print("Restart label_app.R to see the smaller inventory.")
+
+
 def main():
     ap = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -591,6 +705,15 @@ def main():
                     help="cap the number of NEW tiles fetched, for a test run")
     ap.add_argument("--dry-run", action="store_true",
                     help="report the tile count without fetching anything")
+    ap.add_argument("--round", type=int, default=None,
+                    help="only tile plants from this review round. Default: "
+                         "every reviewed round (tiles that already exist are "
+                         "skipped either way).")
+    ap.add_argument("--prune", action="store_true",
+                    help="instead of fetching, move UNLABELLED review ring "
+                         "tiles that do not touch their parcel into "
+                         "tiles/_pruned/ (reversible; see prune_ring_tiles). "
+                         "Combine with --dry-run to see the count first.")
     args = ap.parse_args()
     if args.reported_only and args.candidates_only:
         raise SystemExit("--reported-only and --candidates-only are mutually exclusive")
@@ -603,6 +726,10 @@ def main():
     print(f"          and {DC.NDWI_DIR}")
     print(f"Metadata:     {DC.METADATA_CSV}")
 
+    if args.prune:
+        prune_ring_tiles(DC, args.dry_run)
+        return
+
     if args.all_candidates:
         sites = load_reviewed_sites(args.reported_only, args.candidates_only)
     else:
@@ -611,7 +738,7 @@ def main():
                 "--reported-only / --candidates-only only apply to "
                 "--all-candidates. Targeted selection chooses by verdict and "
                 "detection, not by which list a parcel came from.")
-        sites = load_targeted_sites(args.point_halfwidth_m)
+        sites = load_targeted_sites(args.point_halfwidth_m, args.round)
     if sites.empty:
         print("Nothing to tile.")
         return
@@ -634,8 +761,9 @@ def main():
     tasks, stats = build_tasks(gdf, existing, extract, catalog, args.dry_run)
 
     print("\n--- tile plan ---")
-    print(f"  {stats['single']} single-tile site(s), {stats['ring']} nine-tile site(s) "
-          f"-> {stats['single'] + stats['ring'] * 9} tile(s)")
+    print(f"  {stats['single']} single-tile site(s), {stats['ring']} multi-tile site(s)")
+    print(f"  {stats.get('ring_tiles_dropped', 0)} ring tile(s) skipped for not "
+          f"touching their parcel")
     if stats["no_item"]:
         print(f"  {stats['no_item']} site(s) had no NAIP item -- skipped")
     if stats["lookup_failed"]:
