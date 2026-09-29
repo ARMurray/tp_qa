@@ -1,0 +1,34 @@
+==========================================
+Node:    r7n15
+Job ID:  7492343
+CPUs:    4
+Started: Thu Sep 24 12:46:56 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python "/work/GRDVULN/tp_qa/correction/scripts/02b_merge_feature_shards.py" --states "AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY" --tables "05 10"
+=== 02b_merge_feature_shards.py ===
+Shards: /work/GRDVULN/tp_qa/correction/data/feature_shards
+Output: /work/GRDVULN/tp_qa/correction/data/features
+
+Merging 51 state(s)
+--tables: merging ['05_plant_features.parquet', '10_parcel_features.parquet']
+          leaving untouched: ['14_stage1_training.parquet', '15_stage2_training.parquet']
+
+--- 05_plant_features.parquet ---
+  51 shard(s) -> 16,430 rows, 18 columns
+
+--- 10_parcel_features.parquet (from 10_parcel_features_by_state) ---
+  cache holds 52 state file(s) from earlier runs; using only this run's 51, as it must
+  51 state(s) -> 77,679,378 unique parcels
+
+============================================================
+  wrote 05_plant_features.parquet             16,430 rows, 18 cols, 0.9 MB
+  wrote 10_parcel_features.parquet         77,679,378 rows, 32 cols, 5825.8 MB
+
+=== merge complete ===
+Partial merge (--tables). If this was the FULL_UNIVERSE refresh for
+inference, NEXT is the 05_run_inference_array -- no retraining.
+Finished: Thu Sep 24 12:48:49 EDT 2026
+

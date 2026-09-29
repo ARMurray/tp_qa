@@ -1,0 +1,19 @@
+==========================================
+Node:    a0n15
+Job ID:  7514472
+CPUs:    2
+Started: Tue Sep 29 08:07:25 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/check_od_freshness.py
+=== check_od_freshness.py ===
+Model      : /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+Model time : 2026-09-28 21:58
+
+200 partition(s) newer than the model
+
+No stale partitions. Safe to run 02.
+Finished: Tue Sep 29 08:07:26 EDT 2026  (exit 0)
+
