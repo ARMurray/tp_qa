@@ -242,7 +242,11 @@ def run_stage1(con, plants: pd.DataFrame, plant_features: pd.DataFrame,
     # rather than relying on a downstream drop that may not exist.
     reported_parcels = reported_parcels.drop(
         columns=["geom_wkb", "h3_res9"], errors="ignore")
-    reported_parcels = reported_parcels.drop_duplicates(subset="CWNS_ID") \
+    # Lowest ll_uuid when the point falls in several overlapping parcels -- the
+    # rule 01b and 02's Stage 1 builder use, so inference scores the same
+    # parcel the model was trained on.
+    reported_parcels = reported_parcels.sort_values(["CWNS_ID", "ll_uuid"]) \
+        .drop_duplicates(subset="CWNS_ID") \
         .rename(columns={"ll_uuid": "reported_ll_uuid"})
 
     out = plants.merge(reported_parcels, on="CWNS_ID", how="left")

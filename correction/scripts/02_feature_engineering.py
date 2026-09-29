@@ -699,6 +699,23 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
                         else pd.DataFrame(columns=["CWNS_ID", "class",
                                                    "h3_res9", "geom_wkb",
                                                    "ll_uuid"]))
+    # ONE parcel per plant. A reported point can fall inside several parcels --
+    # overlapping or stacked Regrid records for the same ground (one plant hit
+    # 29 on 2026-09-29). point_in_parcel_lookup returns all of them, so Stage 1
+    # carried a row per parcel and 02b refused the merge on duplicate
+    # CWNS_IDs. Keep the lowest ll_uuid: the SAME rule 01b applies when it
+    # picks the parcel it runs detection on (01b_run_object_detection.py,
+    # "sorted by ll_uuid purely for reproducibility"), so a plant's parcel
+    # features and its od_* features describe the same parcel. 05's Stage 1
+    # lookup applies the same rule.
+    n_rows = len(reported_parcels)
+    reported_parcels = (reported_parcels.sort_values(["CWNS_ID", "ll_uuid"])
+                        .drop_duplicates(subset="CWNS_ID", keep="first")
+                        .reset_index(drop=True))
+    if len(reported_parcels) < n_rows:
+        print(f"  {n_rows - len(reported_parcels)} extra parcel match(es) dropped: a "
+              f"reported point inside several overlapping parcels keeps the lowest "
+              f"ll_uuid, matching 01b")
     print(f"  Reported parcels found: {len(reported_parcels)}")
 
     stage1 = reported_parcels.merge(
@@ -770,7 +787,11 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
             corrected_matches.append(matched)
     corrected_parcels = pd.concat(corrected_matches, ignore_index=True) if corrected_matches \
         else pd.DataFrame(columns=["CWNS_ID", "corrected_ll_uuid"])
-    corrected_parcels = corrected_parcels.drop_duplicates(subset="CWNS_ID")
+    # Deterministic when a corrected point sits in overlapping parcels: lowest
+    # ll_uuid, as for the reported side. drop_duplicates alone kept whichever
+    # row DuckDB returned first, which is not guaranteed stable between runs.
+    corrected_parcels = (corrected_parcels.sort_values(["CWNS_ID", "corrected_ll_uuid"])
+                         .drop_duplicates(subset="CWNS_ID"))
     print(f"  Corrected parcels found: {len(corrected_parcels)}")
 
     corrected_cwns = corrected_parcels["CWNS_ID"].tolist()
