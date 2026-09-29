@@ -210,7 +210,22 @@ def m_embedding(model_name):
     return run
 
 
+def m_production(pairs, _fuzz):
+    """The deployed feature itself -- name_match.add_name_features(), as 02
+    and 05 call it. Differs from distinct_idf above in two ways: IDF comes
+    from all ~31k CWNS facility names (fixed, so training and inference
+    agree) rather than the pool's own text, and it adds acronym <-> initials
+    matching. This row is the check that the shipped code performs at least
+    as well as the method it was chosen from."""
+    import name_match as NM
+
+    names = NM.load_facility_names(FACILITIES_PATH)
+    out = NM.add_name_features(pairs[["CWNS_ID", "owner"]].reset_index(drop=True), names)
+    return out["name_match_score"].to_numpy()
+
+
 METHODS = {
+    "production": m_production,
     "fuzzy_raw": m_fuzzy_raw,
     "fuzzy_norm": m_fuzzy_norm,
     "distinct_idf": m_distinct_idf,
