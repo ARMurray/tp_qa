@@ -378,6 +378,10 @@ def main():
                           "(round_manifest.json doesn't exist yet either, see "
                           "TPQA_MASTER_REFERENCE.md S4 Phase 7).")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--keep-selection", action="store_true",
+                    help="reuse the plants and slices of the existing "
+                         "review_queue_round{N}.parquet and rebuild only their "
+                         "rows -- for the rebuild after 01e --from-queue and 05b")
     ap.add_argument("--allow-partial-rerank", action="store_true",
                      help="proceed even if some states with flagged plants have no "
                           "reranked candidates (those plants get empty candidate "
@@ -501,6 +505,29 @@ def main():
     slice_map = {**{i: "holdout" for i in holdout_ids},
                  **{i: "uncertain" for i in uncertain_selected},
                  **{i: "random" for i in random_selected}}
+
+    # --keep-selection: reuse an existing queue's plants and slices, rebuilding
+    # only their rows (2026-09-30). The queue is built, 01e runs detection on
+    # exactly its candidates, 05b re-ranks them -- and that re-rank changes the
+    # score margins the 'uncertain' rule selects on, so a plain rebuild would
+    # pick DIFFERENT plants, ones 01e never examined. Same --seed is not enough.
+    existing_q = C.DATA_DIR / "review_queue" / f"review_queue_round{args.round}.parquet"
+    if args.keep_selection:
+        if not existing_q.exists():
+            print(f"ERROR: --keep-selection but {existing_q} does not exist -- build "
+                  f"the queue once without it first.")
+            sys.exit(2)
+        prev = pd.read_parquet(existing_q, columns=["CWNS_ID", "queue_slice"]) \
+                 .drop_duplicates(subset="CWNS_ID")
+        prev["CWNS_ID"] = prev["CWNS_ID"].astype(str)
+        slice_map = dict(zip(prev["CWNS_ID"], prev["queue_slice"]))
+        queue_plant_ids = set(slice_map) & set(plant_summary["CWNS_ID"].astype(str))
+        lost = set(slice_map) - queue_plant_ids
+        print(f"\n--keep-selection: reusing the {len(slice_map)} plant(s) and slices "
+              f"of {existing_q.name}")
+        if lost:
+            print(f"  WARNING: {len(lost)} of them are no longer in the scored "
+                  f"output and are dropped: {sorted(lost)[:10]}")
 
     # ---- Assemble final queue: candidate_pick rows + confirm_reported rows,
     #      for exactly the selected plants, tagged with queue_slice/provenance ----

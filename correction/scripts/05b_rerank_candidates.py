@@ -62,6 +62,12 @@ import config as C
 import name_match as NM
 
 OD_ROOT = C.DATA_DIR / "od_features_candidates" / "candidates"
+# 01e --from-queue writes here. Read too (2026-09-30) so a review queue's
+# plants are re-ranked on the detection results fetched for them -- without
+# it, the uncertain/random slices had no candidate OD at all and 05b fell
+# back to Stage 2a's order for nearly every queued plant.
+OD_QUEUE_ROOT = C.DATA_DIR / "od_features_candidates_queue" / "candidates"
+OD_ROOTS = [OD_ROOT, OD_QUEUE_ROOT]
 INFER_DIR = C.DATA_DIR / "inference"
 
 
@@ -77,17 +83,39 @@ def load_model(no_od: bool):
     return bundle
 
 
+def deployed_model_mtime() -> float | None:
+    pts = sorted(C.OD_MODEL_DIR.rglob("*.pt"), key=lambda p: p.stat().st_mtime,
+                 reverse=True) if C.OD_MODEL_DIR.exists() else []
+    return pts[0].stat().st_mtime if pts else None
+
+
 def load_candidate_od(states: list[str] | None) -> pd.DataFrame | None:
-    """01e --all output. Reads the SAME root the holdout run used -- both
-    were produced by the deployed best.pt on the same parcels, so they are
-    interchangeable. The _train root is deliberately NOT read: those rows
-    belong to plants the model trained on."""
-    if not OD_ROOT.exists() or not any(OD_ROOT.rglob("*.parquet")):
-        return None
-    files = sorted(OD_ROOT.rglob("*.parquet"), key=lambda f: f.stat().st_mtime)
+    """Candidate OD from 01e's holdout / --all root AND its --from-queue root.
+    Both are written by the same code on the same kind of parcel, so a row
+    from either is interchangeable; where both hold a (plant, parcel) pair,
+    the newer file wins. The _train root is deliberately NOT read: those rows
+    belong to plants the model trained on.
+
+    Files older than the deployed best.pt are SKIPPED (2026-09-30). They were
+    written by a previous detector -- the national --all run predates the
+    detector swap -- and 01e's resume cannot tell. A candidate with no
+    current-detector row scores as not examined (od_ran False), which is
+    honest; one scored on the old detector's output is not."""
+    files = []
+    for root in OD_ROOTS:
+        if root.exists():
+            files.extend(root.rglob("*.parquet"))
     if states:
         want = {f"state={s}" for s in states}
         files = [f for f in files if f.parent.name in want]
+    model_t = deployed_model_mtime()
+    if model_t is not None:
+        stale = [f for f in files if f.stat().st_mtime < model_t]
+        if stale:
+            print(f"  Skipping {len(stale)} candidate-OD file(s) written before the "
+                  f"deployed best.pt (a previous detector's output)")
+        files = [f for f in files if f.stat().st_mtime >= model_t]
+    files = sorted(files, key=lambda f: f.stat().st_mtime)
     if not files:
         return None
     frames = []
@@ -192,7 +220,8 @@ def main():
         print("\nLoading candidate OD features (01e --all)...")
         od = load_candidate_od(states)
         if od is None:
-            print(f"ERROR: no OD output under {OD_ROOT}.\n"
+            print(f"ERROR: no current-detector OD output under "
+                  f"{' or '.join(str(r) for r in OD_ROOTS)}.\n"
                   f"  Either run the 01e array, or use --no-od to score with "
                   f"the ablation model.")
             sys.exit(2)

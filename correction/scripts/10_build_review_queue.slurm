@@ -15,6 +15,7 @@
 #
 #   sbatch --export=ROUND=3 10_build_review_queue.slurm          # all 48 states
 #   sbatch --export=ROUND=3,BATCHSIZE=150 10_build_review_queue.slurm
+#   sbatch --export=ROUND=3,KEEP=1 10_build_review_queue.slurm      # rebuild, same plants
 #   sbatch --export=ROUND=3 10_build_review_queue.slurm "OH,MS,DE"   # subset
 #
 # ROUND is required. STATES defaults to _common.sh's INFERENCE_STATES -- the
@@ -60,6 +61,7 @@ CMD="python $SCRIPTS/10_build_review_queue.py --states $STATES_ARG --round $ROUN
 [ -n "${BATCHSIZE:-}" ]     && CMD="$CMD --batch-size $BATCHSIZE"
 [ -n "${MODELVERSION:-}" ]  && CMD="$CMD --model-version $MODELVERSION"
 [ -n "${SEED:-}" ]          && CMD="$CMD --seed $SEED"
+[ "${KEEP:-0}" = "1" ]       && CMD="$CMD --keep-selection"
 
 echo "Running: $CMD"
 eval "$CMD"
