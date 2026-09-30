@@ -1,0 +1,72 @@
+==========================================
+Node:    a0n15
+Job ID:  7529742
+CPUs:    4
+Started: Wed Sep 30 15:32:03 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/12_score_holdout.py
+=== 12_score_holdout.py ===
+  [population] 12 holdout: kept plants serving > 1,000: 317/425 plants (108 removed)
+
+Manifest: 317 plant(s)
+  correct     : 240
+  unlabeled   : 42
+  corrections : 35
+
+==================================================================
+CORRECTIONS BIN -- recall@k
+==================================================================
+  Holdout corrections plants : 35
+  With derivable truth        : 35
+  With Stage 2a candidates    : 31
+  With NO candidates          : 4  (unreachable by any ranking)
+
+  True parcel in the top-20   : 24/35 (69% candidate recall)
+    -> that is the CEILING for every arm below.
+
+  Stage 2a ordering
+    recall@1     9/24  =  37.5% (pool)       9/35  =  25.7% (all)
+    recall@3    16/24  =  66.7% (pool)      16/35  =  45.7% (all)
+    recall@5    17/24  =  70.8% (pool)      17/35  =  48.6% (all)
+    recall@10   23/24  =  95.8% (pool)      23/35  =  65.7% (all)
+
+  Re-ranked ordering
+    recall@1    16/24  =  66.7% (pool)      16/35  =  45.7% (all)
+    recall@3    21/24  =  87.5% (pool)      21/35  =  60.0% (all)
+    recall@5    22/24  =  91.7% (pool)      22/35  =  62.9% (all)
+    recall@10   23/24  =  95.8% (pool)      23/35  =  65.7% (all)
+
+  Delta (re-rank minus Stage 2a), pool denominator:
+    recall@1    +7 plant(s)   +29.2%
+    recall@3    +5 plant(s)   +20.8%
+    recall@5    +5 plant(s)   +20.8%
+    recall@10   +0 plant(s)    +0.0%
+
+  n=24 scoreable -> standard error about +/-10pp on any single figure.
+  Differences smaller than that are not distinguishable from noise.
+
+  Plants resolved by Stage 2a fallback (nothing fired): 2/31
+
+==================================================================
+CORRECT BIN -- false-move rate
+==================================================================
+  Holdout correct plants   : 240
+  Present in plant_summary : 231
+
+  Flagged for relocation   : 14 (6.1%)  <-- FALSE-MOVE RATE
+    low_confidence  : 14
+
+  These plants are known CORRECT, so every flag is a false positive.
+  This is a STAGE 1 property -- re-ranking cannot change it. A plant
+  Stage 1 never flagged has no candidates to reorder.
+
+==================================================================
+Reading these: the 'pool' denominator measures RANKING, the 'all'
+denominator measures the PIPELINE. If they diverge sharply, the
+gap belongs to candidate generation (08_diagnose_candidate_
+coverage.py), not to any ranking model.
+Finished: Wed Sep 30 15:32:14 EDT 2026  (exit 0)
+
