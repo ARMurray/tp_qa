@@ -1,0 +1,46 @@
+==========================================
+Node:    r7n28
+Job ID:  7529703
+CPUs:    8
+Started: Wed Sep 30 13:40:02 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/06b_build_rerank_training.py
+=== 06b_build_rerank_training.py ===
+
+Loading Stage 2a candidates...
+  126878 candidate(s) across 6348 plant(s)
+
+Resolving true parcels for corrections...
+  Corrections with usable coordinates: 526
+  True parcel resolved for 519/526 correction(s)
+
+Loading candidate OD features (01e --training-corrections)...
+  11419 candidate(s) with OD output across 419 plant(s)
+
+Candidates for corrections plants: 6715 across 336 plant(s)
+  [holdout] rerank-build: removed 620 rows / 31 plants (6715 -> 6095)
+
+  True parcel present in the top-20: 262/305 plant(s) (86% candidate recall@20)
+
+=== Re-rank training table ===
+Total rows        : 6095
+Label=1 (true)    : 262
+Label=0 (competitor): 5833
+Distinct plants   : 305
+Pools with a positive: 262 (approx)
+
+  OD detection rate -- true      : 75.6% (n=262)
+  OD detection rate -- competitors: 6.8% (n=5833)
+  Stage 2a rank of the true parcel: median 1, top-5 244/262
+
+  Those two rates are what a re-ranker has to work with. If they are close,
+  no model will separate the true parcel from its competitors.
+
+Written: /work/GRDVULN/tp_qa/correction/data/features/17_rerank_training.parquet
+
+Next: 07b_train_rerank.py
+Finished: Wed Sep 30 13:41:42 EDT 2026  (exit 0)
+
