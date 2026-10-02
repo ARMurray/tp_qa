@@ -1,10 +1,10 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-09-30T15:35:03
+when    : 2026-10-02T17:34:58
 source  : /work/GRDVULN/tp_qa/correction/logs
-selected: 05b_* (latest 1)
+selected: 02b_* (latest 1)
 
-  05b_rerank_7529741.log                    2 KB ->       2 KB  (job wrote it 2026-09-30T15:30)
+  02b_merge_7532236.log                     2 KB ->       2 KB  (job wrote it 2026-10-02T17:33)
 
 total copied: 2 KB
 
