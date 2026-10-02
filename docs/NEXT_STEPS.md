@@ -1,3 +1,5 @@
+> **SUPERSEDED by [RESUME_20261002.md](RESUME_20261002.md).** Kept as a record of the 2026-09-23 state; do not follow its commands.
+
 # Resume here — snapshot, 2026-09-23
 
 > **Superseded for the modelling thread by

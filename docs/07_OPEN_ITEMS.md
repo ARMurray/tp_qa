@@ -134,12 +134,70 @@ inference output. The same typo was still sitting in
 `check_01a_01b_complete.sh` until 2026-09-23. The current `12` wrapper sources
 the right `_common.sh`, so that log simply predates the fix.
 
-**There is therefore no valid holdout score on record.** Getting one needs
-`05_run_inference_array` → `merge_05_shards` → `05b_rerank_candidates` → `12`,
-in that order, and it is the number that decides whether the models or candidate
-recall are the binding constraint.
+**Superseded:** valid holdout scores now exist (2026-09-24 and 2026-09-30) — see
+[RESUME_20261002.md](RESUME_20261002.md). Candidate recall (Stage 2a top-20,
+69%) is the binding constraint; the re-ranker gains +7 plants @1 over Stage 2a.
+
+### The project's success measure is precision of automated moves (2026-09-24)
+
+The owner's target: be more than 90% sure that a moved location is right.
+recall@k (what 12 reports) is not that. The relevant read is precision of
+"move to the re-ranker's #1" at a score cutoff, measured on plants the models
+have **not** trained on — i.e. each new review round, not rounds already
+folded into training. Round 4 (2026-10-01): 15/16 = 93.8% at score ≥ 0.95,
+95% CI 72–99%. Not yet provable; more out-of-sample review at the top of the
+score range is what closes the interval.
+
+### Population floor: plants serving > 1,000 people only (2026-09-25)
+
+`config.MIN_POP_SERVED`, applied in 02, 05, 12 and preflight. All 8
+zero-population plants in round 3 came back `needs_info`; `needs_info` fell
+from 32% (round 3) to 17% (round 4) after the filter. CWNS includes planned
+facilities that do not exist yet. The holdout is filtered at scoring time,
+never resampled. `--min-pop 0` disables it.
+
+### OSM-tagged reported parcels pass Stage 1 by rule (2026-10-02)
+
+`config.STAGE1_OSM_PASS`. 99.7% of OSM-tagged reported parcels are labelled
+Correct and the reviewer treats them as correct, so 05 routes them past Stage
+1 (`stage1_route = osm_confirmed`). They stay as Stage 1 TRAINING rows; only
+`osm_ww` is dropped as a Stage 1 feature, because it dominated (importance
+0.34) and starved owner evidence. The threshold is tuned on untagged plants.
+`osm_ww` stays in Stage 2 and the re-ranker. **A rule, not a model finding**
+— if labels were partly made by trusting OSM, the 99.7% is partly circular;
+12's OSM block and each round's random slice are the independent check.
+
+### Owner-vs-facility-name features: rarity-weighted distinctive tokens (2026-09-25)
+
+`name_match.py`. Chosen by `name_match_benchmark.py` over fuzzy matching and
+two embedding models (which rescued similar amounts but broke ~30% of the
+pools Stage 2a had right). The name identifies the OWNER, not the parcel, so
+pool context (`name_pool_*`, `name_top20_*`) carries "the city owns six
+parcels here". Do not swap in embeddings without re-running the benchmark.
+
+### Stage 1 one parcel per plant: lowest ll_uuid (2026-09-29)
+
+A reported point can fall in several overlapping parcels (one plant: 29). 02,
+05 and 01b all keep the lowest `ll_uuid`, so parcel and detection features
+describe the same parcel. Changing the rule in one place without the others
+is a silent mismatch.
 
 ## Decisions that need a human
+
+### The move rule and its cutoff
+
+Needed before any corrected output exists: move only if Stage 1 flags the
+reported location AND the re-ranker's #1 clears a cutoff. The cutoff has to be
+set from out-of-sample precision with a confidence interval, and is the
+owner's call. Candidates so far: 0.95 (93.8%, n=16).
+
+### A Stage 1 guardrail for utility-owned reported parcels
+
+Held, deliberately (2026-10-02). Utility-owned reported parcels are 99% Correct
+in the labels, and 6 of round 4's 14 false flags were this pattern; the 2
+genuine exceptions were large regional utilities owning many facilities.
+First see whether the retrained Stage 1 (OSM rule + `utility_owner`) learns it.
+If not, add "never flag unless Stage 1 < ~0.03".
 
 ### Weighting `confirmed_proposal` vs `independent`
 
@@ -169,9 +227,21 @@ ever rebuilt — which should be approximately never.
 
 ### `K_RINGS`
 
-Currently 18 (≈5.4 km radius). Mean correction distance is ~5.05 km, so the
-average correction lands near the window boundary. `08` puts the ceiling at
-**91%** of corrections having their true parcel inside the ring at all.
+Currently 18 (≈5.6 km radius, measured). The median correction is 0.91 km,
+well inside the window; the mean (3.9 km) is dragged by a long tail.
+
+**`08`'s 91.4% ceiling is overstated** (found 2026-09-24). Its own log says 53
+of 452 corrections lie beyond their k=18 ring, but `classify()` labels only 32
+as outside the window: it checks whether the corrected parcel is in
+`10_parcel_features` before checking the ring, and 01a's correction seeding
+(plus neighbouring plants' windows) puts many such parcels into the parcel
+features even though 02 never offers them as that plant's candidates. The
+realistic ceiling is nearer 87%. `08b` (run 2026-09-24) analysed only the 32,
+so its recovery curve understates near misses. **Fix `classify()` to test
+candidate-ring membership of the parcel's own `h3_index_9` and re-run 08 + 08b
+before any K_RINGS decision.** Decision so far: keep k=18 — k=25 would roughly
+double the pool for ~6 recovered plants, and every extra candidate is another
+distractor for the precision target.
 
 `candidate_recall_failures.parquet` — now produced locally by
 `update_master_locations.py` — accumulates reviewer-confirmed cases where the
@@ -188,6 +258,37 @@ state's worth of those.
 ---
 
 ## Gaps
+
+### No corrected-output product yet
+
+Nothing writes the final corrected-locations file. Proposed:
+`13_build_corrected_output.py`, one row per CWNS plant with a decision of
+`verified` (human, from the master — always wins), `moved` (model, above the
+cutoff), `kept` (incl. `osm_confirmed`), or `not assessed` (population ≤ 1,000
+or missing; AK/HI/PR, no NAIP). ~9,400 of 16,430 treatment plants are in scope.
+
+### The re-ranker trains on in-sample Stage 2a scores
+
+06b takes `stage2_prob_correct` / `stage2a_rank` from a Stage 2a model fitted
+on the same plants, and those are the re-ranker's top two features. On
+training plants Stage 2a looks far better than it is (top-20 recall 84–86%
+vs 69% on the holdout), so the re-ranker over-trusts it. Fix: out-of-fold
+Stage 2a predictions for the training plants. 07b's internal recall@1
+(84.6%) vs the holdout's 66.7% is the size of the symptom.
+
+### 01e --from-queue examines only the 5 shown candidates
+
+05b then re-ranks the full top-20 and can promote an unexamined candidate into
+the shown five: round 4 had 154 of 660 shown candidates "not run" and 63% of
+plants on Stage 2a fallback. Make the queue scope cover each queued plant's
+top-20 (~3,000 parcels).
+
+### Detector validation split re-draws whenever plants are added
+
+`detection/pipeline/03_prepare_dataset.py` shuffles the plant list with a seed,
+so adding any plant changes most of the val set; old-vs-new detector metrics
+are not comparable. A hash-of-CWNS_ID split fixes it (each plant keeps its side
+forever). Deferred by the owner until the dataset stabilises.
 
 ### `Duplicate_Parcel_Flag` is ignored
 

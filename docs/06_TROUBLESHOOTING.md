@@ -120,7 +120,7 @@ One state means the merge is missing. Re-run `02b_merge_feature_shards.py`
 
 Those array tasks failed or never ran. The merge refuses rather than writing a
 table that silently omits them. Check `logs/02_<jobid>_<taskid>.log` for the
-named states, re-run just those (`sbatch --array=35 02_feature_engineering.slurm`),
+named states, re-run just those (`sbatch --array=34 --export=FULL_UNIVERSE=1 02_feature_engineering.slurm` for OH -- indices follow `DEFAULT_STATES` in `_common.sh`, DC excluded),
 then re-merge. Nothing was written, so the existing flat files are untouched.
 
 ### Training class counts are too small to train on

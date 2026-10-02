@@ -53,7 +53,7 @@ build_training_bins.py     master Updates.gpkg -> training_locations.gpkg
 | Script | Purpose |
 |---|---|
 | `build_training_bins.py` | Master `Updates.gpkg` → `training_locations.gpkg`. Splits into `classes` (Correct/Incorrect), `corrections` (known right answer), `unverified`. Resolves the newest dated layer automatically. |
-| `01a_extract_parcels.py` | H3 k-ring search (k=18 ≈ 5.4 km) around each reported point; pulls candidate parcels and computes NLCD zonal stats. Array job, one task per state. |
+| `01a_extract_parcels.py` | H3 k-ring search (k=18 ≈ 5.6 km radius) around each reported point; pulls candidate parcels and computes NLCD zonal stats. Array job, one task per state. |
 | `01b_run_object_detection.py` | Runs `best.pt` on NAIP tiles covering each plant's **reported** parcel. Streams imagery from Planetary Computer. Resumable. |
 | `01c_run_od_corrected_locations.py` | Same, for corrections-bin plants' **true** locations. Separate output root by design. |
 | `01d_nlcd_topup.py` | NLCD stats for a specific parcel list, appended to 01a's output — for parcels that fell outside the original k-ring sweep. |
@@ -174,7 +174,7 @@ to come up:
 
 | Constant | Value | Why it is what it is |
 |---|---|---|
-| `K_RINGS` | 18 | ≈5.4 km search **radius** (not diameter — earlier comments had this wrong). Mean correction distance is ~5.05 km, so the average correction lands near the window boundary. `08`/`08b` measure whether to change it. |
+| `K_RINGS` | 18 | ≈5.6 km search **radius**, measured. Median correction distance is 0.91 km (mean 3.9 km, dragged by a long tail), so the typical correction sits well inside the window. `08` currently undercounts plants outside the ring — see 07_OPEN_ITEMS before using `08b` to change it. |
 | `MAX_PARCEL_AREA_M2` | 2,000,000 | Excludes "whole town as one polygon" digitization artifacts. A judgment call, not a measured value — the docstring says how to set it empirically. |
 | `MAX_TILES_PER_PLANT` | 150 | Last-resort cap. Raised from 60 after a real KY plant strung along a road legitimately needed 121 tiles. |
 | `TARGET_RES_M` | 0.6 | **Must match `detection/config.py` exactly.** The OD model was trained at this resolution; changing it feeds the model images unlike anything it learned on. |

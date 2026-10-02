@@ -48,7 +48,7 @@ The same reasoning applies to:
 |---|---|
 | `data/holdout/holdout_manifest.parquet` + `holdout_truth.parquet` | Frozen. Regenerating them invalidates every round-over-round comparison ever made. |
 | `models/object_detection/best.pt` | Retrainable, but only from the labeled tile inventory. |
-| `detection/data/tiles/` + Label Studio annotations | Months of manual labeling. |
+| `detection/data/tiles/` + `detection/annotation/ls_export/labels/` | Months of manual labeling (now done in `detection/OWM_Imagery_Labeler/label_app.R`; the `ls_export` folder name is left over from Label Studio). |
 | `review_app/data/app.db` | Live review state. Exported verdicts are in `outgoing/`, but in-progress work is only here. |
 | Local Regrid parquet mirror | Large; licensed. Confirm the team's license covers a successor. |
 
@@ -65,7 +65,7 @@ departing author should fill this in.
 | `/work/GRDVULN/` | Who grants access to this allocation? Is there a quota? |
 | Regrid data | License terms, who holds the subscription, how the local mirror is refreshed. |
 | CWNS source data | Where the text exports come from, and how often they are reissued. |
-| Label Studio | Where it runs, credentials, whether the project export is backed up. |
+| Labelling app | `detection/OWM_Imagery_Labeler/label_app.R` (R Shiny), run locally. Labels are plain files in git -- no separate service to back up. |
 | OneDrive folders | `Location_Correction`, `Sewersheds`, `Regrid` — will these survive the departure? |
 
 ---
@@ -193,9 +193,19 @@ Fill these in before you go. They are the ones a successor cannot answer from
 the code.
 
 1. Who is the stakeholder for this work, and what do they expect and when?
+   **Answered 2026-09-24:** federal agencies and the American public. No
+   deadline; sooner is better.
 2. Is there a target state list or national deadline?
+   **Answered:** no deadline. The scope is national, restricted (2026-09-25)
+   to plants serving more than 1,000 people (`config.MIN_POP_SERVED`), and
+   AK/HI/PR are not inferred on (no NAIP).
 3. What accuracy would count as "good enough to publish"?
+   **Answered:** more than 90% confidence that a MOVED location is right --
+   precision of automated relocation, not recall@k. See
+   [RESUME_20261002.md](RESUME_20261002.md) for where it stands.
 4. Which states have been reviewed so far, and was that order deliberate?
+   **Answered:** review is not done state by state. Each round is drawn
+   nationally by 10_build_review_queue (uncertain + random slices).
 5. Are there facility types or regions known to be systematically hard?
 6. Has any of this been presented or published? Where?
 7. Who else has ever run any part of this?

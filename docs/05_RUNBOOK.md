@@ -20,104 +20,113 @@ python -m sync.close_round --round N
 Omit `--round` to close every reviewed round at once — the catch-up case,
 for a machine with review history that has never folded any of it in.
 
-Then upload what it tells you to:
+Step 4 (NAIP tiles) runs with `detection/.venv`'s Python and only for round
+N's plants, tiling just the grid cells that touch each parcel. New tiles show
+up in `label_app.R` after a restart.
 
-| File | Destination on HPC |
-|---|---|
-| `data/outgoing/training_locations.gpkg` | `correction/data/training/` |
-| `data/outgoing/candidate_recall_failures.parquet` | `correction/data/features/` |
-| `data/outgoing/holdout_truth_round{N}.parquet` | merge **by hand** into `data/holdout/holdout_truth.parquet` |
+**Then commit and push immediately** — the master and `app.db` are binary and
+git cannot merge them:
+
+```bash
+git add correction/data/training/Updates.gpkg review_app/data/app.db review_app/data/outgoing/
+git commit -m "round N closeout" && git push
+```
+
+No file transfer is needed: the HPC gets `Updates.gpkg` through `git pull`,
+`00_build_training_bins` builds the training labels from it there, and 10's
+wrapper copies the review logs out of the repo. The one manual step left is
+`holdout_truth_round{N}.parquet` (only when holdout plants were reviewed):
+merge it **by hand** into `data/holdout/holdout_truth.parquet` on the HPC.
 
 Skip this step entirely on the very first cycle — there is no review yet.
 
-### A2. Refresh features for anything new (HPC)
+### A2–A6. Retrain, infer, score (HPC) — the order that works
+
+Updated 2026-10-02. **Submit each step only after the previous one has
+finished** (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`). The login
+shell is tcsh, so `$(...)` chaining does not work, and `--dependency=afterok`
+has repeatedly failed with "Job dependency problem" — check and submit by hand.
 
 ```bash
-cd /work/GRDVULN/tp_qa/correction/scripts
+cd /work/GRDVULN/tp_qa && git pull          # brings the master, labels, code
+cd correction/scripts
 
-# Only for plants NEW to the corrections bin this round:
-sbatch --array=0-50%6 01a_extract_parcels.slurm
-sbatch 01c_run_od_corrected_locations.slurm
+# 1. Training labels from the master (Updates.gpkg is tracked in git, so the
+#    pull already brought the newest round)
+sbatch 00_build_training_bins.slurm
 
-# REQUIRED for the re-ranker. Do not skip.
-sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
+# 2. ONLY if the detector (best.pt) changed since the last run: re-run
+#    detection at every reported location. NORESUME=1 is essential -- resume
+#    keys on CWNS_ID and cannot tell which model wrote a row.
+sbatch --array=0-50%6 --export=FULLUNIVERSE=1,NORESUME=1 01b_run_object_detection.slurm
+sbatch check_od_freshness.slurm                 # must report no stale partitions
 
-# Preflight: fails if any OD partition predates the deployed best.pt
-python check_od_freshness.py
+# 3. Features -- full universe, every time. 02b must succeed: if it fails it
+#    writes NOTHING and 03/04 will silently train on the previous tables.
+sbatch --export=FULL_UNIVERSE=1 02_feature_engineering.slurm
+sbatch 02b_merge_feature_shards.slurm           # after all 51 tasks COMPLETED 0:0
 
-# Per-state array, then the merge. Submit them chained.
-sbatch 02_feature_engineering.slurm
-# prints: Submitted batch job 1234567
-sbatch --dependency=afterok:1234567 02b_merge_feature_shards.slurm
-```
-
-> Written as two steps because `JID=$(...)` is bash-only syntax and the HPC
-> login shell may be `tcsh`. Copy the job id from the first command's output.
-> In bash, `JID=$(sbatch --parsable ...)` chains it in one line.
-
-
-**`02` is a per-state array, and the merge is part of the job.** Each task
-writes a shard under `data/feature_shards/state=XX/`; `02b` unions them into
-the flat files that 03/04/05/06/06b/10 all read by name. `afterok` means the
-merge runs only if every task succeeded — which is exactly when merging is
-safe, since a merge over a partial array produces a well-formed file that
-silently omits states.
-
-Re-running one failed state:
-
-```bash
-sbatch --array=35 02_feature_engineering.slurm    # just OH
-sbatch 02b_merge_feature_shards.slurm              # then re-merge
-```
-
-Without the merge, the flat files stay as the previous run left them.
-
-Check the class counts at the end of 02b's log before going further. If Stage
-1 has single-digit Incorrect rows or Stage 2 has single-digit positives,
-nothing downstream is trainable and you need more states or more review.
-
-### A3. Retrain (HPC)
-
-```bash
+# 4. Stage 1 and Stage 2a
 sbatch 03_train_stage1.slurm
 sbatch 04_train_stage2.slurm
 
-sbatch 06_build_stage2b_training.slurm   # then:
-sbatch 07_train_stage2b.slurm
+# 5. Inference: 48 states (INFERENCE_STATES -- no AK/HI/PR, no NAIP).
+#    TX (index 40) needs 128G.
+sbatch --array=0-39,41-47%8 05_run_inference_array.slurm
+sbatch --array=40 --mem=128G 05_run_inference_array.slurm
+sbatch merge_05_shards.slurm
 
-sbatch 06b_build_rerank_training.slurm   # then:
-sbatch 07b_train_rerank.slurm
-```
+# 6. Re-ranker. 01e reads 05's new candidates, so it comes AFTER 05.
+#    Add NORESUME=1 if the detector changed.
+sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
+sbatch 06b_build_rerank_training.slurm
+sbatch 07b_train_rerank.slurm                   # refuses a stale 17_ table
 
-The `06`/`07` and `06b`/`07b` pairs are ordered — the build must finish
-before the train. The two *pairs* are independent of each other.
-
-### A4. Run inference (HPC)
-
-```bash
-# Per-state array. The national single job OOMs.
-sbatch --array=0-50%8 05_run_inference_array.slurm
-python merge_05_shards.py
-
+# 7. Holdout candidates, re-rank, score
+sbatch 01e_run_od_candidates.slurm              # holdout scope (NORESUME=1 after a detector change)
 sbatch 05b_rerank_candidates.slurm
-```
-
-### A5. Build the next review queue (HPC)
-
-```bash
-sbatch 10_build_review_queue.slurm    # --round N+1
-python check_review_queue_scores.py   # confirms stage2a + stage2b scores present
-```
-
-### A6. Score the holdout (HPC)
-
-```bash
 sbatch 12_score_holdout.slurm
+
+# 8. Logs back through git
+sbatch --export=TRAINING=1 collect_logs.slurm
+#    then, from a login node: git add correction/diagnostics/ && git commit && git push
 ```
 
-This is the only clean read on whether the cycle actually improved anything.
-Every plant in it was excluded from all four models. Compare round over
-round.
+Before step 5 on a fresh setup, `sbatch preflight_inference.slurm` checks that
+02's tables, 01a's candidates and 01b's detections cover the full universe.
+
+**What to check:** 02b ends `=== merge complete ===` with four `wrote` lines;
+03 and 04 print `[population]` lines and include `name_match_*` columns; 05
+prints the OSM-confirmed count; 07b's model is newer than 04's.
+
+Re-running one failed 02 state: array indices follow `DEFAULT_STATES` in
+`_common.sh` (51 states, DC excluded — **OH is 34**). Re-run with
+`sbatch --array=34 --export=FULL_UNIVERSE=1 02_feature_engineering.slurm`,
+then the full 02b. For 05 the list is `INFERENCE_STATES` (48; OH is 32).
+
+### A5. Build the next review queue (HPC) — four steps
+
+The queue picks plants, detection runs on their candidates, the re-ranker
+re-ranks them with those detections, and the queue is rebuilt **with the same
+plants** (`KEEP=1` — the re-rank changes the margins the uncertain slice is
+chosen on, so a plain rebuild picks different plants).
+
+```bash
+sbatch --export=ROUND=5 10_build_review_queue.slurm
+sbatch --export=SCOPE="queue",ROUND=5,NORESUME=1 01e_run_od_candidates.slurm
+sbatch 05b_rerank_candidates.slurm
+sbatch --export=ROUND=5,KEEP=1 10_build_review_queue.slurm
+sbatch --export=PATTERN="10_*",LATEST=1 collect_logs.slurm
+cd /work/GRDVULN/tp_qa
+cp correction/data/review_queue/review_queue_round5.parquet review_app/data/incoming/
+git add correction/diagnostics/logs/ review_app/data/incoming/review_queue_round5.parquet
+git commit -m "round 5 queue" && git push
+```
+
+10's wrapper copies prior rounds' review logs from the repo itself, so earlier
+plants (including `needs_info`) are excluded automatically. Check its log for
+`--keep-selection: reusing the 150 plant(s)` and, in the provenance block,
+`written BEFORE the deployed best.pt: 0`.
 
 ### A7. Review (local)
 
@@ -302,12 +311,14 @@ There is no admin UI for this.
 cd detection
 python pipeline/01_sample_sites.py --source ...
 python pipeline/02_extract_tiles.py
-# label in Label Studio
+# label in detection/OWM_Imagery_Labeler/label_app.R (not Label Studio)
 python pipeline/03_prepare_dataset.py
 python pipeline/04_train_model.py
 ```
 
-`04_train_model.py` **deploys `best.pt` itself** on success, copying it to
+**Back up the deployed model first** (`copy correction\models\object_detection\best.pt best_previous.pt`): `04_train_model.py` **deploys `best.pt` itself** on success, whether or not it is better. Commit the new one only if it is clearly better; otherwise `git checkout -- correction/models/object_detection/best.pt`.
+
+It deploys copying it to
 `correction/models/object_detection/best.pt` — no manual step. Nothing is
 lost: every run's weights stay under `detection/models/runs/`, which is the
 archive; the deployed copy is just a pointer to whichever one is current.
@@ -336,9 +347,12 @@ These are the ones that fail silently rather than loudly.
 |---|---|
 | Skipping `01e` before `06b` | Re-ranker silently gets no hard negatives from this round |
 | Skipping `02b` after the `02` array | Feature tables stay as the last run left them — 03/04 train on stale or single-state data |
-| Running `02` as an array without `--shard` | All 52 tasks write the same four filenames; last to finish wins |
+| Running `02` as an array without `--shard` | All 51 tasks write the same four filenames; last to finish wins |
+| Continuing after a failed `02b` | 02b writes nothing on failure, so 03/04 train on the PREVIOUS tables without error (happened 2026-09-29). Check for `merge complete` |
+| New `best.pt`, then 01b/01e without `NORESUME=1` | Resume skips every plant/parcel already written, so the old detector's output stays in place |
+| Rebuilding the review queue after 05b without `KEEP=1` | Different plants get picked -- ones 01e never examined |
 | Running `02` with stale OD partitions | Features mix old and new model outputs. `check_od_freshness.py` catches it — run it |
-| Space vs comma separated `STATES` | 01a/01b are arrays (space); 02 is single (comma) |
+| Space vs comma separated `STATES` | Array wrappers (01a, 01b, 02, 05) take space-separated lists; `--export` splits on commas, so pass comma lists positionally |
 | Re-running `09_build_holdout.py` | Destroys every round-over-round comparison, undetectably |
 | Feeding `holdout_truth_round{N}.parquet` into training | Same |
 | Rebuilding bins from a master that failed to update | Trains on last round's labels. `close_round.py` gates step 3 on step 2 for this reason |

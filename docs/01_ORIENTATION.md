@@ -113,7 +113,7 @@ docstrings. `06b_build_rerank_training.py`'s header has the full argument.
 | **ll_uuid** | Regrid's parcel identifier. |
 | **The holdout** | A frozen evaluation sample, never trained on. See below. |
 | **Round** | One batch of human review. |
-| **k-ring** | H3 hexagon search radius around the reported point. `K_RINGS = 18` ≈ 5.4 km. |
+| **k-ring** | H3 hexagon search radius around the reported point. `K_RINGS = 18` ≈ 5.6 km radius (measured by 08, 2026-09-24). |
 
 ## The holdout — the rule that must never be broken
 
