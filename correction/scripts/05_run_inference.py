@@ -287,16 +287,32 @@ def run_stage1(con, plants: pd.DataFrame, plant_features: pd.DataFrame,
     else:
         scoreable["stage1_prob_correct"] = pd.Series(dtype=float)
 
+    # OSM-confirmed: the reported parcel carries an OSM wastewater tag, which
+    # is treated as correct by rule (config.STAGE1_OSM_PASS). Stage 1 still
+    # scores it -- stage1_prob_correct is kept for the record -- but its score
+    # cannot flag it.
+    if len(scoreable) and "osm_ww" in scoreable.columns:
+        osm_ids = set(scoreable.loc[scoreable["osm_ww"].fillna(False).astype(str).str.lower()
+                                    .isin(["true", "1", "1.0"]), "CWNS_ID"])
+    else:
+        osm_ids = set()
+
     out = out.merge(
         scoreable[["CWNS_ID", "stage1_prob_correct"]] if len(scoreable) else
         pd.DataFrame(columns=["CWNS_ID", "stage1_prob_correct"]),
         on="CWNS_ID", how="left")
 
+    osm_mask = out["CWNS_ID"].isin(osm_ids).to_numpy() & C.STAGE1_OSM_PASS
+    # How each plant was decided -- carried into plant_summary so 10, 12 and
+    # any output product can say WHY a plant was or was not flagged.
+    out["stage1_route"] = np.select([no_parcel_mask, osm_mask],
+                                    ["no_parcel", "osm_confirmed"], default="model")
     out["trigger_reason"] = np.select(
-        [no_parcel_mask, out["stage1_prob_correct"] < threshold],
-        ["no_parcel", "low_confidence"], default="none")
+        [no_parcel_mask, osm_mask, out["stage1_prob_correct"] < threshold],
+        ["no_parcel", "none", "low_confidence"], default="none")
 
     n_flagged = int((out["trigger_reason"] != "none").sum())
+    print(f"  OSM-confirmed (passed by rule, not by the model): {int(osm_mask.sum())}")
     print(f"  Flagged for Stage 2: {n_flagged} "
           f"({int((out['trigger_reason'] == 'no_parcel').sum())} no_parcel + "
           f"{int((out['trigger_reason'] == 'low_confidence').sum())} low_confidence)")

@@ -358,6 +358,28 @@ PARCEL_WW_KEYWORDS = [
 # The holdout is filtered at SCORING time, never resampled.
 MIN_POP_SERVED = 1000
 
+# ===========================================================================
+# 8c. STAGE 1: OSM-confirmed reported locations
+# ===========================================================================
+# A plant whose REPORTED parcel carries an OSM wastewater tag (osm_ww) is
+# treated as correct by rule: 05 routes it past Stage 1 with
+# stage1_route = 'osm_confirmed' and trigger_reason 'none'. 99.7% of such
+# training plants are labelled Correct, and the reviewer already treats them
+# as correct. Decided 2026-10-02.
+#
+# 03 keeps those plants as TRAINING rows (an abundant sample of correct
+# reported parcels) but drops osm_ww as a feature, and tunes the threshold on
+# the untagged plants the model actually scores. As a feature it dominated
+# (importance 0.34) and crowded out owner-name and keyword evidence: a
+# utility-owned parcel without the tag was flagged 25% of the time despite
+# being 97% Correct. osm_ww stays a feature in Stage 2 and the re-ranker,
+# where it is evidence about which CANDIDATE is the plant.
+#
+# A rule, not a model finding: if labels were partly produced by treating OSM
+# tags as correct, the 99.7% is partly circular. The random review slice is
+# the independent check. Set False to restore osm_ww as a Stage 1 feature.
+STAGE1_OSM_PASS = True
+
 
 def population_ok_ids(min_pop: int | None = None) -> set[str]:
     """CWNS_IDs serving MORE than min_pop residents. Plants with no

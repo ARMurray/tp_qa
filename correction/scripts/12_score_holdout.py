@@ -253,6 +253,27 @@ def main():
                       f"arguably not a 'false move' in the same sense.")
 
     # =======================================================================
+    # OSM-confirmed rule (config.STAGE1_OSM_PASS)
+    # =======================================================================
+    # The independent check on a rule the model does not judge: of holdout
+    # plants passed because their reported parcel carries an OSM wastewater
+    # tag, how many are actually correct -- and how many known-misplaced
+    # plants the rule kept where they were.
+    if summ is not None and "stage1_route" in summ.columns:
+        print(f"\n{'=' * 66}\nOSM-CONFIRMED RULE -- plants passed without Stage 1\n{'=' * 66}")
+        routed = summ.set_index("CWNS_ID")["stage1_route"]
+        for b in ("correct", "corrections"):
+            ids = man.loc[man["bin"] == b, "CWNS_ID"]
+            r = routed.reindex(ids)
+            n_osm = int((r == "osm_confirmed").sum())
+            print(f"  {b:12s}: {n_osm} of {int(r.notna().sum())} scored plants passed by the OSM rule")
+        n_bad = int((routed.reindex(man.loc[man["bin"] == "corrections", "CWNS_ID"])
+                     == "osm_confirmed").sum())
+        if n_bad:
+            print(f"  -> {n_bad} known-MISPLACED plant(s) kept at their reported location "
+                  f"by the rule. That is the rule's error rate; worth a look.")
+
+    # =======================================================================
     # unlabeled
     # =======================================================================
     if "unlabeled" in bins:

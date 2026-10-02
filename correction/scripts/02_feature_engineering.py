@@ -402,12 +402,21 @@ def engineer_parcel_attrs(raw: pd.DataFrame) -> pd.DataFrame:
         r"horton|forestar)\b",
         regex=True).fillna(False)
 
+    # One strong signal instead of two overlapping weak ones (2026-10-02). A
+    # reported parcel whose owner text names a water / sewer utility, or
+    # whose combined attribute text carries a wastewater keyword, was Correct
+    # 99% of the time in Stage 1's labels, yet each flag alone ranked outside
+    # Stage 1's top 20 -- a forest spreads credit thin across correlated
+    # columns. See stage1_keyword_diagnostic.py.
+    df["utility_owner"] = df["owner_is_utility"] | df["has_ww_keyword"]
+
     return df[["ll_uuid", "geoid", "owner", "owner_clean",
                "ll_gisacre", "log_gisacre", "ll_bldg_count", "bldg_per_acre",
                "lbcs_activity", "lbcs_function", "lbcs_structure",
                "lbcs_site", "lbcs_ownership", "zoning_type",
                "owner_is_person", "owner_is_govt", "owner_is_utility",
-               "owner_is_electric", "owner_has_llc_corp", "has_ww_keyword"]]
+               "owner_is_electric", "owner_has_llc_corp", "has_ww_keyword",
+               "utility_owner"]]
 
 
 def build_osm_features(con, state: str, target_uuids: pd.Series) -> pd.DataFrame:
@@ -498,7 +507,7 @@ def build_parcel_features_for_state(con, state: str) -> pd.DataFrame:
             "lbcs_site", "lbcs_ownership", "zoning_type",
             "owner", "owner_is_person", "owner_is_govt",
             "owner_is_utility", "owner_is_electric", "owner_has_llc_corp",
-            "has_ww_keyword", "osm_ww",
+            "has_ww_keyword", "utility_owner", "osm_ww",
             "data_quality_score", "n_parcels",
             "pct_lbcs_activity_known", "pct_owner_known"]
     for c in cols:

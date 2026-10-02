@@ -109,10 +109,28 @@ def main():
     s1["x_5070"] = coords_5070.x.to_numpy()
     s1["y_5070"] = coords_5070.y.to_numpy()
 
+    # ---- OSM-confirmed plants: kept for training, osm_ww NOT a feature ----
+    # Decided 2026-10-02. A reported parcel carrying an OSM wastewater tag is
+    # treated as correct by RULE (05 routes it past Stage 1 as
+    # 'osm_confirmed'); 99.7% of such training plants are labelled Correct.
+    # As a feature, osm_ww was Stage 1's most important by far (0.34) and the
+    # forest leaned on it so hard that a utility-owned parcel WITHOUT the tag
+    # was undervalued: 97% Correct, mean P(correct) 0.70, 25% flagged
+    # (stage1_keyword_diagnostic, 2026-10-01). Those plants stay in training
+    # -- they are an abundant sample of what a correct reported parcel looks
+    # like -- but the model no longer sees the tag, so the other features
+    # carry the decision for the plants it will actually score.
+    osm_mask = (s1["osm_ww"].fillna(False).astype(str).str.lower()
+                .isin(["true", "1", "1.0"]).reset_index(drop=True)
+                if "osm_ww" in s1.columns else pd.Series(False, index=range(len(s1))))
+    print(f"  OSM-tagged reported parcels: {int(osm_mask.sum())} of {len(s1)} "
+          f"(kept as training rows; osm_ww dropped as a feature)")
+
     # ---- Feature selection ----
     y_raw = s1["class"]
     X = s1.drop(columns=[c for c in DROP_COLS if c in s1.columns] +
-                ["class", "CWNS_ID", "LATITUDE", "LONGITUDE"], errors="ignore")
+                ["class", "CWNS_ID", "LATITUDE", "LONGITUDE"] +
+                (["osm_ww"] if C.STAGE1_OSM_PASS else []), errors="ignore")
     if "place_match" in X.columns:
         X["place_match"] = X["place_match"].fillna(False)
     coords = s1[["x_5070", "y_5070"]].reset_index(drop=True)
@@ -212,6 +230,17 @@ def main():
     print("\nConfusion matrix (rows=truth, cols=predicted; 1=Correct, 0=Incorrect):")
     print(confusion_matrix(y_test, y_pred))
 
+    # The population Stage 1 actually SCORES at inference: OSM-tagged plants
+    # are routed past it by rule (05), so the untagged part of the test split
+    # is the honest read -- and the one the threshold is tuned on below.
+    untagged = (~osm_mask.loc[X_test.index]).to_numpy()
+    y_u, p_u = y_test.to_numpy()[untagged], y_pred_proba[untagged]
+    if C.STAGE1_OSM_PASS and len(set(y_u)) == 2:
+        print(f"\nTest set, UNTAGGED plants only ({int(untagged.sum())} of "
+              f"{len(y_test)} -- what Stage 1 scores at inference):")
+        print(f"  roc_auc     : {roc_auc_score(y_u, p_u):.4f}")
+        print(f"  Correct share: {y_u.mean():.1%}  (all test rows: {y_test.mean():.1%})")
+
     # ---- Feature importance (permutation, on held-out test set) ----
     print("\nComputing feature importance...")
     perm = permutation_importance(final_pipeline, X_test, y_test, n_repeats=10,
@@ -226,8 +255,18 @@ def main():
 
     # ---- Threshold analysis ----
     print("\nRunning threshold analysis...")
-    optimal_threshold, roc_df = youden_threshold(y_test.to_numpy(), y_pred_proba)
-    print(f"  Optimal Stage 1 threshold (Youden J): {optimal_threshold:.3f}")
+    # Tuned on the untagged test rows when OSM-confirmed plants bypass Stage 1:
+    # the tagged ones are ~all Correct and would drag the cutoff toward a
+    # population the model never judges. Falls back to all rows if the
+    # untagged slice is too small or one-class.
+    if C.STAGE1_OSM_PASS and len(set(y_u)) == 2 and len(y_u) >= 30:
+        optimal_threshold, roc_df = youden_threshold(y_u, p_u)
+        all_thr, _ = youden_threshold(y_test.to_numpy(), y_pred_proba)
+        print(f"  Optimal Stage 1 threshold (Youden J, untagged plants): "
+              f"{optimal_threshold:.3f}   (all plants would give {all_thr:.3f})")
+    else:
+        optimal_threshold, roc_df = youden_threshold(y_test.to_numpy(), y_pred_proba)
+        print(f"  Optimal Stage 1 threshold (Youden J): {optimal_threshold:.3f}")
     roc_df.to_parquet(C.MODELS_DIR / "stage1_threshold_analysis.parquet", index=False)
 
     # ---- Save model ----
