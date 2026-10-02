@@ -1,0 +1,129 @@
+==========================================
+Node:    r7n07
+Job ID:  7532352
+CPUs:    16
+Started: Fri Oct  2 18:34:04 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+=== 04_train_stage2.py: Stage 2 Model Training (Balanced Random Forest) ===
+NEG_RATIO: 50
+
+Loading Stage 2 training data...
+  [holdout] stage2a: removed 777795 rows / 35 plants (5776474 -> 4998679)
+  Total rows: 4998679
+  Positive labels: 384
+  Negative labels: 4998295
+  Plants: 423
+
+Sampling negatives with hard negative mining...
+  Positives: 384
+  Hard negatives sampled: 13440
+  Easy negatives sampled: 5760
+  Total training rows: 19584
+
+  Class distribution after negative sampling (1 : 50 by design, NOT balanced):
+    label 1 (this parcel IS the plant) :     384
+    label 0 (it is not)                :  19,200
+
+  For scale: the raw table is 1 : 13,016, i.e. about 13,016 candidate
+  parcels per plant at inference. Every metric printed below is computed at 1 : 50,
+  so it does NOT describe deployment. The scaling is printed with the metrics,
+  once the measured false-positive rate is known. 12_score_holdout.py is the honest read.
+
+  NOTE: 39 of 423 plant(s) (9.2%) have NO positive row -- their
+  corrected parcel is not among their candidates. They add only negatives.
+  This is a candidate-recall ceiling, not a model problem.
+  Run 08_diagnose_candidate_coverage.py for the cause split (outside the k-ring /
+  no parcel there / lost in a join), then 08b_analyze_ring_misses.py before
+  considering K_RINGS. Measured 2026-09-24: 91.4% usable, 7.1% outside the window.
+  Model columns: 49
+
+Setting up cross-validation folds...
+  Spatial fold 1: train  15,680 (80.1%,   324 pos)  |  test   3,904 (19.9%,    60 pos)
+  Spatial fold 2: train  15,691 (80.1%,   305 pos)  |  test   3,893 (19.9%,    79 pos)
+  Spatial fold 3: train  15,650 (79.9%,   312 pos)  |  test   3,934 (20.1%,    72 pos)
+  Spatial fold 4: train  15,651 (79.9%,   301 pos)  |  test   3,933 (20.1%,    83 pos)
+  Spatial fold 5: train  15,664 (80.0%,   294 pos)  |  test   3,920 (20.0%,    90 pos)
+  Spatial folds: 5  |  Standard folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 0.5 minutes
+  Best SPATIAL ROC AUC: 0.9939
+
+========================================
+Tuning with STANDARD cross-validation...
+========================================
+  STANDARD CV complete in 0.5 minutes
+  Best STANDARD ROC AUC: 0.9942
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.994242
+0   Spatial  0.993940
+
+========================================
+Fitting final model on full training data...
+========================================
+  Grouped split by CWNS_ID: 315 plant(s) train / 105 test
+    train 14,678 rows (288 pos)  |  test 4,906 rows (96 pos)
+
+FINAL RESULTS SUMMARY
+Test set metrics:
+  roc_auc     : 0.9948
+  accuracy    : 0.9706
+  sensitivity : 0.9688
+  specificity : 0.9707
+  brier_class : 0.0243
+
+  Scaled to deployment: 2.9% false-positive rate against ~13,016 candidate
+  parcels per plant is roughly 382 false parcel(s) per plant ranked
+  above threshold. That is why rank-1 accuracy, not specificity, is the number
+  that matters -- see 12_score_holdout.py.
+
+Confusion matrix (rows=truth, cols=predicted; 1=this parcel IS the plant, 0=it is not):
+[[4669  141]
+ [   3   93]]
+
+Computing feature importance...
+Top 20 features:
+        Variable  Importance  Importance_std
+   ll_bldg_count    0.001594        0.000242
+      ll_gisacre    0.001350        0.000731
+     log_gisacre    0.001309        0.000756
+name_match_score    0.001008        0.000133
+name_pool_is_max    0.000977        0.000107
+      distance_m    0.000966        0.000246
+    log_distance    0.000956        0.000253
+   bldg_per_acre    0.000933        0.000242
+  name_pool_rank    0.000768        0.000194
+    is_municipal    0.000651        0.000221
+          osm_ww    0.000534        0.000020
+    total_pixels    0.000405        0.000497
+  lbcs_ownership    0.000338        0.000131
+   name_pool_gap    0.000332        0.000102
+ water_pixel_pct    0.000274        0.000078
+  dominant_count    0.000246        0.000381
+       has_water    0.000188        0.000050
+    water_pixels    0.000134        0.000042
+      within_1km    0.000126        0.000087
+      pop_served    0.000124        0.000100
+
+Running threshold analysis...
+  Optimal Stage 2 threshold (Youden J): 0.627
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.994242
+0   Spatial  0.993940
+Optimal threshold: 0.627
+
+Saving model...
+  stage2_rf_model.joblib saved: 20.0 MB
+
+=== Stage 2 training complete ===
+Finished: Fri Oct  2 18:35:43 EDT 2026
+

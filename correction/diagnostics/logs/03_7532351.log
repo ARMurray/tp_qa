@@ -1,0 +1,110 @@
+==========================================
+Node:    r7n07
+Job ID:  7532351
+CPUs:    16
+Started: Fri Oct  2 18:33:57 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+=== 03_train_stage1.py: Stage 1 Model Training (Random Forest) ===
+
+Loading Stage 1 training data...
+  [holdout] stage1: removed 260 rows / 260 plants (1926 -> 1666)
+  Rows: 1666
+  Correct: 1431
+  Incorrect: 235
+  OSM-tagged reported parcels: 924 of 1666 (kept as training rows; osm_ww dropped as a feature)
+  Model columns: 74
+
+  1 feature(s) have NO observed values and cannot be imputed:
+    od_max_conf_drying_bed
+  sklearn skips them. They stay in the schema so a later retrain picks them
+  up automatically -- but a feature that is never populated is carrying no
+  signal today, and if it is an od_* column that means the class never fired.
+  Class weights -- Correct: 0.141 | Incorrect: 0.859
+
+Setting up cross-validation folds...
+  Spatial fold 1: train   1,338 (80.3%,  1147 pos)  |  test     328 (19.7%,   284 pos)
+  Spatial fold 2: train   1,334 (80.1%,  1137 pos)  |  test     332 (19.9%,   294 pos)
+  Spatial fold 3: train   1,328 (79.7%,  1127 pos)  |  test     338 (20.3%,   304 pos)
+  Spatial fold 4: train   1,330 (79.8%,  1174 pos)  |  test     336 (20.2%,   257 pos)
+  Spatial fold 5: train   1,334 (80.1%,  1139 pos)  |  test     332 (19.9%,   292 pos)
+  Spatial folds: 5  |  Standard folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 1.5 minutes
+  Best SPATIAL ROC AUC: 0.9407
+
+========================================
+Tuning with STANDARD cross-validation...
+========================================
+  STANDARD CV complete in 1.5 minutes
+  Best STANDARD ROC AUC: 0.9464
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.946391
+0   Spatial  0.940662
+
+========================================
+Fitting final model on full training data...
+========================================
+Test set metrics:
+  roc_auc     : 0.9321
+  accuracy    : 0.8945
+  sensitivity : 0.9162
+  specificity : 0.7627
+  brier_class : 0.0703
+
+Confusion matrix (rows=truth, cols=predicted; 1=Correct, 0=Incorrect):
+[[ 45  14]
+ [ 30 328]]
+
+Test set, UNTAGGED plants only (191 of 417 -- what Stage 1 scores at inference):
+  roc_auc     : 0.9229
+  Correct share: 69.6%  (all test rows: 85.9%)
+
+Computing feature importance...
+Top 20 features:
+             Variable  Importance  Importance_std
+        ll_bldg_count    0.017962        0.005004
+     od_has_detection    0.008986        0.005282
+         is_municipal    0.007405        0.005078
+         od_n_objects    0.005596        0.003718
+  od_n_detections_raw    0.004876        0.003102
+     od_has_clarifier    0.003797        0.001452
+        bldg_per_acre    0.003776        0.002439
+         od_n_classes    0.003645        0.003146
+       has_ww_keyword    0.003428        0.001604
+   owner_has_llc_corp    0.003309        0.001110
+        utility_owner    0.002950        0.000983
+    od_max_confidence    0.002869        0.000825
+       parcel_area_m2    0.002708        0.002225
+    od_dominant_class    0.002670        0.003747
+   data_quality_score    0.002244        0.001553
+       lbcs_ownership    0.002007        0.000755
+parcel_bbox_max_dim_m    0.001951        0.001754
+       od_n_clarifier    0.001870        0.000697
+         total_pixels    0.001572        0.001163
+          log_gisacre    0.001506        0.001408
+
+Running threshold analysis...
+  Optimal Stage 1 threshold (Youden J, untagged plants): 0.743   (all plants would give 0.720)
+
+Saving model...
+  stage1_rf_model.joblib saved: 11.4 MB
+
+=== Stage 1 training complete ===
+
+FINAL RESULTS SUMMARY
+  Test roc_auc: 0.9321
+  Optimal threshold: 0.743
+  CV comparison:
+         cv   roc_auc
+1  Standard  0.946391
+0   Spatial  0.940662
+Finished: Fri Oct  2 18:37:30 EDT 2026
+
