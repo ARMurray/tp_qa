@@ -146,10 +146,17 @@ def sec_round4(r):
         return
     rv = pd.read_parquet(REVIEW_LOG)
     rv["CWNS_ID"] = rv["cwns_id"].astype(str)
-    summ = pd.read_parquet(SUMMARY_PATH, columns=["CWNS_ID", "reported_ll_uuid",
-                                                   "stage1_prob_correct", "trigger_reason"])
-    summ["CWNS_ID"] = summ["CWNS_ID"].astype(str)
-    d = rv.merge(summ, on="CWNS_ID", how="left")
+    # The review log already carries the queue's reported_ll_uuid,
+    # stage1_prob_correct and trigger_reason -- the values the reviewer saw.
+    # Use those; merging plant_summary in as well suffixed both to _x/_y.
+    need = ["reported_ll_uuid", "stage1_prob_correct", "trigger_reason"]
+    if all(c in rv.columns for c in need):
+        d = rv.copy()
+    else:
+        summ = pd.read_parquet(SUMMARY_PATH, columns=["CWNS_ID"] + need)
+        summ["CWNS_ID"] = summ["CWNS_ID"].astype(str)
+        d = rv.drop(columns=[c for c in need if c in rv.columns]).merge(
+            summ, on="CWNS_ID", how="left")
     d = d[d["reported_ll_uuid"].notna()]
     con = C.duckdb_connect(spatial=False)
     con.register("want", d[["reported_ll_uuid"]].rename(columns={"reported_ll_uuid": "ll_uuid"}))
