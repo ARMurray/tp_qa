@@ -283,6 +283,10 @@ the shown five: round 4 had 154 of 660 shown candidates "not run" and 63% of
 plants on Stage 2a fallback. Make the queue scope cover each queued plant's
 top-20 (~3,000 parcels).
 
+**Done 2026-10-03:** `--from-queue` now covers each queued plant's top-20
+(`--shown-only` keeps the old scope). Check round 5's 10 log: shown
+candidates "not run" should be ~0.
+
 ### Detector validation split re-draws whenever plants are added
 
 `detection/pipeline/03_prepare_dataset.py` shuffles the plant list with a seed,

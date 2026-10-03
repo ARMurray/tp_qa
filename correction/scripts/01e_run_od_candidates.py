@@ -132,7 +132,8 @@ def restrict_to_holdout(cands: pd.DataFrame, bins: list[str]) -> pd.DataFrame:
     return out
 
 
-def restrict_to_queue(cands: pd.DataFrame, queue_path: Path) -> pd.DataFrame:
+def restrict_to_queue(cands: pd.DataFrame, queue_path: Path,
+                      shown_only: bool = False) -> pd.DataFrame:
     """Keep only the exact (CWNS_ID, ll_uuid) pairs a review queue will show.
 
     WHY THIS SCOPE EXISTS
@@ -149,9 +150,13 @@ def restrict_to_queue(cands: pd.DataFrame, queue_path: Path) -> pd.DataFrame:
         tile selection afterwards tell a false positive from a parcel nobody
         looked at.
 
-    PAIRS, NOT PLANTS. Restricting by CWNS_ID alone would pull in every
-    candidate for those plants up to --top-k (20 by default), quadrupling the
-    work to compute detections on parcels the reviewer will never see.
+    PLANTS, NOT PAIRS (changed 2026-10-03). Every queued plant gets detection
+    on ALL its top --top-k (20) candidates, not just the 5 shown. 05b re-ranks
+    the pool AFTER this runs, and in round 4 it promoted parcels detection had
+    never seen into the shown top 5: 154 of 660 shown candidates were "not
+    run". Four times the work (~3,000 parcels for 150 plants) buys a top 5
+    that is fully examined whatever the re-rank does. --shown-only restores
+    the old pairs-only scope.
 
     OUTPUT GOES TO ITS OWN ROOT, and that is not tidiness -- it is the
     holdout. A review queue deliberately contains a holdout slice. If these
@@ -180,7 +185,12 @@ def restrict_to_queue(cands: pd.DataFrame, queue_path: Path) -> pd.DataFrame:
     cands = cands.copy()
     cands["ll_uuid"] = cands["ll_uuid"].astype(str)
     keys = list(zip(cands["CWNS_ID"], cands["ll_uuid"]))
-    out = cands[[k in wanted for k in keys]].copy()
+    if shown_only:
+        out = cands[[k in wanted for k in keys]].copy()
+    else:
+        out = cands[cands["CWNS_ID"].isin(set(q["CWNS_ID"]))].copy()
+        print(f"  Scope: each queued plant's top {out.groupby('CWNS_ID').size().max()} "
+              f"candidate(s), not just the shown ones (--shown-only to restrict)")
 
     # A queue parcel missing from stage2_candidates means the two were built
     # from different inference runs, and the detection stats would come back
@@ -290,12 +300,17 @@ def main():
                          "exclusive with --all.")
     ap.add_argument("--from-queue", type=Path, default=None,
                     help="path to a review_queue_round{N}.parquet. Runs "
-                         "detection on exactly the candidate parcels that "
-                         "queue will SHOW, so the review app can display "
+                         "detection on every queued plant's top --top-k "
+                         "candidates (a superset of what the queue SHOWS, "
+                         "since 05b re-ranks afterwards), so the review app "
+                         "can display "
                          "detection stats and tile selection afterwards can "
                          "tell a false positive from an unexamined parcel. "
                          "Writes to its own output root -- see "
                          "restrict_to_queue().")
+    ap.add_argument("--shown-only", action="store_true",
+                    help="with --from-queue: only the candidate parcels the "
+                         "queue shows (the pre-2026-10-03 scope)")
     ap.add_argument("--holdout-bins", default="corrections",
                     help="comma-separated holdout bins (default: corrections)")
     ap.add_argument("--states", default=None, help="comma-separated filter")
@@ -346,7 +361,7 @@ def main():
     if args.training_corrections:
         cands = restrict_to_training_corrections(cands)
     elif args.from_queue:
-        cands = restrict_to_queue(cands, args.from_queue)
+        cands = restrict_to_queue(cands, args.from_queue, args.shown_only)
     elif not args.all:
         bins = [b.strip() for b in args.holdout_bins.split(",")]
         cands = restrict_to_holdout(cands, bins)

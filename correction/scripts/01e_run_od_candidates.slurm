@@ -72,7 +72,8 @@ case "${SCOPE:-holdout}" in
         CMD="$CMD --training-corrections"
         ;;
     queue)
-        # Detection on exactly the parcels a review queue will SHOW, so the
+        # Detection on every queued plant's top-20 candidates (a superset of
+        # what the queue SHOWS, since 05b re-ranks afterwards), so the
         # review app can display detection stats and tile selection afterwards
         # can tell a false positive from a parcel nobody examined.
         #   sbatch --export=SCOPE="queue",ROUND=3 01e_run_od_candidates.slurm
