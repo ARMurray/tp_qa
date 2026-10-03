@@ -1,0 +1,61 @@
+==========================================
+Node:    r7n07
+Job ID:  7532421
+CPUs:    8
+Started: Fri Oct  2 21:53:28 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Processing state: TX  (array index 40 of 48)
+Output: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=TX
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states TX --out-dir /work/GRDVULN/tp_qa/correction/data/inference_shards/state=TX
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+=== 05_run_inference.py ===
+States: ['TX']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 74 feature columns, threshold=0.743
+  Loaded stage2_rf_model.joblib: 49 feature columns, threshold=0.627
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  [population] 05 universe: kept plants serving > 1,000: 1085/1468 plants (383 removed)
+  1085 plants across 1 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Parcel features narrowed to ['TX']: 77679378 -> 7784885 rows
+  Plant features: 9673 rows  |  Parcel features: 7784885 rows
+
+Loading OD features (01b reported-location output)...
+  12676 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 1085  |  reported parcel found: 776  |  no parcel: 309 (28.5%)
+  OSM-confirmed (passed by rule, not by the model): 75
+  Flagged for Stage 2: 830 (309 no_parcel + 521 low_confidence)
+
+=== Stage 2a: candidate scoring ===
+    TX: 100/830 plants (0.2 min elapsed)
+    TX: 200/830 plants (0.5 min elapsed)
+    TX: 300/830 plants (0.8 min elapsed)
+    TX: 400/830 plants (1.0 min elapsed)
+    TX: 500/830 plants (1.3 min elapsed)
+    TX: 600/830 plants (1.6 min elapsed)
+    TX: 700/830 plants (1.9 min elapsed)
+    TX: 800/830 plants (2.1 min elapsed)
+  TX: 830 flagged plants processed
+  Raw candidates (post reported-parcel exclusion): 16754778
+
+=== Summary ===
+  Plants scored          : 1085
+  Flagged for Stage 2     : 830
+  Plants with >=1 candidate: 830
+  Flagged w/ 0 candidates  : 0 (no parcel survived K_RINGS + reported-parcel exclusion)
+  Not flagged (Stage 1 ok) : 255 (no candidates by design -- confirm_reported task in 10)
+
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=TX/plant_summary.parquet
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=TX/stage2_candidates.parquet
+Finished: Fri Oct  2 22:15:37 EDT 2026  (exit 0)
+

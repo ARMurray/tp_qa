@@ -1,0 +1,53 @@
+==========================================
+Node:    r7n07
+Job ID:  7532452
+CPUs:    8
+Started: Fri Oct  2 22:00:31 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Processing state: SD  (array index 38 of 48)
+Output: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=SD
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states SD --out-dir /work/GRDVULN/tp_qa/correction/data/inference_shards/state=SD
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+=== 05_run_inference.py ===
+States: ['SD']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 74 feature columns, threshold=0.743
+  Loaded stage2_rf_model.joblib: 49 feature columns, threshold=0.627
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  [population] 05 universe: kept plants serving > 1,000: 26/51 plants (25 removed)
+  26 plants across 1 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Parcel features narrowed to ['SD']: 77679378 -> 93518 rows
+  Plant features: 9673 rows  |  Parcel features: 93518 rows
+
+Loading OD features (01b reported-location output)...
+  12676 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 26  |  reported parcel found: 25  |  no parcel: 1 (3.8%)
+  OSM-confirmed (passed by rule, not by the model): 3
+  Flagged for Stage 2: 14 (1 no_parcel + 13 low_confidence)
+
+=== Stage 2a: candidate scoring ===
+  SD: 14 flagged plants processed
+  Raw candidates (post reported-parcel exclusion): 35318
+
+=== Summary ===
+  Plants scored          : 26
+  Flagged for Stage 2     : 14
+  Plants with >=1 candidate: 14
+  Flagged w/ 0 candidates  : 0 (no parcel survived K_RINGS + reported-parcel exclusion)
+  Not flagged (Stage 1 ok) : 12 (no candidates by design -- confirm_reported task in 10)
+
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=SD/plant_summary.parquet
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=SD/stage2_candidates.parquet
+Finished: Fri Oct  2 22:00:46 EDT 2026  (exit 0)
+

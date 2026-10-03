@@ -1,0 +1,27 @@
+==========================================
+Node:    r7n07
+Job ID:  7532461
+CPUs:    4
+Started: Fri Oct  2 23:00:05 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/merge_05_shards.py --states "AL AR AZ CA CO CT DE FL GA IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA VT WA WI WV WY"
+=== merge_05_shards.py ===
+shards : /work/GRDVULN/tp_qa/correction/data/inference_shards
+output : /work/GRDVULN/tp_qa/correction/data/inference
+states : 48
+
+--- plant_summary.parquet ---
+  48 shard(s) -> 9564 rows
+  wrote /work/GRDVULN/tp_qa/correction/data/inference/plant_summary.parquet
+
+--- stage2_candidates.parquet ---
+  48 shard(s) -> 123838 rows
+  wrote /work/GRDVULN/tp_qa/correction/data/inference/stage2_candidates.parquet
+
+=== complete ===
+Next: 10_build_review_queue.py --states <...> --round <n>
+Finished: Fri Oct  2 23:00:10 EDT 2026  (exit 0)
+
