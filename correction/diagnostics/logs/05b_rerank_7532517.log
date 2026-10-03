@@ -1,0 +1,41 @@
+==========================================
+Node:    r7n14
+Job ID:  7532517
+CPUs:    8
+Started: Sat Oct  3 17:24:02 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05b_rerank_candidates.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+=== 05b_rerank_candidates.py ===
+
+Loading re-ranker...
+  Loaded rerank_rf_model.joblib: 84 feature columns
+
+Loading Stage 2a candidates...
+  Restricted to ['AK', 'AL', 'AR', 'AZ', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'IA', 'ID', 'IL', 'IN', 'KS', 'KY', 'LA', 'MA', 'MD', 'ME', 'MI', 'MN', 'MO', 'MS', 'MT', 'NC', 'ND', 'NE', 'NH', 'NJ', 'NM', 'NV', 'NY', 'OH', 'OK', 'OR', 'PA', 'PR', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VA', 'VT', 'WA', 'WI', 'WV', 'WY']
+  123838 candidate(s) across 6196 plant(s)
+
+Loading candidate OD features (01e --all)...
+  Skipping 137 candidate-OD file(s) written before the deployed best.pt (a previous detector's output)
+  937 candidate(s) with OD across 31 plant(s)
+  OD coverage: 620/123838 candidate(s) (0.5%)
+  WARNING: under half of candidates have OD. Rows without it score as 'nothing detected', which is indistinguishable from a genuine non-detection. Consider --no-od until the 01e array has covered these states.
+
+Deriving features...
+Scoring...
+
+  Fallback to Stage 2a ordering for 6168 plant(s) where no candidate fired
+
+  Candidates whose rank changed : 505 (0.4%)
+  Plants with a NEW top pick    : 15 (0.2%)
+  Median Stage 2a rank of the promoted candidate: 5
+
+Written: /work/GRDVULN/tp_qa/correction/data/inference/stage2_candidates_reranked.parquet
+Written: /work/GRDVULN/tp_qa/correction/data/inference/plant_summary_reranked.parquet
+
+Next: point 10_build_review_queue.py at the reranked table. Both scores are
+preserved per candidate, so a reviewer can compare Stage 2a against the re-rank.
+Finished: Sat Oct  3 17:24:23 EDT 2026  (exit 0)
+
