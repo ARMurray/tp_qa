@@ -1,0 +1,93 @@
+==========================================
+Node:    r7n07
+Job ID:  7532500
+CPUs:    16
+Started: Sat Oct  3 14:25:05 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/07b_train_rerank.py
+/work/GRDVULN/tp_qa/correction/scripts/07b_train_rerank.py:197: UserWarning: you are shuffling a 'ArrowStringArray' object which is not a subclass of 'Sequence'; `shuffle` is not guaranteed to behave correctly. E.g., non-numpy array/tensor objects with view semantics may contain duplicates after shuffling.
+  rng.shuffle(plants)
+=== 07b_train_rerank.py: Stage 2a Re-ranker ===
+
+Loading re-rank training data...
+  [holdout] rerank: removed 0 rows / 0 plants (7995 -> 7995)
+  Rows: 7995  |  plants: 400
+  Label=1 (true parcel): 342
+  Label=0 (competitor) : 7653
+  Pools containing the true parcel: 342/400 (86%)
+
+  Split by plant: 300 train / 100 test plant(s)
+  Dropping leaking columns: ['true_ll_uuid', 'pool_has_positive']
+  Dropping 1 all-NaN columns: ['od_max_conf_drying_bed']
+  Model columns: 84
+  Class balance 1:22  |  weights true 0.957 / competitor 0.043
+
+Setting up cross-validation folds...
+  Spatial folds: 5  |  Standard (grouped): 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 1.3 minutes
+  Best SPATIAL ROC AUC: 0.9786
+    across 20 configs: mean 0.9735, sd 0.0034
+
+========================================
+Tuning with STANDARD (grouped) cross-validation...
+========================================
+  STANDARD (grouped) CV complete in 1.3 minutes
+  Best STANDARD (grouped) ROC AUC: 0.9796
+    across 20 configs: mean 0.9734, sd 0.0038
+
+CV Comparison:
+         cv   roc_auc
+1  Standard  0.979628
+0   Spatial  0.978571
+
+========================================
+Fitting final model...
+========================================
+
+========================================
+Ranking performance on held-out plants
+========================================
+  recall@1:  Stage 2a 59.5% (50/84)   re-rank 89.3% (75/84)   +29.8%
+  recall@3:  Stage 2a 91.7% (77/84)   re-rank 100.0% (84/84)   +8.3%
+  recall@5:  Stage 2a 96.4% (81/84)   re-rank 100.0% (84/84)   +3.6%
+
+  Denominator is the 84 test plant(s) whose pool contains
+  the true parcel, of 100 total. The other 16 cannot be
+  found by ANY ranking -- that gap belongs to candidate generation
+  (see 08_diagnose_candidate_coverage.py), not to this model.
+
+Computing feature importance...
+              Variable  Importance  Importance_std
+          stage2a_rank    0.005698        0.000708
+                osm_ww    0.005199        0.000173
+   stage2_prob_correct    0.003163        0.000736
+od_fired_share_of_pool    0.001642        0.000207
+       od_pool_n_fired    0.000934        0.000393
+          log_distance    0.000599        0.000218
+            distance_m    0.000578        0.000168
+        lbcs_ownership    0.000547        0.000090
+  dominant_class_group    0.000471        0.000083
+            pop_served    0.000462        0.000158
+                od_ran    0.000457        0.000254
+    od_mean_confidence    0.000342        0.000063
+          is_municipal    0.000317        0.000094
+          water_pixels    0.000249        0.000031
+             has_water    0.000227        0.000006
+   name_top20_n_at_max    0.000219        0.000036
+    owner_has_llc_corp    0.000191        0.000183
+     od_max_confidence    0.000149        0.000083
+  od_any_fired_in_pool    0.000143        0.000147
+      od_has_detection    0.000123        0.000103
+
+Saved: rerank_rf_model.joblib
+
+Next: 05b_rerank_candidates.py, then score the holdout.
+Finished: Sat Oct  3 14:28:14 EDT 2026  (exit 0)
+
