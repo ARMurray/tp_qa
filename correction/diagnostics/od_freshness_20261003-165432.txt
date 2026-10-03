@@ -1,0 +1,43 @@
+od_freshness_report  host=a0n15  when=2026-10-03T16:54:32-04:00
+git HEAD: 14d89fc
+
+=== every .pt under models/object_detection (newest first) ===
+2026-09-28 21:58    22605147  /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+
+=== best.pt vs the committed blob ===
+working file : 06dd3a1da7c1a086f4bcfb2987467fe5146383b1
+HEAD blob    : 06dd3a1da7c1a086f4bcfb2987467fe5146383b1
+(equal = same weights as git; a differing mtime is then only a touch/copy)
+
+=== od_features_candidates: parquet files per modification date ===
+     87 2026-09-08
+     58 2026-09-09
+     40 2026-09-24
+     38 2026-09-29
+     40 2026-09-30
+     24 2026-10-03
+  newest:
+2026-10-03 14:40  /work/GRDVULN/tp_qa/correction/data/od_features_candidates/candidates/state=WI/part-20261003T144035-8274b7e8.parquet
+2026-10-03 14:40  /work/GRDVULN/tp_qa/correction/data/od_features_candidates/objects/state=OR/part-20261003T144022-f32e01c7.parquet
+2026-10-03 14:40  /work/GRDVULN/tp_qa/correction/data/od_features_candidates/objects/state=PA/part-20261003T144027-8d3e2d28.parquet
+
+=== od_features_candidates_queue: parquet files per modification date ===
+     54 2026-09-24
+  newest:
+2026-09-24 18:15  /work/GRDVULN/tp_qa/correction/data/od_features_candidates_queue/candidates/state=WI/part-20260924T181504-c78aba05.parquet
+2026-09-24 18:15  /work/GRDVULN/tp_qa/correction/data/od_features_candidates_queue/candidates/state=WV/part-20260924T181517-d7096a19.parquet
+2026-09-24 18:15  /work/GRDVULN/tp_qa/correction/data/od_features_candidates_queue/objects/state=WV/part-20260924T181517-2dada7f6.parquet
+
+=== od_features_candidates_train: parquet files per modification date ===
+     81 2026-09-08
+     42 2026-09-22
+     78 2026-09-23
+     78 2026-09-24
+     82 2026-09-29
+     82 2026-09-30
+     79 2026-10-03
+  newest:
+2026-10-03 11:49  /work/GRDVULN/tp_qa/correction/data/od_features_candidates_train/candidates/state=WY/part-20261003T114929-127474c8.parquet
+2026-10-03 11:49  /work/GRDVULN/tp_qa/correction/data/od_features_candidates_train/objects/state=WI/part-20261003T114905-ef605c48.parquet
+2026-10-03 11:49  /work/GRDVULN/tp_qa/correction/data/od_features_candidates_train/objects/state=WV/part-20261003T114927-07decbc0.parquet
+
