@@ -1,0 +1,16 @@
+==========================================
+Node:    r7n07
+Job ID:  7532367
+CPUs:    8
+Started: Fri Oct  2 19:51:23 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/var/spool/slurm/job7532367/slurm_script: line 49: 2123138 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 20:26:46 EDT 2026
+[2026-10-02T20:26:46.424] error: Detected 1 oom_kill event in StepId=7532367.batch. Some of the step tasks have been OOM Killed.
+

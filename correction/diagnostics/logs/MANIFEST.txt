@@ -1,11 +1,12 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-10-02T18:53:47
+when    : 2026-10-02T21:47:32
 source  : /work/GRDVULN/tp_qa/correction/logs
-selected: 0[34]_* (latest 2)
+selected: 05_* (latest 3)
 
-  03_7532351.log                            4 KB ->       4 KB  (job wrote it 2026-10-02T18:37)
-  04_7532352.log                            5 KB ->       5 KB  (job wrote it 2026-10-02T18:35)
+  05_merge_7532409.log                      1 KB ->       1 KB  (job wrote it 2026-10-02T21:38)
+  05_inference_7532358.log                  6 KB ->       6 KB  (job wrote it 2026-10-02T21:16)
+  05_inference_7532367.log                  1 KB ->       1 KB  (job wrote it 2026-10-02T20:26)
 
 total copied: 9 KB
 

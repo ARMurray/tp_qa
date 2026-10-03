@@ -1,0 +1,108 @@
+tp_qa Stage 1 owner-keyword diagnostic -- read-only
+
+==============================================================================
+0. ENVIRONMENT
+==============================================================================
+host          : r7n07
+when          : 2026-10-02T21:41:27
+python        : 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+cwd           : /work/GRDVULN/tp_qa/correction/scripts
+ROOT          : /work/GRDVULN/tp_qa/correction
+SLURM_JOB_ID  : 7532410
+SLURM_CPUS_PER_TASK: 4
+git HEAD      : 28fcfd6
+git branch    : master
+git dirty     : (clean)
+
+==============================================================================
+1. TRAINING LABELS: Correct rate by owner-text feature
+==============================================================================
+  training rows: 1926  |  Correct 1667 (86.6%)  Incorrect 259
+
+  feature                 n True  Correct|True  n False  Correct|False
+  has_ww_keyword             255         99.2%     1671          84.6%
+  owner_is_utility           237         98.3%     1689          84.9%
+  owner_water                238         97.9%     1688          85.0%
+  owner_is_govt             1139         94.5%      787          75.1%
+  is_municipal              1530         94.4%      396          56.3%
+  osm_ww                    1082         99.7%      844          69.7%
+  name_match>=0.5           1104         94.5%      822          75.9%
+
+  Read: if Correct|True is far above the baseline, the label supports the reviewer's intuition.
+
+==============================================================================
+2. MODEL vs LABELS: is the keyword group undervalued?
+==============================================================================
+  model: stage1_rf_model.joblib, threshold 0.743 (below it = flagged as wrong)
+
+  group                            n  observed Correct  mean P(correct)  flagged
+  all                           1926             86.6%            0.800    22.9%
+  has_ww_keyword=True            255             99.2%            0.938     2.7%
+  owner_is_utility=True          237             98.3%            0.929     4.2%
+  osm_ww=True                   1082             99.7%            0.919     9.2%
+  keyword, NOT osm_ww             69             97.1%            0.920     5.8%
+
+  Read: a group whose mean P(correct) sits well BELOW its observed Correct rate is being undervalued by the model (explanation b).
+
+==============================================================================
+3. WHO THE KEYWORD OWNERS ARE, by label
+==============================================================================
+
+  Incorrect: 5 plants whose reported parcel has a keyword / utility owner
+    median parcel acreage: 2.0
+    12000000060  TOHO WATER AUTHORITY                                         Unknown
+    19000328001  City Of Glenwood, Iowa c/o Glenwood Municipal Utilities      Water Utility
+    39000175001  UNIVERSITY HOSPITALS HEALTH SYSTEM INC                       Water Utility
+    42005016001  ALLEGHENY COUNTY SANITARY AUTHORITY                          Water Utility
+    45000000077  RENEWABLE WATER RESOURCES                                    Unknown
+
+  Correct: 333 plants whose reported parcel has a keyword / utility owner
+    median parcel acreage: 19.1
+    01000000106  BOARD OF WATER & SEWER                                       Water Utility
+    01000007001  ANNISTON WATER WORKS & SEWER BOARD                           Leisure
+    01000035001  UTILITIES BOARD OF THE TOWN OF CHATOM                        Other
+    01000054002  CITY OF ENTERPRISE                                           Water Utility
+    01000071001  WATER WORKS & SEWER BOARD TOWN                               Unknown
+    01000109001  MONTEVALLO WATER & SEWER BOARD                               Water Utility
+    01000211001  WATER AUTHORITY-EXEMPT                                       Vacant
+    01000256001  DALEVILLE CITY OF WATERWORKS & SEWER BOARD                   Other
+    01000300001  WATER WORKS & SEWER BOARD GUNTERSVILLE                       Water Utility
+    01000303001  HALEYVILLE CITY OF WATER WORK                                Leisure
+    01000305001  WATER WORKS & SEWER BOARD OF THE CITY OF                     Water Utility
+    01000349001  WATER WORKS & SEWER BOARD CITY OF MONROEVILLE                Commercial
+    01000374001  CITY OF RED BAY AND SEWER LAGON                              Leisure
+    01000380002  R'VILLE WATER WORKS BOARD                                    Water Utility
+    01000385002  DALLAS COUNTY WATER SEWER AUTHORITY                          Water Utility
+    05000006002  CITY WATER & LIGHT                                           Unknown
+    05000110002  SUGARLOAF WASTE WATER TREATMENT DIST                         Unknown
+    05000321001  WATER & SEWER IMPROVEMENT DISTRICT #1-CITY OF MARS           Unknown
+    05000401001  CITY OF NASHVILLE (SEWER LAKE)                               Unknown
+    05000648001  GRAVEL RIDGE SAN SEWER                                       Unknown
+    05000652001  MAUMELLE WATER AND SEWER NO 306                              Unknown
+    04001328001  FOUNTAIN HILLS SANITARY DIST                                 Unknown
+    04001711001  Pinetop-Lakeside Sanitary District                           Unknown
+    04002101001  APACHE JUNCTION SEWER DISTRICT COMMUNITY FACILITIES DISTRICT Water Utility
+    06001012001  Garberville Sanitary District                                Unknown
+
+==============================================================================
+4. ROUND 4: flagged plants on keyword-owned parcels
+==============================================================================
+  round 4 reviewed plants with a reported parcel: 94; of those with a keyword/utility owner: 14
+  verdicts: {'reported_correct': 11, 'candidate_correct': 2, 'needs_info': 1}
+
+    45000000077  P(correct)=0.023  candidate_correct         RENEWABLE WATER RESOURCES
+    01000071001  P(correct)=0.050  reported_correct          WATER WORKS & SEWER BOARD TOWN
+    48007075001  P(correct)=0.053  reported_correct          BRAZORIA CO FRESH WATER DISTRICT # 1
+    13000999033  P(correct)=0.125  reported_correct          CLAYTON COUNTY WATER AUTHORITY
+    48009508001  P(correct)=0.137  reported_correct          MAURICEVILLE MUNICIPAL UTILITY DISTRICT
+    01000256001  P(correct)=0.167  reported_correct          DALEVILLE CITY OF WATERWORKS & SEWER BOARD
+    30000000035  P(correct)=0.251  needs_info                FOUR CORNERS CTY WATER & SEWER DIST
+    12000000060  P(correct)=0.296  candidate_correct         TOHO WATER AUTHORITY
+    01000211001  P(correct)=0.307  reported_correct          WATER AUTHORITY-EXEMPT
+    34003080001  P(correct)=0.518  reported_correct          TWP OF OCEAN SEWERAGE AUTHORITY
+    36005009001  P(correct)=0.902  reported_correct          City of Plattsburgh
+    47000255001  P(correct)=0.950  reported_correct          CLEVELAND UTILITIES
+    36008019001  P(correct)=0.961  reported_correct          Village Of Lima
+    41000009001  P(correct)=0.998  reported_correct          OAK LODGE WATER SERVICES DISTRICT
+
+  flagged by Stage 1 but the reported location was RIGHT: 6

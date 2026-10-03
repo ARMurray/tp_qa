@@ -1,0 +1,49 @@
+==========================================
+Node:    r7n07
+Job ID:  7532358
+CPUs:    8
+Started: Fri Oct  2 21:03:45 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+/var/spool/slurm/job7532397/slurm_script: line 49: 2134446 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:03:50 EDT 2026
+[2026-10-02T21:03:50.051] error: Detected 1 oom_kill event in StepId=7532397.batch. Some of the step tasks have been OOM Killed.
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+/var/spool/slurm/job7532403/slurm_script: line 49: 2137357 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:36 EDT 2026
+[2026-10-02T21:16:36.048] error: Detected 1 oom_kill event in StepId=7532403.batch. Some of the step tasks have been OOM Killed.
+/var/spool/slurm/job7532402/slurm_script: line 49: 2137198 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:36 EDT 2026
+[2026-10-02T21:16:36.135] error: Detected 1 oom_kill event in StepId=7532402.batch. Some of the step tasks have been OOM Killed.
+/var/spool/slurm/job7532406/slurm_script: line 49: 2137856 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:40 EDT 2026
+[2026-10-02T21:16:40.283] error: Detected 1 oom_kill event in StepId=7532406.batch. Some of the step tasks have been OOM Killed.
+/var/spool/slurm/job7532407/slurm_script: line 49: 2138041 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:44 EDT 2026
+[2026-10-02T21:16:44.717] error: Detected 1 oom_kill event in StepId=7532407.batch. Some of the step tasks have been OOM Killed.
+/var/spool/slurm/job7532405/slurm_script: line 49: 2137762 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:53 EDT 2026
+[2026-10-02T21:16:53.287] error: Detected 1 oom_kill event in StepId=7532405.batch. Some of the step tasks have been OOM Killed.
+/var/spool/slurm/job7532358/slurm_script: line 49: 2138453 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:54 EDT 2026
+[2026-10-02T21:16:54.059] error: Detected 1 oom_kill event in StepId=7532358.batch. Some of the step tasks have been OOM Killed.
+/var/spool/slurm/job7532404/slurm_script: line 49: 2137545 Killed                  python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states AK,AL,AR,AZ,CA,CO,CT,DE,FL,GA,HI,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,PR,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY
+Finished: Fri Oct  2 21:16:57 EDT 2026
+[2026-10-02T21:16:57.902] error: Detected 1 oom_kill event in StepId=7532404.batch. Some of the step tasks have been OOM Killed.
+
