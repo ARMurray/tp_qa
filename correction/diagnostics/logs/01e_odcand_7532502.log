@@ -1,0 +1,165 @@
+==========================================
+Node:    r7n14
+Job ID:  7532502
+CPUs:    32
+Started: Sat Oct  3 14:38:18 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates
+
+Loading Stage 2a candidates...
+  123838 candidate(s) across 6196 plant(s) (top 20 each)
+  Holdout manifest: 425 plants; 50 in bin(s) ['corrections']
+  Candidates for those plants: 620 across 31 plant(s)
+
+--- work plan ---
+  CA: 20 candidate parcel(s), 1 plant(s)
+  FL: 20 candidate parcel(s), 1 plant(s)
+  IA: 20 candidate parcel(s), 1 plant(s)
+  IL: 40 candidate parcel(s), 2 plant(s)
+  IN: 20 candidate parcel(s), 1 plant(s)
+  KS: 60 candidate parcel(s), 3 plant(s)
+  KY: 40 candidate parcel(s), 2 plant(s)
+  MA: 20 candidate parcel(s), 1 plant(s)
+  MI: 20 candidate parcel(s), 1 plant(s)
+  MN: 20 candidate parcel(s), 1 plant(s)
+  MT: 20 candidate parcel(s), 1 plant(s)
+  NC: 40 candidate parcel(s), 2 plant(s)
+  ND: 20 candidate parcel(s), 1 plant(s)
+  NM: 20 candidate parcel(s), 1 plant(s)
+  NY: 40 candidate parcel(s), 2 plant(s)
+  OK: 20 candidate parcel(s), 1 plant(s)
+  OR: 60 candidate parcel(s), 3 plant(s)
+  PA: 20 candidate parcel(s), 1 plant(s)
+  TX: 40 candidate parcel(s), 2 plant(s)
+  WI: 60 candidate parcel(s), 3 plant(s)
+  TOTAL: 620 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+  Using weights: best.pt
+
+Weights: /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digester', 4: 'drying_bed', 5: 'oxidation_pond'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+--- State CA: 20 candidate(s) ---
+  Resume: skipping 19 already done
+    ...1 candidate(s) done (0.1 min elapsed)
+  Flushed 1 candidate row(s)
+
+--- State FL: 20 candidate(s) ---
+  Resume: skipping 14 already done
+    ...7 candidate(s) done (0.4 min elapsed)
+  Flushed 6 candidate row(s)
+
+--- State IA: 20 candidate(s) ---
+  Resume: skipping 17 already done
+    ...10 candidate(s) done (0.5 min elapsed)
+  Flushed 3 candidate row(s)
+
+--- State IL: 40 candidate(s) ---
+  Resume: skipping 37 already done
+    ...13 candidate(s) done (0.6 min elapsed)
+  Flushed 3 candidate row(s)
+
+--- State IN: 20 candidate(s) ---
+  Resume: skipping 18 already done
+    ...15 candidate(s) done (0.6 min elapsed)
+  Flushed 2 candidate row(s)
+
+--- State KS: 60 candidate(s) ---
+  Resume: skipping 52 already done
+    ...23 candidate(s) done (0.8 min elapsed)
+  Flushed 8 candidate row(s)
+
+--- State KY: 40 candidate(s) ---
+  Resume: skipping 38 already done
+    ...25 candidate(s) done (0.8 min elapsed)
+  Flushed 2 candidate row(s)
+
+--- State MA: 20 candidate(s) ---
+  Resume: skipping 13 already done
+    ...32 candidate(s) done (0.9 min elapsed)
+  Flushed 7 candidate row(s)
+
+--- State MI: 20 candidate(s) ---
+  Resume: skipping 19 already done
+    ...33 candidate(s) done (0.9 min elapsed)
+  Flushed 1 candidate row(s)
+
+--- State MN: 20 candidate(s) ---
+  Resume: skipping 16 already done
+    ...37 candidate(s) done (1.0 min elapsed)
+  Flushed 4 candidate row(s)
+
+--- State MT: 20 candidate(s) ---
+  Resume: skipping 19 already done
+    ...38 candidate(s) done (1.0 min elapsed)
+  Flushed 1 candidate row(s)
+
+--- State NC: 40 candidate(s) ---
+  Resume: skipping 35 already done
+    ...43 candidate(s) done (1.1 min elapsed)
+  Flushed 5 candidate row(s)
+
+--- State ND: 20 candidate(s) ---
+  Resume: skipping 17 already done
+    ...46 candidate(s) done (1.2 min elapsed)
+  Flushed 3 candidate row(s)
+
+--- State NM: 20 candidate(s) ---
+  Resume: skipping 19 already done
+    ...47 candidate(s) done (1.2 min elapsed)
+  Flushed 1 candidate row(s)
+
+--- State NY: 40 candidate(s) ---
+  Resume: skipping 35 already done
+    ...52 candidate(s) done (1.3 min elapsed)
+  Flushed 5 candidate row(s)
+
+--- State OK: 20 candidate(s) ---
+  Resume: skipping 20 already done
+
+--- State OR: 60 candidate(s) ---
+  Resume: skipping 51 already done
+    ...61 candidate(s) done (1.4 min elapsed)
+  Flushed 9 candidate row(s)
+
+--- State PA: 20 candidate(s) ---
+  Resume: skipping 15 already done
+    ...66 candidate(s) done (1.5 min elapsed)
+  Flushed 5 candidate row(s)
+
+--- State TX: 40 candidate(s) ---
+  Resume: skipping 38 already done
+    ...68 candidate(s) done (1.6 min elapsed)
+  Flushed 2 candidate row(s)
+
+--- State WI: 60 candidate(s) ---
+  Resume: skipping 57 already done
+    ...71 candidate(s) done (1.6 min elapsed)
+  Flushed 3 candidate row(s)
+
+=== Summary ===
+  Candidates processed : 71
+  Skipped (resume)     : 549
+  No parcel geometry   : 0
+  Elapsed              : 1.6 min
+
+Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates
+Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
+Finished: Sat Oct  3 14:40:38 EDT 2026  (exit 0)
+

@@ -1,31 +1,11 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-10-03T14:56:27
+when    : 2026-10-03T16:22:53
 source  : /work/GRDVULN/tp_qa/correction/logs
-selected: --training presets (latest 3 each)
+selected: 01e_* (latest 1)
 
-  03_7514657.log                            4 KB ->       4 KB  (job wrote it 2026-09-29T11:02)
-  03_7525727.log                            4 KB ->       4 KB  (job wrote it 2026-09-30T09:56)
-  03_7532351.log                            4 KB ->       4 KB  (job wrote it 2026-10-02T18:37)
-  04_7514722.log                            5 KB ->       5 KB  (job wrote it 2026-09-29T11:26)
-  04_7526004.log                            5 KB ->       5 KB  (job wrote it 2026-09-30T10:00)
-  04_7532352.log                            5 KB ->       5 KB  (job wrote it 2026-10-02T18:35)
-  06_s2b_7406613.log                        1 KB ->       1 KB  (job wrote it 2026-08-27T16:54)
-  06_s2b_7412850.log                        1 KB ->       1 KB  (job wrote it 2026-09-04T18:09)
-  06_s2b_7412858.log                        1 KB ->       1 KB  (job wrote it 2026-09-04T19:14)
-  06b_rerank_7523533.log                    2 KB ->       2 KB  (job wrote it 2026-09-29T17:11)
-  06b_rerank_7529703.log                    2 KB ->       2 KB  (job wrote it 2026-09-30T13:41)
-  06b_rerank_7532498.log                    2 KB ->       2 KB  (job wrote it 2026-10-03T14:17)
-  07_stage2b_7405040.log                    4 KB ->       4 KB  (job wrote it 2026-08-26T13:06)
-  07_stage2b_7406615.log                    4 KB ->       4 KB  (job wrote it 2026-08-27T16:56)
-  07_stage2b_7412859.log                    4 KB ->       4 KB  (job wrote it 2026-09-04T19:28)
-  07b_rerank_7493164.log                    4 KB ->       4 KB  (job wrote it 2026-09-24T17:18)
-  07b_rerank_7529735.log                    4 KB ->       4 KB  (job wrote it 2026-09-30T15:27)
-  07b_rerank_7532500.log                    4 KB ->       4 KB  (job wrote it 2026-10-03T14:28)
-  12_holdout_7493169.log                    3 KB ->       3 KB  (job wrote it 2026-09-24T17:26)
-  12_holdout_7529742.log                    3 KB ->       3 KB  (job wrote it 2026-09-30T15:32)
-  12_holdout_7532504.log                    3 KB ->       3 KB  (job wrote it 2026-10-03T14:55)
+  01e_odcand_7532502.log                    7 KB ->       7 KB  (job wrote it 2026-10-03T14:40)
 
-total copied: 66 KB
+total copied: 7 KB
 
 Originals are untouched. This directory is not gitignored.
