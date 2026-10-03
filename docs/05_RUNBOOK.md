@@ -96,8 +96,12 @@ Before step 5 on a fresh setup, `sbatch preflight_inference.slurm` checks that
 02's tables, 01a's candidates and 01b's detections cover the full universe.
 
 **What to check:** 02b ends `=== merge complete ===` with four `wrote` lines;
-03 and 04 print `[population]` lines and include `name_match_*` columns; 05
-prints the OSM-confirmed count; 07b's model is newer than 04's.
+02 and 05 print `[population]` lines; 03 and 04 include `name_match_*`
+columns; 05 prints the OSM-confirmed count; 07b's model is newer than 04's.
+Step 5 is `05_run_inference_array.slurm` — the national
+`05_run_inference.slurm` now refuses `--array`, and `merge_05_shards` refuses
+shards older than the models. `TRAINING=1` collect_logs does not pick up the
+01e / 05b logs; collect those with `PATTERN=`.
 
 Re-running one failed 02 state: array indices follow `DEFAULT_STATES` in
 `_common.sh` (51 states, DC excluded — **OH is 34**). Re-run with
