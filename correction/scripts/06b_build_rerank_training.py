@@ -132,6 +132,23 @@ def load_candidate_od() -> pd.DataFrame:
         sys.exit(2)
     files = sorted(OD_TRAIN_ROOT.rglob("*.parquet"),
                    key=lambda f: f.stat().st_mtime)
+    # Files older than the deployed detector were written by a previous one.
+    # 05b skips them at inference, so training on them is train/serve skew
+    # (2026-10-03: most of the 09-08..09-24 rows predated the 09-28 best.pt).
+    pts = sorted(C.OD_MODEL_DIR.rglob("*.pt"), key=lambda p: p.stat().st_mtime,
+                 reverse=True) if C.OD_MODEL_DIR.exists() else []
+    if pts:
+        model_t = pts[0].stat().st_mtime
+        stale = [f for f in files if f.stat().st_mtime < model_t]
+        if stale:
+            print(f"  Skipping {len(stale)} candidate-OD file(s) written before the "
+                  f"deployed best.pt (a previous detector's output)")
+        files = [f for f in files if f.stat().st_mtime >= model_t]
+        if not files:
+            print("ERROR: every training-root OD file predates the deployed "
+                  "best.pt. Re-run: sbatch --export=SCOPE=\"train\" "
+                  "01e_run_od_candidates.slurm")
+            sys.exit(2)
     frames = []
     for f in files:
         df = pd.read_parquet(f)

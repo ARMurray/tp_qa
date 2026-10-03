@@ -270,13 +270,26 @@ def load_parcel_geoms(con, state: str, uuids: list[str]) -> pd.DataFrame:
     return res.drop_duplicates(subset="ll_uuid")
 
 
+def deployed_model_mtime() -> float | None:
+    pts = sorted(C.OD_MODEL_DIR.rglob("*.pt"), key=lambda p: p.stat().st_mtime,
+                 reverse=True) if C.OD_MODEL_DIR.exists() else []
+    return pts[0].stat().st_mtime if pts else None
+
+
 def processed_keys(out_root: Path, state: str) -> set:
-    """(CWNS_ID, ll_uuid) pairs already written, for resume."""
+    """(CWNS_ID, ll_uuid) pairs already written BY THE DEPLOYED DETECTOR, for
+    resume. Files older than best.pt are ignored, matching 05b, which skips
+    them: before 2026-10-03, resume counted old-detector rows as done, so
+    those candidates were never re-run and 05b then saw no detections for
+    them at all."""
     d = out_root / "candidates" / f"state={state}"
     if not d.exists():
         return set()
+    model_t = deployed_model_mtime()
     done = set()
     for f in d.glob("*.parquet"):
+        if model_t is not None and f.stat().st_mtime < model_t:
+            continue
         try:
             df = pd.read_parquet(f, columns=["CWNS_ID", "ll_uuid"])
             done |= set(zip(df["CWNS_ID"].astype(str), df["ll_uuid"].astype(str)))
