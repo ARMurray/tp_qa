@@ -42,6 +42,15 @@ source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 # --export or positional arg is needed. Override for a subset as shown above.
 STATES_ARG="${1:-$DEFAULT_STATES_CSV}"
 
+# This script ignores the array index: submitted with --array, EVERY task runs
+# the full national scope and OOMs (2026-10-02). Per-state runs belong to
+# 05_run_inference_array.slurm.
+if [ -n "${SLURM_ARRAY_TASK_ID:-}" ]; then
+    echo "ERROR: 05_run_inference.slurm was submitted as an array job."
+    echo "  Use: sbatch --array=0-39,41-47%8 05_run_inference_array.slurm"
+    exit 1
+fi
+
 CMD="python $SCRIPTS/05_run_inference.py --states $STATES_ARG"
 [ -n "${TOPK:-}" ] && CMD="$CMD --top-k $TOPK"
 

@@ -25,6 +25,10 @@ WHAT IT CHECKS
       survived from an earlier run)
     - stage2_candidates shards can legitimately be EMPTY for a state where
       no flagged plant kept a candidate; that is not an error
+    - no shard is older than the deployed Stage 1 / Stage 2a models. A failed
+      array task leaves the PREVIOUS run's shard in place, and merging it
+      would mix old-model and new-model scores without any other symptom
+      (2026-10-02: every task OOMed and this merged 48 stale shards).
 
 Usage:
     python merge_05_shards.py --states "AL AR AZ ... WY"
@@ -52,6 +56,8 @@ def main():
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--allow-missing", action="store_true",
                     help="merge anyway when a state produced no shard")
+    ap.add_argument("--allow-stale", action="store_true",
+                    help="merge anyway when a shard predates the deployed models")
     args = ap.parse_args()
 
     states = [s for s in args.states.replace(",", " ").split() if s]
@@ -74,6 +80,22 @@ def main():
                   "look well-formed while silently missing these states. Re-run "
                   "the failed array tasks, or pass --allow-missing if the gap is "
                   "intentional.")
+            sys.exit(1)
+
+    models = [C.MODELS_DIR / f"{m}_rf_model.joblib" for m in ("stage1", "stage2")]
+    newest_model = max(p.stat().st_mtime for p in models if p.exists())
+    stale = [s for s in states
+             if (SHARD_ROOT / f"state={s}" / "plant_summary.parquet").exists()
+             and (SHARD_ROOT / f"state={s}" / "plant_summary.parquet").stat().st_mtime
+             < newest_model]
+    if stale:
+        print(f"WARNING: {len(stale)} shard(s) are older than the deployed "
+              f"Stage 1 / Stage 2a model: {' '.join(stale)}")
+        if not args.allow_stale:
+            print("\nRefusing to merge -- these were written by the previous "
+                  "models (a failed or skipped array task leaves its old shard "
+                  "in place). Re-run those array tasks, or pass --allow-stale "
+                  "if that is intentional.")
             sys.exit(1)
 
     for fname in FILES:
