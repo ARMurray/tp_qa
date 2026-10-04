@@ -1,0 +1,73 @@
+=== calibrate_move_rule.py ===
+rounds: [4]  |  target precision: 90%  (met only when the 95% CI lower bound clears it)
+
+--- round 4  (model unversioned-2026-09-30; 132 candidate_pick plants) ---
+  cutoff  moves  right    prec        95% CI wrongC outside  FALSE n_info
+    0.00    106     50   47.2%   38%-57%        25      17     14     26
+    0.50     54     35   64.8%   51%-76%        13       4      2      4
+    0.60     45     31   68.9%   54%-80%         9       3      2      1
+    0.70     36     28   77.8%   62%-88%         5       2      1      1
+    0.75     34     27   79.4%   63%-90%         4       2      1      1
+    0.80     32     26   81.2%   65%-91%         4       1      1      1
+    0.85     30     25   83.3%   66%-93%         4       0      1      1
+    0.90     23     18   78.3%   58%-90%         4       0      1      0
+    0.95     16     15   93.8%   72%-99%         1       0      0      0
+    0.97     10      9   90.0%   60%-98%         1       0      0      0
+
+--- by queue slice, pooled ---
+  [random]  27 plants
+  cutoff  moves  right    prec        95% CI wrongC outside  FALSE n_info
+    0.00     23      9   39.1%   22%-59%         6       5      3      4
+    0.50     15      8   53.3%   30%-75%         4       3      0      1
+    0.60     11      6   54.5%   28%-79%         2       3      0      1
+    0.70      9      6   66.7%   35%-88%         1       2      0      1
+    0.75      8      6   75.0%   41%-93%         0       2      0      1
+    0.80      7      6   85.7%   49%-97%         0       1      0      1
+    0.85      5      5  100.0%   57%-100%        0       0      0      1
+    0.90      2      2  100.0%   34%-100%        0       0      0      0
+    0.95      2      2  100.0%   34%-100%        0       0      0      0
+    0.97      2      2  100.0%   34%-100%        0       0      0      0
+  [uncertain]  105 plants
+  cutoff  moves  right    prec        95% CI wrongC outside  FALSE n_info
+    0.00     83     41   49.4%   39%-60%        19      12     11     22
+    0.50     39     27   69.2%   54%-81%         9       1      2      3
+    0.60     34     25   73.5%   57%-85%         7       0      2      0
+    0.70     27     22   81.5%   63%-92%         4       0      1      0
+    0.75     26     21   80.8%   62%-91%         4       0      1      0
+    0.80     25     20   80.0%   61%-91%         4       0      1      0
+    0.85     25     20   80.0%   61%-91%         4       0      1      0
+    0.90     21     16   76.2%   55%-89%         4       0      1      0
+    0.95     14     13   92.9%   69%-99%         1       0      0      0
+    0.97      8      7   87.5%   53%-98%         1       0      0      0
+
+--- re-rank fallback (#1 is Stage 2a's, nothing fired) ---
+  [rerank_fallback=0]  49 plants
+  cutoff  moves  right    prec        95% CI wrongC outside  FALSE n_info
+    0.00     39     24   61.5%   46%-75%        10       4      1     10
+    0.50     32     23   71.9%   55%-84%         7       2      0      3
+    0.60     30     21   70.0%   52%-83%         7       2      0      1
+    0.70     24     19   79.2%   60%-91%         4       1      0      1
+    0.75     23     19   82.6%   63%-93%         3       1      0      1
+    0.80     23     19   82.6%   63%-93%         3       1      0      1
+    0.85     21     18   85.7%   65%-95%         3       0      0      1
+    0.90     17     14   82.4%   59%-94%         3       0      0      0
+    0.95     14     13   92.9%   69%-99%         1       0      0      0
+    0.97      9      8   88.9%   56%-98%         1       0      0      0
+  [rerank_fallback=1]  83 plants
+  cutoff  moves  right    prec        95% CI wrongC outside  FALSE n_info
+    0.00     67     26   38.8%   28%-51%        15      13     13     16
+    0.50     22     12   54.5%   35%-73%         6       2      2      1
+    0.60     15     10   66.7%   42%-85%         2       1      2      0
+    0.70     12      9   75.0%   47%-91%         1       1      1      0
+    0.75     11      8   72.7%   43%-90%         1       1      1      0
+    0.80      9      7   77.8%   45%-94%         1       0      1      0
+    0.85      9      7   77.8%   45%-94%         1       0      1      0
+    0.90      6      4   66.7%   30%-90%         1       0      1      0
+    0.95      2      2  100.0%   34%-100%        0       0      0      0
+    0.97      1      1  100.0%   21%-100%        0       0      0      0
+
+--- plants needed for the CI to clear the target ---
+  observed precision 93%: n >= 362 moves at the cutoff
+  observed precision 95%: n >= 127 moves at the cutoff
+  observed precision 97%: n >= 69 moves at the cutoff
+  observed precision 99%: n >= 35 moves at the cutoff
