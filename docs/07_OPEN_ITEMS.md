@@ -191,6 +191,13 @@ reported location AND the re-ranker's #1 clears a cutoff. The cutoff has to be
 set from out-of-sample precision with a confidence interval, and is the
 owner's call. Candidates so far: 0.95 (93.8%, n=16).
 
+**Decided 2026-10-04 (owner): cutoff 0.95, detections NOT required**
+(`--cutoff 0.95`, no `--require-detection`). Provisional until the Wilson
+lower bound clears 90% (~127 moves at 95% observed); re-check with
+`calibrate_move_rule.py` after every round. In round 4 both ≥0.95 plants with
+no detection in the pool were right (n=2); below 0.95, no-detection pools
+held 13 of the 14 false moves — watch that row.
+
 ### A Stage 1 guardrail for utility-owned reported parcels
 
 Held, deliberately (2026-10-02). Utility-owned reported parcels are 99% Correct

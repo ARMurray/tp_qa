@@ -12,7 +12,7 @@
 # The corrected-locations product. CUTOFF is required -- it is the move rule,
 # set from calibrate_move_rule.py and chosen by the project owner.
 #
-#   sbatch --export=CUTOFF=0.95 13_build_corrected_output.slurm
+#   sbatch --export=CUTOFF=0.95 13_build_corrected_output.slurm   # decided 2026-10-04
 #   sbatch --export=CUTOFF=0.95,REQUIRE_DETECTION=1 13_build_corrected_output.slurm
 #
 # Needs the national 01e array + 05b first; refuses otherwise.
