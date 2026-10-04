@@ -1,0 +1,237 @@
+==========================================
+Node:    r7n14
+Job ID:  7532531
+CPUs:    32
+Started: Sat Oct  3 23:55:59 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32 --from-queue "/work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round5.parquet" --no-resume
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01e_run_od_candidates.py ===
+output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_queue
+
+Loading Stage 2a candidates...
+  123838 candidate(s) across 6196 plant(s) (top 20 each)
+  Queue review_queue_round5.parquet: 670 shown candidate parcel(s) across 134 plant(s)
+  Scope: each queued plant's top 20 candidate(s), not just the shown ones (--shown-only to restrict)
+  Running detection on 2680 parcel(s)
+
+--- work plan ---
+  AR: 20 candidate parcel(s), 1 plant(s)
+  AZ: 40 candidate parcel(s), 2 plant(s)
+  CA: 140 candidate parcel(s), 7 plant(s)
+  CO: 40 candidate parcel(s), 2 plant(s)
+  CT: 20 candidate parcel(s), 1 plant(s)
+  DE: 20 candidate parcel(s), 1 plant(s)
+  FL: 40 candidate parcel(s), 2 plant(s)
+  GA: 60 candidate parcel(s), 3 plant(s)
+  IA: 120 candidate parcel(s), 6 plant(s)
+  ID: 20 candidate parcel(s), 1 plant(s)
+  IL: 120 candidate parcel(s), 6 plant(s)
+  IN: 120 candidate parcel(s), 6 plant(s)
+  KS: 80 candidate parcel(s), 4 plant(s)
+  KY: 20 candidate parcel(s), 1 plant(s)
+  LA: 100 candidate parcel(s), 5 plant(s)
+  MD: 20 candidate parcel(s), 1 plant(s)
+  MI: 120 candidate parcel(s), 6 plant(s)
+  MN: 80 candidate parcel(s), 4 plant(s)
+  MO: 100 candidate parcel(s), 5 plant(s)
+  MT: 20 candidate parcel(s), 1 plant(s)
+  NC: 120 candidate parcel(s), 6 plant(s)
+  ND: 20 candidate parcel(s), 1 plant(s)
+  NJ: 60 candidate parcel(s), 3 plant(s)
+  NY: 160 candidate parcel(s), 8 plant(s)
+  OH: 120 candidate parcel(s), 6 plant(s)
+  OR: 40 candidate parcel(s), 2 plant(s)
+  PA: 60 candidate parcel(s), 3 plant(s)
+  TN: 20 candidate parcel(s), 1 plant(s)
+  TX: 460 candidate parcel(s), 23 plant(s)
+  UT: 20 candidate parcel(s), 1 plant(s)
+  VA: 40 candidate parcel(s), 2 plant(s)
+  VT: 20 candidate parcel(s), 1 plant(s)
+  WA: 60 candidate parcel(s), 3 plant(s)
+  WI: 80 candidate parcel(s), 4 plant(s)
+  WV: 100 candidate parcel(s), 5 plant(s)
+  TOTAL: 2680 candidate parcel(s)
+  Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
+  Using weights: best.pt
+
+Weights: /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digester', 4: 'drying_bed', 5: 'oxidation_pond'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+--- State AR: 20 candidate(s) ---
+    ...20 candidate(s) done (0.4 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State AZ: 40 candidate(s) ---
+    ...60 candidate(s) done (0.8 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State CA: 140 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 8s (attempt 1/5)
+    ...200 candidate(s) done (1.9 min elapsed)
+  Flushed 140 candidate row(s)
+
+--- State CO: 40 candidate(s) ---
+    ...240 candidate(s) done (2.3 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State CT: 20 candidate(s) ---
+    ...260 candidate(s) done (2.5 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State DE: 20 candidate(s) ---
+    ...280 candidate(s) done (2.7 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State FL: 40 candidate(s) ---
+    ...320 candidate(s) done (3.1 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State GA: 60 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 10s (attempt 1/5)
+    ...380 candidate(s) done (3.7 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State IA: 120 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 9s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 17s (attempt 2/5)
+    ...500 candidate(s) done (5.0 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State ID: 20 candidate(s) ---
+    ...520 candidate(s) done (5.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State IL: 120 candidate(s) ---
+    ...640 candidate(s) done (6.1 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State IN: 120 candidate(s) ---
+    ...760 candidate(s) done (7.0 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State KS: 80 candidate(s) ---
+    ...840 candidate(s) done (7.5 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State KY: 20 candidate(s) ---
+    ...860 candidate(s) done (7.8 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State LA: 100 candidate(s) ---
+    ...960 candidate(s) done (8.5 min elapsed)
+  Flushed 100 candidate row(s)
+
+--- State MD: 20 candidate(s) ---
+    ...980 candidate(s) done (8.7 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State MI: 120 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 14s (attempt 1/5)
+    ...1100 candidate(s) done (9.8 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State MN: 80 candidate(s) ---
+    ...1180 candidate(s) done (25.9 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State MO: 100 candidate(s) ---
+    ...1280 candidate(s) done (26.7 min elapsed)
+  Flushed 100 candidate row(s)
+
+--- State MT: 20 candidate(s) ---
+    ...1300 candidate(s) done (26.9 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NC: 120 candidate(s) ---
+    ...1420 candidate(s) done (27.9 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State ND: 20 candidate(s) ---
+    ...1440 candidate(s) done (28.2 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State NJ: 60 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 15s (attempt 1/5)
+    ...1500 candidate(s) done (29.0 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State NY: 160 candidate(s) ---
+    ...1660 candidate(s) done (30.3 min elapsed)
+  Flushed 160 candidate row(s)
+
+--- State OH: 120 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 14s (attempt 1/5)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 15s (attempt 1/5)
+    ...1780 candidate(s) done (31.7 min elapsed)
+  Flushed 120 candidate row(s)
+
+--- State OR: 40 candidate(s) ---
+    ...1820 candidate(s) done (32.0 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State PA: 60 candidate(s) ---
+    ...1880 candidate(s) done (32.5 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State TN: 20 candidate(s) ---
+    ...1900 candidate(s) done (32.7 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State TX: 460 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 8s (attempt 1/5)
+    48003304001::d1e0af92-01f7-49c4-9294-94cd7fede5e9: prepare failed -- {"error":"Service is unavailable."}
+    ...2099 candidate(s) done (34.2 min elapsed)
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 9s (attempt 1/5)
+    ...2299 candidate(s) done (35.8 min elapsed)
+    ...2359 candidate(s) done (36.3 min elapsed)
+  Flushed 459 candidate row(s)
+
+--- State UT: 20 candidate(s) ---
+    ...2379 candidate(s) done (36.4 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State VA: 40 candidate(s) ---
+    ...2419 candidate(s) done (36.8 min elapsed)
+  Flushed 40 candidate row(s)
+
+--- State VT: 20 candidate(s) ---
+    ...2439 candidate(s) done (37.0 min elapsed)
+  Flushed 20 candidate row(s)
+
+--- State WA: 60 candidate(s) ---
+    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 11s (attempt 1/5)
+    ...2499 candidate(s) done (37.7 min elapsed)
+  Flushed 60 candidate row(s)
+
+--- State WI: 80 candidate(s) ---
+    ...2579 candidate(s) done (38.2 min elapsed)
+  Flushed 80 candidate row(s)
+
+--- State WV: 100 candidate(s) ---
+    ...2679 candidate(s) done (39.1 min elapsed)
+  Flushed 100 candidate row(s)
+
+=== Summary ===
+  Candidates processed : 2679
+  Skipped (resume)     : 0
+  No parcel geometry   : 0
+  Elapsed              : 39.1 min
+
+Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_queue
+Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
+Finished: Sun Oct  4 00:35:50 EDT 2026  (exit 0)
+

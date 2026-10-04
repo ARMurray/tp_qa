@@ -1,13 +1,12 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-10-03T17:30:13
+when    : 2026-10-04T09:14:11
 source  : /work/GRDVULN/tp_qa/correction/logs
-selected: 0[15][eb]_* (latest 3)
+selected: 0[15][eb]_* (latest 2)
 
-  05b_rerank_7532517.log                    2 KB ->       2 KB  (job wrote it 2026-10-03T17:24)
-  01e_odcand_7532516.log                    6 KB ->       6 KB  (job wrote it 2026-10-03T17:22)
-  01e_odcand_7532512.log                   10 KB ->      10 KB  (job wrote it 2026-10-03T17:04)
+  01e_odcand_7532531.log                   10 KB ->      10 KB  (job wrote it 2026-10-04T00:35)
+  01e_odcand_7532523.log                   11 KB ->      11 KB  (job wrote it 2026-10-03T18:53)
 
-total copied: 18 KB
+total copied: 21 KB
 
 Originals are untouched. This directory is not gitignored.

@@ -1,0 +1,43 @@
+==========================================
+Node:    r7n14
+Job ID:  7532545
+CPUs:    4
+Started: Sun Oct  4 09:10:03 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Prior-round review files copied into /work/GRDVULN/tp_qa/correction/data/review_log_incoming: 5
+Running: python /work/GRDVULN/tp_qa/correction/scripts/10_build_review_queue.py --states AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY --round 5 --keep-selection
+=== 10_build_review_queue.py ===
+States: AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY  |  Round: 5  |  Model version tag: unversioned-2026-10-04
+Using re-ranked (OD-aware) inference output
+
+Loaded 9564 scored plants, 123838 candidate rows
+  Excluding 360 plant(s) already reviewed in a prior round (600 total prior reviews found across all uploaded review_log/holdout_truth files)
+
+Loading plant display info (address/city/county, pop_served, discharge facts)...
+  Detection stats attached: 26381/29450 candidate(s) have an 01e result, 4422 fired
+
+Review tasks: 9204 plants -- 5891 candidate_pick, 3313 confirm_reported
+
+Holdout slice: 0 unreviewed unlabeled-bin plant(s) in this pilot's scope (skipped -- round > 1)
+
+Batch composition (target size 150):
+  holdout   : 0
+  uncertain : 105 (of 5580 eligible, target 105)
+  random    : 45 (target 45)
+
+--keep-selection: reusing the 150 plant(s) and slices of review_queue_round5.parquet
+
+  Queued candidates with detection stats: 670/670
+    from od_features_candidates_queue     670
+    written BEFORE the deployed best.pt: 0
+
+=== Summary ===
+  Plants queued : 150
+  Queue rows    : 686 (670 candidate_pick, 16 confirm_reported)
+
+Written: /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round5.parquet
+Finished: Sun Oct  4 09:10:22 EDT 2026
+
