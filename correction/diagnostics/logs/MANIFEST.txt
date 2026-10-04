@@ -1,12 +1,22 @@
 collect_logs.py
 host    : a0n15
-when    : 2026-10-04T09:14:11
+when    : 2026-10-04T15:12:05
 source  : /work/GRDVULN/tp_qa/correction/logs
-selected: 0[15][eb]_* (latest 2)
+selected: 01e_arr_* (latest 12)
 
-  01e_odcand_7532531.log                   10 KB ->      10 KB  (job wrote it 2026-10-04T00:35)
-  01e_odcand_7532523.log                   11 KB ->      11 KB  (job wrote it 2026-10-03T18:53)
+  01e_arr_7532551_43.log                    6 KB ->       6 KB  (job wrote it 2026-10-04T15:11)
+  01e_arr_7532551_34.log                   18 KB ->      18 KB  (job wrote it 2026-10-04T15:11)
+  01e_arr_7532551_45.log                    4 KB ->       4 KB  (job wrote it 2026-10-04T15:11)
+  01e_arr_7532551_33.log                   20 KB ->      20 KB  (job wrote it 2026-10-04T15:07)
+  01e_arr_7532551_44.log                    2 KB ->       2 KB  (job wrote it 2026-10-04T15:01)
+  01e_arr_7532551_37.log                   13 KB ->      13 KB  (job wrote it 2026-10-04T15:01)
+  01e_arr_7532551_42.log                    8 KB ->       8 KB  (job wrote it 2026-10-04T14:59)
+  01e_arr_7532551_41.log                    4 KB ->       4 KB  (job wrote it 2026-10-04T14:44)
+  01e_arr_7532551_40.log                    5 KB ->       5 KB  (job wrote it 2026-10-04T14:41)
+  01e_arr_7532551_39.log                    3 KB ->       3 KB  (job wrote it 2026-10-04T14:33)
+  01e_arr_7532551_36.log                   11 KB ->      11 KB  (job wrote it 2026-10-04T14:33)
+  01e_arr_7532551_35.log                   11 KB ->      11 KB  (job wrote it 2026-10-04T14:31)
 
-total copied: 21 KB
+total copied: 105 KB
 
 Originals are untouched. This directory is not gitignored.
