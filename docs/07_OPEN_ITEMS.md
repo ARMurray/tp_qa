@@ -267,6 +267,15 @@ Nothing writes the final corrected-locations file. Proposed:
 cutoff), `kept` (incl. `osm_confirmed`), or `not assessed` (population ≤ 1,000
 or missing; AK/HI/PR, no NAIP). ~9,400 of 16,430 treatment plants are in scope.
 
+**Written 2026-10-04, not yet run:** `13_build_corrected_output.py` (+ .slurm).
+Statuses: verified_correct, verified_corrected, reviewed_unresolved, moved,
+flagged_not_moved, kept_osm, kept_model, not_assessed (with reason). `--cutoff`
+is required; `--require-detection` refuses moves where nothing fired. A moved
+plant gets a point inside its parcel. Refuses while under 50% of re-ranked #1s
+have current-detector results. The master has 17,874 treatment plants (all
+states); every one gets a row. Tested locally on synthetic inference tables.
+Out-of-sample precision by cutoff: `calibrate_move_rule.py`.
+
 ### The re-ranker trains on in-sample Stage 2a scores
 
 06b takes `stage2_prob_correct` / `stage2a_rank` from a Stage 2a model fitted
