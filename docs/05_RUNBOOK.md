@@ -118,7 +118,7 @@ chosen on, so a plain rebuild picks different plants).
 ```bash
 sbatch --export=ROUND=5 10_build_review_queue.slurm
 sbatch --export=SCOPE="queue",ROUND=5,NORESUME=1 01e_run_od_candidates.slurm
-sbatch 05b_rerank_candidates.slurm
+sbatch 05b_rerank_candidates.slurm                # ONLY after 01e shows COMPLETED -- 10 now refuses otherwise
 sbatch --export=ROUND=5,KEEP=1 10_build_review_queue.slurm
 sbatch --export=PATTERN="10_*",LATEST=1 collect_logs.slurm
 cd /work/GRDVULN/tp_qa

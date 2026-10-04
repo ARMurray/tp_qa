@@ -386,6 +386,9 @@ def main():
                      help="proceed even if some states with flagged plants have no "
                           "reranked candidates (those plants get empty candidate "
                           "lists). Off by default -- the script exits instead.")
+    ap.add_argument("--allow-stale-rerank", action="store_true",
+                    help="with --keep-selection: build even when 05b's fallback "
+                         "flag contradicts the attached detection stats")
     args = ap.parse_args()
 
     from datetime import date
@@ -533,6 +536,24 @@ def main():
     #      for exactly the selected plants, tagged with queue_slice/provenance ----
     cp = cand_pick_rows[cand_pick_rows["CWNS_ID"].isin(queue_plant_ids)].copy()
     report_od_provenance(cp)
+
+    # 05b's re-rank must have SEEN the detections shown next to it. If a plant
+    # is marked rerank_fallback ("nothing fired") while a queued candidate
+    # carries a detection, 05b ran before 01e --from-queue finished: the
+    # scores and order are Stage 2a's with every OD feature empty. Round 5
+    # (2026-10-04) shipped like that for all 134 candidate_pick plants.
+    if {"rerank_fallback", "od_has_detection"}.issubset(cp.columns) and len(cp):
+        per = cp.groupby("CWNS_ID").agg(
+            fb=("rerank_fallback", lambda s: bool(s.fillna(False).astype(bool).any())),
+            hit=("od_has_detection", lambda s: bool(s.fillna(False).astype(bool).any())))
+        bad = int((per["fb"] & per["hit"]).sum())
+        print(f"    marked 'nothing fired' by 05b but a detection is attached: {bad}"
+              + ("  <-- 05b did not see these detections" if bad else ""))
+        if bad and args.keep_selection and not args.allow_stale_rerank:
+            print("\nRefusing: re-run 05b_rerank_candidates.slurm AFTER 01e "
+                  "--from-queue has finished, then this again. "
+                  "(--allow-stale-rerank overrides.)")
+            sys.exit(1)
     cr = confirm_rows[confirm_rows["CWNS_ID"].isin(queue_plant_ids)].copy()
 
     # PARCEL_INFO_COLS: was silently dropped by an earlier version of this

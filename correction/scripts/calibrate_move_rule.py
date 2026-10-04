@@ -90,6 +90,19 @@ def load_round(n: int) -> pd.DataFrame:
     df.loc[v == "candidate_correct", "outcome"] = "wrong_candidate"
     df.loc[(v == "candidate_correct") & (df["candidate_rank"] == 1), "outcome"] = "right"
     df["round"] = n
+
+    # A round whose 05b ran without the queue's detections (fallback flagged
+    # while a shown candidate fired -- round 5, 2026-10-04) carries Stage 2a
+    # order and OD-blind re-rank scores. Its verdicts are fine; its scores
+    # are not the production re-ranker's and must be recomputed.
+    fired = cands.groupby("cwns_id")["od_has_detection"].max().fillna(0).astype(bool)
+    fb = cands.groupby("cwns_id")["rerank_fallback"].max().fillna(0).astype(bool)
+    bad = int((fired & fb).sum())
+    if bad:
+        print(f"WARNING: round {n}: {bad} plant(s) marked 'nothing fired' with a "
+              f"detection attached -- its re-rank scores were computed without "
+              f"the queue's detections. Do NOT use its precision table until it "
+              f"is re-scored with the national 05b output.\n")
     return df
 
 
