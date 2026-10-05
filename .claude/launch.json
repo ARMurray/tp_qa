@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "plant-viewer",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["viewer/app.py", "--port", "8050"],
+      "port": 8050
+    }
+  ]
+}

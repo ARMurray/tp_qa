@@ -263,6 +263,13 @@ def main():
     gdf.to_file(base.with_suffix(".gpkg"), layer="plants", driver="GPKG")
     print(f"\nWritten: {base}.parquet / .csv / .gpkg")
 
+    # A copy where git can carry it (data/ is ignored, diagnostics/ is not):
+    # viewer/build_data.py on the work computer reads exactly this path.
+    share = C.ROOT / "diagnostics" / "output" / "cwns_corrected_locations.parquet"
+    share.parent.mkdir(parents=True, exist_ok=True)
+    out.to_parquet(share, index=False)
+    print(f"Copied for the viewer: {share}  (git add correction/diagnostics/output/)")
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CWNS Plant Locations</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://unpkg.com/deck.gl@^9.1.0/dist.min.js"></script>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="tooltip"></div>
+
+  <div id="search-bar">
+    <input id="search-input" type="text" placeholder="Search by name or CWNS ID" autocomplete="off">
+    <button id="search-button">Search</button>
+    <div id="search-suggestions"></div>
+  </div>
+
+  <div id="basemap-toggle">
+    <button id="basemap-street" class="active">Street</button>
+    <button id="basemap-imagery">Imagery</button>
+  </div>
+
+  <div id="legend-stack">
+    <div id="legend">
+      <div class="title">Location status</div>
+      <div id="status-filters"></div>
+      <div class="filter-group">
+        <label for="state-filter">State</label>
+        <select id="state-filter"><option value="">All states</option></select>
+      </div>
+      <div class="filter-group">
+        <label class="row"><input type="checkbox" id="show-moves" checked> Show move lines</label>
+      </div>
+      <div class="opacity-control">
+        <label for="size-slider">Point size</label>
+        <input id="size-slider" type="range" min="1" max="10" value="4">
+      </div>
+      <div id="visible-count" class="count"></div>
+    </div>
+  </div>
+
+  <div id="detail-panel" class="detail-panel"></div>
+  <div id="status">loading…</div>
+  <div id="map-attribution"></div>
+
+  <script src="/static/map.js"></script>
+</body>
+</html>
