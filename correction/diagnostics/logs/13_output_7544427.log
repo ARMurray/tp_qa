@@ -1,0 +1,52 @@
+==========================================
+Node:    r7n15
+Job ID:  7544427
+CPUs:    4
+Started: Mon Oct  5 19:29:46 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/13_build_corrected_output.py --cutoff 0.95
+=== 13_build_corrected_output.py ===
+move rule: Stage 1 flagged AND re-rank #1 >= 0.95
+site rule: neighbours within 50 m with a detection (conf >= 0.4) or #1's owner (re-rank >= 0.5); max 4 parcels
+  master: Updates.gpkg layer CWNS_Locations_20261005: 32,296 facilities
+  treatment plants: 17,874
+  re-ranked #1 candidates with a current-detector result: 93.5%
+
+  flagged plants: 5,541  |  clearing the move rule: 1,019
+
+  loading 27,920 parcel geometries...
+  found 27,920
+
+  loading detected objects...
+  objects from reported            18,494  (91 current file(s))
+  objects from corrected                0  (0 current file(s))
+  objects from candidate           47,151  (95 current file(s))
+  objects from candidate_queue      1,688  (70 current file(s))
+
+  moves: 950 moved, 69 kept_site (reported parcel in the site), 280 multi-parcel site(s), 0 parcel(s) not found
+
+  sites layer: 8,358 plant site(s)  |  detections layer: 22,668 object(s)
+
+=== status ===
+  not_assessed             7,555  (42.3%)
+  flagged_not_moved        4,522  (25.3%)
+  verified_correct         2,218  (12.4%)
+  kept_model               1,680  (9.4%)
+  moved                      950  (5.3%)
+  verified_corrected         723  (4.0%)
+  kept_osm                   108  (0.6%)
+  kept_site                   69  (0.4%)
+  reviewed_unresolved         49  (0.3%)
+  TOTAL                   17,874
+  not_assessed by reason: population_le_1000_or_unknown 7,361, no_imagery_state 194
+  moved distance: median 254 m, 90th pct 856 m, max 4,281 m
+  moved point from: detections 927, centroid 23
+  moved points outside their site (mean centre fell between parcels): 6
+
+Written: /work/GRDVULN/tp_qa/correction/data/output/cwns_corrected_locations.parquet / .csv / .gpkg (layers plants, sites, detections)
+Copied for the viewer: /work/GRDVULN/tp_qa/correction/diagnostics/output/  (git add correction/diagnostics/output/)
+Finished: Mon Oct  5 19:35:05 EDT 2026  (exit 0)
+
