@@ -38,16 +38,23 @@ WWW = Path(__file__).resolve().parent / "www"
 
 _lock = threading.Lock()
 _payload: bytes = b""
+_sites: bytes = b""
+_dets: bytes = b""
 _meta: dict = {}
 
 
 def load() -> None:
-    global _payload, _meta
+    global _payload, _sites, _dets, _meta
     d = build_data.build()
+    sites = build_data.build_sites()
+    dets = build_data.build_detections()
     with _lock:
         _payload = json.dumps(d, separators=(",", ":")).encode("utf-8")
+        _sites = json.dumps(sites, separators=(",", ":")).encode("utf-8")
+        _dets = json.dumps(dets, separators=(",", ":")).encode("utf-8")
         _meta = {k: d[k] for k in ("source", "cutoff", "counts")}
-    print(f"[viewer] {d['source']}: {len(d['plants']):,} plants")
+    print(f"[viewer] {d['source']}: {len(d['plants']):,} plants, "
+          f"{len(sites['features']):,} sites, {len(dets):,} detections")
 
 
 class NoCacheStatic(StaticFiles):
@@ -66,6 +73,20 @@ async def index(request):
 async def plants(request):
     with _lock:
         body = _payload
+    return Response(body, media_type="application/json",
+                    headers={"Cache-Control": "no-store"})
+
+
+async def sites(request):
+    with _lock:
+        body = _sites
+    return Response(body, media_type="application/geo+json",
+                    headers={"Cache-Control": "no-store"})
+
+
+async def detections(request):
+    with _lock:
+        body = _dets
     return Response(body, media_type="application/json",
                     headers={"Cache-Control": "no-store"})
 
@@ -90,6 +111,8 @@ app = Starlette(
     routes=[
         Route("/", index),
         Route("/data/plants.json", plants),
+        Route("/data/sites.geojson", sites),
+        Route("/data/detections.json", detections),
         Route("/api/meta", meta),
         Route("/api/reload", reload, methods=["GET", "POST"]),
         Mount("/static", NoCacheStatic(directory=WWW), name="static"),

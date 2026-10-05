@@ -143,3 +143,6 @@ body.panel-open #search-bar { left: calc((100vw - min(400px, 92vw)) / 2); }
   body.panel-open #search-bar { display: none; }
   #search-input { width: 220px; }
 }
+
+.class-key { display: flex; flex-wrap: wrap; gap: 4px 10px; margin: 6px 0 0 2px; font-size: 11px; color: #555; }
+.class-key i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; border: 1px solid rgba(0,0,0,0.25); vertical-align: -1px; }

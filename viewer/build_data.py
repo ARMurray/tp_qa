@@ -38,7 +38,10 @@ MASTER_LAYER_RE = r"^CWNS_Locations_(\d{8})(_v\d+)?$"
 
 # Draw order: first is drawn first (bottom). Status the eye should find --
 # moves and doubts -- goes on top.
-STATUS_ORDER = ["not_assessed", "pending", "kept_model", "kept_osm",
+SITES_PARQUET = OUTPUT_PARQUET.parent / "cwns_sites.parquet"
+DETECTIONS_PARQUET = OUTPUT_PARQUET.parent / "cwns_detections.parquet"
+
+STATUS_ORDER = ["not_assessed", "pending", "kept_model", "kept_osm", "kept_site",
                 "verified_correct", "verified_corrected", "reviewed_unresolved",
                 "flagged_not_moved", "moved"]
 
@@ -163,11 +166,37 @@ def build() -> dict:
             "fb": None if pd.isna(r.get("rerank_fallback")) else bool(r.get("rerank_fallback")),
             "parcel": txt(r.get("moved_to_ll_uuid")),
             "osm": bool(r.get("Has_OSM")) if not pd.isna(r.get("Has_OSM")) else None,
+            "coord": txt(r.get("coord_method")),
+            "nobj": None if pd.isna(r.get("n_objects")) else int(r.get("n_objects")),
+            "site": txt(r.get("site_parcels")),
+            "nsite": None if pd.isna(r.get("n_site_parcels")) else int(r.get("n_site_parcels")),
+            "insite": None if pd.isna(r.get("coord_in_site")) else bool(r.get("coord_in_site")),
             "reviews": hist.get(r["CWNS_ID"], []),
         })
 
     counts = df["status"].value_counts().to_dict()
     return {"source": source, "cutoff": cutoff, "counts": counts, "plants": plants}
+
+
+def build_sites() -> dict:
+    """Site outlines (13's sites layer) as GeoJSON; empty when absent."""
+    if not SITES_PARQUET.exists():
+        return {"type": "FeatureCollection", "features": []}
+    import geopandas as gpd
+    g = gpd.read_parquet(SITES_PARQUET)
+    g = g[["CWNS_ID", "status", "n_parcels", "geometry"]]
+    return json.loads(g.to_json(drop_id=True))
+
+
+def build_detections() -> list[dict]:
+    """One record per detected object at each plant's final site."""
+    if not DETECTIONS_PARQUET.exists():
+        return []
+    d = pd.read_parquet(DETECTIONS_PARQUET)
+    return [{"id": r.CWNS_ID, "cls": r.class_name, "conf": round(float(r.confidence), 3),
+             "src": r.source, "used": bool(r.used_for_coord),
+             "lon": round(float(r.lon), 6), "lat": round(float(r.lat), 6)}
+            for r in d.itertuples(index=False)]
 
 
 if __name__ == "__main__":
@@ -178,3 +207,4 @@ if __name__ == "__main__":
             print(f"  {s:<22} {d['counts'][s]:>7,}")
     print(f"  {'TOTAL':<22} {len(d['plants']):>7,}")
     print(f"  JSON size ~{len(json.dumps(d)) / 1e6:.1f} MB")
+    print(f"  sites: {len(build_sites()['features']):,}  detections: {len(build_detections()):,}")

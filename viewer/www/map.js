@@ -3,15 +3,30 @@
 // suggestions, legend that doubles as the filter panel, slide-in detail panel.
 // No vector tiles: every plant arrives in one JSON (see app.py).
 
-const { DeckGL, TileLayer, BitmapLayer, ScatterplotLayer, LineLayer, FlyToInterpolator } = deck;
+const { DeckGL, TileLayer, BitmapLayer, ScatterplotLayer, LineLayer, GeoJsonLayer, FlyToInterpolator } = deck;
 
 const DATA_URL = "/data/plants.json";
+const SITES_URL = "/data/sites.geojson";
+const DETECTIONS_URL = "/data/detections.json";
+const SITES_MIN_ZOOM = 11;       // parcel outlines of each plant's final site
+const DETECTIONS_MIN_ZOOM = 13;  // detected objects
+
+const CLASS_COLORS = {
+  clarifier: [56, 189, 248],
+  aeration_basin: [244, 114, 182],
+  digester: [250, 204, 21],
+  chlorine_contact: [52, 211, 153],
+  drying_bed: [251, 146, 60],
+  oxidation_pond: [129, 140, 248],
+};
+const CLASS_FALLBACK = [229, 231, 235];
 
 // Order here = legend order (most important first). Colours chosen to stay
 // distinct on both the street and imagery basemaps.
 const STATUS = {
   moved:               { label: "Moved (model)",          color: [249, 115, 22],  hint: "Stage 1 flagged it and the re-ranker's #1 parcel cleared the cutoff" },
   flagged_not_moved:   { label: "Flagged, not moved",     color: [220, 38, 38],   hint: "Stage 1 doubts the reported location; no candidate cleared the cutoff" },
+  kept_site:           { label: "Kept – split site",      color: [234, 179, 8],   hint: "The re-ranker's #1 is a neighbouring parcel of the same plant site as the reported parcel (split parcels), so it was not moved" },
   verified_corrected:  { label: "Verified – corrected",   color: [37, 99, 235],   hint: "A reviewer supplied the corrected location" },
   verified_correct:    { label: "Verified – correct",     color: [22, 163, 74],   hint: "A reviewer confirmed the reported location" },
   reviewed_unresolved: { label: "Reviewed – unresolved",  color: [147, 51, 234],  hint: "Reviewed as wrong, no corrected location yet" },
@@ -62,6 +77,12 @@ const enabled = new Set(Object.keys(STATUS));
 let stateFilter = "";
 let showMoves = true;
 let sizeBase = 4;
+let SITES = { type: "FeatureCollection", features: [] };
+let DETS = [];
+let sitesShown = { type: "FeatureCollection", features: [] };
+let detsShown = [];
+let showSites = true;
+let showDets = true;
 let viewState = { longitude: -96.5, latitude: 38.5, zoom: 3.8, pitch: 0, bearing: 0 };
 
 const $ = (id) => document.getElementById(id);
@@ -100,6 +121,12 @@ function applyFilters() {
   moves = filtered.filter(
     (p) => MOVE_STATUSES.has(p.status) && p.rlat !== null && p.rlon !== null && (p.moved_m || 0) > 1
   );
+  const keep = (id) => {
+    const p = BY_ID.get(id);
+    return p && enabled.has(p.status) && (!stateFilter || p.state === stateFilter);
+  };
+  sitesShown = { type: "FeatureCollection", features: SITES.features.filter((f) => keep(f.properties.CWNS_ID)) };
+  detsShown = DETS.filter((d) => keep(d.id));
   $("visible-count").textContent = `${filtered.length.toLocaleString()} of ${ALL.length.toLocaleString()} plants shown`;
   render();
 }
@@ -109,6 +136,22 @@ function layers() {
   const r = radiusPx();
   const zoomBucket = Math.round(viewState.zoom * 2);
   const out = [basemapLayer(basemap)];
+
+  if (showSites && viewState.zoom >= SITES_MIN_ZOOM && sitesShown.features.length) {
+    out.push(
+      new GeoJsonLayer({
+        id: "sites",
+        data: sitesShown,
+        stroked: true,
+        filled: true,
+        getFillColor: (f) => [...((STATUS[f.properties.status] || {}).color || UNKNOWN_COLOR), 45],
+        getLineColor: (f) => [...((STATUS[f.properties.status] || {}).color || UNKNOWN_COLOR), 230],
+        lineWidthUnits: "pixels",
+        getLineWidth: 2,
+        pickable: true,
+      })
+    );
+  }
 
   if (showMoves && moves.length) {
     out.push(
@@ -161,6 +204,24 @@ function layers() {
     })
   );
 
+  if (showDets && viewState.zoom >= DETECTIONS_MIN_ZOOM && detsShown.length) {
+    out.push(
+      new ScatterplotLayer({
+        id: "detections",
+        data: detsShown,
+        getPosition: (d) => [d.lon, d.lat],
+        radiusUnits: "pixels",
+        getRadius: (d) => (d.used ? 5 : 4),
+        getFillColor: (d) => [...(CLASS_COLORS[d.cls] || CLASS_FALLBACK), d.conf >= 0.4 ? 230 : 110],
+        stroked: true,
+        getLineColor: (d) => (d.used ? [0, 0, 0, 255] : [255, 255, 255, 200]),
+        lineWidthUnits: "pixels",
+        getLineWidth: (d) => (d.used ? 2 : 1),
+        pickable: true,
+      })
+    );
+  }
+
   if (selected) {
     const sel = [{ pos: [selected.lon, selected.lat] }];
     if (selected.rlat !== null && MOVE_STATUSES.has(selected.status) && (selected.moved_m || 0) > 1) {
@@ -197,6 +258,24 @@ function onHover({ object, x, y, layer }) {
     tooltip.style.display = "none";
     return;
   }
+  if (layer && layer.id === "detections") {
+    tooltip.innerHTML =
+      `<div><b>${esc(object.cls.replace(/_/g, " "))}</b> · ${(object.conf * 100).toFixed(0)}%</div>` +
+      `<div style="color:#888">${esc(object.src)} detection · plant ${esc(object.id)}</div>` +
+      (object.used ? "<div>used for the moved point</div>" : "") +
+      (object.conf < 0.4 ? '<div style="color:#888">below 0.4, not used</div>' : "");
+    tooltip.style.left = `${x + 14}px`;
+    tooltip.style.top = `${y + 14}px`;
+    tooltip.style.display = "block";
+    return;
+  }
+  if (layer && layer.id === "sites") {
+    object = BY_ID.get(object.properties.CWNS_ID);
+    if (!object) {
+      tooltip.style.display = "none";
+      return;
+    }
+  }
   const ghost = layer && layer.id === "reported-ghosts";
   tooltip.innerHTML =
     `<div><b>${esc(object.name || object.id)}</b></div>` +
@@ -208,7 +287,10 @@ function onHover({ object, x, y, layer }) {
   tooltip.style.display = "block";
 }
 
-function onClick({ object }) {
+function onClick({ object, layer }) {
+  if (!object) return;
+  if (layer && layer.id === "sites") object = BY_ID.get(object.properties.CWNS_ID);
+  else if (layer && layer.id === "detections") object = BY_ID.get(object.id);
   if (object) select(object, false);
 }
 
@@ -243,6 +325,14 @@ function closePanel() {
   render();
 }
 
+const COORD_LABELS = {
+  detections: (p) => `mean of ${p.nobj} detection(s)`,
+  centroid: () => "parcel centroid",
+  polylabel: () => "parcel interior point",
+  reviewer: () => "reviewer",
+  reported: () => "reported location",
+};
+
 function gmaps(lat, lon) {
   return `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
 }
@@ -273,6 +363,9 @@ function showPanel(p) {
       ${fact("Shown at", `${fmt(p.lat, 6)}, ${fmt(p.lon, 6)}`)}
       ${moved ? fact("Reported at", `${fmt(p.rlat, 6)}, ${fmt(p.rlon, 6)}`) : ""}
       ${moved ? fact("Moved by", fmtDist(p.moved_m)) : ""}
+      ${p.coord ? fact("Point from", esc(COORD_LABELS[p.coord] ? COORD_LABELS[p.coord](p) : p.coord)) : ""}
+      ${p.insite === false ? fact("Point inside site", '<span style="color:#b45309">no, between parcels</span>') : ""}
+      ${p.nsite ? fact("Site parcels", p.nsite) : ""}
       ${p.parcel ? fact("Moved to parcel", `<span style="font-weight:500;font-size:12px">${esc(p.parcel)}</span>`) : ""}
       ${fact("Owner type", esc(p.owner || "—"))}
       ${fact("OSM wastewater tag", p.osm === null ? "—" : p.osm ? "yes" : "no")}
@@ -462,6 +555,8 @@ async function main() {
   $("basemap-street").onclick = () => setBasemap("street");
   $("basemap-imagery").onclick = () => setBasemap("imagery");
   $("show-moves").onchange = (e) => { showMoves = e.target.checked; render(); };
+  $("show-sites").onchange = (e) => { showSites = e.target.checked; render(); };
+  $("show-dets").onchange = (e) => { showDets = e.target.checked; render(); };
   $("size-slider").oninput = (e) => { sizeBase = Number(e.target.value); render(); };
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
@@ -483,6 +578,20 @@ async function main() {
   statusEl.textContent =
     `${data.source}` + (data.cutoff !== null && data.cutoff !== undefined ? ` · move cutoff ${data.cutoff}` : "");
   applyFilters();
+
+  // Sites and detections are secondary: load them after the plants are up.
+  Promise.all([
+    fetch(SITES_URL).then((r) => (r.ok ? r.json() : SITES)),
+    fetch(DETECTIONS_URL).then((r) => (r.ok ? r.json() : [])),
+  ])
+    .then(([s, d]) => {
+      SITES = s;
+      DETS = d;
+      $("layer-counts").textContent =
+        `${SITES.features.length.toLocaleString()} sites · ${DETS.length.toLocaleString()} detections`;
+      applyFilters();
+    })
+    .catch((err) => console.warn("sites/detections not loaded", err));
 
   const fromHash = () => {
     const m = location.hash.match(/id=([^&]+)/);

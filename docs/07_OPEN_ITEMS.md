@@ -156,6 +156,13 @@ from 32% (round 3) to 17% (round 4) after the filter. CWNS includes planned
 facilities that do not exist yet. The holdout is filtered at scoring time,
 never resampled. `--min-pop 0` disables it.
 
+**Planned 2026-10-05 (owner): lower the floor to > 100.** When that runs:
+slice every performance read (12, `calibrate_move_rule.py`, Stage 1 flag
+rates, `needs_info` rate) by population band (100–1,000 vs > 1,000), and
+label plants serving 100–1,000 as more uncertain in the corrected output
+(e.g. a `confidence_tier` column), with their own move cutoff if the
+precision by band says so.
+
 ### OSM-tagged reported parcels pass Stage 1 by rule (2026-10-02)
 
 `config.STAGE1_OSM_PASS`. 99.7% of OSM-tagged reported parcels are labelled
