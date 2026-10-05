@@ -1,0 +1,35 @@
+==========================================
+Node:    r7n14
+Job ID:  7533031
+CPUs:    4
+Started: Mon Oct  5 08:51:28 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/13_build_corrected_output.py --cutoff 0.95
+=== 13_build_corrected_output.py ===
+move rule: Stage 1 flagged AND re-rank #1 >= 0.95
+  master: Updates.gpkg layer CWNS_Locations_20261001: 32,296 facilities
+  treatment plants: 17,874
+  re-ranked #1 candidates with a current-detector result: 93.5%
+
+  flagged plants: 5,653  |  clearing the move rule: 1,048
+
+=== status ===
+  not_assessed             7,555  (42.3%)
+  flagged_not_moved        4,605  (25.8%)
+  verified_correct         2,199  (12.3%)
+  kept_model               1,691  (9.5%)
+  moved                    1,048  (5.9%)
+  verified_corrected         619  (3.5%)
+  kept_osm                   108  (0.6%)
+  reviewed_unresolved         49  (0.3%)
+  TOTAL                   17,874
+  not_assessed by reason: population_le_1000_or_unknown 7,361, no_imagery_state 194
+  moved distance: median 269 m, 90th pct 819 m, max 4,332 m
+
+Written: /work/GRDVULN/tp_qa/correction/data/output/cwns_corrected_locations.parquet / .csv / .gpkg
+Copied for the viewer: /work/GRDVULN/tp_qa/correction/diagnostics/output/cwns_corrected_locations.parquet  (git add correction/diagnostics/output/)
+Finished: Mon Oct  5 08:54:16 EDT 2026  (exit 0)
+
