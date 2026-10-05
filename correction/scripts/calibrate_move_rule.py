@@ -106,6 +106,46 @@ def load_round(n: int) -> pd.DataFrame:
     return df
 
 
+def load_round_rescored(n: int, output: pd.DataFrame) -> pd.DataFrame:
+    """Judge round n's verdicts against the PRODUCTION re-rank instead of the
+    scores the queue carried (13's output: rerank_top_ll_uuid, rerank_score
+    per plant). Needed when the queue's own re-rank was invalid (round 5) or
+    the models have changed since the queue was built -- provided the round
+    was NOT trained on (round 5 vs the 2026-10-03 models: not trained on).
+
+    Every decided plant the production pipeline would act on counts --
+    candidate_pick AND confirm_reported -- because the current Stage 1 may
+    flag a plant the queue-time model passed:
+      reported_correct          any move is a false_move
+      candidate_correct         right iff production #1 == the reviewer's parcel
+      truth_outside_candidates  counted WRONG (truth_outside). Conservative:
+                                the truth lay outside the 5 shown, but the
+                                production #1 could still be the truth parcel;
+                                no parcel geometry here to check.
+    """
+    plants = pd.read_parquet(LOG_DIR / f"review_log_round{n}.parquet")
+    if "reviewed" in plants.columns:
+        plants = plants[plants["reviewed"] == 1]
+    out = output[["CWNS_ID", "rerank_top_ll_uuid", "rerank_score", "rerank_fallback"]] \
+        .rename(columns={"CWNS_ID": "cwns_id", "rerank_score": "stage2b_score"})
+    df = plants.merge(out, on="cwns_id", how="inner")
+    df = df[df["stage2b_score"].notna()].copy()   # flagged with candidates today
+
+    v = df["plant_verdict"]
+    df["outcome"] = "needs_info"
+    df.loc[v == "reported_correct", "outcome"] = "false_move"
+    df.loc[v == "truth_outside_candidates", "outcome"] = "truth_outside"
+    pick = v == "candidate_correct"
+    same = df["selected_ll_uuid"].astype(str) == df["rerank_top_ll_uuid"].astype(str)
+    df.loc[pick, "outcome"] = "wrong_candidate"
+    df.loc[pick & same, "outcome"] = "right"
+    df["round"] = n
+    print(f"round {n} RE-SCORED against the production re-rank: "
+          f"{len(df)} reviewed plant(s) flagged today with candidates "
+          f"(of {len(plants)} reviewed)")
+    return df
+
+
 def table(df: pd.DataFrame, target: float) -> None:
     print(f"  {'cutoff':>6} {'moves':>6} {'right':>6} {'prec':>7} "
           f"{'95% CI':>13} {'wrongC':>6} {'outside':>7} {'FALSE':>6} {'n_info':>6}")
@@ -138,6 +178,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--rounds", type=int, nargs="*", default=None)
     ap.add_argument("--target", type=float, default=0.90)
+    ap.add_argument("--rescore", type=int, nargs="*", default=[],
+                    help="rounds to judge against the production re-rank "
+                         "(13's output) instead of the queue's own scores")
+    ap.add_argument("--output", type=Path,
+                    default=REPO / "correction" / "diagnostics" / "output"
+                    / "cwns_corrected_locations.parquet",
+                    help="13's output, for --rescore")
     ap.add_argument("--out", type=Path, default=None,
                     help="also write the report to this file")
     args = ap.parse_args()
@@ -155,13 +202,24 @@ def main():
         print("=== calibrate_move_rule.py ===")
         print(f"rounds: {rounds}  |  target precision: {args.target:.0%}  "
               f"(met only when the 95% CI lower bound clears it)\n")
-        frames = [load_round(r) for r in rounds]
+        output = None
+        if args.rescore:
+            output = pd.read_parquet(args.output)
+            output["CWNS_ID"] = output["CWNS_ID"].astype(str)
+            print(f"production re-rank from {args.output.name} "
+                  f"(built {output['built'].iloc[0] if 'built' in output else '?'})\n")
+        frames = [load_round_rescored(r, output) if r in args.rescore else load_round(r)
+                  for r in rounds]
         all_ = pd.concat(frames, ignore_index=True)
 
         for r, df in zip(rounds, frames):
-            mv = df["model_version"].dropna().unique()
-            print(f"--- round {r}  (model {', '.join(map(str, mv)) or '?'}; "
-                  f"{len(df)} candidate_pick plants) ---")
+            if r in args.rescore:
+                print(f"--- round {r}  (RE-SCORED: production re-rank, "
+                      f"{len(df)} plants flagged today) ---")
+            else:
+                mv = df["model_version"].dropna().unique()
+                print(f"--- round {r}  (queue-time model {', '.join(map(str, mv)) or '?'}; "
+                      f"{len(df)} candidate_pick plants) ---")
             table(df, args.target)
             print()
 

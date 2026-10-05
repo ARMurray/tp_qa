@@ -198,6 +198,15 @@ lower bound clears 90% (~127 moves at 95% observed); re-check with
 no detection in the pool were right (n=2); below 0.95, no-detection pools
 held 13 of the 14 false moves — watch that row.
 
+**2026-10-05, rounds 4 + 5** (`calibrate_move_rule.py --rounds 4 5 --rescore 5`,
+report in `correction/diagnostics/move_rule_calibration_r4_r5.txt`). Round 5
+re-scored against the production re-rank (its queue's own scores were
+OD-blind; round 5 was not trained on): **31/31 right at ≥ 0.95** (CI 89–100%).
+Pooled 4+5 at ≥ 0.95: **46/47 = 97.9%, CI 89–100%** — lower bound one point
+short of 90%. No false move (a correct record overwritten) at ≥ 0.70 in
+round 5. No-detection pools at ≥ 0.95: 2/2 right. Round 5 alone also reached
+96.7% at ≥ 0.85 (n=60). `truth_outside` is counted wrong (conservative).
+
 ### A Stage 1 guardrail for utility-owned reported parcels
 
 Held, deliberately (2026-10-02). Utility-owned reported parcels are 99% Correct
