@@ -236,7 +236,8 @@ def main():
     cols = ["CWNS_ID", "STATE_CODE", "FACILITY_NAME", "status", "status_reason",
             "reported_lat", "reported_lon", "out_lat", "out_lon", "moved_m",
             "moved_to_ll_uuid", "reported_ll_uuid", "stage1_route",
-            "stage1_prob_correct", "rerank_score", "rerank_fallback",
+            "stage1_prob_correct", "rerank_top_ll_uuid", "rerank_score",
+            "rerank_fallback",
             "move_cutoff", "require_detection", "built"]
     out = df[cols].sort_values(["STATE_CODE", "CWNS_ID"]).reset_index(drop=True)
 

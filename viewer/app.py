@@ -50,8 +50,17 @@ def load() -> None:
     print(f"[viewer] {d['source']}: {len(d['plants']):,} plants")
 
 
+class NoCacheStatic(StaticFiles):
+    """The viewer's JS/CSS change with every git pull; never serve a stale copy."""
+
+    async def get_response(self, path, scope):
+        resp = await super().get_response(path, scope)
+        resp.headers["Cache-Control"] = "no-cache"
+        return resp
+
+
 async def index(request):
-    return FileResponse(WWW / "index.html")
+    return FileResponse(WWW / "index.html", headers={"Cache-Control": "no-cache"})
 
 
 async def plants(request):
@@ -83,7 +92,7 @@ app = Starlette(
         Route("/data/plants.json", plants),
         Route("/api/meta", meta),
         Route("/api/reload", reload, methods=["GET", "POST"]),
-        Mount("/static", StaticFiles(directory=WWW), name="static"),
+        Mount("/static", NoCacheStatic(directory=WWW), name="static"),
     ],
     middleware=[Middleware(GZipMiddleware, minimum_size=1000)],
     lifespan=lifespan,

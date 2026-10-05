@@ -217,11 +217,17 @@ function select(p, fly) {
   showPanel(p);
   history.replaceState(null, "", `#id=${encodeURIComponent(p.id)}`);
   if (fly) {
+    // Centre the plant in the part of the map the detail panel leaves visible.
+    const zoom = Math.max(viewState.zoom, 15);
+    const w = window.innerWidth, h = window.innerHeight;
+    const panelW = Math.min(400, 0.92 * w);
+    const vp = new deck.WebMercatorViewport({ width: w, height: h, longitude: p.lon, latitude: p.lat, zoom });
+    const [lon, lat] = vp.unproject([w / 2 + panelW / 2, h / 2]);
     viewState = {
       ...viewState,
-      longitude: p.lon,
-      latitude: p.lat,
-      zoom: Math.max(viewState.zoom, 15),
+      longitude: lon,
+      latitude: lat,
+      zoom,
       transitionDuration: 1200,
       transitionInterpolator: new FlyToInterpolator(),
     };
@@ -478,8 +484,13 @@ async function main() {
     `${data.source}` + (data.cutoff !== null && data.cutoff !== undefined ? ` · move cutoff ${data.cutoff}` : "");
   applyFilters();
 
-  const m = location.hash.match(/id=([^&]+)/);
-  if (m && BY_ID.has(decodeURIComponent(m[1]))) select(BY_ID.get(decodeURIComponent(m[1])), true);
+  const fromHash = () => {
+    const m = location.hash.match(/id=([^&]+)/);
+    const id = m && decodeURIComponent(m[1]);
+    if (id && BY_ID.has(id) && (!selected || selected.id !== id)) select(BY_ID.get(id), true);
+  };
+  window.addEventListener("hashchange", fromHash);
+  fromHash();
 }
 
 main().catch((err) => {

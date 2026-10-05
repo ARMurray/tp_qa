@@ -131,7 +131,15 @@ body.panel-open #basemap-toggle { right: calc(min(400px, 92vw) + 16px); }
 /* With the detail panel open, keep the search bar centred in the space left
    of it, so the basemap toggle (shifted left above) never sits on top of it. */
 body.panel-open #search-bar { left: calc((100vw - min(400px, 92vw)) / 2); }
+
+/* Narrow windows: the centred search bar would sit on the legend. Park it
+   under the basemap toggle on the right instead. */
 @media (max-width: 1100px) {
-  body.panel-open #search-bar { left: 16px; transform: none; top: 64px; }
-  body.panel-open #legend-stack { top: 130px; }
+  #search-bar, body.panel-open #search-bar {
+    left: auto; right: 16px; transform: none; top: 64px;
+  }
+  /* Too little map left beside the panel for legend AND search: close the
+     panel (x) or press Esc to search again. */
+  body.panel-open #search-bar { display: none; }
+  #search-input { width: 220px; }
 }
