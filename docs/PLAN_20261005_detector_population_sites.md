@@ -64,8 +64,12 @@ using them as negatives, calibration counts any site parcel as right.
 - [x] review app: "also part" checkbox per candidate → `plants.site_ll_uuids`
   → master `Site_UUIDs` (`update_master_locations`) → corrections layer
   (`build_training_bins`) → 06b drops other-half rows from the negatives;
-  `calibrate_move_rule` and 13 are site-aware. **Not yet run end to end** —
-  the machine it was written on has no FastAPI; first use is the test
+  `calibrate_move_rule` and 13 are site-aware. **Smoke-tested 2026-10-05**
+  on a copy of app.db: browser click-through (tick, main-parcel guard,
+  submit → `plants.site_ll_uuids`) and
+  `python -m analysis.smoke_site_checkbox` (route, validation, migration,
+  master `Site_UUIDs` primary-first) all pass. Downstream (06b, calibrate,
+  13 on reviewer sites) first runs with real ticks in round 6
 - [x] population floor 100 (`config.MIN_POP_SERVED`) + band slicing in 12,
   `calibrate_move_rule`, and 13 (`pop_served`, `pop_band`, `confidence_tier`)
 - [ ] label + train the new detector (work PC)
