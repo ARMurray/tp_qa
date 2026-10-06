@@ -136,7 +136,20 @@ HOW_CORRECTED_MANUAL = "Manual_Review"
 VERDICT_COLUMNS = [
     "Verified", "Original_Correct", "Corrected",
     "Corrected_X", "Corrected_Y", "How_Corrected",
+    # ';'-joined parcels that make up the plant, primary first (the selected
+    # candidate, or the reported parcel for reported_correct), then any the
+    # reviewer marked "also part of this plant". Added 2026-10-05 for
+    # split-parcel plants; read by build_training_bins -> 06b (extra parcels
+    # are not negatives) and by 13 (the verified plant's site outline).
+    "Site_UUIDs",
 ]
+
+
+def site_uuids(primary, extras) -> str | None:
+    parts = [str(primary)] if primary and not pd.isna(primary) else []
+    if isinstance(extras, str) and extras:
+        parts += [u for u in extras.split(";") if u and u not in parts]
+    return ";".join(parts) or None
 
 VERDICTS_WITH_TRUTH = ("reported_correct", "candidate_correct",
                        "truth_outside_candidates")
@@ -361,11 +374,13 @@ def build_updates(df: pd.DataFrame, points: dict) -> pd.DataFrame:
         cwns_id = r["cwns_id"]
         verdict = r["plant_verdict"]
 
+        extras = r.get("site_ll_uuids")
         if verdict == "reported_correct":
             rows.append({
                 "CWNS_ID": cwns_id, "Verified": "Yes",
                 "Original_Correct": "Yes", "Corrected": "No",
                 "Corrected_X": None, "Corrected_Y": None, "How_Corrected": None,
+                "Site_UUIDs": site_uuids(r.get("reported_ll_uuid"), extras),
             })
             continue
 
@@ -380,6 +395,8 @@ def build_updates(df: pd.DataFrame, points: dict) -> pd.DataFrame:
             "How_Corrected": (HOW_CORRECTED_MODEL
                               if verdict == "candidate_correct"
                               else HOW_CORRECTED_MANUAL),
+            "Site_UUIDs": (site_uuids(r.get("selected_ll_uuid"), extras)
+                           if verdict == "candidate_correct" else None),
         })
 
     return pd.DataFrame(rows, columns=["CWNS_ID"] + VERDICT_COLUMNS)

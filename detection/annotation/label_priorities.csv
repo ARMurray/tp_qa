@@ -1,0 +1,301 @@
+cwns_id,st,ll_uuid,role,lat,lon,priority,reason,pop,name
+42000894701,PA,c9ab385b-4445-41fc-b99e-d00e61aedc2e,label_priority_small_plant_miss,,,1,small_plant_miss,511.0,BRADFORD CO - W BURLINGTON STP
+46000479001,SD,0ac12d79-c5cf-4c83-a7cf-df451e0244ba,label_priority_small_plant_miss,,,1,small_plant_miss,164.0,MONROE STP
+28001395001,MS,525dcfbe-4983-4897-a455-18a8edcb3a82,label_priority_small_plant_miss,,,1,small_plant_miss,751.0,WALNUT POTW
+32000008004,NV,cd5ea4e6-4080-448c-ad6f-064b875bfe90,label_priority_small_plant_miss,,,1,small_plant_miss,350.0,SEARCHLIGHT WWTF
+41000212001,OR,b14f8b4e-ae7d-4a7d-95cd-ca80e5e196f0,label_priority_small_plant_miss,,,1,small_plant_miss,397.0,MORO STP
+13000000873,GA,d50a525e-fc76-43ec-ac3d-e476e0ee69a6,label_priority_small_plant_miss,,,1,small_plant_miss,629.0,Smithville WPCP
+42006183001,PA,fc29f2df-b575-485b-b278-770aa3da835d,label_priority_small_plant_miss,,,1,small_plant_miss,408.0,WASHINGTON TOWNSHIP
+46000367001,SD,132474b3-40f6-42d4-b941-490f2445a870,label_priority_small_plant_miss,,,1,small_plant_miss,735.0,STICKNEY WWTP
+28000070001,MS,e40ac247-233f-4dfb-8981-a66c6d16a79a,label_priority_small_plant_miss,,,1,small_plant_miss,930.0,BEAUMONT POTW
+32000008020,NV,b1bfd799-59c8-424b-8cc7-4ce6c15fc0e4,label_priority_small_plant_miss,,,1,small_plant_miss,850.0,INDIAN SPRINGS CCWRD
+46000061001,SD,103bc10d-4292-43b4-b471-a0b5d5d4d560,label_priority_small_plant_miss,,,1,small_plant_miss,430.0,WORTHING WWTP
+42001329001,PA,a6e47d32-f8f5-41de-9e57-6105e7636656,label_priority_small_plant_miss,,,1,small_plant_miss,997.0,BEAVER MEADOWS BORO
+28001090003,MS,97294820-0bca-4574-9f9e-8e89255da6c0,label_priority_small_plant_miss,,,1,small_plant_miss,994.0,"RAYMOND POTW, WEST"
+46000019001,SD,68bad845-b2e9-4149-8cdc-05f526a7727e,label_priority_small_plant_miss,,,1,small_plant_miss,837.0,KIMBALL WWTP
+42004172001,PA,cbaf75fe-87b5-49c0-befb-dbbfb1e62feb,label_priority_small_plant_miss,,,1,small_plant_miss,331.0,BROADTOP TWP - LANGDONDALE STP
+46000268001,SD,56589646-ccb9-4dcc-a6ae-c0bea28567a3,label_priority_small_plant_miss,,,1,small_plant_miss,365.0,WARNER LAGOONS
+42006005110,PA,d544a0a8-78ae-439a-90ec-0804ba4d03aa,label_priority_small_plant_miss,,,1,small_plant_miss,102.0,BARKEYVILLE SEWERAGE CO. STP
+46000451001,SD,a7924f6f-064b-41b6-8c93-3af5ab51a797,label_priority_small_plant_miss,,,1,small_plant_miss,453.0,EMERY STP
+42003079001,PA,10188631-eaa6-41ce-9273-965a5b4b9cac,label_priority_small_plant_miss,,,1,small_plant_miss,664.0,YORK SPRINGS STP
+46000025001,SD,025e0408-107d-4f0b-83f5-743f1b8850bc,label_priority_small_plant_miss,,,1,small_plant_miss,891.0,VALLEY SPRINGS WWTP
+42007002004,PA,839ba178-5431-43c3-95bd-554e8074445a,label_priority_small_plant_miss,,,1,small_plant_miss,332.0,DCNR - SHAWNEE STATE PARK STP
+46000059001,SD,bcbb0534-5ef1-4ab3-be04-7fdae8554ad7,label_priority_small_plant_miss,,,1,small_plant_miss,854.0,TEA WWTP
+42001046001,PA,bdf21111-80a8-4344-a49b-1941b9ebd7b3,label_priority_miss,,,2,miss,,SHOEMAKERSVILLE SEW. FAC.
+48009003001,TX,1e3209d8-c751-4cc3-b9bc-b961c63592de,label_priority_miss,,,2,miss,,Santa Anna WWTP
+25000194001,MA,081cad84-f492-4ce8-9df5-6d962794ef9d,label_priority_miss,,,2,miss,,Hopedale Sewerage Collection System and WWTF
+15000009004,HI,99d0d13b-bc0e-42bc-8b0b-a1e8a8a5f3c9,label_priority_miss,,,2,miss,,KAUNAKAKAI WWTF
+41000148001,OR,9f8a3673-116a-4a14-a460-092c18397e58,label_priority_miss,,,2,miss,,GOLD HILL STP
+55002740000,WI,24d2613d-3f36-4166-93a3-7c21a149889f,label_priority_miss,,,2,miss,,Luxemburg - CS
+04002118001,AZ,188e703e-8ee8-413c-8bff-4adafd0d3ebd,label_priority_miss,,,2,miss,,Kearny STP
+12000102001,FL,3c8832b3-a984-4a50-bb54-11d648f27946,label_priority_miss,,,2,miss,,Harbor Road WWTF
+18000155001,IN,87d3229b-23ac-4f0b-aa84-c89d17cc6742,label_priority_miss,,,2,miss,,KOUTS WWTP
+37001015001,NC,475244cb-025c-4069-87c3-d79237b720e8,label_priority_miss,,,2,miss,,BELVILLE WWTP
+39000063001,OH,91d498a0-6fa6-447e-af65-2db75c51b3d8,label_priority_miss,,,2,miss,,Adena WWTP & Sewer System
+53002380001,WA,37f7ce06-3af8-4e3f-b8a3-6d61e8c49448,label_priority_miss,,,2,miss,,SUNNYSIDE POTW
+02100000000,AK,387264ca-4191-49d0-a30b-c746adb7f20a,label_priority_miss,,,2,miss,,Denali Aerated Lagoon
+38000016001,ND,eecbea04-47c0-4d4b-9842-d9112ce99ab3,label_priority_miss,,,2,miss,,TOWER CITY WASTEWATER
+45000242002,SC,108a2604-34df-4e24-a2ab-2a7e9126851f,label_priority_miss,,,2,miss,2808.0,ROPER
+33000129001,NH,4feeebf7-cb42-4160-bf5c-c478682872b7,label_priority_miss,,,2,miss,,Gorham WWTF
+34001077001,NJ,c2bf3d88-e4fd-40d3-905c-f9f557dc0bc4,label_priority_miss,,,2,miss,,Northwest Bergen County UA - CS/STP
+51000142002,VA,f4aff5a7-513c-4e3e-94cf-f27db3258358,label_priority_miss,,,2,miss,,APPOMATTOX STP NO I
+06004027001,CA,7ceab5cb-25f3-438e-8b48-1951b1f9812a,label_priority_miss,,,2,miss,,Oxnard WWTP
+05000648001,AR,02dcf7ac-1cef-4f4a-b056-38a318bb013b,label_priority_miss,,,2,miss,,Gravel Ridge SID #213 WWTP
+20000515001,KS,54a9fe29-e375-49ad-95d3-c18bf3edebca,label_priority_miss,,,2,miss,,VALLEY CENTER WWTP
+23000060001,ME,6be41aa5-6704-40a6-8fa5-0fe9d58f67fd,label_priority_miss,,,2,miss,,OLD TOWN WWTF
+54001504001,WV,9a74d0f1-a65a-492c-b7cb-c4fe6cc7f1b8,label_priority_miss,,,2,miss,,NEW CUMBERLAND WWTP
+47001045001,TN,220c548b-abfc-48cc-8d3e-305eeb1ff7b1,label_priority_miss,,,2,miss,,NIOTA STP
+36006060001,NY,3712f9d7-1272-45b1-99b1-de47e90c71ec,label_priority_miss,,,2,miss,,Lowville (V) STP
+28000515002,MS,92af6113-fc2e-4ed3-bfa6-0832cfff32d4,label_priority_miss,,,2,miss,,"HCW&SWMA - GULFPORT POTW, NORTH"
+40000529001,OK,3b81aef4-2dc5-443b-9f8a-30247c87e246,label_priority_miss,,,2,miss,,WAPANUCKA PWA WWT
+26000627001,MI,7687c206-c0a9-4416-b5d1-62c5ec26b416,label_priority_miss,,,2,miss,,TRENTON WWTP
+21000365001,KY,4f5f41ad-80f0-4013-9196-aa730696358f,label_priority_miss,,,2,miss,,WARSAW
+22003110001,LA,74f34fc7-8b04-4af0-aff7-71dd28004f19,label_priority_miss,,,2,miss,,MONTGOMERY LAGOONS
+72000002004,PR,ffd24c9a-20e5-4172-92f9-3eed9c64ebdc,label_priority_miss,,,2,miss,,Camuy-Hatillo WWTP
+24000018002,MD,6cddc99f-0042-407b-8b81-a2ecc8182e86,label_priority_miss,,,2,miss,,PARKWAY STP
+19000788001,IA,e7354ddd-4a51-4afd-b09f-2d3a2fab1bc1,label_priority_miss,,,2,miss,,SHELDON WWTP
+29003003001,MO,824782b5-a815-42a1-9ba6-13810f13cbcc,label_priority_miss,,,2,miss,,Albany WWTP
+50000008001,VT,6998d056-da07-41ac-80ec-a6d8c01839ce,label_priority_miss,,,2,miss,,Bennington WWTF
+08000034003,CO,ca5e0a0b-bb7c-4a5f-935a-828555e69412,label_priority_miss,,,2,miss,,BOULDER 75TH STREET WWTP
+27005313001,MN,1e364e09-8c76-4db1-82b9-7730d4a36a1e,label_priority_miss,,,2,miss,,BADGER WWTF
+30000000032,MT,4445a922-4ba4-4871-9acb-936a018cb43a,label_priority_miss,,,2,miss,,"Columbus, City of"
+13000022003,GA,b127ce67-b1aa-4b1d-b34d-33ab2ff8c928,label_priority_miss,,,2,miss,,Cobb Noonday Creek WPCP
+46000047001,SD,e57228de-6f3d-462b-aa05-2c1081e01bfa,label_priority_miss,,,2,miss,2065.0,LENNOX WWTP
+01000211001,AL,f2cf34c3-6c66-4449-bbc3-4786b97cee18,label_priority_miss,,,2,miss,,ASHLAND WWTP
+16000165001,ID,e0c275df-9030-45cf-85b3-bdcfa74cf3a3,label_priority_miss,,,2,miss,,PRESTON S/T FACILITY
+31000545001,NE,db90dd45-dee5-489a-8b7c-30a27a65cda1,label_priority_miss,,,2,miss,,COLUMBUS WWTP
+44000260011,RI,7edeeb17-59ca-471c-8c1a-42302606f882,label_priority_miss,,,2,miss,,WARREN WWTF
+35000098001,NM,bc9344ff-f1fb-4a2c-8a59-cd4f4f9f0f84,label_priority_miss,,,2,miss,,"Santa Ana, Pueblo of"
+32000200402,NV,0a03e986-540b-4d4a-bbb4-c94c5666f4a7,label_priority_miss,,,2,miss,115230.0,DURANGO HILLS WRC
+49000148001,UT,0e2a8bf3-0654-4e11-908d-e191a55e108b,label_priority_miss,,,2,miss,,MEXICAN HAT
+17000587001,IL,31570772-8382-4c8e-8f8e-807fa592eaca,label_priority_miss,,,2,miss,,Thorn Creek Basin. S.D. STP
+09000740001,CT,0085d973-c5c5-4707-a55f-99925246b4e3,label_priority_miss,,,2,miss,,LITCHFIELD WPCF
+48002045001,TX,50d20286-7c3d-4917-8acd-c9d40d8b4b9a,label_priority_miss,,,2,miss,,Goree WWTP
+42001303001,PA,8f7c8fad-54ad-4212-8b2b-ce022934fbac,label_priority_miss,,,2,miss,,ASHLAND BORO
+12000219004,FL,50bffcd0-6bc3-4dd6-acb9-d208b6596f8c,label_priority_miss,,,2,miss,,SUWANNEE WWTF
+41000191001,OR,49ff3b45-ef22-417d-88bd-dc98ef3075fb,label_priority_miss,,,2,miss,,LOWELL STP
+02000265001,AK,7faf01f3-267a-4ad0-ba18-9a0b2d9b10ea,label_priority_miss,,,2,miss,,Marshall Lagoon
+18000026001,IN,d2ab5966-819e-410b-b98f-86869533f903,label_priority_miss,,,2,miss,,GREENFIELD STP
+55000170001,WI,ce87cc04-5756-4b4f-be65-9a889e6b3fd5,label_priority_miss,,,2,miss,,APPLETON WWTP
+45000182002,SC,74a3b954-6847-42c3-8917-565ae52501f3,label_priority_miss,,,2,miss,6486.0,"DENMARK, CITY OF"
+36004038002,NY,cafa04a0-0855-40d0-bba1-ae6cc7ff2187,label_priority_miss,,,2,miss,,Rotterdam (T) WWTP & Collection System Improvements
+53002100001,WA,07360200-2c66-4eca-8405-7656b53adc38,label_priority_miss,,,2,miss,,NORTH BONNEVILLE S/T FAC.
+37004102003,NC,3cc0c6ac-96be-4949-882d-4b87f4ea533a,label_priority_miss,,,2,miss,,T.Z. OSBOURNE WWTP
+54004009001,WV,d0737a78-b9a4-4623-8eea-ea3a4a69a713,label_priority_miss,,,2,miss,,POCA WWTP
+05000117001,AR,c0c85e08-402f-47ed-9db4-3ff202812c58,label_priority_miss,,,2,miss,,Harrell WWTP
+40000806001,OK,676315c9-ee98-4f00-b0dd-459ee9a9fbe1,label_priority_miss,,,2,miss,,OKAY WWT
+25000073001,MA,5de72452-9020-4542-8299-242241ec3977,label_priority_miss,,,2,miss,,Lowell Sewerage Collection System and WWTF
+51000207010,VA,61e5f101-5d21-4ed4-b2f7-cc6f53dba97e,label_priority_miss,,,2,miss,,HALL CREEK WWTP & COLLECTION SYS.
+19000847001,IA,e10466ce-c7be-48c4-800d-757eb20f05dd,label_priority_miss,,,2,miss,,THORNTON STL
+20001701001,KS,b046eb1a-b726-446f-b3c2-956484563ad9,label_priority_miss,,,2,miss,,SPIVEY WWTP
+06001079001,CA,56aeb391-b470-4192-a1c8-1b1cd935ec3f,label_priority_miss,,,2,miss,,Ukiah WWTF
+34002100001,NJ,327d6bf7-1f5c-455e-9510-fc8a1b4dac7e,label_priority_miss,,,2,miss,,Stony Brook RSA-River Rd STP/ Princeton CS-TP
+23000021001,ME,cf904275-862a-45a3-9cd3-b8ba07e9de09,label_priority_miss,,,2,miss,,BATH WTP
+28000885001,MS,9b564bed-4d7a-4c3f-b651-5f54a83a2961,label_priority_miss,,,2,miss,7928.0,NEW ALBANY POTW
+27009706001,MN,65a866a6-a65d-45f9-b3a3-b8adf6fad632,label_priority_miss,,,2,miss,,LE CENTER STP
+24000008001,MD,7d2ed30e-9248-4da1-a748-aadd0c68d30f,label_priority_miss,,,2,miss,,Mt. Airy WWTP
+04001315005,AZ,ec5028d5-df89-4aeb-bb44-a5012d70e889,label_priority_miss,,,2,miss,,Mesa Northwest WRP
+29002222001,MO,61a485f2-d416-41c1-b0df-6c57f449b2cb,label_priority_miss,,,2,miss,,Mountain View WWTP
+21000018001,KY,e4f5ca3b-2a0c-4c35-ab5c-7a89c0e5050b,label_priority_miss,,,2,miss,,ASHLAND
+72000002001,PR,d3b8c063-6f53-4869-9989-cb3420b6af27,label_priority_miss,,,2,miss,,Arecibo WWTP
+39008371001,OH,a62f3daa-4c1f-41a6-89c0-e387620441a6,label_priority_miss,,,2,miss,,Lawrence Co Union-Rome SD WWTP
+22003326001,LA,4eb6e243-af59-4be2-b7ee-78faa0f32914,label_priority_miss,,,2,miss,,St. Mary SD #5
+01000150001,AL,4d4ed671-9b86-45f6-a971-5b8442c5b428,label_priority_miss,,,2,miss,,SARALAND WWTP
+26000518001,MI,ec408d59-b630-4920-8a1d-e5969ec3db0a,label_priority_miss,,,2,miss,,RICHMOND WWTP
+15000007001,HI,5abf48c2-9e30-4b76-95f0-ae0d73818a08,label_priority_miss,,,2,miss,,LIHUE WWTF
+13000578001,GA,b68b9e7f-f701-4ac4-adc1-4a08fb619b48,label_priority_miss,,,2,miss,,Cornelia WPCP
+30000000014,MT,2cb1707b-d8ee-42ee-82c4-d916bc934121,label_priority_miss,,,2,miss,,Chester WWTP
+50000037001,VT,242de2aa-5257-4ff8-8aea-501f4e93248c,label_priority_miss,,,2,miss,,Ludlow WWTF
+16000209001,ID,eda71ebe-53e3-48f3-88fa-9f82fa42b863,label_priority_miss,,,2,miss,,GRANITE CREEK-REEDER BAY STP
+47000360002,TN,90f4569a-2edb-41fb-baf3-6fd7628e10ec,label_priority_miss,,,2,miss,,Decaturville STP
+08000500060,CO,f2a086c6-a89c-4d18-a06c-a29486306ab6,label_priority_miss,,,2,miss,,Westminster Big Dry Creek WWTF
+31000206001,NE,aadf2792-fa30-443e-8af8-9d4254732fbb,label_priority_miss,,,2,miss,,WYMORE WWTP
+38000146001,ND,439b8bfd-b1dc-4d54-996e-892c6ca19390,label_priority_miss,,,2,miss,,COURTENAY WASTEWATER
+35201200021,NM,d02ef084-4e72-42b4-853e-3cb1cb8c22a2,label_priority_miss,,,2,miss,,Crownpoint - Navajo Nation Lake Valley Boarding School
+33000026001,NH,b8a3689d-bb13-4316-a037-9db252fb9ce7,label_priority_miss,,,2,miss,,Whitefield WWTF
+46000107001,SD,354cd139-b1b6-4180-a7e0-3b200f64c6e1,label_priority_miss,,,2,miss,11931.0,VERMILLION WWT WORKS
+17000721002,IL,55262dea-16d7-4233-a68e-b5da1caf3a31,label_priority_miss,,,2,miss,,"MWRDGC, HANOVER PARK WRP"
+09000550002,CT,b0602c2a-84a7-4b2d-ab09-5d3b777fb8f9,label_priority_miss,,,2,miss,,"GOSHEN, TOWN OF - Woodridge Lake Sewer Dist"
+44000006001,RI,0d46e715-894d-4b59-8722-fdf3cbc6ea78,label_priority_miss,,,2,miss,,Veolia Water - Cranston WPCF
+32000037001,NV,def34309-45a2-4e41-a9fa-80eacb748de2,label_priority_miss,,,2,miss,17245.0,BOULDER CITY WWTF
+42002103002,PA,cfdcd7ba-8a83-4913-895a-d367d0b6be0d,label_priority_miss,,,2,miss,6483.0,BUTLER TWP - ST JOHNS STP
+48006139001,TX,43b0576d-2ca3-404c-a707-c9df2deb5408,label_priority_miss,,,2,miss,,Moscow WWTP
+02000102002,AK,aba04d80-7223-4bbd-9a83-da19b94185b6,label_priority_miss,,,2,miss,,Mendenhall Treatment Plant
+12000020003,FL,09fc4621-9350-460a-b20e-7a36887cad80,label_priority_miss,,,2,miss,,OCOEE STP #2
+41000149001,OR,f99038ac-8ba6-4cf1-9f18-407cbf1d3bf4,label_priority_miss,,,2,miss,,GOVERNMENT CAMP STP
+36003166001,NY,227f4a44-1132-41dc-80a6-c82c72f3de17,label_priority_miss,,,2,miss,,"Lewisboro, (T) Wild Oaks WWTP"
+37000604001,NC,d5b5dbcc-49e4-48af-b1af-464aceebf10a,label_priority_miss,,,2,miss,,NEWLAND WWTP
+45000244007,SC,9f74d25a-d8e0-4b8e-8081-33a37a155db4,label_priority_miss,,,2,miss,1254.0,18 MI CRK UPPER REG WWTP
+25000016001,MA,17d5aaf2-bd6a-4167-bbd0-77df09f8e40b,label_priority_miss,,,2,miss,,Plymouth Sewerage Collection System and WWTF
+40000021001,OK,99cc3eae-60b4-4771-a74d-5cf08ec73c11,label_priority_miss,,,2,miss,,STROUD UA NORTH WWT
+18000037001,IN,e1638f67-ea53-4383-af8a-867672183ec4,label_priority_miss,,,2,miss,,Amo-Coatsville CD WWTP
+55009790002,WI,81643b6f-2bce-4a3a-843d-9a843331304b,label_priority_miss,,,2,miss,,ONION RIVER SC STP
+53000000115,WA,9b893b47-a262-485f-8197-c5f1cf3a08f0,label_priority_miss,,,2,miss,,LAKE WENATCHEE POTW
+20001216001,KS,861836fd-b4d0-4231-b6f8-0a1c9d7185ee,label_priority_miss,,,2,miss,,ESBON WWTP
+51000126001,VA,9bacd8df-e4e8-47e7-ae3e-dd917cb1ee82,label_priority_miss,,,2,miss,,CHILHOWIE STP &COLL.SYS.
+28000590001,MS,54458807-8b43-40e2-9ec1-da9aeebd941a,label_priority_miss,,,2,miss,11385.0,INDIANOLA POTW
+06001029001,CA,c2f0fa52-ea22-4c7b-b4df-97156c5ed1c5,label_priority_miss,,,2,miss,6500.0,Russian River County WWTF
+27000001001,MN,18388b79-574f-40ec-bb43-6666fa8f5b00,label_priority_miss,,,2,miss,,METROPOLITAN WWTP
+24000090034,MD,2ba48a0a-8ecf-4436-8929-74195c5ddeb5,label_priority_miss,,,2,miss,,Victor Cullen WWTP
+23000155001,ME,3bd47f7a-f0e5-483e-8d98-79746600b82c,label_priority_miss,,,2,miss,,WISCASSET SEWAGE TREATMENT
+39007987001,OH,ed1a7e64-9cad-46f9-b018-0f57436dc6d6,label_priority_miss,,,2,miss,,Strasburg WWTP & Sewer System
+34007205001,NJ,4b2baccb-9e74-40cd-b05f-4db9db544882,label_priority_miss,,,2,miss,,Fieldsboro STP & CS
+19000050001,IA,8e9667ce-eaf4-4579-93fb-7d5f2c25b181,label_priority_miss,,,2,miss,,AURORA STL
+01000385002,AL,6a6a9ef9-c972-4e78-b2fc-c0faa209a54e,label_priority_miss,,,2,miss,,DALLAS COUNTY W&S WWTP
+04000701002,AZ,7c3c7c8f-ec96-428f-ad66-d123c9391f85,label_priority_miss,,,2,miss,,Miami WWTF
+29001020003,MO,567485aa-2b66-4eaf-83ce-77f09e2e54e0,label_priority_miss,,,2,miss,,Rolla Vichy Road WWTP
+54002305001,WV,051536af-cc1f-4e12-a2c2-a46a6a9eb380,label_priority_miss,,,2,miss,,LOGAN WWTP
+21000234001,KY,9c21803d-a0e5-4639-9b2b-198125f69e2e,label_priority_miss,,,2,miss,,FRENCHBURG
+47000255001,TN,f003b643-482d-487b-ab1f-50870410e55d,label_priority_miss,,,2,miss,,CLEVELAND UTILITIES STP
+16000063201,ID,556047b1-18e2-4279-91e2-867f2e3affd5,label_priority_miss,,,2,miss,,Coolin S/T System
+26003077001,MI,ff814148-63e5-4752-8ebc-89b52bdb0050,label_priority_miss,,,2,miss,,JONESVILLE STP
+13000000499,GA,e30e70bc-68e1-4469-86a1-956f80c7e8eb,label_priority_miss,,,2,miss,,Brunswick-Glynn County St. Simons Island Dunbar Creek WPCP
+22001095001,LA,ddc0c45e-d96d-42ab-9132-28c97af9cd67,label_priority_miss,,,2,miss,,POLLOCK STP
+50000047001,VT,812f04bc-5d21-45b3-b398-73481de6f02a,label_priority_miss,,,2,miss,,Northfield WWTF
+33000064001,NH,3161d405-2578-4275-bfbd-011015d424fd,label_priority_miss,,,2,miss,,Henniker WWTF
+05000110002,AR,7498ff56-b98a-4e6f-8939-456966a4ae84,label_priority_miss,,,2,miss,,Sugarloaf WTD WWTP
+15000003021,HI,25a235d6-d9d6-4a82-8aa7-7aa3bbac2ace,label_priority_miss,,,2,miss,,WAIMANALO WWTF
+35000000179,NM,58fc0d46-74f6-4bce-b644-b73a46dea034,label_priority_miss,,,2,miss,,Gallup Regional WWTP
+30000000024,MT,26bfefb1-085f-4c20-8d97-71e8628ae0d2,label_priority_miss,,,2,miss,,Corvallis Wastewater
+08000037002,CO,2536e0ee-955e-4473-8acc-da2b2956d43c,label_priority_miss,,,2,miss,,Fort Collins Mulberry WW Facility
+31002665001,NE,0c9849af-1a3c-4a59-af39-fbab467648ff,label_priority_miss,,,2,miss,,WISNER WWTP
+17000103001,IL,ec1f53d4-e3dc-4032-99f9-186bcd102918,label_priority_miss,,,2,miss,,FISHER STP
+46000110001,SD,cb535e35-909d-4c02-b4ed-90cefafa75a1,label_priority_miss,,,2,miss,165725.0,SIOUX FALLS WWT FACILITY
+72000002007,PR,c93903bc-d01b-4f71-974f-1d831b0968a9,label_priority_miss,,,2,miss,,Ciales WWTP
+42007558001,PA,b11b9b35-c145-4be3-84e6-51c370aa5183,label_priority_miss,,,2,miss,,GIRARDVILLE AREA MA STP
+48002067001,TX,932a8970-2c50-4cad-a2fb-8d816c7042a3,label_priority_miss,,,2,miss,,Sundown WWTP
+12000000004,FL,234d8b46-5800-45c0-a62a-fa57a2a7750a,label_priority_miss,,,2,miss,,Arbennie Pritchett Water Reclamation Facilit
+41000049001,OR,5ed3b9fc-2aa2-43c6-abec-65aae209a6ef,label_priority_miss,,,2,miss,,OAKRIDGE STP
+36004122001,NY,5c3e8042-ed0c-4b2d-9aa5-bb3abddb4836,label_priority_miss,,,2,miss,,Chatham (V) WPCF
+45000237001,SC,6c1efbab-c9d0-4eae-a19b-1b8d039470c1,label_priority_miss,,,2,miss,46486.0,GENEROSTEE WWTP
+02000315001,AK,5568aad3-7f8e-404d-89bd-bfc396e7a5d0,label_priority_miss,,,2,miss,,Atqasuk WWTP
+37009507002,NC,7ffd4c0f-1631-495f-b36f-a09a36655a2c,label_priority_miss,,,2,miss,,BEECH MOUNTAIN/POND CREEK WWTP
+18001005003,IN,b4675f11-e005-4e1b-9a25-26028dd8a402,label_priority_miss,,,2,miss,,Clarksville WWTP
+06001028001,CA,c972a8be-be35-4550-8a3f-1a573b18c094,label_priority_miss,,,2,miss,,Fort Bragg WWTP
+20000190001,KS,dbd558c3-40eb-484b-bd06-0ceddd98127c,label_priority_miss,,,2,miss,,SUSANK WWTP
+40000672001,OK,e9e363ea-9ff2-4e37-9c19-29b5b0d69d87,label_priority_miss,,,2,miss,,SOUTH COFFEYVILLE PWA WWT
+27001706001,MN,21fc4e4c-b645-4cf0-af5d-b143eac46a88,label_priority_miss,,,2,miss,,BIG FALLS WWTP
+53000000119,WA,6cab4fdb-fcb6-420c-8e69-579fbac9ad21,label_priority_miss,,,2,miss,,LYLE POTW
+24000054012,MD,ca973c09-8a4b-4831-be32-4472a9519ebe,label_priority_miss,,,2,miss,,Bloomington WWTP
+25000262002,MA,bc2144ca-9d98-408d-9888-091aa32676f7,label_priority_miss,,,2,miss,,Royalston Sewerage Collection System and WWTF
+23000047001,ME,aeeffff7-d57b-4b1f-8af9-dc2a767b1371,label_priority_miss,,,2,miss,,KENNEBUNKPORT WWTF
+28000065001,MS,200427ea-3b12-4fde-a1c7-50a64f1e10f8,label_priority_miss,,,2,miss,,BAY SPRINGS POTW
+51000341001,VA,0e6f9178-a22c-4a36-a727-6c588c596b46,label_priority_miss,,,2,miss,,THORNBURG REG. STP
+55009596001,WI,3f0a5b9c-938a-47ab-ad63-edb99e5b260f,label_priority_miss,,,2,miss,,WATERLOO WWTP
+39000275001,OH,61cb54af-3316-43cb-ab94-7abefc32af80,label_priority_miss,,,2,miss,,Prospect WWTP & Sewer System
+29002071001,MO,83499bbe-5429-434f-af6b-7330b2ce2f31,label_priority_miss,,,2,miss,,Palmyra WWTP
+04000000147,AZ,8c81c811-d543-4683-8ea4-aa5e2979841a,label_priority_miss,,,2,miss,,Goodyear Direct Potable Use WRF
+19000627001,IA,8d7adc2c-37a5-4b99-9c7c-86ec799db2ee,label_priority_miss,,,2,miss,,NORWAY WWTP
+16000015001,ID,8ee1972f-eda3-4238-951a-9624f18d6c78,label_priority_miss,,,2,miss,,KALISPEL BAY STP
+21000728002,KY,ebe6a6aa-759b-4f13-8d91-d29774917788,label_priority_miss,,,2,miss,,MTN WD - BELFRY (POND CREEK)  STP
+34001138001,NJ,d5dc29cf-5c16-4caf-bc9a-2283d5ae22a8,label_priority_miss,,,2,miss,,Berkeley Heights Township - CS/STP
+01000071001,AL,6ea20e92-843a-4152-a740-349350c39d16,label_priority_miss,,,2,miss,,GOODWATER LAGOON
+13000864002,GA,5024e1b9-0262-4906-a7c7-d6a93f368acb,label_priority_miss,,,2,miss,,Young Harris WPCP
+47002004001,TN,9863ffa3-7080-439a-9831-a018bc37cc63,label_priority_miss,,,2,miss,,MOSHEIM WWTP
+05000641001,AR,062855cd-9f34-49b7-b0ad-15fc422f8b90,label_priority_miss,,,2,miss,,Hazen WWTP
+22003384001,LA,3be0d615-0a3b-4698-909c-abcac1f2ee2d,label_priority_miss,,,2,miss,,MAURICE WWTP
+35200900006,NM,0737b017-1b2d-4a39-8871-07cb852454c4,label_priority_miss,,,2,miss,,Los Alamos County White Rock
+26003014001,MI,10fec7de-1116-493f-9075-f7be4b99c0b5,label_priority_miss,,,2,miss,,ROSEBUSH WWSL
+15000007002,HI,a108e66a-0ad8-4bae-a724-a761d3ebe89f,label_priority_miss,,,2,miss,,WAILUA WWTF
+33000082001,NH,27215be7-ffdf-4d39-8d3b-705443706ae6,label_priority_miss,,,2,miss,,Newmarket WWTF
+50000096001,VT,936f29c6-e24e-439c-8d55-ca569bc3d269,label_priority_miss,,,2,miss,,Brandon WWTF
+30000022001,MT,3cb21492-55e2-44f6-85c4-3d1afb23c7a7,label_priority_miss,,,2,miss,,STEVENSVILLE WWTP
+54001495001,WV,bfc3328a-5895-45f9-a24e-0b2c222eab72,label_priority_miss,,,2,miss,,CENTRAL HAMPSHIRE PSD  - AUGUSTA TP
+08000000196,CO,01aa8619-1875-4d14-babf-6f5ac7dcbabf,label_priority_miss,,,2,miss,,Lowell Whiteman School/Steamboat Mountain School
+31002620001,NE,acb1f206-09f2-4518-9e8f-c2bc3434762a,label_priority_miss,,,2,miss,,WEST POINT WWTP
+17009935001,IL,87ac6471-0be5-4d1e-ab3d-f811b411295a,label_priority_miss,,,2,miss,,SENECA STP
+72000002008,PR,60cf8437-a817-4e90-8e8d-ff520d0dc28f,label_priority_miss,,,2,miss,,Corozal WWTP
+42000105001,PA,d749c57f-710e-41b5-a7d5-7e2d856aa535,label_priority_miss,,,2,miss,85270.0,LPVRSA  -  OAKS STP
+36005040001,NY,f9f879c5-8309-4e3f-8d7b-ca6aa464b949,label_priority_miss,,,2,miss,,Schuylerville (V) STP
+12000267001,FL,8da4f1e8-2072-4d59-b9fd-c0f756674729,label_priority_miss,,,2,miss,,CEDAR KEY WRF
+37006708001,NC,ba887234-0323-4420-90d0-a74da090c366,label_priority_miss,,,2,miss,,Richlands WWTP
+48003112001,TX,b0210165-c1f7-422b-a830-91e224876fb5,label_priority_miss,,,2,miss,,Rosebud WWTP
+06008010001,CA,50927f32-eee8-4694-a4d9-123caf6b57bf,label_priority_miss,,,2,miss,,IEUA Regional Plant No.1
+45000262001,SC,e964e648-72e0-4f0e-8a9a-ef0e0371903c,label_priority_miss,,,2,miss,19922.0,LITTLE RIVER S T P
+40000042001,OK,f28c9df2-e732-437a-aec0-08c8f23847b0,label_priority_miss,,,2,miss,,AFTON PWA WWT
+41000218001,OR,ef518d2b-1c5d-4515-a390-37a795217714,label_priority_miss,,,2,miss,,NETARTS-OCEANSIDE SANITARY DISTRICT
+18005354001,IN,f23047db-c48c-4711-8e43-0294aa8a97d6,label_priority_miss,,,2,miss,,RIDGEVILLE WWTP
+20001305001,KS,73e0d0ab-773b-4dd2-8c7b-6c00dcfe02fc,label_priority_miss,,,2,miss,,BAZINE WWTP
+27044000207,MN,80850ff8-3da8-4dbc-bbf7-8fdd903e06b9,label_priority_miss,,,2,miss,,TOWER - BRIETUNG WWTF
+24000029001,MD,cbc23f29-b16e-4564-96d1-c3d71cccbfe6,label_priority_miss,,,2,miss,,RISING SUN STP
+25000128001,MA,31129e99-419a-47b6-85d2-878b657b00c4,label_priority_miss,,,2,miss,,MWRA Deer Island WWTF
+28000655002,MS,2d4c3b68-976f-42f2-befe-be143245513a,label_priority_miss,,,2,miss,12770.0,"LAUREL POTW, NUMBER 2"
+55001350001,WI,2376621d-d78a-462a-ac4a-cc34873de41b,label_priority_miss,,,2,miss,,DICKEYVILLE STP
+23000136001,ME,e0584a36-81fc-4b30-89a0-e0622a604d38,label_priority_miss,,,2,miss,,ORONO WWTP
+39007090001,OH,1b02dd47-ba51-44a3-ab8b-c59db86c64d1,label_priority_miss,,,2,miss,,NWWSD Risingsun WWTP and Sewer System
+29004081001,MO,879ed864-52ff-4b70-93bb-9f25cc943f32,label_priority_miss,,,2,miss,,Bourbon WWTP
+53001000001,WA,cf675737-57c6-4d27-8517-b8ae3876f5a8,label_priority_miss,,,2,miss,,South Kitsap Water Reclamation Facility
+02000414001,AK,72f80017-5e1a-4dc0-ad0e-03a7e298cc1e,label_priority_miss,,,2,miss,,Kiana Lagoon
+51000264001,VA,be899e86-8932-4cc4-9de4-26c24f01ca65,label_priority_miss,,,2,miss,,MONTEREY STP
+34002443002,NJ,24c1e424-8458-4e67-9b3e-64a3a95ffe6c,label_priority_miss,,,2,miss,,Washington Township MUA (Morris) - Long Valley CS/STP
+21000400001,KY,f843f6db-b00c-408c-a1a3-abc7c1a8b2f5,label_priority_miss,,,2,miss,,MARTIN COUNTY - Tug Valley STP
+47000395001,TN,aa4f42b5-31aa-4978-b22f-e3532fecb4fa,label_priority_miss,,,2,miss,,Dresden Lagoon
+13000867001,GA,ba5d170b-fcde-4707-bcf5-66a0d4fd7dd9,label_priority_miss,,,2,miss,,Woodstock (Rubes Creek WPCP)
+01000330001,AL,5ecb3a59-8b12-470f-96e3-6d14782b87f3,label_priority_miss,,,2,miss,,LINCOLN SOUTH WWTP
+19000486001,IA,defe787b-3032-4be1-a911-63605bfb377d,label_priority_miss,,,2,miss,,LISCOMB STL
+04001343001,AZ,006a7073-e11b-42e0-b4c5-ac38b9d8d78a,label_priority_miss,,,2,miss,,Peoria Jomax WRF
+16000185001,ID,1a0e00e4-4442-4186-8ad1-c3fe0f0658d6,label_priority_miss,,,2,miss,,HAYDEN AREA REGIONAL S/T FACILITY
+15000003011,HI,3f138023-f891-4608-9ab7-bcbd19bc6281,label_priority_miss,,,2,miss,,KAHUKU WWTP
+26000234001,MI,8fcb707f-bfca-4945-a304-17b111b2ac8a,label_priority_miss,,,2,miss,,CRYSTAL STP
+33000098001,NH,f6b20719-a32d-49f0-bd74-0d2ed5eb8d4b,label_priority_miss,,,2,miss,,Sunapee WWTF
+35000075001,NM,9689af9b-2a8a-459f-99bd-7eca03f9efc6,label_priority_miss,,,2,miss,,ZUNI PUEBLO LAGOONS
+05000377001,AR,57227e1a-df2d-4dc2-bee0-f4c2b7344ee3,label_priority_miss,,,2,miss,,Nimmons WWTP
+30000003001,MT,7d67911b-2ceb-4988-a9a9-b915bfc33642,label_priority_miss,,,2,miss,,WHITEFISH WWTP
+54004502001,WV,406aa9b6-e0d2-433d-8395-453265d46c62,label_priority_miss,,,2,miss,,HINTON WWTP
+22000110002,LA,d10b8a76-071e-4cf6-adaa-58af4e02c8d6,label_priority_miss,,,2,miss,,Benton Wastewater System
+31001468001,NE,a1c6f130-f574-48ce-ac55-c05dbbc34fcd,label_priority_miss,,,2,miss,,SYRACUSE WWTP
+08201200080,CO,8f27710e-16c3-4f02-91b8-c41a36254d83,label_priority_miss,,,2,miss,,"Empire, Town of"
+42003135001,PA,d141d4df-c377-48dd-979a-d5e4b5190628,label_priority_miss,,,2,miss,2086.0,GLEN ROCK SEW AUTH
+37002407001,NC,b58f649f-d69b-4b16-a506-56811824e5d8,label_priority_miss,,,2,miss,,TABOR CITY WWTP
+12000000072,FL,06c93e30-0f89-419e-8440-7217e67aa722,label_priority_miss,,,2,miss,,Nassau Regional WRF
+06002040001,CA,5b59116c-b680-4b53-9691-e14b283aa305,label_priority_miss,,,2,miss,,North San Mateo County Sanitation District WWTP
+48003052001,TX,4ed17e02-5e26-4b1d-9ef5-358ab6dfa0d8,label_priority_miss,,,2,miss,,Hico WWTP
+36004077001,NY,20500385-d0d0-4aef-8e71-a3c0b2d2e2ba,label_priority_miss,,,2,miss,,Fonda (V) Fonda-Fultonville WWTP
+18004664001,IN,66d8a04e-e004-482e-ad6b-416badc358b7,label_priority_miss,,,2,miss,,South Henry County RWD
+41000001002,OR,1f223813-f4d0-42ea-b813-d6df09eea60f,label_priority_miss,,,2,miss,,TRI CITY WPCP
+45000255001,SC,c8fac292-3c3e-4297-b28c-9b5a0233499c,label_priority_miss,,,2,miss,16823.0,ORANGEBURG STP
+24000017001,MD,19d5b22f-48df-4da4-b310-cfbac10ec418,label_priority_miss,,,2,miss,,Little Patuxent WWTP
+55000120001,WI,d470da9a-6772-437c-92f4-5a8fc820e7c8,label_priority_miss,,,2,miss,,AMERY STP
+28001345001,MS,d294d6ce-b089-41a4-af7c-9b4d6f2d7277,label_priority_miss,,,2,miss,67980.0,TUPELO POTW
+39009600001,OH,bd77e361-c99f-4e89-bcbd-4a14fbadaae0,label_priority_miss,,,2,miss,,Holmesville WWTP & Sewers
+27009319001,MN,ae9794bc-61c3-46bc-b491-170bd3c3d58a,label_priority_miss,,,2,miss,,BELLE PLAINE WWTP
+25000028001,MA,fd7bed79-8132-493b-9b44-73f81cb763a7,label_priority_miss,,,2,miss,,Fairhaven Sewerage Collection System and WPCF
+20000483001,KS,2e9e88df-977d-4217-b94f-5ec562bc8a2f,label_priority_miss,,,2,miss,,JF CO S D #2 IND RIDGE WWTP
+23000043001,ME,9277871c-d6d3-4bb2-888c-902f339144b6,label_priority_miss,,,2,miss,,HOULTON WPCF
+40000025001,OK,b7cb47f3-b71f-47d3-a124-a8874d8043d6,label_priority_miss,,,2,miss,,BROKEN BOW PWA WWT
+29003866001,MO,e92c9dd4-91ce-4bc3-aa5b-75104a0739e0,label_priority_miss,,,2,miss,,Wyaconda WWTP
+02000176001,AK,d1f23967-648e-469d-a866-2922932cf097,label_priority_miss,,,2,miss,,Shungnak Lagoon
+51000010001,VA,fcf5430b-23df-4c32-99b9-9f2908428a56,label_priority_miss,,,2,miss,,HONAKER WWTP & Collection System
+34008050001,NJ,2d665110-a545-44b2-ab80-da6d4a6abcb5,label_priority_miss,,,2,miss,,Lambertville City SA - CS/STP
+21000087001,KY,7d5ce4ca-1bce-4c1c-ac68-2cc65ec06ca5,label_priority_miss,,,2,miss,,SACRAMENTO STP
+53002625501,WA,97d5407e-7cfc-45de-8715-7f1af2069d10,label_priority_miss,,,2,miss,,Kitsap Co SD #7 WWTP
+47001405001,TN,dcc69228-3a04-4bf4-8abe-e65e4d1f87ce,label_priority_miss,,,2,miss,,SWEETWATER STP
+13000184001,GA,6bc0ea93-feef-4d16-9f60-748ade5b60d7,label_priority_miss,,,2,miss,,Vidalia Southeast Collection (LAS)
+19000591001,IA,e16f137b-dfc7-4c8b-a945-afc87a716b3e,label_priority_miss,,,2,miss,,MOUNT AYR WASTEWATER
+01200100002,AL,0e2fde93-7d24-4405-b909-9f67f1244b5d,label_priority_miss,,,2,miss,,Jefferson County-Valley Creek WWTP
+26002162002,MI,d618349f-b2e9-4584-b76c-28c95bad98b5,label_priority_miss,,,2,miss,,COLDWATER
+16000058002,ID,532a38fe-2102-4990-ab07-f2f39fa31e80,label_priority_miss,,,2,miss,,S Frk Coeur D' Alene Rvr SD--Mullan
+04001711001,AZ,8fa17d69-1c9b-462b-b64a-02bb9069be92,label_priority_miss,,,2,miss,,Pinetop-Lakeside SD WWTF
+33000067001,NH,3f7966df-a8d7-4109-a8e5-5dc335fd46c8,label_priority_miss,,,2,miss,,Newbury WWTF
+15000003012,HI,a148263f-decc-4a2b-aa63-41902ca00de1,label_priority_miss,,,2,miss,,PAALAA KAI WWTP
+05000708001,AR,c4cd39bd-f313-4892-a288-62e8d80b33ee,label_priority_miss,,,2,miss,,Cave City WWTP
+22003011001,LA,8a4b7068-3bb6-4004-88bd-202f59e4f7e3,label_priority_miss,,,2,miss,,OAKDALE WWT FACILITY
+30000062001,MT,3ee34b66-4ad9-4c08-b85d-d78ade2c8b22,label_priority_miss,,,2,miss,,LAUREL WWTP
+54003904001,WV,9bb886c2-0f30-4c58-9dec-5a43d907b7cd,label_priority_miss,,,2,miss,,NEWBURG WWTP
+31000452001,NE,ef9e3526-dd16-4777-b41b-33b7dcb3cf3a,label_priority_miss,,,2,miss,,ASHLAND WWTP
+08000114001,CO,8a3b60b4-c312-4eb5-b566-ac43f97ab4a2,label_priority_miss,,,2,miss,,WINDSOR WWTP
+42005070001,PA,75870b61-c4d9-442b-b0d3-61c8afe7ef0e,label_priority_miss,,,2,miss,,KISKI VALLEY WPCA
+12000170001,FL,1a0d06e8-da46-4016-a177-f6f23d2fac4b,label_priority_miss,,,2,miss,,Crescent City WWTF
+48001294001,TX,edffcc6d-f6b9-442b-9f88-64c95b1b49f2,label_priority_miss,,,2,miss,,Aloe WWTP
+37007809001,NC,797be19f-e7e5-47f3-b65d-4fa2826799da,label_priority_miss,,,2,miss,,PEMBROKE WWTP
+41000111001,OR,70e5d1b5-3746-43f6-b45c-ed83294b9f23,label_priority_miss,,,2,miss,,CLATSKANIE STP
+06000000137,CA,bf9b0e73-c9b5-4f91-a537-543fd96ac52f,label_priority_miss,,,2,miss,,RIDGECREST WWTF
+45000215001,SC,a4893764-1aeb-4427-8745-b664e9d91923,label_priority_miss,,,2,miss,36524.0,CHERAW WWTP
+24000062001,MD,c4b3e99e-03e1-40a3-b555-6bdbc5463c34,label_priority_miss,,,2,miss,,CENTREVILLE WWTP
+55007980001,WI,b2d2c804-f12b-462c-8025-7259fbe44c4d,label_priority_miss,,,2,miss,,MORRISON SD #1 STP
+28001305001,MS,94d6623c-1157-426d-b6d6-64a583366b7d,label_priority_miss,,,2,miss,1034.0,TAYLORSVILLE POTW
+39000096001,OH,5f4e22dc-bf87-42aa-9829-02d9881d659e,label_priority_miss,,,2,miss,,Pickaway Co Walnut Heights Subdivision WWTP & Sewers
+36004051001,NY,6f1ab909-196e-4d7d-b095-b7fa118e9926,label_priority_miss,,,2,miss,,St. Johnsville (V) STP
+27006403001,MN,4aab08ea-f2a7-4086-b0ab-b35bb9e70a0f,label_priority_miss,,,2,miss,,SPRING VALLEY WWTP
+29003707001,MO,398ce84e-390f-455a-95f3-1b310f08ea93,label_priority_miss,,,2,miss,,Spickard WWTP
+18004691001,IN,1ff790a9-c26f-4464-baaa-44878bb5d1fa,label_priority_miss,,,2,miss,,MARKLE WWTP

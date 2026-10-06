@@ -31,6 +31,10 @@ class VerdictSubmit(BaseModel):
     selected_ll_uuid: Optional[str] = None
     candidate_rank: Optional[int] = None
 
+    # optional, candidate_correct / reported_correct only: other parcels that
+    # are part of the same plant (split parcels), besides the selected one
+    site_ll_uuids: Optional[list[str]] = None
+
     # required iff plant_verdict == "truth_outside_candidates"
     truth_latitude: Optional[float] = None
     truth_longitude: Optional[float] = None
@@ -52,6 +56,10 @@ class VerdictSubmit(BaseModel):
         # actually confirmed something -- reported_correct or candidate_correct.
         # Not required for truth_outside_candidates (nothing proposed was
         # confirmed) or needs_info (nothing was decided at all).
+        if self.site_ll_uuids and self.plant_verdict not in ("reported_correct",
+                                                             "candidate_correct"):
+            raise ValueError("site_ll_uuids only applies to reported_correct or "
+                             "candidate_correct")
         if self.plant_verdict in ("reported_correct", "candidate_correct"):
             if self.confirmation_type is None:
                 raise ValueError(

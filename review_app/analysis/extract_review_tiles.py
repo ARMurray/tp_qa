@@ -709,6 +709,10 @@ def main():
                     help="only tile plants from this review round. Default: "
                          "every reviewed round (tiles that already exist are "
                          "skipped either way).")
+    ap.add_argument("--sites-csv", type=Path, default=None,
+                    help="tile exactly the sites in this CSV (columns cwns_id, "
+                         "st, ll_uuid, role, lat, lon) instead of selecting from "
+                         "app.db -- e.g. analysis/label_priorities.py's output")
     ap.add_argument("--prune", action="store_true",
                     help="instead of fetching, move UNLABELLED review ring "
                          "tiles that do not touch their parcel into "
@@ -730,7 +734,15 @@ def main():
         prune_ring_tiles(DC, args.dry_run)
         return
 
-    if args.all_candidates:
+    if args.sites_csv is not None:
+        sites = pd.read_csv(args.sites_csv, dtype={"cwns_id": str, "ll_uuid": str, "st": str})
+        sites["ll_uuid"] = sites["ll_uuid"].fillna("")
+        for c in ("lat", "lon"):
+            sites[c] = pd.to_numeric(sites.get(c), errors="coerce") if c in sites else None
+        sites["point_halfwidth_m"] = args.point_halfwidth_m
+        sites = sites[["cwns_id", "st", "ll_uuid", "role", "lat", "lon", "point_halfwidth_m"]]
+        print(f"{len(sites)} site(s) from {args.sites_csv}")
+    elif args.all_candidates:
         sites = load_reviewed_sites(args.reported_only, args.candidates_only)
     else:
         if args.reported_only or args.candidates_only:

@@ -160,6 +160,8 @@ def main():
     if summ is not None:
         summ["CWNS_ID"] = summ["CWNS_ID"].astype(str)
 
+    band_rows = {}   # bin -> (plant ids scored, per-plant outcome Series)
+
     # =======================================================================
     # corrections -- the headline
     # =======================================================================
@@ -225,6 +227,10 @@ def main():
             print(f"\n  Plants resolved by Stage 2a fallback (nothing fired): "
                   f"{fb}/{n_with_cands}")
 
+        # per-plant: is the re-ranked #1 the true parcel? (for the band split)
+        hit1 = c[c["rerank_rank"] == 1].groupby("CWNS_ID")["is_true"].max()
+        band_rows["corrections"] = (held["CWNS_ID"], hit1)
+
     # =======================================================================
     # correct -- false-move rate
     # =======================================================================
@@ -245,12 +251,39 @@ def main():
             print(f"  This is a STAGE 1 property -- re-ranking cannot change "
                   f"it. A plant\n  Stage 1 never flagged has no candidates to "
                   f"reorder.")
+            band_rows["correct"] = (s["CWNS_ID"],
+                                    s.set_index("CWNS_ID")["trigger_reason"] != "none")
             no_parcel = int((flagged["trigger_reason"] == "no_parcel").sum())
             if no_parcel:
                 print(f"\n  NOTE: {no_parcel} were flagged as no_parcel -- the "
                       f"reported point hit\n  no parcel at all. That is a "
                       f"Regrid coverage gap, not a model error,\n  and is "
                       f"arguably not a 'false move' in the same sense.")
+
+    # =======================================================================
+    # by population band (since the floor dropped to 100, 2026-10-05)
+    # =======================================================================
+    # Plants serving 100-1,000 are newly admitted and expected to be harder.
+    # Every headline above, split by band. Small n per band: read the counts.
+    if band_rows:
+        print(f"\n{'=' * 66}\nBY POPULATION BAND\n{'=' * 66}")
+        pops = C.population_served()
+        if "corrections" in band_rows:
+            ids, hit1 = band_rows["corrections"]
+            b = ids.map(lambda i: C.pop_band(pops.get(i)))
+            print("  corrections bin -- re-ranked #1 is the true parcel (all plants):")
+            for band, grp in ids.groupby(b):
+                n = len(grp)
+                k = int(hit1.reindex(grp).fillna(False).astype(bool).sum())
+                print(f"    {band:<12} {k:3d}/{n:<3d} = {k / n if n else float('nan'):6.1%}")
+        if "correct" in band_rows:
+            ids, flag = band_rows["correct"]
+            b = ids.map(lambda i: C.pop_band(pops.get(i)))
+            print("  correct bin -- flagged by Stage 1 (every flag is a false one):")
+            for band, grp in ids.groupby(b):
+                n = len(grp)
+                k = int(flag.reindex(grp).fillna(False).astype(bool).sum())
+                print(f"    {band:<12} {k:3d}/{n:<3d} = {k / n if n else float('nan'):6.1%}")
 
     # =======================================================================
     # OSM-confirmed rule (config.STAGE1_OSM_PASS)

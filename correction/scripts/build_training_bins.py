@@ -188,9 +188,13 @@ def main():
         & incorrect_rows["Corrected_X"].notna()
         & incorrect_rows["Corrected_Y"].notna()
     ].copy()
+    # Site_UUIDs (2026-10-05): the corrected plant's parcels when a reviewer
+    # marked more than one. 06b keeps the extra ones out of its negatives.
+    if "Site_UUIDs" not in corrections_src.columns:
+        corrections_src["Site_UUIDs"] = None
     corrections_gdf = make_point_gdf(
         corrections_src, "Original_X", "Original_Y",
-        extra_cols=["Corrected_X", "Corrected_Y"],
+        extra_cols=["Corrected_X", "Corrected_Y", "Site_UUIDs"],
     )
     n_dropped_corrections = len(corrections_src) - len(corrections_gdf)
     if n_dropped_corrections:

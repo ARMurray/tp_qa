@@ -220,3 +220,7 @@ html, body, #app { height: 100%; margin: 0; font-family: -apple-system, Segoe UI
 .od-hit     { color: #B4761E; font-weight: 600; }
 .od-none    { color: #5A6B66; }
 .od-unknown { color: #98A5A1; font-style: italic; }
+
+/* "also part" -- split-parcel plants (2026-10-05) */
+.site-chk-label { font-size: 11px; color: #555; white-space: nowrap; cursor: pointer; margin-left: 4px; }
+.site-chk-label input { vertical-align: -2px; margin: 0 2px 0 0; }

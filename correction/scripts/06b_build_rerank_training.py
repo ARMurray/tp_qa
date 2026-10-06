@@ -119,6 +119,19 @@ def load_true_parcels(con) -> pd.DataFrame:
         pd.DataFrame(columns=["CWNS_ID", "true_ll_uuid"])
     truth["true_ll_uuid"] = truth["true_ll_uuid"].astype(str)
     print(f"  True parcel resolved for {len(truth)}/{len(corr)} correction(s)")
+
+    # Split-parcel plants: every parcel the reviewer marked as part of the
+    # plant (master Site_UUIDs, 2026-10-05). The extra ones are NOT negatives
+    # -- see main(), which drops them from training.
+    site = corr.get("Site_UUIDs")
+    sites = {}
+    if site is not None:
+        for cw, s in zip(corr["CWNS_ID"], site):
+            if isinstance(s, str) and s:
+                sites[cw] = set(s.split(";"))
+    truth["site_ll_uuids"] = truth["CWNS_ID"].map(lambda c: sites.get(c, set()))
+    n_multi = sum(1 for s in sites.values() if len(s) > 1)
+    print(f"  Corrections marked as multi-parcel plants: {n_multi}")
     return truth
 
 
@@ -240,6 +253,19 @@ def main():
     # ---- label ------------------------------------------------------------
     train = train.merge(truth, on="CWNS_ID", how="left")
     train["label"] = (train["ll_uuid"] == train["true_ll_uuid"]).astype(int)
+
+    # Another parcel of the SAME plant (split parcels) is neither the label
+    # nor a competitor: calling it a negative teaches the re-ranker that half
+    # the plant is "not the plant". Dropped.
+    other_half = [(u != t) and isinstance(s, set) and (u in s)
+                  for u, t, s in zip(train["ll_uuid"], train["true_ll_uuid"],
+                                     train["site_ll_uuids"])]
+    n_other = int(sum(other_half))
+    if n_other:
+        print(f"  Dropped {n_other} candidate row(s) that are another parcel of "
+              f"their plant's site (not negatives)")
+        train = train[~pd.Series(other_half, index=train.index)]
+    train = train.drop(columns=["site_ll_uuids"])
 
     pos_per_plant = train.groupby("CWNS_ID")["label"].max()
     n_with_pos = int(pos_per_plant.sum())

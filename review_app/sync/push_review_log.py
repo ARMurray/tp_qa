@@ -169,8 +169,12 @@ def main():
             "selected_ll_uuid": "true_ll_uuid",
             "truth_latitude": "true_lat",
             "truth_longitude": "true_lon",
-        })[["CWNS_ID", "plant_verdict", "true_ll_uuid", "true_lat", "true_lon",
-            "candidate_rank", "reviewer", "reviewed_at"]]
+        })
+        if "site_ll_uuids" not in holdout_out.columns:
+            holdout_out["site_ll_uuids"] = None
+        holdout_out = holdout_out[["CWNS_ID", "plant_verdict", "true_ll_uuid", "true_lat",
+                                   "true_lon", "site_ll_uuids", "candidate_rank",
+                                   "reviewer", "reviewed_at"]]
 
         out_path = C.OUTGOING_DIR / f"holdout_truth_round{args.round}.parquet"
         if out_path.exists() and not args.all:

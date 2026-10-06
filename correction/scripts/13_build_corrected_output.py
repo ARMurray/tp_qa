@@ -216,9 +216,11 @@ def main():
     pop_ok = C.population_ok_ids()
     scored_states = set(summ["STATE_CODE"].dropna().astype(str))
 
+    if "Site_UUIDs" not in master.columns:   # masters written before 2026-10-05
+        master["Site_UUIDs"] = None
     df = master[["CWNS_ID", "STATE_CODE", "FACILITY_NAME", "LATITUDE", "LONGITUDE",
                  "Original_Correct", "Verified", "Corrected_X", "Corrected_Y",
-                 "How_Corrected", "ReGrid_UUID"]].rename(
+                 "How_Corrected", "ReGrid_UUID", "Site_UUIDs"]].rename(
         columns={"LATITUDE": "reported_lat", "LONGITUDE": "reported_lon"})
     keep = ["CWNS_ID", "stage1_route", "trigger_reason", "stage1_prob_correct",
             "reported_ll_uuid", "rerank_top_ll_uuid", "rerank_score",
@@ -281,6 +283,11 @@ def main():
     df["final_parcel"] = df["reported_ll_uuid"]
     has_rg = verified & df["ReGrid_UUID"].notna() & (df["ReGrid_UUID"].astype(str) != "")
     df.loc[has_rg, "final_parcel"] = df.loc[has_rg, "ReGrid_UUID"]
+    # A reviewer's split-parcel site (master Site_UUIDs, primary first) wins.
+    has_site_lbl = verified & df["Site_UUIDs"].fillna("").astype(str).str.len().gt(0)
+    df.loc[has_site_lbl, "final_parcel"] = df.loc[has_site_lbl, "Site_UUIDs"].str.split(";").str[0]
+    verified_sites = {cw: s.split(";") for cw, s in
+                      zip(df.loc[has_site_lbl, "CWNS_ID"], df.loc[has_site_lbl, "Site_UUIDs"])}
 
     movers = df.loc[can_move, ["CWNS_ID", "STATE_CODE", "rerank_top_ll_uuid",
                                "reported_ll_uuid"]]
@@ -295,7 +302,10 @@ def main():
     singles = df.loc[df["final_parcel"].notna() & ~can_move,
                      ["CWNS_ID", "STATE_CODE", "final_parcel"]] \
                 .rename(columns={"final_parcel": "ll_uuid"})
-    wanted = pd.concat([pool[["STATE_CODE", "ll_uuid"]], singles[["STATE_CODE", "ll_uuid"]]])
+    st_of = dict(zip(df["CWNS_ID"], df["STATE_CODE"]))
+    extra = pd.DataFrame([(st_of.get(cw), u) for cw, us in verified_sites.items() for u in us],
+                         columns=["STATE_CODE", "ll_uuid"])
+    wanted = pd.concat([pool[["STATE_CODE", "ll_uuid"]], singles[["STATE_CODE", "ll_uuid"]], extra])
     wanted = wanted.drop_duplicates()
     print(f"\n  loading {len(wanted):,} parcel geometries...")
     parcels = load_parcels(wanted)
@@ -367,14 +377,32 @@ def main():
         df.loc[leftover, "status_reason"] = "unrouted"
         print(f"  WARNING: {int(leftover.sum())} plant(s) matched no rule (unrouted)")
 
-    # ---- site of every other plant: its one final parcel ---------------------
+    # ---- site of every other plant: the reviewer's parcels, else its one ----
     for r in df.loc[df["final_parcel"].notna() & ~df["CWNS_ID"].isin(site_of),
                     ["CWNS_ID", "final_parcel"]].itertuples(index=False):
-        if str(r.final_parcel) in geom_m:
-            site_of[r.CWNS_ID] = [str(r.final_parcel)]
+        parts = [u for u in verified_sites.get(r.CWNS_ID, [str(r.final_parcel)]) if u in geom_m]
+        if parts:
+            site_of[r.CWNS_ID] = parts
     has_site = df["CWNS_ID"].isin(site_of) & (df["n_site_parcels"] == 0)
-    df.loc[has_site, "site_parcels"] = df.loc[has_site, "CWNS_ID"].map(lambda c: site_of[c][0])
-    df.loc[has_site, "n_site_parcels"] = 1
+    df.loc[has_site, "site_parcels"] = df.loc[has_site, "CWNS_ID"].map(lambda c: ";".join(site_of[c]))
+    df.loc[has_site, "n_site_parcels"] = df.loc[has_site, "CWNS_ID"].map(lambda c: len(site_of[c]))
+
+    # Population served (the same table and first-row-wins rule as the
+    # population floor), so downstream readers can slice by band without the
+    # HPC-only CWNS export.
+    df["pop_served"] = df["CWNS_ID"].map(C.population_served())
+    df["pop_band"] = df["pop_served"].map(C.pop_band)
+
+    # How far to trust a location (decided 2026-10-05): a human said so >
+    # model decision on a plant serving > 1,000 > model decision on a newly
+    # admitted 100-1,000 plant, whose precision has not been measured yet.
+    model_decided = df["status"].isin(["moved", "kept_site", "kept_model",
+                                       "kept_osm", "flagged_not_moved"])
+    df["confidence_tier"] = "none"
+    df.loc[df["status"].isin(["verified_correct", "verified_corrected"]),
+           "confidence_tier"] = "verified"
+    df.loc[model_decided, "confidence_tier"] = "model"
+    df.loc[model_decided & (df["pop_band"] != ">1k"), "confidence_tier"] = "model_small_plant"
 
     df["moved_m"] = np.where(
         df["status"].isin(["moved", "verified_corrected"]),
@@ -415,7 +443,8 @@ def main():
     print(f"\n  sites layer: {len(sites):,} plant site(s)  |  detections layer: "
           f"{len(dets):,} object(s)")
 
-    cols = ["CWNS_ID", "STATE_CODE", "FACILITY_NAME", "status", "status_reason",
+    cols = ["CWNS_ID", "STATE_CODE", "FACILITY_NAME", "pop_served", "pop_band",
+            "confidence_tier", "status", "status_reason",
             "reported_lat", "reported_lon", "out_lat", "out_lon", "moved_m",
             "coord_method", "coord_in_site", "n_objects", "site_parcels",
             "n_site_parcels", "moved_to_ll_uuid", "reported_ll_uuid", "stage1_route",
@@ -429,7 +458,9 @@ def main():
     for s, n in vc.items():
         print(f"  {s:<22} {n:>7,}  ({n / len(out):.1%})")
     print(f"  {'TOTAL':<22} {len(out):>7,}")
-    na_r = out.loc[out["status"] == "not_assessed", "status_reason"].value_counts()
+    print("\n  by population band:")
+    print(pd.crosstab(out["status"], out["pop_band"]).to_string())
+    na_r =out.loc[out["status"] == "not_assessed", "status_reason"].value_counts()
     if len(na_r):
         print("  not_assessed by reason: " + ", ".join(f"{k} {v:,}" for k, v in na_r.items()))
     mv = out[out["status"] == "moved"]

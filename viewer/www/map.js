@@ -325,6 +325,12 @@ function closePanel() {
   render();
 }
 
+const TIER_LABELS = {
+  verified: "verified by a reviewer",
+  model: "model decision",
+  model_small_plant: "model decision, small plant (less certain)",
+};
+
 const COORD_LABELS = {
   detections: (p) => `mean of ${p.nobj} detection(s)`,
   centroid: () => "parcel centroid",
@@ -368,6 +374,8 @@ function showPanel(p) {
       ${p.nsite ? fact("Site parcels", p.nsite) : ""}
       ${p.parcel ? fact("Moved to parcel", `<span style="font-weight:500;font-size:12px">${esc(p.parcel)}</span>`) : ""}
       ${fact("Owner type", esc(p.owner || "—"))}
+      ${p.pop !== null && p.pop !== undefined ? fact("Population served", Math.round(p.pop).toLocaleString()) : ""}
+      ${p.tier && p.tier !== "none" ? fact("Confidence tier", esc(TIER_LABELS[p.tier] || p.tier)) : ""}
       ${fact("OSM wastewater tag", p.osm === null ? "—" : p.osm ? "yes" : "no")}
     </dl>
     <div class="detail-links">

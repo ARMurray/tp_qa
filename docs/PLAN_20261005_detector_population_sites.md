@@ -50,17 +50,40 @@ using them as negatives, calibration counts any site parcel as right.
 
 ## Status
 
-- [ ] stable (hash-based) detector validation split
-- [ ] labelling priority list
-- [x] 13: coordinate rule, site assembly, `kept_site`, three layers (`site_geometry.py`; tested on synthetic data, not yet run on the HPC)
-- [x] viewer: sites + detections layers (tested on synthetic data)
-- [ ] review app: multi-parcel pick → master column → 06b + calibration
-- [ ] population floor 100 + band slicing in 12 / calibrate / 13 `confidence_tier`
+- [x] stable (hash-based) detector validation split — `03_prepare_dataset.py`
+  `in_val()`. `04_train_model.py` now validates the new AND the deployed model
+  on it and deploys only if the new mAP50 ≥ the deployed one (`FORCE_DEPLOY`
+  overrides); the replaced model is backed up under
+  `detection/models/runs/deployed_backups/`
+- [x] labelling priority list — `review_app/analysis/label_priorities.py` →
+  `detection/annotation/label_priorities.csv`; tile it with
+  `python -m analysis.extract_review_tiles --sites-csv <csv>` (detection venv)
+- [x] 13: coordinate rule, site assembly, `kept_site`, three layers
+  (`site_geometry.py`) — run on real data 2026-10-05, below
+- [x] viewer: sites + detections layers
+- [x] review app: "also part" checkbox per candidate → `plants.site_ll_uuids`
+  → master `Site_UUIDs` (`update_master_locations`) → corrections layer
+  (`build_training_bins`) → 06b drops other-half rows from the negatives;
+  `calibrate_move_rule` and 13 are site-aware. **Not yet run end to end** —
+  the machine it was written on has no FastAPI; first use is the test
+- [x] population floor 100 (`config.MIN_POP_SERVED`) + band slicing in 12,
+  `calibrate_move_rule`, and 13 (`pop_served`, `pop_band`, `confidence_tier`)
+- [ ] label + train the new detector (work PC)
 - [ ] full HPC cycle
+
+## Measured on real data (13, 2026-10-05, current detector)
+
+950 moved, 69 `kept_site`, 211 moved plants with a multi-parcel site
+(170 × 2, 36 × 3, 5 × 4); 927 moved points from detections, 23 from the
+parcel; 6 points fell between parcels. Detections layer: 22,668 objects —
+no drying bed anywhere. Label inventory: drying_bed 10, chlorine_contact 37,
+digester 97, aeration_basin 142, oxidation_pond 267, clarifier 332; 937 of
+1,151 label files empty. 01c (corrected locations) has no current-detector
+output, so verified-corrected plants show no detections until the full cycle.
 
 ## Open question (raised 2026-10-05)
 
 When detections sit on two parcels of a split site, their mean centre can
 fall in the road between them. 13 flags it (`coord_in_site = False`, counted
 in the log). Options: accept it (it is the true middle of the plant), or snap
-such points to the nearest point inside the site.
+such points to the nearest point inside the site. Real data: 6 of 950 moves.

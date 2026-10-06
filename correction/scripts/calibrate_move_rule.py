@@ -74,13 +74,24 @@ def available_rounds() -> list[int]:
     return sorted(out)
 
 
+def _in_site(df: pd.DataFrame, top_col: str) -> pd.Series:
+    """#1 is one of the OTHER parcels the reviewer marked as part of the
+    plant (site_ll_uuids, split-parcel plants, 2026-10-05). Moving there puts
+    the plant on itself, so it counts as right -- also for reported_correct,
+    where the reported parcel is one half and #1 the other."""
+    if "site_ll_uuids" not in df.columns:
+        return pd.Series(False, index=df.index)
+    return pd.Series([isinstance(s, str) and str(t) in s.split(";")
+                      for s, t in zip(df["site_ll_uuids"], df[top_col])], index=df.index)
+
+
 def load_round(n: int) -> pd.DataFrame:
     plants = pd.read_parquet(LOG_DIR / f"review_log_round{n}.parquet")
     cands = pd.read_parquet(LOG_DIR / f"review_log_candidates_round{n}.parquet")
     pick = plants[plants["review_task"] == "candidate_pick"].copy()
     top = cands[cands["candidate_rank"] == 1][
-        ["cwns_id", "stage2b_score", "stage2a_score", "rerank_fallback",
-         "od_has_detection"]]
+        ["cwns_id", "ll_uuid", "stage2b_score", "stage2a_score", "rerank_fallback",
+         "od_has_detection"]].rename(columns={"ll_uuid": "top_ll_uuid"})
     df = pick.merge(top, on="cwns_id", how="left")
 
     v = df["plant_verdict"]
@@ -89,6 +100,8 @@ def load_round(n: int) -> pd.DataFrame:
     df.loc[v == "truth_outside_candidates", "outcome"] = "truth_outside"
     df.loc[v == "candidate_correct", "outcome"] = "wrong_candidate"
     df.loc[(v == "candidate_correct") & (df["candidate_rank"] == 1), "outcome"] = "right"
+    in_site = _in_site(df, "top_ll_uuid")
+    df.loc[v.isin(["candidate_correct", "reported_correct"]) & in_site, "outcome"] = "right"
     df["round"] = n
 
     # A round whose 05b ran without the queue's detections (fallback flagged
@@ -139,6 +152,8 @@ def load_round_rescored(n: int, output: pd.DataFrame) -> pd.DataFrame:
     same = df["selected_ll_uuid"].astype(str) == df["rerank_top_ll_uuid"].astype(str)
     df.loc[pick, "outcome"] = "wrong_candidate"
     df.loc[pick & same, "outcome"] = "right"
+    in_site = _in_site(df, "rerank_top_ll_uuid")
+    df.loc[v.isin(["candidate_correct", "reported_correct"]) & in_site, "outcome"] = "right"
     df["round"] = n
     print(f"round {n} RE-SCORED against the production re-rank: "
           f"{len(df)} reviewed plant(s) flagged today with candidates "
@@ -239,6 +254,16 @@ def main():
             print(f"  [rerank_fallback={fb}]  {len(df)} plants")
             table(df, args.target)
         print()
+
+        if "pop_served" in all_.columns:
+            print("--- by population band (served), pooled ---")
+            band = pd.cut(pd.to_numeric(all_["pop_served"], errors="coerce"),
+                          [-float("inf"), 100, 1000, float("inf")],
+                          labels=["<=100", "100-1k", ">1k"])
+            for b, df in all_.groupby(band.astype(str)):
+                print(f"  [{b}]  {len(df)} plants")
+                table(df, args.target)
+            print()
 
         print("--- plants needed for the CI to clear the target ---")
         for p in (0.93, 0.95, 0.97, 0.99):

@@ -42,6 +42,9 @@ def submit_verdict(payload: VerdictSubmit):
         verdict = dict(
             plant_verdict=payload.plant_verdict,
             selected_ll_uuid=payload.selected_ll_uuid,
+            site_ll_uuids=";".join(
+                u for u in dict.fromkeys(payload.site_ll_uuids or [])
+                if u and u != payload.selected_ll_uuid) or None,
             candidate_rank=payload.candidate_rank,
             truth_rank=truth_rank,
             truth_latitude=payload.truth_latitude,

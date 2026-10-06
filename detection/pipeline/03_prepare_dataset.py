@@ -17,6 +17,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
 
+import hashlib
 import os
 import re
 import shutil
@@ -144,6 +145,14 @@ def build_rgb_index(rgb_dir: Path) -> dict[str, Path]:
     return index
 
 
+def in_val(site_id: str, val_fraction: float) -> bool:
+    """Stable val membership: first 8 hex digits of sha1(site_id) as a
+    fraction of 2**32. Deterministic across machines and Python versions
+    (unlike hash(), which is salted per process)."""
+    h = int(hashlib.sha1(site_id.encode("utf-8")).hexdigest()[:8], 16)
+    return h / 2**32 < val_fraction
+
+
 def split_by_plant(
     matched: list[tuple[str, Path, Path]],
     val_fraction: float,
@@ -153,19 +162,22 @@ def split_by_plant(
     matched: list of (cwns_id, rgb_path, label_path)
     Splits by CWNS_ID so no plant appears in both train and val.
     Returns (train_list, val_list) of the same tuples.
+
+    STABLE SPLIT (2026-10-05). A site is in val iff a hash of its id falls
+    below val_fraction -- a property of the id alone. Adding plants never
+    moves an existing plant between train and val, so two detectors trained
+    a labelling round apart are scored on the same val plants plus new ones.
+    The old seeded shuffle re-drew the whole split whenever a plant was
+    added, so val scores were not comparable between training runs.
+    `seed` is unused; kept so callers do not change.
     """
     # Group tile indices by plant
     plant_to_tiles = defaultdict(list)
     for i, (cwns_id, rgb_path, label_path) in enumerate(matched):
         plant_to_tiles[cwns_id].append(i)
 
-    plants = list(plant_to_tiles.keys())
-    random.seed(seed)
-    random.shuffle(plants)
-
-    n_val = max(1, round(len(plants) * val_fraction))
-    val_plants  = set(plants[:n_val])
-    train_plants = set(plants[n_val:])
+    val_plants = {p for p in plant_to_tiles if in_val(p, val_fraction)}
+    train_plants = set(plant_to_tiles) - val_plants
 
     train = [matched[i] for p in train_plants for i in plant_to_tiles[p]]
     val   = [matched[i] for p in val_plants   for i in plant_to_tiles[p]]

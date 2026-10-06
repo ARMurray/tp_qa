@@ -166,6 +166,8 @@ def build() -> dict:
             "fb": None if pd.isna(r.get("rerank_fallback")) else bool(r.get("rerank_fallback")),
             "parcel": txt(r.get("moved_to_ll_uuid")),
             "osm": bool(r.get("Has_OSM")) if not pd.isna(r.get("Has_OSM")) else None,
+            "pop": num(r.get("pop_served"), 0),
+            "tier": txt(r.get("confidence_tier")),
             "coord": txt(r.get("coord_method")),
             "nobj": None if pd.isna(r.get("n_objects")) else int(r.get("n_objects")),
             "site": txt(r.get("site_parcels")),

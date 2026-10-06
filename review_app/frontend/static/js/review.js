@@ -19,6 +19,9 @@ let currentPlant = null;
 let currentCandidates = [];
 let selectedVerdict = null;
 let selectedCandidate = null;   // {ll_uuid, candidate_rank}
+// Split-parcel plants (2026-10-05): other candidate parcels the reviewer marks
+// "also part of this plant". Sent with reported_correct / candidate_correct.
+let siteExtras = new Set();
 let capturedTruth = null;       // {lat, lng}
 let confirmationType = null;    // auto-determined, see setVerdict()
 
@@ -240,6 +243,9 @@ function renderCandidatePickTask(candidates, panel) {
             <button data-uuid="${c.ll_uuid}" data-rank="${c.candidate_rank}" class="pick-candidate-btn">
                 This is correct
             </button>
+            <label class="site-chk-label" title="This parcel is ALSO part of the plant (plant spans several parcels). Tick it in addition to choosing the main parcel or 'Reported location is correct'.">
+                <input type="checkbox" class="site-chk" data-uuid="${c.ll_uuid}"> also part
+            </label>
         `;
         list.appendChild(row);
 
@@ -252,7 +258,23 @@ function renderCandidatePickTask(candidates, panel) {
     list.querySelectorAll(".pick-candidate-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             selectedCandidate = { ll_uuid: btn.dataset.uuid, candidate_rank: parseInt(btn.dataset.rank) };
+            // The main parcel cannot also be an "extra" one.
+            siteExtras.delete(btn.dataset.uuid);
+            const own = list.querySelector(`.site-chk[data-uuid="${btn.dataset.uuid}"]`);
+            if (own) own.checked = false;
             setVerdict("candidate_correct");
+        });
+    });
+
+    list.querySelectorAll(".site-chk").forEach(chk => {
+        chk.addEventListener("change", () => {
+            if (selectedCandidate && chk.dataset.uuid === selectedCandidate.ll_uuid) {
+                chk.checked = false;   // already the main parcel
+                return;
+            }
+            if (chk.checked) siteExtras.add(chk.dataset.uuid);
+            else siteExtras.delete(chk.dataset.uuid);
+            updateVerdictStatus();
         });
     });
 }
@@ -368,6 +390,12 @@ function updateVerdictStatus() {
         const activeBtn = document.querySelector(`.verdict-btn[data-verdict="${selectedVerdict}"]`);
         if (activeBtn) activeBtn.classList.add("selected");
     }
+    const takesExtras = selectedVerdict === "candidate_correct" || selectedVerdict === "reported_correct";
+    if (siteExtras.size && takesExtras) {
+        statusEl.textContent += ` Plus ${siteExtras.size} more parcel(s) marked as part of the plant.`;
+    } else if (siteExtras.size) {
+        statusEl.textContent += " (The 'also part' ticks are ignored for this verdict.)";
+    }
     statusEl.className = "verdict-status-active";
 }
 
@@ -447,6 +475,8 @@ async function submitVerdict() {
         reviewer: getReviewerName(),
         selected_ll_uuid: selectedCandidate ? selectedCandidate.ll_uuid : null,
         candidate_rank: selectedCandidate ? selectedCandidate.candidate_rank : null,
+        site_ll_uuids: (selectedVerdict === "candidate_correct" || selectedVerdict === "reported_correct")
+            && siteExtras.size ? [...siteExtras] : null,
         truth_latitude: capturedTruth ? capturedTruth.lat : null,
         truth_longitude: capturedTruth ? capturedTruth.lng : null,
         confirmation_type: confirmationType,
@@ -477,6 +507,7 @@ async function submitVerdict() {
 function resetVerdictState() {
     selectedVerdict = null;
     selectedCandidate = null;
+    siteExtras = new Set();
     capturedTruth = null;
     confirmationType = null;
     ReviewMap.setCaptureMode(false);

@@ -14,6 +14,7 @@ Outputs (under models/runs/{RUN_NAME}/):
 """
 
 import shutil
+import time
 import sys
 from pathlib import Path
 
@@ -43,6 +44,7 @@ MODEL      = "yolov8s.pt"   # downloads pretrained COCO weights automatically
 # Training hyperparameters (training-specific; kept local)
 EPOCHS     = 100            # temporarily set to 2 for the RUNS_DIR permission test -- reverted
 PATIENCE   = 20             # stop if val mAP stalls for this many epochs
+FORCE_DEPLOY = False        # deploy even if the new model scores below the deployed one
 BATCH_SIZE = 16             # fits comfortably in 8GB VRAM with yolov8s
 LR         = 0.001          # initial LR (Adam; fine for transfer learning)
 WORKERS    = 4              # dataloader workers
@@ -264,12 +266,67 @@ def main():
         print(f"ERROR: expected best.pt at {best} but it doesn't exist.")
         return
 
+    # ---- Validate the new model AND the deployed one on the same val set ---
+    # 03's val split is stable (hash of the site id, 2026-10-05), so both are
+    # scored on the same plants. Caveat printed below: the deployed model was
+    # trained under the OLD random split, so it has seen some of these val
+    # plants -- its score is optimistic, and the comparison favours it. A new
+    # model that still wins is genuinely better.
+    def _val(weights: Path, tag: str):
+        m = YOLO(str(weights)).val(
+            data=str(data_yaml), imgsz=MODEL_IMGSZ, device=device, plots=(tag == "new"),
+            project=str(C.RUNS_DIR), name=f"{run_dir.name}_val_{tag}", exist_ok=True,
+        )
+        return {"map50": float(m.box.map50), "map": float(m.box.map),
+                "p": float(m.box.mp), "r": float(m.box.mr),
+                "ap50": {m.names[i]: float(ap) for i, ap in zip(m.box.ap_class_index, m.box.ap50)}}
+
+    print("\nValidating the NEW model...")
+    new = _val(best, "new")
+    old = None
+    if C.DEPLOY_MODEL_PATH.exists():
+        print("\nValidating the DEPLOYED model on the same val set...")
+        try:
+            old = _val(C.DEPLOY_MODEL_PATH, "deployed")
+        except Exception as e:  # e.g. a class list the new dataset no longer has
+            print(f"  could not validate the deployed model: {e}")
+
+    print("\n=== Validation: new vs deployed (same stable val split) ===")
+    print(f"  {'metric':<18}{'new':>9}{'deployed':>10}")
+    for k, label in (("map50", "mAP50"), ("map", "mAP50-95"), ("p", "Precision"), ("r", "Recall")):
+        o = f"{old[k]:.3f}" if old else "--"
+        print(f"  {label:<18}{new[k]:>9.3f}{o:>10}")
+    print("  per-class AP50:")
+    for cls in sorted(set(new["ap50"]) | set(old["ap50"] if old else {})):
+        n = new["ap50"].get(cls)
+        o = old["ap50"].get(cls) if old else None
+        print(f"  {cls:<18}{(f'{n:.3f}' if n is not None else '--'):>9}"
+              f"{(f'{o:.3f}' if o is not None else '--'):>10}")
+    if old:
+        print("  (the deployed model trained under the old random split and has seen")
+        print("   some of these val plants -- its numbers are optimistic)")
+
+    deploy = old is None or new["map50"] >= old["map50"] or FORCE_DEPLOY
+    if not deploy:
+        print(f"\nNOT deploying: new mAP50 {new['map50']:.3f} < deployed {old['map50']:.3f}.")
+        print(f"  The new weights stay at {best}. Set FORCE_DEPLOY = True in this")
+        print(f"  script (or copy by hand) to deploy anyway.")
+        print("\nNext: 05_run_inference.py")
+        return
+
     # ---- Deploy to the correction pipeline -------------------------------
-    # Copy, don't ask. A manual copy is the step that gets forgotten, and
+    # Copy, don't ask -- once the new model has matched or beaten the deployed
+    # one above. A manual copy is the step that gets forgotten, and
     # forgetting it means 01b/01c/01e keep running the previous model while
-    # everything downstream looks perfectly normal. Nothing is lost:
-    # RUNS_DIR keeps every run's weights, so this is only a pointer to
-    # whichever one is deployed.
+    # everything downstream looks perfectly normal. The model being replaced
+    # is backed up under RUNS_DIR (not next to best.pt: every *.pt there
+    # counts as "the deployed detector" for the freshness checks).
+    if C.DEPLOY_MODEL_PATH.exists():
+        backup = C.RUNS_DIR / "deployed_backups" / \
+            f"best_replaced_{time.strftime('%Y%m%d-%H%M%S')}.pt"
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(C.DEPLOY_MODEL_PATH, backup)
+        print(f"\nBacked up the replaced model: {backup}")
     #
     # shutil.copy, NOT copy2 -- and this matters more than it looks.
     # check_od_freshness.py decides whether existing detection output is
@@ -295,20 +352,6 @@ def main():
         # the deploy copy failed, and that is recoverable by hand.
         print(f"\nWARNING: could not deploy to {C.DEPLOY_MODEL_PATH}: {e}")
         print(f"  Copy it manually from {best} before running 01b/01c/01e.")
-
-    print("\nValidating with best weights...")
-    metrics = YOLO(str(best)).val(
-        data=str(data_yaml), imgsz=MODEL_IMGSZ, device=device, plots=True,
-        project=str(C.RUNS_DIR), name=run_dir.name + "_val", exist_ok=True,
-    )
-    print("\n=== Validation Metrics ===")
-    print(f"  mAP50    : {metrics.box.map50:.3f}")
-    print(f"  mAP50-95 : {metrics.box.map:.3f}")
-    print(f"  Precision: {metrics.box.mp:.3f}")
-    print(f"  Recall   : {metrics.box.mr:.3f}")
-    print("Per-class AP50:")
-    for i, ap in enumerate(metrics.box.ap50):
-        print(f"  {metrics.names[i]:<18}: {ap:.3f}")
 
     print("\nNext: 05_run_inference.py")
 

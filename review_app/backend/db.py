@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS plants (
     plant_verdict          TEXT,    -- 'reported_correct' | 'candidate_correct'
                                     -- | 'truth_outside_candidates' | 'needs_info'
     selected_ll_uuid        TEXT,   -- set iff plant_verdict == 'candidate_correct'
+    site_ll_uuids           TEXT,   -- other parcels of the same plant, ';'-joined
     candidate_rank           INTEGER, -- rank of selected candidate, NULL otherwise
     truth_rank                INTEGER, -- == candidate_rank unless truth_outside_candidates (NULL)
     truth_latitude             REAL,   -- set iff truth_outside_candidates
@@ -129,6 +130,11 @@ PLANTS_MIGRATION_COLS = [
     ("place", "TEXT"), ("county", "TEXT"), ("is_rural", "INTEGER"),
     ("surface_water_discharge", "INTEGER"), ("requires_npdes", "INTEGER"),
     ("any_reuse", "INTEGER"),
+    # Split-parcel plants (added 2026-10-05): ';'-joined ll_uuids of OTHER
+    # parcels the reviewer marked "also part of this plant", besides the
+    # selected candidate (candidate_correct) or the reported parcel
+    # (reported_correct). NULL when the plant is one parcel.
+    ("site_ll_uuids", "TEXT"),
 ]
 CANDIDATES_MIGRATION_COLS = [
     ("owner", "TEXT"), ("lbcs_activity", "TEXT"), ("lbcs_ownership", "TEXT"),
@@ -243,6 +249,7 @@ def submit_verdict(conn, cwns_id: str, verdict: dict):
             reviewed = 1,
             plant_verdict = :plant_verdict,
             selected_ll_uuid = :selected_ll_uuid,
+            site_ll_uuids = :site_ll_uuids,
             candidate_rank = :candidate_rank,
             truth_rank = :truth_rank,
             truth_latitude = :truth_latitude,

@@ -356,7 +356,33 @@ PARCEL_WW_KEYWORDS = [
 # preflight_inference), all through apply_population_filter() below, so the
 # rule cannot drift between them. Pass --min-pop 0 to any of them to disable.
 # The holdout is filtered at SCORING time, never resampled.
-MIN_POP_SERVED = 1000
+MIN_POP_SERVED = 100   # was 1,000 until 2026-10-05 (docs/PLAN_20261005_...)
+
+# Bands every evaluation is sliced by since the floor dropped to 100: plants
+# serving 100-1,000 are the newly admitted, more uncertain group.
+POP_BANDS = [(100, 1000, "100-1k"), (1000, float("inf"), ">1k")]
+
+
+def population_served():
+    """CWNS_ID -> TOTAL_RES_POPULATION_2022 (float, NaN if non-numeric), with
+    the same first-row-wins dedup as population_ok_ids()."""
+    import pandas as pd
+    df = pd.read_csv(CWNS_DIR / "POPULATION_WASTEWATER.txt", dtype={"CWNS_ID": str},
+                     encoding="latin1", usecols=["CWNS_ID", "TOTAL_RES_POPULATION_2022"])
+    df = df.drop_duplicates(subset="CWNS_ID")
+    return pd.Series(pd.to_numeric(df["TOTAL_RES_POPULATION_2022"], errors="coerce").to_numpy(),
+                     index=df["CWNS_ID"].astype(str))
+
+
+def pop_band(pop) -> str:
+    """Band label for one population value ('unknown' / 'below_floor')."""
+    import math
+    if pop is None or (isinstance(pop, float) and math.isnan(pop)):
+        return "unknown"
+    for lo, hi, name in POP_BANDS:
+        if lo < pop <= hi:
+            return name
+    return "below_floor"
 
 # ===========================================================================
 # 8c. STAGE 1: OSM-confirmed reported locations
