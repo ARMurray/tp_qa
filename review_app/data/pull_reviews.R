@@ -72,3 +72,26 @@ output <- existing%>%
 layer_str <- paste0("CWNS_Locations_",format(Sys.Date(), "%m%d%Y"))
 
 st_write(output,"C:/Users/AMURRA02/tp_qa/correction/data/training/Updates.gpkg", layer = layer_str)
+
+
+
+crct <- read_parquet("C:/Users/AMURRA02/tp_qa/correction/diagnostics/output/cwns_corrected_locations.parquet")%>%
+  filter(status %in% c("flagged_not_moved","moved","reviewed_unresolved","verified_corrected"))%>%
+  select(!c("moved_to_ll_uuid", "reported_ll_uuid", "stage1_route", "stage1_prob_correct", "rerank_score", "rerank_fallback", "move_cutoff", "require_detection"))
+
+
+write_csv(crct, "C:/Users/AMURRA02/tp_qa/correction/diagnostics/output/cwns_corrected_locations.csv")
+
+
+# Histogram of moved distances
+moved <- crct%>%
+  filter(status %in% c("moved","verified_corrected"))
+
+ggplot(moved, aes(x = moved_m/1000))+
+  geom_histogram(bins = 50, color = "black", fill = "white")+
+  scale_x_log10()+
+  theme_bw()+
+  labs(x = "Moved Distance (km)", y = "Count", title = "Histogram of Moved Distances for Corrected CWNS Locations",
+subtitle = "1,667 Treatment Plants")
+
+summary(moved$moved_m/1000)
