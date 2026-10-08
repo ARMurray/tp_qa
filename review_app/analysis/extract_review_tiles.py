@@ -280,9 +280,14 @@ def load_targeted_sites(point_halfwidth_m: float,
     a false positive. It might be the plant.
     """
     conn = sqlite3.connect(C.APP_DB_PATH)
+    # site_ll_uuids arrived 2026-10-05 and is only added to app.db when the
+    # review app next starts (db.py's migration). An older app.db has no
+    # extra site parcels to report, so read it as NULL rather than fail.
+    plant_cols = {r[1] for r in conn.execute("PRAGMA table_info(plants)")}
+    site_col = "site_ll_uuids" if "site_ll_uuids" in plant_cols else "NULL AS site_ll_uuids"
     plants = pd.read_sql_query(
         "SELECT cwns_id, state_code, reported_ll_uuid, plant_verdict, "
-        "       selected_ll_uuid, site_ll_uuids, truth_latitude, truth_longitude "
+        f"       selected_ll_uuid, {site_col}, truth_latitude, truth_longitude "
         "FROM plants WHERE reviewed = 1"
         + (" AND review_round = ?" if review_round is not None else ""),
         conn, params=[review_round] if review_round is not None else None)
