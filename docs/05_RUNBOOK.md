@@ -127,6 +127,11 @@ git add correction/diagnostics/logs/ review_app/data/incoming/review_queue_round
 git commit -m "round 5 queue" && git push
 ```
 
+From round 6, add `AUDIT=80` to the first 10 call (not the `KEEP=1` one):
+80 plants drawn at random from 13's `moved` plants, before the
+uncertain/random split, so 13 must be current (10 refuses a 13 output older
+than 05b). See `docs/RUN_20261008_round6.md`.
+
 10's wrapper copies prior rounds' review logs from the repo itself, so earlier
 plants (including `needs_info`) are excluded automatically. Check its log for
 `--keep-selection: reusing the 150 plant(s)` and, in the provenance block,
