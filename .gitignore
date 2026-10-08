@@ -64,6 +64,7 @@ reconstructed/
 # trains the model. It was committed by accident on 2026-09-22 and took the
 # repository from 181 MB to 1.2 GB -- untracked again the same day.
 detection/dataset_filtered/
+detection/dataset_compare/
 
 # ===========================================================================
 # review_app/
