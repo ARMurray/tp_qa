@@ -341,6 +341,29 @@ Note that `extract_review_tiles.py` (step 4 of `close_round`) has already been
 feeding the labeling inventory every round, so there should be new material
 waiting.
 
+**What gets tiled for labelling (2026-10-08).** Only two kinds of tile, from
+reviewed plants (not `needs_info`): tiles on a verified true location's
+parcel(s), including parcels ticked "also part of this plant"; and tiles on a
+candidate parcel where the detector fired but the reviewer said it is not the
+plant (false positive). Rejected candidates where nothing fired are not tiled:
+there are already ~900 confirmed-empty labels. This is the default of
+`extract_review_tiles.py` and so of `close_round`; `--all-candidates` and
+`label_priorities.py` are opt-in only.
+
+To clear an inventory built under older rules (keeps every labelled tile,
+including old Label Studio names and confirmed-empty labels):
+
+```bash
+cd detection/pipeline
+python purge_unlabelled_tiles.py            # dry run: counts by source/role
+python purge_unlabelled_tiles.py --apply    # deletes PNG + NDWI, trims tile_metadata.csv (backed up)
+cd ../../review_app
+..\detection\.venv\Scripts\python.exe -m analysis.extract_review_tiles --dry-run
+..\detection\.venv\Scripts\python.exe -m analysis.extract_review_tiles
+```
+
+then restart `label_app.R`.
+
 ---
 
 ## D. Order-of-operations traps

@@ -150,11 +150,15 @@ label_path <- function(png_name) {
 selection_label <- function(role, source) {
   role <- ifelse(is.na(role), "", role)
   source <- ifelse(is.na(source), "", source)
-  out <- ifelse(role == "verified_true", "True location",
+  # label_priority_* tiles (analysis/label_priorities.py) are verified true
+  # locations too; they used to fall through to "Review (all candidates)"
+  # because their source is review_candidate.
+  out <- ifelse(role %in% c("verified_true", "verified_true_site"), "True location",
          ifelse(role == "verified_true_point", "True location (clicked)",
+         ifelse(startsWith(role, "label_priority"), "True location (priority list)",
          ifelse(role == "detection_not_selected", "False positive",
          ifelse(grepl("^review", source), "Review (all candidates)",
-         ifelse(source %in% c("", "reconstructed"), "Earlier sample", source)))))
+         ifelse(source %in% c("", "reconstructed"), "Earlier sample", source))))))
   out
 }
 
@@ -657,6 +661,7 @@ ui <- fluidPage(
                               choices = c("Any selection" = "all",
                                           "True location" = "True location",
                                           "True location (clicked)" = "True location (clicked)",
+                                          "True location (priority list)" = "True location (priority list)",
                                           "False positive" = "False positive",
                                           "Earlier sample" = "Earlier sample",
                                           "Review (all candidates)" = "Review (all candidates)",
@@ -768,16 +773,6 @@ server <- function(input, output, session) {
     ))
   }
 
-  session$onFlushed(function() {
-    isolate({
-      session$sendCustomMessage("init_editor", list(
-        classes = CLASSES,
-        colors  = as.list(CLASS_COLORS)
-      ))
-      load_tile(1L)
-    })
-  }, once = TRUE)
-
   push_boxes <- function() {
     session$sendCustomMessage("set_boxes", list(
       boxes = boxes_to_client(rv$boxes),
@@ -787,12 +782,15 @@ server <- function(input, output, session) {
 
   # Hand the class list/colours to the canvas, then load the first tile once
   # the client has had a flush to register its message handlers.
+  # (This was registered twice, so the first tile loaded twice on startup.)
   session$onFlushed(function() {
-    session$sendCustomMessage("init_editor", list(
-      classes = CLASSES,
-      colors  = as.list(CLASS_COLORS)
-    ))
-    load_tile(1L)
+    isolate({
+      session$sendCustomMessage("init_editor", list(
+        classes = CLASSES,
+        colors  = as.list(CLASS_COLORS)
+      ))
+      load_tile(1L)
+    })
   }, once = TRUE)
 
   # ---- incoming edits from the canvas ---------------------------------------
@@ -981,9 +979,15 @@ server <- function(input, output, session) {
   }, server = TRUE)
   plant_proxy <- dataTableProxy("plantlist")
 
+  # Back to page 1 when a filter changes (a short filtered list would
+  # otherwise open on an empty page 3); keep the page after a save.
+  last_filters <- ""
   observeEvent(plant_df(), {
+    key <- paste(input$plant_filter, input$sel_filter)
+    reset <- !identical(key, last_filters)
+    last_filters <<- key
     replaceData(plant_proxy, plant_df()[, plant_cols],
-                resetPaging = FALSE, rownames = FALSE)
+                resetPaging = reset, rownames = FALSE)
   }, ignoreInit = TRUE)
 
   # Keep the plant table's highlight on the current plant.
@@ -1025,12 +1029,16 @@ server <- function(input, output, session) {
 
   tile_cols <- c("Status", "Tile", "Selected", "Boxes")
 
+  # NO PAGING (2026-10-08). With pages of 9 and replaceData(resetPaging =
+  # FALSE), opening a plant while the table was on page 2+ kept that page
+  # offset, and a plant with fewer tiles than the offset showed an empty
+  # table under a perfectly good image. One plant's tiles fit in a scroll box.
   output$imglist <- renderDT({
     df <- isolate(tile_df())
     datatable(
       df[, tile_cols], selection = "single", rownames = FALSE,
-      options = list(pageLength = 9, lengthChange = FALSE, dom = "tip",
-                     ordering = FALSE)
+      options = list(paging = FALSE, scrollY = "260px", scrollCollapse = TRUE,
+                     dom = "ti", ordering = FALSE)
     ) |>
       formatStyle("Status",
                   color = styleEqual(c("labeled", "-"), c("#1e7d34", "#999")),
@@ -1044,7 +1052,7 @@ server <- function(input, output, session) {
 
   observeEvent(tile_df(), {
     replaceData(img_proxy, tile_df()[, tile_cols],
-                resetPaging = FALSE, rownames = FALSE)
+                resetPaging = TRUE, rownames = FALSE)
     r <- match(rv$idx, tile_df()$idx)
     selectRows(img_proxy, if (is.na(r)) NULL else r)
   }, ignoreInit = TRUE)

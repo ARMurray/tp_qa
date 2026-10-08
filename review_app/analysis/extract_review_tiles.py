@@ -256,6 +256,8 @@ def load_targeted_sites(point_halfwidth_m: float,
           reported_correct          the reported parcel
           truth_outside_candidates  a clicked lat/lon with no parcel at all,
                                     tiled from a synthetic square (see below)
+          site_ll_uuids             parcels ticked "also part of this
+                                    plant" (role verified_true_site)
       These are the positive examples. Worth labelling whether or not the
       detector fired: if it did, the label confirms it; if it did not, the
       label is a miss it needs to learn from.
@@ -280,7 +282,7 @@ def load_targeted_sites(point_halfwidth_m: float,
     conn = sqlite3.connect(C.APP_DB_PATH)
     plants = pd.read_sql_query(
         "SELECT cwns_id, state_code, reported_ll_uuid, plant_verdict, "
-        "       selected_ll_uuid, truth_latitude, truth_longitude "
+        "       selected_ll_uuid, site_ll_uuids, truth_latitude, truth_longitude "
         "FROM plants WHERE reviewed = 1"
         + (" AND review_round = ?" if review_round is not None else ""),
         conn, params=[review_round] if review_round is not None else None)
@@ -297,18 +299,31 @@ def load_targeted_sites(point_halfwidth_m: float,
         print(f"  --round {review_round}: restricted to that round's plants")
     print(f"{len(plants)} reviewed plant(s) in {C.APP_DB_PATH.name}")
 
-    rows, n_point, truth_parcel = [], 0, {}
+    # truth_parcels: every parcel of the plant -- the answer plus any the
+    # reviewer ticked "also part of this plant" (site_ll_uuids, 2026-10-05).
+    # Those are true locations too, and a detection on one is a true
+    # positive, not a false one.
+    rows, n_point, n_site, truth_parcels = [], 0, 0, {}
     for _, p in plants.iterrows():
         v, cw, st = p["plant_verdict"], p["cwns_id"], p["state_code"]
+        answer = None
         if v == "candidate_correct" and p["selected_ll_uuid"]:
-            truth_parcel[cw] = str(p["selected_ll_uuid"])
-            rows.append(dict(cwns_id=cw, st=st, ll_uuid=str(p["selected_ll_uuid"]),
-                             role="verified_true", lat=None, lon=None))
+            answer = str(p["selected_ll_uuid"])
         elif v == "reported_correct" and p["reported_ll_uuid"]:
-            truth_parcel[cw] = str(p["reported_ll_uuid"])
-            rows.append(dict(cwns_id=cw, st=st, ll_uuid=str(p["reported_ll_uuid"]),
+            answer = str(p["reported_ll_uuid"])
+        if answer:
+            truth_parcels[cw] = {answer}
+            rows.append(dict(cwns_id=cw, st=st, ll_uuid=answer,
                              role="verified_true", lat=None, lon=None))
-        elif v == "truth_outside_candidates":
+            site = p["site_ll_uuids"] if isinstance(p["site_ll_uuids"], str) else ""
+            for extra in site.split(";"):
+                extra = extra.strip()
+                if extra and extra not in truth_parcels[cw]:
+                    truth_parcels[cw].add(extra)
+                    rows.append(dict(cwns_id=cw, st=st, ll_uuid=extra,
+                                     role="verified_true_site", lat=None, lon=None))
+                    n_site += 1
+        if v == "truth_outside_candidates":
             if pd.isna(p["truth_latitude"]) or pd.isna(p["truth_longitude"]):
                 print(f"  WARNING: {cw} is truth_outside_candidates with no "
                       f"clicked point -- skipped")
@@ -332,8 +347,8 @@ def load_targeted_sites(point_halfwidth_m: float,
             continue
         if not bool(c["od_has_detection"]):
             continue
-        if truth_parcel.get(cw) == str(c["ll_uuid"]):
-            continue                      # it fired on the right parcel: a TP,
+        if str(c["ll_uuid"]) in truth_parcels.get(cw, ()):
+            continue                      # it fired on the plant: a TP,
                                           # already captured as verified_true
         st = st_by_cwns.get(cw)
         if st is None:
@@ -343,7 +358,8 @@ def load_targeted_sites(point_halfwidth_m: float,
         n_fp += 1
 
     n_true = sum(1 for r in rows if r["role"].startswith("verified_true"))
-    print(f"  {n_true} verified true location(s) ({n_point} from a clicked point)")
+    print(f"  {n_true} verified true location(s) ({n_point} from a clicked point, "
+          f"{n_site} extra parcel(s) ticked 'also part of this plant')")
     print(f"  {n_fp} detection(s) on a parcel that was not the answer")
 
     if cands["od_ran"].isna().all() and len(cands):

@@ -50,7 +50,12 @@ _UUID = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 # 65 folded-in 500m tiles failed to parse and was dropped from the dataset
 # with only a "Could not parse" warning -- fold_in_500m.py's docstring
 # claims 03 picks them up automatically, which was never actually true.
-_RE_PARCEL = re.compile(rf'^(\d+)_({_UUID})_(r\d+_c\d+|500m)$')
+#
+# The uuid is OPTIONAL (2026-10-08): extract_review_tiles.py names tiles for a
+# clicked truth_outside_candidates point, which has no parcel, as
+# {CWNS_ID}__rRR_cCC (empty uuid, double underscore). Those failed to parse
+# and their labels were dropped from the dataset with only a warning.
+_RE_PARCEL = re.compile(rf'^(\d+)_({_UUID})?_(r\d+_c\d+|500m)$')
 
 # TRI hard negatives carry no parcel uuid and lead with letters, so they
 # never matched the parcel pattern either. Unlabeled today, but they would
@@ -95,7 +100,7 @@ def parse_tile_stem(label_filename: str) -> tuple[str, str] | None:
 
     m = _RE_PARCEL.match(name)
     if m:
-        cwns_id, ll_uuid, suffix = m.group(1), m.group(2), m.group(3)
+        cwns_id, ll_uuid, suffix = m.group(1), m.group(2) or "", m.group(3)
         return cwns_id, f"{cwns_id}_{ll_uuid}_{suffix}"
 
     m = _RE_TRI.match(name)
