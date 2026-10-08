@@ -20,6 +20,8 @@
 #
 # Writes correction/diagnostics/od_freshness_<timestamp>.txt; commit and push it.
 
+source /work/GRDVULN/tp_qa/correction/scripts/_latest_log.sh   # log copy -> diagnostics/latest_logs/
+
 ROOT=/work/GRDVULN/tp_qa/correction
 OUT="$ROOT/diagnostics/od_freshness_$(date +%Y%m%d-%H%M%S).txt"
 cd "$ROOT/.." || exit 1

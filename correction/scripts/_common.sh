@@ -13,6 +13,10 @@ ROOT=/work/GRDVULN/tp_qa/correction
 SCRIPTS="$ROOT/scripts"
 VENV_DIR="$ROOT/.venv"
 
+# Copy this job's log to diagnostics/latest_logs/ when it ends (overwriting
+# the last run's copy). Sourced first so even a failed setup is captured.
+source "$SCRIPTS/_latest_log.sh"
+
 echo "=========================================="
 echo "Node:    ${SLURMD_NODENAME:-unknown}"
 echo "Job ID:  ${SLURM_JOB_ID:-none}"

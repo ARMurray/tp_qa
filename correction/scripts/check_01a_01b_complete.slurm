@@ -16,6 +16,8 @@
 #
 # Get the job IDs from your earlier sbatch output, or:  sacct -u $USER --format=JobID,JobName%20 | grep corr_01
 
+source /work/GRDVULN/tp_qa/correction/scripts/_latest_log.sh   # log copy -> diagnostics/latest_logs/
+
 bash /work/GRDVULN/tp_qa/correction/scripts/check_01a_01b_complete.sh
 
 echo "Finished: $(date)"

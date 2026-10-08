@@ -11,6 +11,8 @@
 
 #   sbatch inspect_deployed_02.slurm
 
+source /work/GRDVULN/tp_qa/correction/scripts/_latest_log.sh   # log copy -> diagnostics/latest_logs/
+
 python /work/GRDVULN/tp_qa/correction/scripts/inspect_deployed_02.py
 
 echo "Finished: $(date)"

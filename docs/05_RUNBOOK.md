@@ -87,9 +87,10 @@ sbatch 01e_run_od_candidates.slurm              # holdout scope (NORESUME=1 afte
 sbatch 05b_rerank_candidates.slurm
 sbatch 12_score_holdout.slurm
 
-# 8. Logs back through git
-sbatch --export=TRAINING=1 collect_logs.slurm
-#    then, from a login node: git add correction/diagnostics/ && git commit && git push
+# 8. Logs back through git. Every job copies its log to
+#    correction/diagnostics/latest_logs/<step>.log when it ends, overwriting
+#    the last run's copy (2026-10-08) -- no collect_logs needed:
+#    git add correction/diagnostics/latest_logs && git commit && git push
 ```
 
 Before step 5 on a fresh setup, `sbatch preflight_inference.slurm` checks that
@@ -120,10 +121,9 @@ sbatch --export=ROUND=5 10_build_review_queue.slurm
 sbatch --export=SCOPE="queue",ROUND=5,NORESUME=1 01e_run_od_candidates.slurm
 sbatch 05b_rerank_candidates.slurm                # ONLY after 01e shows COMPLETED -- 10 now refuses otherwise
 sbatch --export=ROUND=5,KEEP=1 10_build_review_queue.slurm
-sbatch --export=PATTERN="10_*",LATEST=1 collect_logs.slurm
 cd /work/GRDVULN/tp_qa
 cp correction/data/review_queue/review_queue_round5.parquet review_app/data/incoming/
-git add correction/diagnostics/logs/ review_app/data/incoming/review_queue_round5.parquet
+git add correction/diagnostics/latest_logs/ review_app/data/incoming/review_queue_round5.parquet
 git commit -m "round 5 queue" && git push
 ```
 
