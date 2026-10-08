@@ -1,55 +1,81 @@
-=== Training Complete ===
-Run directory: C:\Users\AMURRA02\tp_qa\detection\models\runs\wwtp_v2-8
-NOTE: C.RUN_NAME='wwtp_v2' was already taken -- Ultralytics used 'wwtp_v2-8' instead. Update C.RUN_NAME in config.py to avoid this next time, or clear out old run folders under C:\Users\AMURRA02\tp_qa\detection\models\runs.
-Best weights: C:\Users\AMURRA02\tp_qa\detection\models\runs\wwtp_v2-8\weights\best.pt
-
-Validating the NEW model...
-Ultralytics 8.4.90  Python-3.13.6 torch-2.12.0.dev20260408+cu128 CUDA:0 (NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU, 8151MiB)
+Deployed model last committed in 0c7fcce; 194 plants had labels then
+Val: 238 tiles -> fresh 30 tiles / 8 plants, seen 208 tiles / 35 plants
+WARNING Ultralytics settings updated to the latest schema. Existing values were preserved where possible. 
+View Ultralytics Settings with 'yolo settings' or at 'C:\Users\AMURRA02\AppData\Roaming\Ultralytics\settings.json'
+Update Settings with 'yolo settings key=value', i.e. 'yolo settings runs_dir=path/to/dir'. For help see https://docs.ultralytics.com/quickstart/#ultralytics-settings.
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+Ultralytics 8.4.120  Python-3.14.6 torch-2.11.0+cu128 CUDA:0 (NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU, 8151MiB)
 Model summary (fused): 73 layers, 11,127,906 parameters, 0 gradients, 28.4 GFLOPs
-val: Fast image access  (ping: 0.00.0 ms, read: 1423.6103.8 MB/s, size: 1190.7 KB)
-val: Scanning C:\Users\AMURRA02\tp_qa\detection\dataset\labels\val.cache... 238 images, 184 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 238/238 71.3Mit/s 0.0s
-                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 15/15 4.8it/s 3.1s
-                   all        238        241      0.553      0.608       0.58      0.265
-        aeration_basin         26         45      0.468      0.533      0.481      0.277
-      chlorine_contact          6          8      0.231       0.25      0.202      0.135
-             clarifier         30        104      0.608      0.846      0.743      0.246
-              digester          9         22      0.544      0.909      0.872      0.238
-            drying_bed          5         12      0.878      0.167      0.296      0.154
-        oxidation_pond         23         50      0.589      0.945      0.887      0.543
-Speed: 2.4ms preprocess, 8.0ms inference, 0.0ms loss, 0.4ms postprocess per image
-Results saved to C:\Users\AMURRA02\tp_qa\detection\models\runs\wwtp_v2-8_val_new
-
-Validating the DEPLOYED model on the same val set...
-Ultralytics 8.4.90  Python-3.13.6 torch-2.12.0.dev20260408+cu128 CUDA:0 (NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU, 8151MiB)
+val: Fast image access  (ping: 0.00.0 ms, read: 195.535.4 MB/s, size: 1085.7 KB)
+val: Scanning C:\Users\AMURRA02\tp_qa\detection\dataset_compare\fresh\labels\val... 30 images, 20 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 30/30 633.7it/s 0.0s
+val: New cache created: C:\Users\AMURRA02\tp_qa\detection\dataset_compare\fresh\labels\val.cache
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 2/2 1.0it/s 1.9s
+                   all         30         40      0.829       0.59      0.766      0.435
+Speed: 1.6ms preprocess, 8.2ms inference, 0.0ms loss, 0.7ms postprocess per image
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'torch.nn.modules.conv.Conv2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+C:\Users\AMURRA02\tp_qa\detection\.venv\Lib\site-packages\torch\serialization.py:1782: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+Ultralytics 8.4.120  Python-3.14.6 torch-2.11.0+cu128 CUDA:0 (NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU, 8151MiB)
 Model summary (fused): 73 layers, 11,127,906 parameters, 0 gradients, 28.4 GFLOPs
-val: Fast image access  (ping: 0.00.0 ms, read: 1631.1204.4 MB/s, size: 1153.5 KB)
-val: Scanning C:\Users\AMURRA02\tp_qa\detection\dataset\labels\val.cache... 238 images, 184 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 238/238 90.7Mit/s 0.0s
-                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 15/15 5.2it/s 2.9s
-                   all        238        241      0.725       0.53      0.668      0.327
-        aeration_basin         26         45      0.836      0.452       0.69      0.393
-      chlorine_contact          6          8          0          0       0.14     0.0746
-             clarifier         30        104      0.847      0.853      0.843      0.301
-              digester          9         22      0.862      0.955      0.965      0.372
-            drying_bed          5         12          1          0      0.423      0.214
-        oxidation_pond         23         50      0.806       0.92      0.945      0.606
-Speed: 1.8ms preprocess, 8.3ms inference, 0.0ms loss, 0.5ms postprocess per image
+val: Fast image access  (ping: 0.00.0 ms, read: 1899.2243.0 MB/s, size: 1140.1 KB)
+val: Scanning C:\Users\AMURRA02\tp_qa\detection\dataset_compare\fresh\labels\val.cache... 30 images, 20 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 30/30 9.7Mit/s 0.0s
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 2/2 1.1s/it 2.2s
+                   all         30         40      0.887      0.627      0.817      0.427
+Speed: 1.3ms preprocess, 7.4ms inference, 0.0ms loss, 0.5ms postprocess per image
+Ultralytics 8.4.120  Python-3.14.6 torch-2.11.0+cu128 CUDA:0 (NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU, 8151MiB)
+Model summary (fused): 73 layers, 11,127,906 parameters, 0 gradients, 28.4 GFLOPs
+val: Fast image access  (ping: 0.00.0 ms, read: 244.058.1 MB/s, size: 1251.6 KB)
+val: Scanning C:\Users\AMURRA02\tp_qa\detection\dataset_compare\seen\labels\val... 208 images, 164 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 208/208 733.2it/s 0.3s
+val: New cache created: C:\Users\AMURRA02\tp_qa\detection\dataset_compare\seen\labels\val.cache
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 13/13 2.9it/s 4.4s
+                   all        208        201      0.628      0.554      0.563      0.239
+Speed: 1.8ms preprocess, 7.5ms inference, 0.0ms loss, 0.4ms postprocess per image
+Ultralytics 8.4.120  Python-3.14.6 torch-2.11.0+cu128 CUDA:0 (NVIDIA RTX PRO 2000 Blackwell Generation Laptop GPU, 8151MiB)
+Model summary (fused): 73 layers, 11,127,906 parameters, 0 gradients, 28.4 GFLOPs
+val: Fast image access  (ping: 0.00.0 ms, read: 1589.4144.2 MB/s, size: 1140.9 KB)
+val: Scanning C:\Users\AMURRA02\tp_qa\detection\dataset_compare\seen\labels\val.cache... 208 images, 164 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 208/208 72.7Mit/s 0.0s
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 13/13 3.0it/s 4.3s
+                   all        208        201      0.885      0.531      0.666      0.323
+Speed: 1.8ms preprocess, 7.6ms inference, 0.0ms loss, 0.5ms postprocess per image
 
-=== Validation: new vs deployed (same stable val split) ===
+new      = C:\Users\AMURRA02\tp_qa\detection\models\runs\wwtp_v2-8\weights\best.pt
+deployed = C:\Users\AMURRA02\tp_qa\correction\models\object_detection\best.pt
+
+=== FRESH val plants (neither model trained on these -- DECIDE ON THIS) ===
   metric                  new  deployed
-  mAP50                 0.580     0.668
-  mAP50-95              0.265     0.327
-  Precision             0.553     0.725
-  Recall                0.608     0.530
+  mAP50                 0.766     0.817
+  mAP50-95              0.435     0.427
+  Precision             0.829     0.887
+  Recall                0.590     0.627
   per-class AP50:
-  aeration_basin        0.481     0.690
-  chlorine_contact      0.202     0.140
-  clarifier             0.743     0.843
-  digester              0.872     0.965
-  drying_bed            0.296     0.423
-  oxidation_pond        0.887     0.945
-  (the deployed model trained under the old random split and has seen
-   some of these val plants -- its numbers are optimistic)
+  aeration_basin        0.796     0.740
+  clarifier             0.677     0.792
+  digester              0.995     0.995
+  drying_bed            0.467     0.593
+  oxidation_pond        0.894     0.962
 
-NOT deploying: new mAP50 0.580 < deployed 0.668.
-  The new weights stay at C:\Users\AMURRA02\tp_qa\detection\models\runs\wwtp_v2-8\weights\best.pt. Set FORCE_DEPLOY = True in this
-  script (or copy by hand) to deploy anyway.
+=== SEEN val plants (deployed model likely trained on most of these -- reference only) ===
+  metric                  new  deployed
+  mAP50                 0.563     0.666
+  mAP50-95              0.239     0.323
+  Precision             0.628     0.885
+  Recall                0.554     0.531
+  per-class AP50:
+  aeration_basin        0.430     0.696
+  chlorine_contact      0.220     0.199
+  clarifier             0.775     0.859
+  digester              0.836     0.956
+  drying_bed            0.216     0.339
+  oxidation_pond        0.899     0.947
