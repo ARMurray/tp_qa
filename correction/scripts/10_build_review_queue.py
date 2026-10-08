@@ -36,6 +36,11 @@ QUEUE COMPOSITION per batch (Phase 3 table):
                the Stage 2a threshold
   random     : ~30% of the remainder -- uniform over ALL scored plants
                (both task types), not just flagged ones. Not droppable.
+  audit      : --audit-size N (2026-10-08, round 6 on). A uniform random
+               sample of the plants 13_build_corrected_output.py MOVED, drawn
+               before the other slices. The only unbiased read of the move
+               rule's precision: uncertain over-samples small margins and
+               random rarely lands on a move. Needs a current 13 output.
 
 Usage:
     python 10_build_review_queue.py --states OH,MS,DE --round 1
@@ -364,6 +369,46 @@ def load_previously_reviewed_ids() -> set:
     return ids
 
 
+def draw_audit(n: int, plant_summary: pd.DataFrame, flagged_with_cands: set,
+               holdout_ids: set, reranked_summary: Path, rng,
+               allow_stale: bool) -> set:
+    """Uniform random sample of n plants that 13 marked status == 'moved',
+    restricted to plants still in the pool (not reviewed before, not holdout)
+    and with candidates to pick from -- the moved-to parcel is #1 of the five
+    shown, so the reviewer judges the move by picking the true parcel."""
+    path = C.DATA_DIR / "output" / "cwns_corrected_locations.parquet"
+    if not path.exists():
+        print(f"ERROR: --audit-size needs 13's output at {path}. Run "
+              f"13_build_corrected_output.slurm first.")
+        sys.exit(2)
+    if (reranked_summary.exists() and path.stat().st_mtime < reranked_summary.stat().st_mtime
+            and not allow_stale):
+        print(f"ERROR: {path.name} is older than {reranked_summary.name}: 05b ran "
+              f"after 13, so 13's moves may not match the current re-rank. Re-run "
+              f"13 (or pass --allow-stale-output).")
+        sys.exit(2)
+    out = pd.read_parquet(path)
+    moved = out.loc[out["status"] == "moved"].copy()
+    moved["CWNS_ID"] = moved["CWNS_ID"].astype(str)
+    pool = set(moved["CWNS_ID"]) & set(plant_summary["CWNS_ID"].astype(str))
+    pool &= set(map(str, flagged_with_cands))
+    pool -= set(map(str, holdout_ids))
+    print(f"\nAudit slice: {len(moved):,} plant(s) moved in {path.name} "
+          f"(cutoff {moved['move_cutoff'].iloc[0] if 'move_cutoff' in moved and len(moved) else '?'}); "
+          f"{len(pool):,} eligible (not reviewed before, not holdout, with candidates)")
+    pool = sorted(pool)
+    rng.shuffle(pool)
+    chosen = set(pool[:n])
+    if len(chosen) < n:
+        print(f"  NOTE: only {len(chosen)} eligible -- audit slice is short of {n}")
+    if "pop_band" in moved.columns and chosen:
+        bands = moved[moved["CWNS_ID"].isin(chosen)]["pop_band"].value_counts()
+        allb = moved[moved["CWNS_ID"].isin(set(pool))]["pop_band"].value_counts()
+        print("  by population band (audit / eligible): " + ", ".join(
+            f"{b} {int(bands.get(b, 0))}/{int(allb.get(b, 0))}" for b in allb.index))
+    return chosen
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--states", type=str, required=True,
@@ -378,6 +423,12 @@ def main():
                           "(round_manifest.json doesn't exist yet either, see "
                           "TPQA_MASTER_REFERENCE.md S4 Phase 7).")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--audit-size", type=int, default=0,
+                    help="plants to draw at random from 13's moved plants, "
+                         "before the uncertain/random split (default 0)")
+    ap.add_argument("--allow-stale-output", action="store_true",
+                    help="with --audit-size: use a 13 output older than "
+                         "plant_summary_reranked.parquet")
     ap.add_argument("--keep-selection", action="store_true",
                     help="reuse the plants and slices of the existing "
                          "review_queue_round{N}.parquet and rebuild only their "
@@ -473,17 +524,25 @@ def main():
     print(f"\nHoldout slice: {len(holdout_ids)} unreviewed unlabeled-bin plant(s) "
           f"in this pilot's scope" + ("" if args.round == 1 else " (skipped -- round > 1)"))
 
+    rng = np.random.default_rng(args.seed)
+
+    # ---- Audit: random sample of 13's moved plants, before anything else ----
+    audit_selected = set()
+    if args.audit_size and not args.keep_selection:
+        audit_selected = draw_audit(args.audit_size, plant_summary, flagged_with_cands,
+                                    holdout_ids, reranked_summary, rng,
+                                    args.allow_stale_output)
+
     # ---- Uncertain / random, drawn from the NON-holdout pool ----
-    non_holdout_ids = set(plant_summary["CWNS_ID"]) - holdout_ids
+    non_holdout_ids = set(plant_summary["CWNS_ID"]) - holdout_ids - audit_selected
     uncertain_ids = classify_uncertain(
         plant_summary, cand_pick_rows[cand_pick_rows["CWNS_ID"].isin(non_holdout_ids)],
         stage2a_threshold) & non_holdout_ids
 
-    remaining_slots = max(0, args.batch_size - len(holdout_ids))
+    remaining_slots = max(0, args.batch_size - len(holdout_ids) - len(audit_selected))
     n_uncertain_target = round(remaining_slots * UNCERTAIN_SHARE)
     n_random_target = remaining_slots - n_uncertain_target
 
-    rng = np.random.default_rng(args.seed)
     uncertain_pool = sorted(uncertain_ids)  # sorted for reproducibility pre-shuffle
     rng.shuffle(uncertain_pool)
     uncertain_selected = set(uncertain_pool[:n_uncertain_target])
@@ -494,6 +553,7 @@ def main():
 
     print(f"\nBatch composition (target size {args.batch_size}):")
     print(f"  holdout   : {len(holdout_ids)}")
+    print(f"  audit     : {len(audit_selected)}")
     print(f"  uncertain : {len(uncertain_selected)} (of {len(uncertain_ids)} eligible, "
           f"target {n_uncertain_target})")
     print(f"  random    : {len(random_selected)} (target {n_random_target})")
@@ -504,8 +564,9 @@ def main():
               f"smaller batch. Not silently backfilling from random -- that would quietly "
               f"change what 'uncertain' means batch to batch.")
 
-    queue_plant_ids = holdout_ids | uncertain_selected | random_selected
+    queue_plant_ids = holdout_ids | audit_selected | uncertain_selected | random_selected
     slice_map = {**{i: "holdout" for i in holdout_ids},
+                 **{i: "audit" for i in audit_selected},
                  **{i: "uncertain" for i in uncertain_selected},
                  **{i: "random" for i in random_selected}}
 
