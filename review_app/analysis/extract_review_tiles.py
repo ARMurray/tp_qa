@@ -243,6 +243,15 @@ def load_reviewed_sites(reported_only: bool, candidates_only: bool) -> pd.DataFr
     return dedup
 
 
+def latest_reviewed_round() -> int:
+    conn = sqlite3.connect(C.APP_DB_PATH)
+    r = conn.execute("SELECT MAX(review_round) FROM plants WHERE reviewed = 1").fetchone()[0]
+    conn.close()
+    if r is None:
+        raise SystemExit(f"No reviewed plants with a review_round in {C.APP_DB_PATH}")
+    return int(r)
+
+
 def load_targeted_sites(point_halfwidth_m: float,
                         review_round: int | None = None) -> pd.DataFrame:
     """Sites worth labelling after a review round, rather than every parcel
@@ -732,8 +741,13 @@ def main():
                     help="report the tile count without fetching anything")
     ap.add_argument("--round", type=int, default=None,
                     help="only tile plants from this review round. Default: "
-                         "every reviewed round (tiles that already exist are "
-                         "skipped either way).")
+                         "the latest round with reviewed plants -- earlier "
+                         "rounds were tiled when they closed (2026-10-08; "
+                         "used to be every round).")
+    ap.add_argument("--all-rounds", action="store_true",
+                    help="tile every reviewed round, not just the latest. "
+                         "Tiles already in tile_metadata.csv are still skipped, "
+                         "but anything purged is fetched again.")
     ap.add_argument("--sites-csv", type=Path, default=None,
                     help="tile exactly the sites in this CSV (columns cwns_id, "
                          "st, ll_uuid, role, lat, lon) instead of selecting from "
@@ -775,7 +789,16 @@ def main():
                 "--reported-only / --candidates-only only apply to "
                 "--all-candidates. Targeted selection chooses by verdict and "
                 "detection, not by which list a parcel came from.")
-        sites = load_targeted_sites(args.point_halfwidth_m, args.round)
+        rnd = args.round
+        if args.all_rounds:
+            if rnd is not None:
+                raise SystemExit("--round and --all-rounds are mutually exclusive")
+            print("--all-rounds: every reviewed round")
+        elif rnd is None:
+            rnd = latest_reviewed_round()
+            print(f"Latest reviewed round: {rnd} (earlier rounds skipped; "
+                  f"--all-rounds to include them)")
+        sites = load_targeted_sites(args.point_halfwidth_m, rnd)
     if sites.empty:
         print("Nothing to tile.")
         return

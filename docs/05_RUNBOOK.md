@@ -348,7 +348,8 @@ candidate parcel where the detector fired but the reviewer said it is not the
 plant (false positive). Rejected candidates where nothing fired are not tiled:
 there are already ~900 confirmed-empty labels. This is the default of
 `extract_review_tiles.py` and so of `close_round`; `--all-candidates` and
-`label_priorities.py` are opt-in only.
+`label_priorities.py` are opt-in only. Each run takes only the **latest reviewed round**
+(`--round N` for another, `--all-rounds` for every round).
 
 To clear an inventory built under older rules (keeps every labelled tile,
 including old Label Studio names and confirmed-empty labels):
