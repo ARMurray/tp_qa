@@ -350,7 +350,11 @@ def load_targeted_sites(point_halfwidth_m: float,
         cw = c["cwns_id"]
         if verdicts.get(cw) in (None, "needs_info"):
             continue
-        if not bool(c["od_has_detection"]):
+        # NULL means detection never ran on this candidate (rounds 1-2 and
+        # most of 3), not that it fired. bool(NaN) is True, so the old
+        # `not bool(...)` test tiled every one of those as a false positive
+        # (~870 extra sites, 2026-10-08).
+        if pd.isna(c["od_has_detection"]) or int(c["od_has_detection"]) != 1:
             continue
         if str(c["ll_uuid"]) in truth_parcels.get(cw, ()):
             continue                      # it fired on the plant: a TP,
