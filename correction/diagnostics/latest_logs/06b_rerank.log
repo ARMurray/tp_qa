@@ -1,0 +1,50 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/06b_rerank_7568950.log
+# job 7568950 on r5n14, exit status 0, copied 2026-10-09 15:10:34
+#
+==========================================
+Node:    r5n14
+Job ID:  7568950
+CPUs:    8
+Started: Fri Oct  9 15:08:47 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/06b_build_rerank_training.py
+=== 06b_build_rerank_training.py ===
+
+Loading Stage 2a candidates...
+  189045 candidate(s) across 9459 plant(s)
+
+Resolving true parcels for corrections...
+  Corrections with usable coordinates: 723
+  True parcel resolved for 713/723 correction(s)
+  Corrections marked as multi-parcel plants: 0
+
+Loading candidate OD features (01e --training-corrections)...
+  Skipping 149 candidate-OD file(s) written before the deployed best.pt (a previous detector's output)
+  16808 candidate(s) with OD output across 640 plant(s)
+
+Candidates for corrections plants: 13355 across 668 plant(s)
+  [holdout] rerank-build: removed 860 rows / 43 plants (13355 -> 12495)
+
+  True parcel present in the top-20: 552/625 plant(s) (88% candidate recall@20)
+
+=== Re-rank training table ===
+Total rows        : 12495
+Label=1 (true)    : 552
+Label=0 (competitor): 11943
+Distinct plants   : 625
+Pools with a positive: 552 (approx)
+
+  OD detection rate -- true      : 71.9% (n=552)
+  OD detection rate -- competitors: 4.9% (n=11943)
+  Stage 2a rank of the true parcel: median 1, top-5 509/552
+
+  Those two rates are what a re-ranker has to work with. If they are close,
+  no model will separate the true parcel from its competitors.
+
+Written: /work/GRDVULN/tp_qa/correction/data/features/17_rerank_training.parquet
+
+Next: 07b_train_rerank.py
+Finished: Fri Oct  9 15:10:34 EDT 2026  (exit 0)
