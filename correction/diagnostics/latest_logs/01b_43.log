@@ -1,0 +1,53 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01b_7562531_43.log
+# job 7562531 task 43 on r5n28, exit status 0, copied 2026-10-09 09:38:16
+#
+==========================================
+Node:    r5n28
+Job ID:  7562629
+CPUs:    32
+Started: Fri Oct  9 09:37:38 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Processing state: TX  (array index 43 of 51)
+Checking outbound HTTPS to Planetary Computer...
+  STAC API HTTP status: 200
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01b_run_object_detection.py --states TX --workers 32 --full-universe
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.batchnorm.BatchNorm2d' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
+  _check_container_source(*data)
+=== 01b_run_object_detection_hpc.py ===
+Device: cpu  |  fetch workers: 32  |  tile=500m imgsz=864px  |  imagery: Planetary Computer NAIP (streamed, no local download)
+
+  Using weights: best.pt
+Model: best.pt  |  Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digester', 4: 'drying_bed', 5: 'oxidation_pond'}
+
+Connecting to Planetary Computer STAC API...
+Connected.
+
+  Dropped 1 rows with non-numeric/missing coordinates
+Treatment plants loaded: 1468
+Resuming: skipping 1077 already-processed plants (found across all state partitions)
+
+--- State TX: 391 plants ---
+  Resuming: skipping 0 already-processed plants in this state
+  No containing parcel found for 391 plants -- skipped, not written to any table (rerun later if parcel coverage improves)
+  State TX done
+
+=== Summary ===
+  Plants processed : 0
+  No parcel found  : 391
+  Parcels capped (area > 2.0 km2, OR still >150 tiles after real-polygon-filtered tiling -- used point-fallback footprint instead): 0
+  Tiles w/ detections   : 0
+  Tiles empty           : 0
+  Fetch failures        : 0
+  Elapsed               : 0.1 min
+
+Outputs (Parquet, partitioned by state) in: /work/GRDVULN/tp_qa/correction/data/od_features
+Finished: Fri Oct  9 09:38:16 EDT 2026
