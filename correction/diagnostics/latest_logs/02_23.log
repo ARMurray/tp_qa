@@ -1,0 +1,77 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7564295_23.log
+# job 7564295 task 23 on r7n09, exit status 0, copied 2026-10-09 10:16:42
+#
+==========================================
+Node:    r7n09
+Job ID:  7564319
+CPUs:    16
+Started: Fri Oct  9 10:14:32 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+State: MO  (array index 23 of 51)
+Running: python "/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py" --states MO --shard --full-universe
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pyogrio/raw.py:200: RuntimeWarning: organizePolygons() received a polygon with more than 100 parts. The processing may be really slow.  You can skip the processing by setting METHOD=SKIP, or only make it analyze counter-clock wise parts by setting METHOD=ONLY_CCW if you can assume that the outline of holes is counter-clock wise defined
+  return ogr_read(
+/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:379: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
+/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:384: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
+/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:387: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_govt"] = owner_clean.str.contains(
+/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:391: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_utility"] = owner_clean.str.contains(
+/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:395: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_is_electric"] = owner_clean.str.contains(
+/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
+  df["owner_has_llc_corp"] = owner_clean.str.contains(
+=== 02_feature_engineering.py ===
+SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards/state=MO
+Run 02b_merge_feature_shards.py once every task has finished.
+
+PART 1: Building plant features
+  [population] 02 plants: kept plants serving > 100: 804/873 plants (69 removed)
+  Plants loaded: 804
+  Loading census geographies...
+  Running census spatial joins...
+  Plant features combined: 804 rows, 18 cols
+
+PART 2: Building parcel features
+
+--- State MO ---
+  Fetching parcel attributes for 1804101 parcels...
+  has_ww_keyword TRUE: 1695
+  Computing OSM wastewater features...
+  Parcels with OSM wastewater tag: 108
+
+Unioning parcel feature files for this run's 1 state(s)...
+  (Cache directory holds 52 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
+  (shard mode: 10_parcel_features.parquet is left to the merge step)
+
+Parcel features combined: 1804101 rows
+  OD plants: 314 part-file(s) found across 51 partition(s); reading and unioning all of them
+  19163 duplicate CWNS_ID rows across part-files (same plant processed more than once, e.g. a --limit test followed by a full run) -- kept the most recently written row for each
+
+STEP 14: Building Stage 1 training data
+  [population] 02 stage1 labels: kept plants serving > 100: 2789/2941 plants (152 removed)
+  Classes: 2789
+  NOTE: 2698 labelled plant(s) have no STATE_CODE and are dropped from Stage 1 training: {'Correct': 2008, 'Incorrect': 690}
+        They are in the label file but not in PHYSICAL_LOCATION.txt, which is a smaller export. See this function's comment.
+  Reported parcels found: 83
+  OD features joined -- od_ran True for 76 / 83
+  Stage 1 training rows: 83
+  Correct: 69
+  Incorrect: 14
+
+STEP 15: Building Stage 2 training data
+  Corrected parcels found: 20
+  Plants for Stage 2: 20
+  Stage 2 raw candidates labeled: 104161
+  Stage 2 training rows: 104161
+  Positive labels: 20
+  Negative labels: 104141
+
+=== 02_feature_engineering.py complete ===
+Outputs in: /work/GRDVULN/tp_qa/correction/data/features
+Finished: Fri Oct  9 10:16:42 EDT 2026
