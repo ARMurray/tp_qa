@@ -30,5 +30,10 @@ CMD="python $SCRIPTS/13_build_corrected_output.py --cutoff $CUTOFF"
 echo "Running: $CMD"
 eval "$CMD"
 RC=$?
+
+# Candidates + detected objects for the viewer (correction/diagnostics/output/).
+if [ "$RC" -eq 0 ]; then
+    python "$SCRIPTS/export_viewer_data.py" || echo "WARNING: export_viewer_data.py failed (13's output is fine)"
+fi
 echo "Finished: $(date)  (exit $RC)"
 exit $RC

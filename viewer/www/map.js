@@ -3,13 +3,18 @@
 // suggestions, legend that doubles as the filter panel, slide-in detail panel.
 // No vector tiles: every plant arrives in one JSON (see app.py).
 
-const { DeckGL, TileLayer, BitmapLayer, ScatterplotLayer, LineLayer, GeoJsonLayer, FlyToInterpolator } = deck;
+const { DeckGL, TileLayer, BitmapLayer, ScatterplotLayer, LineLayer, GeoJsonLayer, TextLayer, FlyToInterpolator } = deck;
 
 const DATA_URL = "/data/plants.json";
 const SITES_URL = "/data/sites.geojson";
 const DETECTIONS_URL = "/data/detections.json";
 const SITES_MIN_ZOOM = 11;       // parcel outlines of each plant's final site
 const DETECTIONS_MIN_ZOOM = 13;  // detected objects
+const PARCELS_MIN_ZOOM = 15;     // every parcel in view, live from the local Regrid mirror
+const ALLOBJ_MIN_ZOOM = 14;      // every detected object in view (candidates, reported, corrected)
+const RANK_COLORS = { 1: [249, 115, 22], top5: [250, 204, 21], rest: [229, 231, 235] };
+const REPORTED_PARCEL_COLOR = [34, 211, 238];
+const OTHER_CAND_COLOR = [167, 139, 250];
 
 const CLASS_COLORS = {
   clarifier: [56, 189, 248],
@@ -33,7 +38,7 @@ const STATUS = {
   kept_osm:            { label: "Kept – OSM tagged",      color: [20, 184, 166],  hint: "Reported parcel carries an OSM wastewater tag" },
   kept_model:          { label: "Kept – model",           color: [163, 230, 53],  hint: "Stage 1 scored the reported location as correct" },
   pending:             { label: "Pending (no model run)", color: [156, 163, 175], hint: "Preview mode: model output not loaded yet" },
-  not_assessed:        { label: "Not assessed",           color: [107, 114, 128], hint: "Outside model scope (no NAIP, population ≤ 1,000, …)" },
+  not_assessed:        { label: "Not assessed",           color: [107, 114, 128], hint: "Outside model scope (no NAIP, population ≤ 100 or unknown, …)" },
 };
 const UNKNOWN_COLOR = [0, 0, 0];
 const SELECTED_COLOR = [255, 255, 0];
@@ -84,6 +89,16 @@ let detsShown = [];
 let showSites = true;
 let showDets = true;
 let viewState = { longitude: -96.5, latitude: 38.5, zoom: 3.8, pitch: 0, bearing: 0 };
+let CUTOFF = null;
+// Explore: the selected plant's candidates, and what is in the map window.
+let cands = [];                 // candidate rows of the selected plant (ranked)
+let candParcels = { type: "FeatureCollection", features: [] };  // their outlines (+ reported parcel)
+let activeParcel = null;        // ll_uuid highlighted from the table or a click
+let showParcels = false;
+let showAllObj = false;
+let viewParcels = { type: "FeatureCollection", features: [] };
+let viewObjects = [];
+let viewSeq = 0;
 
 const $ = (id) => document.getElementById(id);
 const tooltip = $("tooltip");
@@ -151,6 +166,67 @@ function layers() {
         pickable: true,
       })
     );
+  }
+
+  if (showParcels && viewState.zoom >= PARCELS_MIN_ZOOM && viewParcels.features.length) {
+    out.push(
+      new GeoJsonLayer({
+        id: "view-parcels",
+        data: viewParcels,
+        stroked: true,
+        filled: true,
+        getFillColor: (f) => (f.properties.cand && f.properties.cand.length ? [...OTHER_CAND_COLOR, 50] : [255, 255, 255, 8]),
+        getLineColor: (f) => (f.properties.cand && f.properties.cand.length ? [...OTHER_CAND_COLOR, 230] : [255, 255, 255, 170]),
+        lineWidthUnits: "pixels",
+        getLineWidth: (f) => (f.properties.ll_uuid === activeParcel ? 3 : 1),
+        pickable: true,
+        updateTriggers: { getLineWidth: activeParcel },
+      })
+    );
+  }
+
+  if (selected && candParcels.features.length) {
+    const rankOf = new Map(cands.map((c) => [c.parcel, c.rank]));
+    const colorFor = (f) => {
+      const u = f.properties.ll_uuid;
+      if (rankOf.has(u)) {
+        const r = rankOf.get(u);
+        return r === 1 ? RANK_COLORS[1] : r !== null && r <= 5 ? RANK_COLORS.top5 : RANK_COLORS.rest;
+      }
+      return REPORTED_PARCEL_COLOR;
+    };
+    out.push(
+      new GeoJsonLayer({
+        id: "cand-parcels",
+        data: candParcels,
+        stroked: true,
+        filled: true,
+        getFillColor: (f) => [...colorFor(f), f.properties.ll_uuid === activeParcel ? 90 : 35],
+        getLineColor: (f) => [...colorFor(f), 240],
+        lineWidthUnits: "pixels",
+        getLineWidth: (f) => (f.properties.ll_uuid === activeParcel ? 4 : 2),
+        pickable: true,
+        updateTriggers: { getFillColor: [activeParcel, selected.id], getLineWidth: activeParcel },
+      })
+    );
+    const labelled = cands.filter((c) => c.lat !== null && c.lon !== null && c.rank !== null && c.rank <= 20);
+    if (labelled.length && viewState.zoom >= 12) {
+      out.push(
+        new TextLayer({
+          id: "cand-ranks",
+          data: labelled,
+          getPosition: (c) => [c.lon, c.lat],
+          getText: (c) => String(c.rank),
+          getSize: 14,
+          getColor: [17, 24, 39, 255],
+          background: true,
+          getBackgroundColor: (c) => [...(c.rank === 1 ? RANK_COLORS[1] : c.rank <= 5 ? RANK_COLORS.top5 : RANK_COLORS.rest), 230],
+          backgroundPadding: [4, 1],
+          fontWeight: 700,
+          pickable: false,
+        })
+      );
+    }
   }
 
   if (showMoves && moves.length) {
@@ -222,6 +298,24 @@ function layers() {
     );
   }
 
+  if (showAllObj && viewState.zoom >= ALLOBJ_MIN_ZOOM && viewObjects.length) {
+    out.push(
+      new ScatterplotLayer({
+        id: "all-objects",
+        data: viewObjects,
+        getPosition: (d) => [d.lon, d.lat],
+        radiusUnits: "pixels",
+        getRadius: 4,
+        getFillColor: (d) => [...(CLASS_COLORS[d.cls] || CLASS_FALLBACK), d.conf >= 0.4 ? 230 : 110],
+        stroked: true,
+        getLineColor: [17, 24, 39, 220],
+        lineWidthUnits: "pixels",
+        getLineWidth: 1,
+        pickable: true,
+      })
+    );
+  }
+
   if (selected) {
     const sel = [{ pos: [selected.lon, selected.lat] }];
     if (selected.rlat !== null && MOVE_STATUSES.has(selected.status) && (selected.moved_m || 0) > 1) {
@@ -258,6 +352,31 @@ function onHover({ object, x, y, layer }) {
     tooltip.style.display = "none";
     return;
   }
+  if (layer && (layer.id === "view-parcels" || layer.id === "cand-parcels")) {
+    const pr = object.properties;
+    const c = cands.find((x) => x.parcel === pr.ll_uuid);
+    const others = (pr.cand || []).filter((x) => !selected || x.id !== selected.id);
+    tooltip.innerHTML =
+      `<div><b>${esc(pr.owner || "(no owner)")}</b></div>` +
+      (pr.ll_gisacre !== null && pr.ll_gisacre !== undefined ? `<div>${fmt(pr.ll_gisacre, 2)} acres</div>` : "") +
+      (c ? `<div>candidate #${c.rank ?? "—"} · re-rank ${fmt(c.rr)}</div>` :
+        selected && pr.ll_uuid === selected.rparcel ? "<div>reported parcel</div>" : "") +
+      (others.length ? `<div style="color:#7c3aed">candidate of ${others.length} other plant(s)</div>` : "") +
+      '<div style="color:#888">click for details</div>';
+    tooltip.style.left = `${x + 14}px`;
+    tooltip.style.top = `${y + 14}px`;
+    tooltip.style.display = "block";
+    return;
+  }
+  if (layer && layer.id === "all-objects") {
+    tooltip.innerHTML =
+      `<div><b>${esc(object.cls.replace(/_/g, " "))}</b> · ${(object.conf * 100).toFixed(0)}%</div>` +
+      `<div style="color:#888">${esc(object.src)} run for plant ${esc(object.id)}</div>`;
+    tooltip.style.left = `${x + 14}px`;
+    tooltip.style.top = `${y + 14}px`;
+    tooltip.style.display = "block";
+    return;
+  }
   if (layer && layer.id === "detections") {
     tooltip.innerHTML =
       `<div><b>${esc(object.cls.replace(/_/g, " "))}</b> · ${(object.conf * 100).toFixed(0)}%</div>` +
@@ -289,14 +408,31 @@ function onHover({ object, x, y, layer }) {
 
 function onClick({ object, layer }) {
   if (!object) return;
+  if (layer && (layer.id === "view-parcels" || layer.id === "cand-parcels")) {
+    showParcelCard(object.properties);
+    return;
+  }
+  if (layer && layer.id === "all-objects") {
+    const p = BY_ID.get(object.id);
+    if (p) select(p, false);
+    return;
+  }
   if (layer && layer.id === "sites") object = BY_ID.get(object.properties.CWNS_ID);
   else if (layer && layer.id === "detections") object = BY_ID.get(object.id);
   if (object) select(object, false);
 }
 
 function select(p, fly) {
+  const changed = !selected || selected.id !== p.id;
   selected = p;
+  if (changed) {
+    cands = [];
+    candParcels = { type: "FeatureCollection", features: [] };
+    activeParcel = null;
+    $("parcel-card").classList.remove("open");   // it described the parcel relative to the old plant
+  }
   showPanel(p);
+  if (changed) loadCandidates(p);
   history.replaceState(null, "", `#id=${encodeURIComponent(p.id)}`);
   if (fly) {
     // Centre the plant in the part of the map the detail panel leaves visible.
@@ -321,6 +457,9 @@ function closePanel() {
   panel.classList.remove("open");
   document.body.classList.remove("panel-open");
   selected = null;
+  cands = [];
+  candParcels = { type: "FeatureCollection", features: [] };
+  activeParcel = null;
   history.replaceState(null, "", location.pathname);
   render();
 }
@@ -391,12 +530,214 @@ function showPanel(p) {
       ${fact("Nothing fired (Stage 2a order)", p.fb === null ? "—" : p.fb ? "yes" : "no")}
     </dl>
 
+    <div class="detail-section-title">Candidates</div>
+    <div id="cand-box"><div class="cand-note">loading…</div></div>
+
     <div class="detail-section-title">Review history</div>
     ${reviews || '<div class="detail-note">Not reviewed in any round.</div>'}
   `;
   $("detail-close").addEventListener("click", closePanel);
   panel.classList.add("open");
   document.body.classList.add("panel-open");
+}
+
+// ---- explore: candidates, parcels, objects ---------------------------------
+async function loadCandidates(p) {
+  const box = () => $("cand-box");
+  let data;
+  try {
+    const r = await fetch(`/api/plant/${encodeURIComponent(p.id)}/candidates`);
+    data = await r.json();
+  } catch (err) {
+    if (box()) box().innerHTML = `<div class="cand-note">could not load candidates: ${esc(err.message)}</div>`;
+    return;
+  }
+  if (!selected || selected.id !== p.id) return;
+  cands = data.candidates || [];
+  renderCandTable(p, data.loaded);
+  // Outlines: every candidate plus the reported parcel, from the local mirror.
+  const ids = cands.map((c) => c.parcel);
+  if (p.rparcel && !ids.includes(p.rparcel)) ids.push(p.rparcel);
+  if (!ids.length || !p.state) {
+    render();
+    return;
+  }
+  statusEl.textContent = `loading ${ids.length} parcel outline(s)…`;
+  try {
+    const r = await fetch(`/api/parcels?state=${encodeURIComponent(p.state)}&ids=${ids.map(encodeURIComponent).join(",")}`);
+    const fc = await r.json();
+    if (!selected || selected.id !== p.id) return;
+    if (fc.error) throw new Error(fc.error);
+    candParcels = fc;
+    const nOk = fc.features.length;
+    statusEl.textContent = `${nOk} of ${ids.length} parcel outline(s) found in the local Regrid mirror`;
+    const owners = new Map(fc.features.map((f) => [f.properties.ll_uuid, f.properties.owner]));
+    document.querySelectorAll(".cand-owner").forEach((el) => {
+      const o = owners.get(el.dataset.parcel);
+      el.textContent = o || "—";
+    });
+  } catch (err) {
+    statusEl.textContent = `parcel outlines unavailable: ${err.message}`;
+  }
+  render();
+}
+
+function renderCandTable(p, loaded) {
+  const box = $("cand-box");
+  if (!box) return;
+  if (!loaded) {
+    box.innerHTML = '<div class="cand-note">No viewer_candidates.parquet yet -- it is written on the HPC by 13\'s job (export_viewer_data.py). Commit correction/diagnostics/output/ and pull.</div>';
+    return;
+  }
+  if (!cands.length) {
+    const why = p.route === "osm_confirmed" ? "the reported parcel has an OSM wastewater tag, so it passed by rule"
+      : p.s1 !== null && p.s1 !== undefined && (p.status === "kept_model" || p.status === "kept_site") ? `Stage 1 scored the reported location as correct (P = ${fmt(p.s1)})`
+      : p.status === "not_assessed" ? "the plant is outside model scope"
+      : p.status && p.status.startsWith("verified") ? "a reviewer settled this plant"
+      : "the plant was not flagged, or no parcel survived the candidate search";
+    box.innerHTML = `<div class="cand-note">No candidates were scored: ${esc(why)}. Turn on <b>All parcels</b> to inspect the area.</div>`;
+    return;
+  }
+  const cut = CUTOFF;
+  const rows = [];
+  let cutDrawn = false;
+  for (const c of cands) {
+    if (cut !== null && !cutDrawn && (c.rr === null || c.rr < cut)) {
+      rows.push(`<tr class="cutoff"><td colspan="6"></td></tr>`);
+      cutDrawn = true;
+    }
+    const col = c.rank === 1 ? RANK_COLORS[1] : c.rank !== null && c.rank <= 5 ? RANK_COLORS.top5 : RANK_COLORS.rest;
+    const od = c.od_ran === false || c.od_ran === null ? '<span class="od-no">not run</span>'
+      : c.od ? `<span class="od-yes">${c.nobj ?? "?"} obj</span><div class="sub">${esc((c.odcls || "").replace(/_/g, " "))} ${c.odconf !== null ? (c.odconf * 100).toFixed(0) + "%" : ""}</div>`
+      : '<span class="od-no">none</span>';
+    const flags = [c.osm ? "OSM" : "", c.kw ? "ww keyword" : "", c.util ? "utility" : ""].filter(Boolean).join(", ");
+    rows.push(
+      `<tr class="cand-row" data-parcel="${esc(c.parcel)}">` +
+        `<td><span class="rank-dot" style="background:${hex(col)}">${c.rank ?? "—"}</span><div class="sub">2a #${c.rank2a ?? "—"}</div></td>` +
+        `<td class="num">${fmt(c.rr)}<div class="sub">2a ${fmt(c.s2a)}</div></td>` +
+        `<td class="num">${fmtDist(c.dist)}</td>` +
+        `<td>${od}</td>` +
+        `<td><span class="cand-owner" data-parcel="${esc(c.parcel)}">…</span>` +
+          `<div class="sub">${c.acres !== null ? fmt(c.acres, 1) + " ac" : ""}${flags ? " · " + esc(flags) : ""}${c.name ? " · name " + fmt(c.name, 2) : ""}</div></td>` +
+      `</tr>`
+    );
+  }
+  const fb = cands.some((c) => c.fb) ? " Nothing fired in this pool, so the order is Stage 2a's." : "";
+  box.innerHTML =
+    `<div class="cand-note">${cands.length} scored candidate(s), best first.` +
+    (cut !== null ? ` Dashed line = move cutoff ${cut}.` : "") + fb + ` Click a row to show the parcel.</div>` +
+    `<table class="cand-table"><thead><tr><th>#</th><th class="num">re-rank</th><th class="num">dist</th><th>detection</th><th>owner</th></tr></thead>` +
+    `<tbody>${rows.join("")}</tbody></table>`;
+  box.querySelectorAll("tr.cand-row").forEach((tr) =>
+    tr.addEventListener("click", () => focusParcel(tr.dataset.parcel))
+  );
+}
+
+function focusParcel(uuid) {
+  activeParcel = uuid;
+  document.querySelectorAll("tr.cand-row").forEach((tr) => tr.classList.toggle("active", tr.dataset.parcel === uuid));
+  const f = candParcels.features.find((x) => x.properties.ll_uuid === uuid) ||
+    viewParcels.features.find((x) => x.properties.ll_uuid === uuid);
+  const c = cands.find((x) => x.parcel === uuid);
+  if (f) showParcelCard(f.properties);
+  const lon = c && c.lon !== null ? c.lon : null, lat = c && c.lat !== null ? c.lat : null;
+  if (lon !== null && lat !== null) {
+    const zoom = Math.max(viewState.zoom, 16);
+    const w = window.innerWidth, h = window.innerHeight;
+    const panelW = Math.min(400, 0.92 * w);
+    const vp = new deck.WebMercatorViewport({ width: w, height: h, longitude: lon, latitude: lat, zoom });
+    const [clon, clat] = vp.unproject([w / 2 + panelW / 2, h / 2]);
+    viewState = { ...viewState, longitude: clon, latitude: clat, zoom, transitionDuration: 700, transitionInterpolator: new FlyToInterpolator() };
+    scheduleViewFetch();
+  }
+  render();
+}
+
+const ATTR_LABELS = [
+  ["owner", "Owner"], ["address", "Address"], ["ll_gisacre", "Acres"], ["ll_bldg_count", "Buildings"],
+  ["usedesc", "Use"], ["lbcs_activity_desc", "Activity"], ["lbcs_function_desc", "Function"],
+  ["lbcs_structure_desc", "Structure"], ["lbcs_site_desc", "Site"], ["lbcs_ownership_desc", "Ownership"],
+  ["zoning_type", "Zoning"], ["zoning_subtype", "Zoning subtype"],
+];
+
+function showParcelCard(pr) {
+  activeParcel = pr.ll_uuid;
+  const card = $("parcel-card");
+  const fact = (k, v) => `<div class="fact"><dt>${k}</dt><dd>${v}</dd></div>`;
+  const attrs = ATTR_LABELS.filter(([k]) => pr[k] !== null && pr[k] !== undefined && pr[k] !== "")
+    .map(([k, l]) => fact(l, esc(typeof pr[k] === "number" ? fmt(pr[k], k === "ll_gisacre" ? 2 : 0) : pr[k]))).join("");
+  const mine = cands.find((x) => x.parcel === pr.ll_uuid);
+  let role = "";
+  if (selected && mine) {
+    role = `<div class="detail-section-title">Candidate for the selected plant</div><dl>` +
+      fact("Rank (re-rank / Stage 2a)", `#${mine.rank ?? "—"} / #${mine.rank2a ?? "—"}`) +
+      fact("Re-rank score", fmt(mine.rr) + (CUTOFF !== null ? (mine.rr !== null && mine.rr >= CUTOFF ? " (≥ cutoff)" : " (below cutoff)") : "")) +
+      fact("Stage 2a score", fmt(mine.s2a)) +
+      fact("Distance from reported point", fmtDist(mine.dist)) +
+      fact("Detection", mine.od_ran ? (mine.od ? `${mine.nobj ?? "?"} object(s), max ${fmt(mine.odconf, 2)} ${esc(mine.odcls || "")}` : "ran, nothing found") : "not run") +
+      fact("Name match", fmt(mine.name, 2)) +
+      fact("OSM wastewater tag / keyword / utility owner", `${mine.osm ? "yes" : "no"} / ${mine.kw ? "yes" : "no"} / ${mine.util ? "yes" : "no"}`) +
+      `</dl>`;
+  } else if (selected && pr.ll_uuid === selected.rparcel) {
+    role = '<div class="cand-note">This is the selected plant\'s <b>reported</b> parcel.</div>';
+  }
+  const others = (pr.cand || []).filter((x) => !selected || x.id !== selected.id);
+  const otherHtml = others.length
+    ? `<div class="detail-section-title">Candidate of other plant(s)</div>` +
+      others.map((x) => {
+        const p = BY_ID.get(x.id);
+        return `<div class="pc-cand"><a data-id="${esc(x.id)}">${esc(p ? p.name || x.id : x.id)}</a>` +
+          ` <span class="sub">${esc(x.id)}</span><br>rank #${x.rank ?? "—"} · re-rank ${fmt(x.rr)} · detection ${x.od === null ? "not run" : x.od ? "yes" : "no"}` +
+          (p ? ` · <span style="color:${hex(colorOf(p))}">${esc(labelOf(p.status))}</span>` : "") + `</div>`;
+      }).join("")
+    : (pr.cand ? '<div class="cand-note">Not a scored candidate of any other plant.</div>' : "");
+  card.innerHTML =
+    `<button class="pc-close" id="pc-close">×</button>` +
+    `<div class="pc-title">${esc(pr.owner || "(no owner)")}</div>` +
+    `<div class="pc-sub">parcel ${esc(pr.ll_uuid)} · ${esc(pr.state || "")}</div>` +
+    `<dl>${attrs}</dl>${role}${otherHtml}`;
+  card.classList.add("open");
+  $("pc-close").onclick = () => { card.classList.remove("open"); activeParcel = null; render(); };
+  card.querySelectorAll("a[data-id]").forEach((a) =>
+    a.addEventListener("click", () => { const p = BY_ID.get(a.dataset.id); if (p) select(p, true); })
+  );
+  render();
+}
+
+function viewBounds() {
+  const vp = new deck.WebMercatorViewport({ ...viewState, width: window.innerWidth, height: window.innerHeight });
+  const [w, s, e, n] = vp.getBounds();
+  return { w, s, e, n };
+}
+
+let viewTimer = null;
+function scheduleViewFetch() {
+  clearTimeout(viewTimer);
+  viewTimer = setTimeout(fetchViewData, 450);
+}
+
+async function fetchViewData() {
+  const b = viewBounds();
+  const q = `w=${b.w}&s=${b.s}&e=${b.e}&n=${b.n}`;
+  const seq = ++viewSeq;
+  const jobs = [];
+  if (showParcels && viewState.zoom >= PARCELS_MIN_ZOOM) {
+    statusEl.textContent = "loading parcels in view…";
+    jobs.push(fetch(`/api/parcels_in_view?${q}`).then((r) => r.json()).then((fc) => {
+      if (seq !== viewSeq) return;
+      if (fc.error) { statusEl.textContent = fc.error; return; }
+      viewParcels = fc;
+      statusEl.textContent = fc.too_big ? "zoom in further to load parcels"
+        : `${fc.features.length.toLocaleString()} parcel(s) in view (${(fc.states || []).join(", ")})` + (fc.truncated ? " -- truncated, zoom in" : "");
+    }).catch((err) => { statusEl.textContent = `parcels unavailable: ${err.message}`; }));
+  }
+  if (showAllObj && viewState.zoom >= ALLOBJ_MIN_ZOOM) {
+    jobs.push(fetch(`/api/objects?${q}`).then((r) => r.json()).then((d) => {
+      if (seq === viewSeq && Array.isArray(d)) viewObjects = d;
+    }).catch(() => {}));
+  }
+  await Promise.all(jobs);
+  if (seq === viewSeq) render();
 }
 
 // ---- legend / filters -----------------------------------------------------
@@ -549,12 +890,20 @@ async function main() {
     controller: true,
     layers: [basemapLayer(basemap)],
     getCursor: ({ isHovering, isDragging }) => (isDragging ? "grabbing" : isHovering ? "pointer" : "grab"),
-    onViewStateChange: ({ viewState: vs }) => {
+    onViewStateChange: ({ viewState: vs, interactionState }) => {
+      // Once a fly-to has finished, drop its transition props: otherwise every
+      // later render() re-sends them, deck starts the transition again, and
+      // the view-fetch -> render cycle never settles.
+      if (!(interactionState && interactionState.inTransition)) {
+        const { transitionDuration, transitionInterpolator, transitionEasing, transitionInterruption, ...rest } = vs;
+        vs = rest;
+      }
       const bucketChanged = Math.round(vs.zoom * 2) !== Math.round(viewState.zoom * 2) ||
         (vs.zoom >= REPORTED_MIN_ZOOM) !== (viewState.zoom >= REPORTED_MIN_ZOOM);
       viewState = vs;
       if (bucketChanged) render();
       else deckgl.setProps({ viewState });
+      if (showParcels || showAllObj) scheduleViewFetch();
     },
     onHover,
     onClick,
@@ -565,6 +914,8 @@ async function main() {
   $("show-moves").onchange = (e) => { showMoves = e.target.checked; render(); };
   $("show-sites").onchange = (e) => { showSites = e.target.checked; render(); };
   $("show-dets").onchange = (e) => { showDets = e.target.checked; render(); };
+  $("show-parcels").onchange = (e) => { showParcels = e.target.checked; if (showParcels) fetchViewData(); else render(); };
+  $("show-allobj").onchange = (e) => { showAllObj = e.target.checked; if (showAllObj) fetchViewData(); else render(); };
   $("size-slider").oninput = (e) => { sizeBase = Number(e.target.value); render(); };
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
@@ -579,6 +930,7 @@ async function main() {
   }
   const data = await res.json();
   ALL = data.plants;
+  CUTOFF = data.cutoff ?? null;
   BY_ID = new Map(ALL.map((p) => [p.id, p]));
   buildLegend(data.counts || {});
   buildStateFilter();
