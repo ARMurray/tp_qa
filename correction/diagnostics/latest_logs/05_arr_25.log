@@ -1,0 +1,56 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/05_arr_7568283_25.log
+# job 7568283 task 25 on r7n07, exit status 0, copied 2026-10-09 11:50:55
+#
+==========================================
+Node:    r7n07
+Job ID:  7568441
+CPUs:    8
+Started: Fri Oct  9 11:50:22 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Processing state: ND  (array index 25 of 48)
+Output: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=ND
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states ND --out-dir /work/GRDVULN/tp_qa/correction/data/inference_shards/state=ND
+/work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
+  warnings.warn(
+=== 05_run_inference.py ===
+States: ['ND']
+
+Loading Stage 1 / Stage 2a models...
+  Loaded stage1_rf_model.joblib: 74 feature columns, threshold=0.595
+  Loaded stage2_rf_model.joblib: 49 feature columns, threshold=0.646
+
+Loading full-universe plant list...
+  Dropped 1 rows with non-numeric/missing coordinates
+  [population] 05 universe: kept plants serving > 100: 228/285 plants (57 removed)
+  228 plants across 1 state(s)
+
+Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
+  Parcel features narrowed to ['ND']: 77679378 -> 277040 rows
+  Plant features: 15543 rows  |  Parcel features: 277040 rows
+
+Loading OD features (01b reported-location output)...
+  12677 plants with OD output
+
+=== Stage 1: reported-location scoring ===
+  Plants: 228  |  reported parcel found: 174  |  no parcel: 54 (23.7%)
+  OSM-confirmed (passed by rule, not by the model): 0
+  Flagged for Stage 2: 130 (54 no_parcel + 76 low_confidence)
+
+=== Stage 2a: candidate scoring ===
+    ND: 100/130 plants (0.0 min elapsed)
+  ND: 130 flagged plants processed
+  Raw candidates (post reported-parcel exclusion): 170234
+
+=== Summary ===
+  Plants scored          : 228
+  Flagged for Stage 2     : 130
+  Plants with >=1 candidate: 130
+  Flagged w/ 0 candidates  : 0 (no parcel survived K_RINGS + reported-parcel exclusion)
+  Not flagged (Stage 1 ok) : 98 (no candidates by design -- confirm_reported task in 10)
+
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=ND/plant_summary.parquet
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=ND/stage2_candidates.parquet
+Finished: Fri Oct  9 11:50:55 EDT 2026  (exit 0)

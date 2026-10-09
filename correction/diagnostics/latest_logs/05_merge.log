@@ -1,0 +1,29 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/05_merge_7568466.log
+# job 7568466 on r7n07, exit status 0, copied 2026-10-09 12:12:39
+#
+==========================================
+Node:    r7n07
+Job ID:  7568466
+CPUs:    4
+Started: Fri Oct  9 12:12:30 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/merge_05_shards.py --states "AL AR AZ CA CO CT DE FL GA IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA VT WA WI WV WY"
+=== merge_05_shards.py ===
+shards : /work/GRDVULN/tp_qa/correction/data/inference_shards
+output : /work/GRDVULN/tp_qa/correction/data/inference
+states : 48
+
+--- plant_summary.parquet ---
+  48 shard(s) -> 15337 rows
+  wrote /work/GRDVULN/tp_qa/correction/data/inference/plant_summary.parquet
+
+--- stage2_candidates.parquet ---
+  48 shard(s) -> 189045 rows
+  wrote /work/GRDVULN/tp_qa/correction/data/inference/stage2_candidates.parquet
+
+=== complete ===
+Next: 10_build_review_queue.py --states <...> --round <n>
+Finished: Fri Oct  9 12:12:39 EDT 2026  (exit 0)
