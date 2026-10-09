@@ -1,0 +1,112 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/03_7566077.log
+# job 7566077 on r3n24, exit status 0, copied 2026-10-09 11:01:55
+#
+==========================================
+Node:    r3n24
+Job ID:  7566077
+CPUs:    16
+Started: Fri Oct  9 10:50:06 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+=== 03_train_stage1.py: Stage 1 Model Training (Random Forest) ===
+
+Loading Stage 1 training data...
+  [holdout] stage1: removed 319 rows / 319 plants (2481 -> 2162)
+  Rows: 2162
+  Correct: 1787
+  Incorrect: 375
+  OSM-tagged reported parcels: 1126 of 2162 (kept as training rows; osm_ww dropped as a feature)
+  Model columns: 74
+
+  1 feature(s) have NO observed values and cannot be imputed:
+    od_max_conf_drying_bed
+  sklearn skips them. They stay in the schema so a later retrain picks them
+  up automatically -- but a feature that is never populated is carrying no
+  signal today, and if it is an od_* column that means the class never fired.
+  Class weights -- Correct: 0.173 | Incorrect: 0.827
+
+Setting up cross-validation folds...
+  Spatial fold 1: train   1,722 (79.6%,  1411 pos)  |  test     440 (20.4%,   376 pos)
+  Spatial fold 2: train   1,736 (80.3%,  1417 pos)  |  test     426 (19.7%,   370 pos)
+  Spatial fold 3: train   1,732 (80.1%,  1453 pos)  |  test     430 (19.9%,   334 pos)
+  Spatial fold 4: train   1,733 (80.2%,  1440 pos)  |  test     429 (19.8%,   347 pos)
+  Spatial fold 5: train   1,725 (79.8%,  1427 pos)  |  test     437 (20.2%,   360 pos)
+  Spatial folds: 5  |  Standard folds: 5
+
+========================================
+Tuning with SPATIAL cross-validation...
+========================================
+  SPATIAL CV complete in 5.5 minutes
+  Best SPATIAL ROC AUC: 0.9535
+
+========================================
+Tuning with STANDARD cross-validation...
+========================================
+  STANDARD CV complete in 5.6 minutes
+  Best STANDARD ROC AUC: 0.9529
+
+CV Comparison:
+         cv   roc_auc
+0   Spatial  0.953508
+1  Standard  0.952857
+
+========================================
+Fitting final model on full training data...
+========================================
+Test set metrics:
+  roc_auc     : 0.9603
+  accuracy    : 0.9131
+  sensitivity : 0.9284
+  specificity : 0.8404
+  brier_class : 0.0645
+
+Confusion matrix (rows=truth, cols=predicted; 1=Correct, 0=Incorrect):
+[[ 79  15]
+ [ 32 415]]
+
+Test set, UNTAGGED plants only (261 of 541 -- what Stage 1 scores at inference):
+  roc_auc     : 0.9407
+  Correct share: 64.4%  (all test rows: 82.6%)
+
+Computing feature importance...
+Top 20 features:
+            Variable  Importance  Importance_std
+       ll_bldg_count    0.011923        0.002230
+       bldg_per_acre    0.008223        0.001684
+    od_has_detection    0.007099        0.004298
+dominant_class_group    0.004391        0.000573
+       utility_owner    0.003434        0.001346
+     water_pixel_pct    0.003127        0.000492
+          pop_served    0.002949        0.001896
+      lbcs_ownership    0.002292        0.002295
+        water_pixels    0.002211        0.000594
+        od_n_objects    0.002187        0.003193
+        is_municipal    0.002163        0.002825
+    od_has_clarifier    0.002063        0.000716
+      parcel_area_m2    0.002016        0.001232
+         log_gisacre    0.001754        0.000920
+      has_ww_keyword    0.001673        0.000913
+        od_n_classes    0.001628        0.003065
+          ll_gisacre    0.001556        0.000934
+    name_match_score    0.001530        0.001319
+ od_n_detections_raw    0.001459        0.002944
+   od_dominant_class    0.001445        0.003188
+
+Running threshold analysis...
+  Optimal Stage 1 threshold (Youden J, untagged plants): 0.595   (all plants would give 0.595)
+
+Saving model...
+  stage1_rf_model.joblib saved: 16.0 MB
+
+=== Stage 1 training complete ===
+
+FINAL RESULTS SUMMARY
+  Test roc_auc: 0.9603
+  Optimal threshold: 0.595
+  CV comparison:
+         cv   roc_auc
+0   Spatial  0.953508
+1  Standard  0.952857
+Finished: Fri Oct  9 11:01:55 EDT 2026
