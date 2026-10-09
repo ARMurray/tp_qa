@@ -34,6 +34,7 @@ from starlette.staticfiles import StaticFiles
 
 import build_data
 import explore
+import verdicts
 from starlette.concurrency import run_in_threadpool
 
 WWW = Path(__file__).resolve().parent / "www"
@@ -44,12 +45,13 @@ _sites: bytes = b""
 _dets: bytes = b""
 _meta: dict = {}
 _plant_xy = None            # (ids, states, lon, lat) numpy arrays, for "which state is this view in"
+_by_id: dict = {}
 SCORED = explore.Scored()
 PARCELS = explore.Parcels()
 
 
 def load() -> None:
-    global _payload, _sites, _dets, _meta, _plant_xy
+    global _payload, _sites, _dets, _meta, _plant_xy, _by_id
     d = build_data.build()
     sites = build_data.build_sites()
     dets = build_data.build_detections()
@@ -59,6 +61,7 @@ def load() -> None:
         _dets = json.dumps(dets, separators=(",", ":")).encode("utf-8")
         _meta = {k: d[k] for k in ("source", "cutoff", "counts")}
         import numpy as np
+        _by_id = {p["id"]: p for p in d["plants"]}
         ps = [p for p in d["plants"] if p["lat"] is not None]
         _plant_xy = (np.array([p["state"] or "" for p in ps]),
                      np.array([p["lon"] for p in ps]), np.array([p["lat"] for p in ps]))
@@ -169,6 +172,33 @@ async def objects_in_view(request):
     return JSONResponse(SCORED.objects_in(w, s, e, n))
 
 
+async def verdict_status(request):
+    try:
+        st = await run_in_threadpool(verdicts.status)
+    except Exception as e:
+        return JSONResponse({"error": f"app.db unreadable: {e}"}, status_code=500)
+    return JSONResponse({"round": verdicts.VIEWER_ROUND, "plants": st})
+
+
+async def verdict_save(request):
+    payload = await request.json()
+    pid = str(payload.get("cwns_id") or "")
+    plant = _by_id.get(pid)
+    try:
+        row = await run_in_threadpool(verdicts.save, payload, plant, SCORED.candidates_of(pid))
+    except ValueError as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    except Exception as e:
+        return JSONResponse({"error": f"could not write app.db: {e}"}, status_code=500)
+    return JSONResponse({"saved": row})
+
+
+async def verdict_undo(request):
+    payload = await request.json()
+    ok = await run_in_threadpool(verdicts.undo, str(payload.get("cwns_id") or ""))
+    return JSONResponse({"undone": ok})
+
+
 async def meta(request):
     with _lock:
         return JSONResponse(_meta)
@@ -196,6 +226,9 @@ app = Starlette(
         Route("/api/parcels", parcels_by_id),
         Route("/api/parcels_in_view", parcels_in_view),
         Route("/api/objects", objects_in_view),
+        Route("/api/verdicts", verdict_status),
+        Route("/api/verdict", verdict_save, methods=["POST"]),
+        Route("/api/verdict/undo", verdict_undo, methods=["POST"]),
         Route("/api/reload", reload, methods=["GET", "POST"]),
         Mount("/static", NoCacheStatic(directory=WWW), name="static"),
     ],

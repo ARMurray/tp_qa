@@ -187,3 +187,17 @@ body.panel-open .parcel-card { right: calc(min(400px, 92vw) + 16px); }
 @media (max-width: 900px) {
   .parcel-card, body.panel-open .parcel-card { left: 16px; right: 16px; width: auto; }
 }
+
+/* ---- verify / correct --------------------------------------------- */
+.vrow { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+.vbtn { border: 1px solid #d1d5db; background: white; border-radius: 6px; padding: 5px 9px; font-size: 12px; cursor: pointer; }
+.vbtn:hover { background: #f3f4f6; }
+.vbtn.primary { background: #1d4ed8; color: white; border-color: #1d4ed8; }
+.vbtn.primary:hover { background: #1e40af; }
+.vpending { border: 1px solid #93c5fd; background: #eff6ff; border-radius: 6px; padding: 8px; margin: 6px 0; font-size: 12px; }
+.vpending textarea { width: 100%; box-sizing: border-box; margin-top: 6px; font: inherit; }
+.vsaved { border: 1px solid #86efac; background: #f0fdf4; border-radius: 6px; padding: 8px; margin: 6px 0; font-size: 12px; }
+.vsaved a { color: #2563eb; cursor: pointer; }
+.sub { color: #888; font-size: 11px; }
+.pc-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+body.pick-mode #map { outline: 3px solid #2563eb; outline-offset: -3px; }

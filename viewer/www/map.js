@@ -10,7 +10,7 @@ const SITES_URL = "/data/sites.geojson";
 const DETECTIONS_URL = "/data/detections.json";
 const SITES_MIN_ZOOM = 11;       // parcel outlines of each plant's final site
 const DETECTIONS_MIN_ZOOM = 13;  // detected objects
-const PARCELS_MIN_ZOOM = 15;     // every parcel in view, live from the local Regrid mirror
+const PARCELS_MIN_ZOOM = 14;     // every parcel in view, live from the local Regrid mirror
 const ALLOBJ_MIN_ZOOM = 14;      // every detected object in view (candidates, reported, corrected)
 const RANK_COLORS = { 1: [249, 115, 22], top5: [250, 204, 21], rest: [229, 231, 235] };
 const REPORTED_PARCEL_COLOR = [34, 211, 238];
@@ -99,6 +99,11 @@ let showAllObj = false;
 let viewParcels = { type: "FeatureCollection", features: [] };
 let viewObjects = [];
 let viewSeq = 0;
+// Verify / correct (writes the review app's app.db as round 900; see viewer/verdicts.py)
+let VSTATUS = {};               // cwns_id -> app.db row (viewer verdicts and locked rounds)
+let VIEWER_ROUND = 900;
+let pending = null;             // { verdict, parcel, sites: [], lat, lon }
+let pickMode = false;
 
 const $ = (id) => document.getElementById(id);
 const tooltip = $("tooltip");
@@ -178,7 +183,7 @@ function layers() {
         getFillColor: (f) => (f.properties.cand && f.properties.cand.length ? [...OTHER_CAND_COLOR, 50] : [255, 255, 255, 8]),
         getLineColor: (f) => (f.properties.cand && f.properties.cand.length ? [...OTHER_CAND_COLOR, 230] : [255, 255, 255, 170]),
         lineWidthUnits: "pixels",
-        getLineWidth: (f) => (f.properties.ll_uuid === activeParcel ? 3 : 1),
+        getLineWidth: (f) => (f.properties.ll_uuid === activeParcel ? 4 : 2),
         pickable: true,
         updateTriggers: { getLineWidth: activeParcel },
       })
@@ -204,7 +209,7 @@ function layers() {
         getFillColor: (f) => [...colorFor(f), f.properties.ll_uuid === activeParcel ? 90 : 35],
         getLineColor: (f) => [...colorFor(f), 240],
         lineWidthUnits: "pixels",
-        getLineWidth: (f) => (f.properties.ll_uuid === activeParcel ? 4 : 2),
+        getLineWidth: (f) => (f.properties.ll_uuid === activeParcel ? 5 : 3),
         pickable: true,
         updateTriggers: { getFillColor: [activeParcel, selected.id], getLineWidth: activeParcel },
       })
@@ -338,6 +343,24 @@ function layers() {
       })
     );
   }
+  if (selected && pending && pending.verdict === "truth_outside_candidates") {
+    out.push(
+      new ScatterplotLayer({
+        id: "pending-point",
+        data: [pending],
+        getPosition: (d) => [d.lon, d.lat],
+        radiusUnits: "pixels",
+        getRadius: 9,
+        filled: true,
+        getFillColor: [37, 99, 235, 200],
+        stroked: true,
+        getLineColor: [255, 255, 255, 255],
+        lineWidthUnits: "pixels",
+        getLineWidth: 3,
+        pickable: false,
+      })
+    );
+  }
   return out;
 }
 
@@ -407,6 +430,7 @@ function onHover({ object, x, y, layer }) {
 }
 
 function onClick({ object, layer }) {
+  if (pickMode) return;          // handled by the DOM listener in setupPick()
   if (!object) return;
   if (layer && (layer.id === "view-parcels" || layer.id === "cand-parcels")) {
     showParcelCard(object.properties);
@@ -430,6 +454,8 @@ function select(p, fly) {
     candParcels = { type: "FeatureCollection", features: [] };
     activeParcel = null;
     $("parcel-card").classList.remove("open");   // it described the parcel relative to the old plant
+    pending = null;
+    setPickMode(false);
   }
   showPanel(p);
   if (changed) loadCandidates(p);
@@ -489,7 +515,7 @@ function showPanel(p) {
   const reviews = (p.reviews || [])
     .map(
       (r) =>
-        `<div class="review-item">Round ${r.round}: <b>${esc(r.verdict)}</b> <span style="color:#888">(${esc(r.task)})</span>` +
+        `<div class="review-item">${r.round === VIEWER_ROUND ? "Viewer" : "Round " + r.round}: <b>${esc(r.verdict)}</b> <span style="color:#888">(${esc(r.task)})</span>` +
         (r.notes ? `<div class="notes">${esc(r.notes)}</div>` : "") +
         `</div>`
     )
@@ -505,6 +531,7 @@ function showPanel(p) {
     <div class="detail-section-title">Location</div>
     <dl class="detail-facts">
       ${fact("CWNS ID", esc(p.id))}
+      ${fact("Population served", p.pop !== null && p.pop !== undefined ? Math.round(p.pop).toLocaleString() : '<span style="color:#888;font-weight:400">unknown</span>')}
       ${fact("Shown at", `${fmt(p.lat, 6)}, ${fmt(p.lon, 6)}`)}
       ${moved ? fact("Reported at", `${fmt(p.rlat, 6)}, ${fmt(p.rlon, 6)}`) : ""}
       ${moved ? fact("Moved by", fmtDist(p.moved_m)) : ""}
@@ -513,7 +540,6 @@ function showPanel(p) {
       ${p.nsite ? fact("Site parcels", p.nsite) : ""}
       ${p.parcel ? fact("Moved to parcel", `<span style="font-weight:500;font-size:12px">${esc(p.parcel)}</span>`) : ""}
       ${fact("Owner type", esc(p.owner || "—"))}
-      ${p.pop !== null && p.pop !== undefined ? fact("Population served", Math.round(p.pop).toLocaleString()) : ""}
       ${p.tier && p.tier !== "none" ? fact("Confidence tier", esc(TIER_LABELS[p.tier] || p.tier)) : ""}
       ${fact("OSM wastewater tag", p.osm === null ? "—" : p.osm ? "yes" : "no")}
     </dl>
@@ -530,6 +556,9 @@ function showPanel(p) {
       ${fact("Nothing fired (Stage 2a order)", p.fb === null ? "—" : p.fb ? "yes" : "no")}
     </dl>
 
+    <div class="detail-section-title">Verify / correct</div>
+    <div id="verify-box"></div>
+
     <div class="detail-section-title">Candidates</div>
     <div id="cand-box"><div class="cand-note">loading…</div></div>
 
@@ -537,6 +566,7 @@ function showPanel(p) {
     ${reviews || '<div class="detail-note">Not reviewed in any round.</div>'}
   `;
   $("detail-close").addEventListener("click", closePanel);
+  renderVerify();
   panel.classList.add("open");
   document.body.classList.add("panel-open");
 }
@@ -695,8 +725,25 @@ function showParcelCard(pr) {
     `<button class="pc-close" id="pc-close">×</button>` +
     `<div class="pc-title">${esc(pr.owner || "(no owner)")}</div>` +
     `<div class="pc-sub">parcel ${esc(pr.ll_uuid)} · ${esc(pr.state || "")}</div>` +
-    `<dl>${attrs}</dl>${role}${otherHtml}`;
+    `<dl>${attrs}</dl>${role}${otherHtml}` +
+    (selected && canVerify(selected)
+      ? `<div class="pc-actions"><button id="pc-is-plant" class="vbtn primary">This parcel is the plant</button>` +
+        (pending && (pending.verdict === "candidate_correct" || pending.verdict === "reported_correct") &&
+         pending.parcel !== pr.ll_uuid && !(pending.sites || []).includes(pr.ll_uuid)
+          ? `<button id="pc-also" class="vbtn">Also part of this plant</button>` : "") +
+        `</div>`
+      : "");
   card.classList.add("open");
+  const isBtn = $("pc-is-plant");
+  if (isBtn) isBtn.onclick = () => {
+    pending = { verdict: "candidate_correct", parcel: pr.ll_uuid, sites: [], owner: pr.owner };
+    renderVerify(); showParcelCard(pr);
+  };
+  const alsoBtn = $("pc-also");
+  if (alsoBtn) alsoBtn.onclick = () => {
+    pending.sites = [...(pending.sites || []), pr.ll_uuid];
+    renderVerify(); showParcelCard(pr);
+  };
   $("pc-close").onclick = () => { card.classList.remove("open"); activeParcel = null; render(); };
   card.querySelectorAll("a[data-id]").forEach((a) =>
     a.addEventListener("click", () => { const p = BY_ID.get(a.dataset.id); if (p) select(p, true); })
@@ -738,6 +785,141 @@ async function fetchViewData() {
   }
   await Promise.all(jobs);
   if (seq === viewSeq) render();
+}
+
+// ---- verify / correct --------------------------------------------------------
+const VERDICT_LABELS = {
+  reported_correct: "reported location is correct",
+  candidate_correct: "this parcel is the plant",
+  truth_outside_candidates: "the plant is at a clicked point",
+  needs_info: "needs more information",
+};
+
+function canVerify(p) {
+  const v = VSTATUS[p.id];
+  return !(v && v.locked);
+}
+
+// Point picking listens on the map container directly rather than through
+// deck's onClick: it needs a coordinate for a click on empty map, and a plain
+// DOM click is the most dependable way to get one. A drag (pan) is ignored.
+function setupPick() {
+  const el = $("map");
+  let down = null;
+  el.addEventListener("pointerdown", (e) => { down = [e.clientX, e.clientY]; }, true);
+  el.addEventListener("click", (e) => {
+    if (!pickMode || !selected) return;
+    if (down && Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+    const r = el.getBoundingClientRect();
+    const vp = new deck.WebMercatorViewport({ ...viewState, width: r.width, height: r.height });
+    const [lon, lat] = vp.unproject([e.clientX - r.left, e.clientY - r.top]);
+    pending = { verdict: "truth_outside_candidates", lat, lon, sites: [] };
+    setPickMode(false);
+    renderVerify();
+    render();
+    e.stopPropagation();
+  }, true);
+}
+
+function setPickMode(on) {
+  pickMode = on;
+  document.body.classList.toggle("pick-mode", on);
+  if (on) statusEl.textContent = "click the plant's location on the map (Esc to cancel)";
+}
+
+function confirmShown(p) {
+  // "Shown location is correct": a model move confirms its parcel; anything
+  // else shown at the reported point confirms the reported location.
+  if (p.status === "moved" && p.parcel) return { verdict: "candidate_correct", parcel: p.parcel, sites: [] };
+  return { verdict: "reported_correct", sites: [] };
+}
+
+function renderVerify() {
+  const box = $("verify-box");
+  if (!box || !selected) return;
+  const p = selected;
+  const v = VSTATUS[p.id];
+  if (v && v.locked) {
+    box.innerHTML = `<div class="cand-note">In review round ${v.review_round}` +
+      (v.reviewed ? ` (verdict: <b>${esc(v.plant_verdict)}</b>)` : ", queued and not yet reviewed") +
+      ". Change it in the review app, so that round's record stays intact.</div>";
+    return;
+  }
+  let saved = "";
+  if (v && v.viewer && v.reviewed) {
+    saved = `<div class="vsaved">Saved: <b>${esc(VERDICT_LABELS[v.plant_verdict] || v.plant_verdict)}</b>` +
+      (v.selected_ll_uuid ? `<div class="sub">parcel ${esc(v.selected_ll_uuid)}</div>` : "") +
+      (v.site_ll_uuids ? `<div class="sub">also: ${esc(v.site_ll_uuids)}</div>` : "") +
+      (v.truth_latitude !== null && v.truth_latitude !== undefined ? `<div class="sub">${fmt(v.truth_latitude, 6)}, ${fmt(v.truth_longitude, 6)}</div>` : "") +
+      (v.reviewer_notes ? `<div class="sub">${esc(v.reviewer_notes)}</div>` : "") +
+      `<div class="sub">${esc(v.reviewer || "")} · ${esc(v.reviewed_at || "")} · reaches the master at the next <code>close_round --round ${VIEWER_ROUND}</code></div>` +
+      ` <a id="v-undo">undo</a></div>`;
+  }
+  let pend = "";
+  if (pending) {
+    const what = pending.verdict === "candidate_correct"
+      ? `parcel ${esc(pending.owner || "")} <span class="sub">${esc(pending.parcel)}</span>` +
+        ((cands.find((c) => c.parcel === pending.parcel) || {}).rank ? ` (candidate #${cands.find((c) => c.parcel === pending.parcel).rank})` : " (not a scored candidate)")
+      : pending.verdict === "truth_outside_candidates" ? `point ${fmt(pending.lat, 6)}, ${fmt(pending.lon, 6)}` : "";
+    pend = `<div class="vpending"><b>${esc(VERDICT_LABELS[pending.verdict])}</b> ${what}` +
+      ((pending.sites || []).length ? `<div class="sub">also part of the plant: ${pending.sites.length} parcel(s)</div>` : "") +
+      `<textarea id="v-notes" rows="2" placeholder="notes (optional)">${esc(pending.notes || "")}</textarea>` +
+      `<div class="vrow"><button id="v-save" class="vbtn primary">Save verdict</button><button id="v-cancel" class="vbtn">Cancel</button></div></div>`;
+  }
+  box.innerHTML = saved + pend +
+    `<div class="vrow">` +
+    `<button id="v-confirm" class="vbtn">Shown location is correct</button>` +
+    `<button id="v-pick" class="vbtn">${pickMode ? "Click the map…" : "Pick a point"}</button>` +
+    `<button id="v-ni" class="vbtn">Needs more info</button></div>` +
+    `<div class="cand-note">To pick a parcel, click it (or a candidate row) and use <b>This parcel is the plant</b> on its card. ` +
+    `Saved to the review app's app.db as round ${VIEWER_ROUND}; feeds the master and training, not calibration.</div>`;
+  $("v-confirm").onclick = () => { pending = confirmShown(p); renderVerify(); };
+  $("v-pick").onclick = () => { setPickMode(!pickMode); renderVerify(); };
+  $("v-ni").onclick = () => { pending = { verdict: "needs_info", sites: [] }; renderVerify(); };
+  if ($("v-cancel")) $("v-cancel").onclick = () => { pending = null; renderVerify(); render(); };
+  if ($("v-notes")) $("v-notes").oninput = (e) => { pending.notes = e.target.value; };
+  if ($("v-save")) $("v-save").onclick = saveVerdict;
+  if ($("v-undo")) $("v-undo").onclick = undoVerdict;
+}
+
+async function saveVerdict() {
+  const p = selected;
+  const body = { cwns_id: p.id, verdict: pending.verdict, parcel: pending.parcel || null,
+    site_parcels: pending.sites || [], lat: pending.lat ?? null, lon: pending.lon ?? null, notes: pending.notes || "" };
+  const r = await fetch("/api/verdict", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const d = await r.json();
+  if (!r.ok) {
+    statusEl.textContent = `not saved: ${d.error || r.status}`;
+    alert(`Not saved: ${d.error || r.status}`);
+    return;
+  }
+  const s = d.saved;
+  VSTATUS[p.id] = { ...s, viewer: true, locked: false };
+  pending = null;
+  statusEl.textContent = `saved: ${p.id} ${s.plant_verdict}`;
+  renderVerify();
+  render();
+}
+
+async function undoVerdict() {
+  const p = selected;
+  if (!confirm("Remove this viewer verdict? (Only undoes it in app.db; if close_round already ran, the master keeps it.)")) return;
+  await fetch("/api/verdict/undo", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cwns_id: p.id }) });
+  delete VSTATUS[p.id];
+  renderVerify();
+}
+
+async function loadVerdictStatus() {
+  try {
+    const r = await fetch("/api/verdicts");
+    const d = await r.json();
+    if (d.error) { console.warn(d.error); return; }
+    VSTATUS = d.plants || {};
+    VIEWER_ROUND = d.round || VIEWER_ROUND;
+    if (selected) renderVerify();
+  } catch (err) {
+    console.warn("verdict status not loaded", err);
+  }
 }
 
 // ---- legend / filters -----------------------------------------------------
@@ -889,7 +1071,7 @@ async function main() {
     viewState,
     controller: true,
     layers: [basemapLayer(basemap)],
-    getCursor: ({ isHovering, isDragging }) => (isDragging ? "grabbing" : isHovering ? "pointer" : "grab"),
+    getCursor: ({ isHovering, isDragging }) => (pickMode ? "crosshair" : isDragging ? "grabbing" : isHovering ? "pointer" : "grab"),
     onViewStateChange: ({ viewState: vs, interactionState }) => {
       // Once a fly-to has finished, drop its transition props: otherwise every
       // later render() re-sends them, deck starts the transition again, and
@@ -918,6 +1100,7 @@ async function main() {
   $("show-allobj").onchange = (e) => { showAllObj = e.target.checked; if (showAllObj) fetchViewData(); else render(); };
   $("size-slider").oninput = (e) => { sizeBase = Number(e.target.value); render(); };
   document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && pickMode) { setPickMode(false); renderVerify(); return; }
     if (e.key === "Escape" && panel.classList.contains("open")) closePanel();
   });
   setBasemap("street");
@@ -938,6 +1121,9 @@ async function main() {
   statusEl.textContent =
     `${data.source}` + (data.cutoff !== null && data.cutoff !== undefined ? ` · move cutoff ${data.cutoff}` : "");
   applyFilters();
+
+  loadVerdictStatus();
+  setupPick();
 
   // Sites and detections are secondary: load them after the plants are up.
   Promise.all([

@@ -130,6 +130,7 @@ REPORTED_CRS = "EPSG:4269"  # matches build_training_bins.py exactly
 # existing file uses different strings, change them here, in one place.
 HOW_CORRECTED_MODEL = "Model"
 HOW_CORRECTED_MANUAL = "Manual_Review"
+HOW_CORRECTED_VIEWER = "Viewer"   # viewer/ verdicts (review round 900), any parcel or a clicked point
 
 # Columns this script is allowed to write on a master row. Everything else
 # on the row (the CWNS attribute columns) is left untouched.
@@ -392,8 +393,8 @@ def build_updates(df: pd.DataFrame, points: dict) -> pd.DataFrame:
             "CWNS_ID": cwns_id, "Verified": "Yes",
             "Original_Correct": "No", "Corrected": "Yes",
             "Corrected_X": pt[0], "Corrected_Y": pt[1],
-            "How_Corrected": (HOW_CORRECTED_MODEL
-                              if verdict == "candidate_correct"
+            "How_Corrected": (HOW_CORRECTED_VIEWER if r.get("review_task") == "viewer"
+                              else HOW_CORRECTED_MODEL if verdict == "candidate_correct"
                               else HOW_CORRECTED_MANUAL),
             "Site_UUIDs": (site_uuids(r.get("selected_ll_uuid"), extras)
                            if verdict == "candidate_correct" else None),

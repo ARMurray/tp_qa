@@ -94,6 +94,20 @@ def haversine_m(lat1, lon1, lat2, lon2):
     return 2 * 6_371_008.8 * np.arcsin(np.sqrt(a))
 
 
+def app_db_population() -> dict:
+    import sqlite3
+    db = REPO / "review_app" / "data" / "app.db"
+    if not db.exists():
+        return {}
+    try:
+        con = sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
+        rows = con.execute("SELECT cwns_id, pop_served FROM plants WHERE pop_served IS NOT NULL").fetchall()
+        con.close()
+    except Exception:
+        return {}
+    return {str(a): float(b) for a, b in rows}
+
+
 def review_history() -> dict[str, list[dict]]:
     out: dict[str, list[dict]] = {}
     for f in sorted(REVIEW_DIR.glob("review_log_round*.parquet")):
@@ -124,6 +138,15 @@ def build() -> dict:
         df = preview_from_master(master)
         source = f"PREVIEW: master layer {layer} only (no 13 output yet)"
         cutoff = None
+
+    # Population served: 13 writes pop_served (since 2026-10-05). For an older
+    # 13 output, or the preview, fall back to the review app's app.db, which
+    # carries it for every plant ever queued.
+    if "pop_served" not in df.columns:
+        df["pop_served"] = np.nan
+    if df["pop_served"].isna().any():
+        pop = app_db_population()
+        df["pop_served"] = df["pop_served"].fillna(df["CWNS_ID"].map(pop))
 
     info = master[["CWNS_ID", "CITY", "COUNTY_NAME", "OWNER_TYPE", "Has_OSM"]]
     df = df.merge(info, on="CWNS_ID", how="left")

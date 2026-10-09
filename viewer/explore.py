@@ -42,8 +42,8 @@ ATTR_COLS = ["owner", "ll_gisacre", "ll_bldg_count", "lbcs_activity_desc",
              "lbcs_ownership_desc", "zoning_type", "zoning_subtype"]
 OPTIONAL_COLS = ["address", "usedesc", "scity"]   # used when the mirror has them
 
-MAX_VIEW_KM = 4.0          # widest window parcels are fetched for
-MAX_VIEW_PARCELS = 6000    # cap per response
+MAX_VIEW_KM = 14.0         # widest window parcels are fetched for (zoom 14 on a wide screen)
+MAX_VIEW_PARCELS = 15000   # cap per response
 H3_RES = 9
 
 
@@ -213,7 +213,7 @@ class Parcels:
                 geom = json.loads(g)
             props = {k: _clean(v) for k, v in r.items()}
             props["state"] = state
-            feats.append({"type": "Feature", "geometry": geom, "properties": props})
+            feats.append({"type": "Feature", "geometry": _round_coords(geom), "properties": props})
         return feats
 
     def by_uuids(self, state: str, uuids: list[str]) -> list[dict]:
@@ -289,6 +289,20 @@ class Parcels:
         self._by_uuid[f["properties"]["ll_uuid"]] = f
         while len(self._by_uuid) > 200000:
             self._by_uuid.popitem(last=False)
+
+
+def _round_coords(geom: dict, nd: int = 6) -> dict:
+    """~0.1 m precision is plenty for drawing; halves the JSON for a zoom-14
+    window of thousands of parcels."""
+    def rnd(c):
+        if isinstance(c, (list, tuple)) and c and isinstance(c[0], (int, float)):
+            return [round(float(x), nd) for x in c]
+        return [rnd(x) for x in c]
+    if "coordinates" in geom:
+        geom = {**geom, "coordinates": rnd(geom["coordinates"])}
+    elif geom.get("type") == "GeometryCollection":
+        geom = {**geom, "geometries": [_round_coords(g, nd) for g in geom.get("geometries", [])]}
+    return geom
 
 
 def _cells_for_bbox(w, s, e, n) -> list[str]:

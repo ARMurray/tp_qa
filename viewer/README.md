@@ -51,7 +51,7 @@ Why a plant was or was not moved, and what else is nearby.
   acreage, OSM / keyword / utility-owner flags. Their outlines are drawn on
   the map with rank labels (#1 orange, #2-5 yellow, the rest grey; the
   reported parcel cyan). Click a row to fly to that parcel.
-- **All parcels (zoom 15+).** Every parcel in the window, live from the local
+- **All parcels (zoom 14+).** Every parcel in the window, live from the local
   Regrid mirror. Parcels that are a scored candidate of any plant are purple.
 - **Parcel card.** Click any parcel: its Regrid attributes, its scores if it
   is a candidate of the selected plant, and every other plant it is a
@@ -78,7 +78,41 @@ Parcels are read with DuckDB from `review_app/config.py`'s `REGRID_ROOT`
 (override with `VIEWER_REGRID_ROOT`): by `ll_uuid` for a plant's candidates,
 and by H3 cell (`h3_index_9`) for the window, cached in memory. The first
 window in a state scans that state's files and can take a few seconds;
-panning back is instant. Windows wider than 4 km are not fetched.
+panning back is instant. Windows wider than 14 km are not fetched, and a
+window is capped at 15,000 parcels (zoom in if the status line says truncated).
 
 If DuckDB's spatial extension cannot be installed (offline), geometry is
 decoded with shapely instead -- slower, same result.
+
+## Verify / correct (2026-10-09)
+
+The plant panel's **Verify / correct** section records a verdict:
+
+- **Shown location is correct** -- a model move confirms its parcel; any other
+  plant confirms its reported location.
+- **This parcel is the plant** (on any parcel's card -- candidate or not), then
+  **Also part of this plant** on other parcels' cards for split sites.
+- **Pick a point** -- click the plant's location on the map (Esc cancels).
+- **Needs more info** -- notes only.
+
+Verdicts go into the review app's database (`review_app/data/app.db`) as
+review round **900**, so they reach the master and training like any review
+round. From `review_app/`:
+
+```bash
+python -m sync.close_round --round 900
+```
+
+then commit `Updates.gpkg`, `app.db` and `data/outgoing/` as usual. In the
+master they are `Verified = Yes` with `How_Corrected = "Viewer"`. They do
+**not** enter the move-rule calibration or the audit (those need randomly
+chosen plants; `calibrate_move_rule.py` only reads the rounds it is given).
+
+A plant already in app.db under another round -- reviewed there, or queued
+and unreviewed (round 6) -- cannot be changed from the viewer; use the review
+app. **Undo** removes a viewer verdict from app.db; after `close_round` the
+master keeps it (re-verdict instead). `VIEWER_APP_DB=<copy>` points the
+viewer at another app.db for testing.
+
+Population served is shown for every plant: from 13's output (written since
+2026-10-05), else from app.db for plants that were ever queued.
