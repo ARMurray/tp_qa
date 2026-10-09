@@ -12,7 +12,7 @@
 # Per-state candidate object detection, one array task per state. This is the
 # national SCOPE=all run, split so it can actually finish.
 #
-#   sbatch --array=0-47%6 01e_run_od_candidates_array.slurm "AL AR AZ ... WY"
+#   sbatch --array=0-47%6 01e_run_od_candidates_array.slurm      # all 48 inference states
 #   sbatch --array=0-2%3 --export=WORKERS="16" 01e_run_od_candidates_array.slurm "OH WI KS"
 #
 # WHY AN ARRAY RATHER THAN ONE JOB
@@ -64,7 +64,7 @@
 # RESTARTING FAILED TASKS
 #   sacct -j <arrayjobid> --format=JobID,State,Elapsed -X | grep -v COMPLETED
 #   then resubmit just those indices, WITHOUT NORESUME, e.g.
-#   sbatch --array=12,31,40 01e_run_od_candidates_array.slurm "AL AR ... WY"
+#   sbatch --array=12,31,40 01e_run_od_candidates_array.slurm
 #
 # WALLTIME: 12h per task. TX and CA are the risk -- at 39/min a state with
 # 20,000 candidates needs ~8.5 hours. If one times out, resubmit that index
@@ -72,9 +72,12 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
-# Defaults to _common.sh's DEFAULT_STATES (the full training universe) so no
-# --export or positional arg is needed. Override for a subset as shown above.
-STATES_ARG="${1:-$DEFAULT_STATES}"
+# Defaults to _common.sh's INFERENCE_STATES (the 48 states 05 scores -- no
+# AK/HI/PR, no NAIP), so the national run is just
+#     sbatch --array=0-47%6 01e_run_od_candidates_array.slurm
+# (2026-10-09; was DEFAULT_STATES, whose 51-entry order did not match 05's).
+# A positional list still overrides it for a subset.
+STATES_ARG="${1:-$INFERENCE_STATES}"
 read -ra STATE_LIST <<< "$STATES_ARG"
 STATE="${STATE_LIST[$SLURM_ARRAY_TASK_ID]}"
 
