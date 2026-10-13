@@ -105,18 +105,23 @@ const ReviewMap = (() => {
         return group;
     }
 
+    // Fits polygons AND point markers. It used to fit polygons only, so a plant
+    // whose parcel geometry did not come back from the local Regrid lookup had
+    // nothing to fit and the map silently stayed on the previous plant
+    // (2026-10-13). Markers have getLatLng, not getBounds.
     function fitToAllLayers() {
         const allBounds = [];
-        if (reportedLayer) {
-            reportedLayer.eachLayer(l => { if (l.getBounds) allBounds.push(l.getBounds()); });
-        }
-        candidateLayers.forEach(c => {
-            c.layerGroup.eachLayer(l => { if (l.getBounds) allBounds.push(l.getBounds()); });
-        });
+        const add = (l) => {
+            if (l.getBounds) allBounds.push(l.getBounds());
+            else if (l.getLatLng) allBounds.push(L.latLngBounds([l.getLatLng(), l.getLatLng()]));
+            else if (l.eachLayer) l.eachLayer(add);
+        };
+        if (reportedLayer) reportedLayer.eachLayer(add);
+        candidateLayers.forEach(c => c.layerGroup.eachLayer(add));
         if (allBounds.length === 0) return;
         let combined = allBounds[0];
         allBounds.slice(1).forEach(b => { combined = combined.extend(b); });
-        map.fitBounds(combined, { padding: [40, 40], maxZoom: 18 });
+        map.fitBounds(combined, { padding: [40, 40], maxZoom: 17 });
     }
 
     function setCaptureMode(enabled, callback) {
