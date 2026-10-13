@@ -1,0 +1,48 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/10_review_queue_7572713.log
+# job 7572713 on r7n19, exit status 0, copied 2026-10-13 10:15:04
+#
+==========================================
+Node:    r7n19
+Job ID:  7572713
+CPUs:    4
+Started: Tue Oct 13 10:14:41 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Prior-round review files copied into /work/GRDVULN/tp_qa/correction/data/review_log_incoming: 6
+Running: python /work/GRDVULN/tp_qa/correction/scripts/10_build_review_queue.py --states AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY --round 6 --audit-size 80
+=== 10_build_review_queue.py ===
+States: AL,AR,AZ,CA,CO,CT,DE,FL,GA,IA,ID,IL,IN,KS,KY,LA,MA,MD,ME,MI,MN,MO,MS,MT,NC,ND,NE,NH,NJ,NM,NV,NY,OH,OK,OR,PA,RI,SC,SD,TN,TX,UT,VA,VT,WA,WI,WV,WY  |  Round: 6  |  Model version tag: unversioned-2026-10-13
+Using re-ranked (OD-aware) inference output
+
+Loaded 15337 scored plants, 189045 candidate rows
+  Excluding 712 plant(s) already reviewed in a prior round (750 total prior reviews found across all uploaded review_log/holdout_truth files)
+
+Loading plant display info (address/city/county, pop_served, discharge facts)...
+  Detection stats attached: 44426/44426 candidate(s) have an 01e result, 10315 fired
+
+Review tasks: 14625 plants -- 8887 candidate_pick, 5738 confirm_reported
+
+Holdout slice: 0 unreviewed unlabeled-bin plant(s) in this pilot's scope (skipped -- round > 1)
+
+Audit slice: 2,153 plant(s) moved in cwns_corrected_locations.parquet (cutoff 0.95); 2,149 eligible (not reviewed before, not holdout, with candidates)
+  by population band (audit / eligible): >1k 51/1387, 100-1k 29/762
+
+Batch composition (target size 150):
+  holdout   : 0
+  audit     : 80
+  uncertain : 49 (of 3581 eligible, target 49)
+  random    : 21 (target 21)
+
+  Queued candidates with detection stats: 700/700
+    from od_features_candidates           700
+    written BEFORE the deployed best.pt: 0
+    marked 'nothing fired' by 05b but a detection is attached: 0
+
+=== Summary ===
+  Plants queued : 150
+  Queue rows    : 710 (700 candidate_pick, 10 confirm_reported)
+
+Written: /work/GRDVULN/tp_qa/correction/data/review_queue/review_queue_round6.parquet
+Finished: Tue Oct 13 10:15:03 EDT 2026
