@@ -1,0 +1,75 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/13_output_7571862.log
+# job 7571862 on r5n25, exit status 0, copied 2026-10-13 09:53:45
+#
+==========================================
+Node:    r5n25
+Job ID:  7571862
+CPUs:    4
+Started: Tue Oct 13 09:42:10 EDT 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Running: python /work/GRDVULN/tp_qa/correction/scripts/13_build_corrected_output.py --cutoff 0.95
+=== 13_build_corrected_output.py ===
+move rule: Stage 1 flagged AND re-rank #1 >= 0.95
+site rule: neighbours within 50 m with a detection (conf >= 0.4) or #1's owner (re-rank >= 0.5); max 4 parcels
+  master: Updates.gpkg layer CWNS_Locations_20261005: 32,296 facilities
+  treatment plants: 17,874
+  re-ranked #1 candidates with a current-detector result: 93.0%
+
+  flagged plants: 8,674  |  clearing the move rule: 2,275
+
+  loading 56,881 parcel geometries...
+  found 56,881
+
+  loading detected objects...
+  objects from reported            23,081  (91 current file(s))
+  objects from corrected                0  (0 current file(s))
+  objects from candidate           74,928  (142 current file(s))
+  objects from candidate_queue      1,688  (70 current file(s))
+
+  moves: 2,153 moved, 122 kept_site (reported parcel in the site), 596 multi-parcel site(s), 0 parcel(s) not found
+
+  sites layer: 13,058 plant site(s)  |  detections layer: 32,740 object(s)
+
+=== status ===
+  flagged_not_moved        6,399  (35.8%)
+  kept_model               3,771  (21.1%)
+  not_assessed             2,318  (13.0%)
+  verified_correct         2,218  (12.4%)
+  moved                    2,153  (12.0%)
+  verified_corrected         723  (4.0%)
+  kept_site                  122  (0.7%)
+  kept_osm                   121  (0.7%)
+  reviewed_unresolved         49  (0.3%)
+  TOTAL                   17,874
+
+  by population band:
+pop_band             100-1k   >1k  below_floor  unknown
+status                                                 
+flagged_not_moved      2708  3691            0        0
+kept_model             1710  2061            0        0
+kept_osm                 13   108            0        0
+kept_site                42    80            0        0
+moved                   764  1389            0        0
+not_assessed             90    75          844     1309
+reviewed_unresolved      16    26            7        0
+verified_correct        390  1687           29      112
+verified_corrected      141   571           11        0
+  not_assessed by reason: population_le_100_or_unknown 2,124, no_imagery_state 194
+  moved distance: median 292 m, 90th pct 1,044 m, max 4,281 m
+  moved point from: detections 2,081, centroid 72
+  moved points outside their site (mean centre fell between parcels): 29
+
+Written: /work/GRDVULN/tp_qa/correction/data/output/cwns_corrected_locations.parquet / .csv / .gpkg (layers plants, sites, detections)
+Copied for the viewer: /work/GRDVULN/tp_qa/correction/diagnostics/output/  (git add correction/diagnostics/output/)
+=== export_viewer_data.py ===
+  viewer_candidates.parquet: 189,045 rows, 9,459 plants, 10.1 MB  (from stage2_candidates_reranked.parquet)
+  objects from reported            23,585  (91 current file(s))
+  objects from corrected                0  (0 current file(s))
+  objects from candidate           98,173  (142 current file(s))
+  objects from candidate_queue      3,290  (70 current file(s))
+  viewer_objects.parquet: 121,458 objects, 2.7 MB
+Written to /work/GRDVULN/tp_qa/correction/diagnostics/output -- commit correction/diagnostics/output/ and git pull on the work computer; the viewer picks them up on restart.
+Finished: Tue Oct 13 09:53:45 EDT 2026  (exit 0)
