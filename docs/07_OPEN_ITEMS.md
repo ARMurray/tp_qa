@@ -214,6 +214,20 @@ short of 90%. No false move (a correct record overwritten) at ≥ 0.70 in
 round 5. No-detection pools at ≥ 0.95: 2/2 right. Round 5 alone also reached
 96.7% at ≥ 0.85 (n=60). `truth_outside` is counted wrong (conservative).
 
+**2026-10-13, round 6 AUDIT -- the target is met.** 80 plants drawn uniformly
+at random from the 2,153 plants 13 moved (models of 2026-10-09, floor 100,
+cutoff 0.95), reviewed blind (shuffled candidates, no scores). 2 needs_info;
+of 78 decided: **76 right = 97.4%, Wilson 95% CI 91-99%** -- the lower bound
+clears 90%. Wrong: 1 wrong candidate (OR, 41000308001, #2 was the plant),
+1 truth outside the candidates (IN, 18120000025). **No false moves** (no
+correct record overwritten). By band: >1,000 50/51 = 98.0% (CI 90-100%);
+100-1,000 26/27 = 96.3% (CI 82-99% -- not yet shown > 90% on its own). This
+is the first precision estimate on a random sample of actual moves; rounds
+4-5 measured the previous re-ranker. Report:
+`correction/diagnostics/move_rule_calibration_r6.txt`. Cutoff 0.95 stands.
+Round 6 plants now go into training, so the next audit must be a fresh draw
+from the next cycle's moves.
+
 ### A Stage 1 guardrail for utility-owned reported parcels
 
 Held, deliberately (2026-10-02). Utility-owned reported parcels are 99% Correct
