@@ -128,8 +128,12 @@ async function refreshNavList() {
     document.getElementById("nav-count").textContent =
         `(${plants.filter(p => p.reviewed).length} / ${plants.length})`;
 
-    const groups = { holdout: [], uncertain: [], random: [] };
-    plants.forEach(p => { if (groups[p.queue_slice]) groups[p.queue_slice].push(p); });
+    // Holdout apart; every other slice in ONE list ordered by id, so the list
+    // does not reveal which plants are audit moves (see isBlind). Unknown
+    // slices are no longer dropped (the audit slice was invisible here).
+    const groups = { holdout: [], queue: [] };
+    plants.forEach(p => (p.queue_slice === "holdout" ? groups.holdout : groups.queue).push(p));
+    groups.queue.sort((a, b) => String(a.cwns_id).localeCompare(String(b.cwns_id)));
 
     const container = document.getElementById("plant-nav-list");
     container.innerHTML = "";
@@ -147,7 +151,7 @@ async function refreshNavList() {
             const label = p.facility_name ? `${p.facility_name}` : p.cwns_id;
             row.title = p.facility_name ? `${p.facility_name} (${p.cwns_id})` : p.cwns_id;
             row.innerHTML = `
-                <span class="nav-slice-dot ${p.queue_slice}"></span>
+                <span class="nav-slice-dot ${p.queue_slice === "holdout" ? "holdout" : "queue"}"></span>
                 <span class="nav-item-label">${label}</span>
                 ${p.reviewed ? '<span class="nav-reviewed-badge">&#10003;</span>' : ''}
             `;
@@ -172,7 +176,7 @@ function renderPlant(plant, candidates, reportedGeometry, reportedContext) {
         <div>Stage 1 confidence (reported correct): ${
             plant.stage1_prob_correct !== null ? plant.stage1_prob_correct.toFixed(3) : "n/a (no parcel)"}</div>
         <div>Trigger: ${plant.trigger_reason}</div>
-        <div>Queue slice: ${plant.queue_slice}</div>
+        ${isBlind(plant) ? "" : `<div>Queue slice: ${plant.queue_slice}</div>`}
         ${plant.owner_type ? `<div>Owner type: ${plant.owner_type}</div>` : ""}
     `;
     if (plant.reviewed) {
@@ -191,7 +195,7 @@ function renderPlant(plant, candidates, reportedGeometry, reportedContext) {
 
     const taskPanel = document.getElementById("task-panel");
     if (plant.review_task === "candidate_pick") {
-        renderCandidatePickTask(candidates, taskPanel);
+        renderCandidatePickTask(candidates, taskPanel, isBlind(plant));
     } else {
         renderConfirmReportedTask(taskPanel);
     }
@@ -225,22 +229,45 @@ function resetDock() {
     });
 }
 
-function renderCandidatePickTask(candidates, panel) {
+// AUDIT BLINDING (2026-10-13). The audit slice measures how often the model's
+// moves are right. Showing its pick on top with a 0.95+ score anchors the
+// verdict and inflates exactly that number, so for audit plants the
+// candidates are shown in a fixed shuffled order, lettered A-E, with no
+// scores, no ranks and no slice label. The real candidate_rank is still what
+// is submitted. Detection results and parcel facts stay visible -- they are
+// evidence, not the model's opinion.
+function isBlind(plant) {
+    return plant && plant.queue_slice === "audit";
+}
+
+function blindOrder(candidates) {
+    const h = (s) => { let x = 2166136261; for (const ch of s) { x ^= ch.charCodeAt(0); x = Math.imul(x, 16777619); } return x >>> 0; };
+    return [...candidates].sort((a, b) => h(a.ll_uuid) - h(b.ll_uuid));
+}
+
+function renderCandidatePickTask(candidates, panel, blind = false) {
     panel.innerHTML = "<h3>Candidates</h3><div id='candidate-list'></div>";
     const list = document.getElementById("candidate-list");
+    if (blind) {
+        candidates = blindOrder(candidates);
+        list.insertAdjacentHTML("beforebegin",
+            "<div class='blind-note'>Candidates are in random order, without scores.</div>");
+    }
 
-    candidates.forEach(c => {
-        const popup = buildCandidatePopup(c);
-        ReviewMap.addCandidate(c.candidate_rank, c.ll_uuid, c.geometry, popup);
+    candidates.forEach((c, i) => {
+        const shown = blind ? String.fromCharCode(65 + i) : c.candidate_rank;
+        const slot = blind ? i + 1 : c.candidate_rank;
+        const popup = buildCandidatePopup(c, blind ? shown : null);
+        ReviewMap.addCandidate(c.candidate_rank, c.ll_uuid, c.geometry, popup, shown, slot);
 
         const row = document.createElement("div");
         row.className = "candidate-row";
         row.innerHTML = `
-            <span class="rank-swatch rank-${c.candidate_rank}">${c.candidate_rank}</span>
-            <span>score ${formatScores(c)}</span>
-            ${c.rerank_fallback ? '<span class="fallback-badge" title="No candidate in this pool fired OD -- ordered by Stage 2a instead">2a fallback</span>' : ''}
+            <span class="rank-swatch rank-${slot}">${shown}</span>
+            ${blind ? "" : `<span>score ${formatScores(c)}</span>`}
+            ${!blind && c.rerank_fallback ? '<span class="fallback-badge" title="No candidate in this pool fired OD -- ordered by Stage 2a instead">2a fallback</span>' : ''}
             <span>${c.distance_m !== null ? Math.round(c.distance_m) + "m" : ""}</span>
-            <button data-uuid="${c.ll_uuid}" data-rank="${c.candidate_rank}" class="pick-candidate-btn">
+            <button data-uuid="${c.ll_uuid}" data-rank="${c.candidate_rank}" data-label="${shown}" class="pick-candidate-btn">
                 This is correct
             </button>
             <label class="site-chk-label" title="This parcel is ALSO part of the plant (plant spans several parcels). Tick it in addition to choosing the main parcel or 'Reported location is correct'.">
@@ -257,7 +284,8 @@ function renderCandidatePickTask(candidates, panel) {
 
     list.querySelectorAll(".pick-candidate-btn").forEach(btn => {
         btn.addEventListener("click", () => {
-            selectedCandidate = { ll_uuid: btn.dataset.uuid, candidate_rank: parseInt(btn.dataset.rank) };
+            selectedCandidate = { ll_uuid: btn.dataset.uuid, candidate_rank: parseInt(btn.dataset.rank),
+                                  label: btn.dataset.label };
             // The main parcel cannot also be an "extra" one.
             siteExtras.delete(btn.dataset.uuid);
             const own = list.querySelector(`.site-chk[data-uuid="${btn.dataset.uuid}"]`);
@@ -279,9 +307,11 @@ function renderCandidatePickTask(candidates, panel) {
     });
 }
 
-function buildCandidatePopup(c) {
-    const lines = [`<b>Rank ${c.candidate_rank}</b>`, `Score: ${formatScores(c)}`];
-    if (c.rerank_fallback) lines.push(`<i>No OD detections in this pool -- ranked by Stage 2a</i>`);
+function buildCandidatePopup(c, blindLabel = null) {
+    const lines = blindLabel != null
+        ? [`<b>Candidate ${blindLabel}</b>`]
+        : [`<b>Rank ${c.candidate_rank}</b>`, `Score: ${formatScores(c)}`];
+    if (blindLabel == null && c.rerank_fallback) lines.push(`<i>No OD detections in this pool -- ranked by Stage 2a</i>`);
     if (c.distance_m != null) lines.push(`Distance: ${Math.round(c.distance_m)}m`);
     if (c.owner) lines.push(`Owner: ${c.owner}`);
     if (c.lbcs_activity_desc) lines.push(`Activity: ${c.lbcs_activity_desc}`);
@@ -377,7 +407,9 @@ function updateVerdictStatus() {
     }
 
     if (selectedVerdict === "candidate_correct" && selectedCandidate) {
-        statusEl.textContent = `Selected: Candidate rank ${selectedCandidate.candidate_rank} is correct. Choose a confirmation type below, then Submit.`;
+        statusEl.textContent = isBlind(currentPlant)
+            ? `Selected: Candidate ${selectedCandidate.label} is correct. Submit when ready.`
+            : `Selected: Candidate rank ${selectedCandidate.candidate_rank} is correct. Choose a confirmation type below, then Submit.`;
         const pickBtn = document.querySelector(`.pick-candidate-btn[data-rank="${selectedCandidate.candidate_rank}"]`);
         if (pickBtn) pickBtn.classList.add("selected");
     } else {
@@ -420,7 +452,8 @@ function setVerdict(verdict) {
         display.textContent = confirmationType === "confirmed_proposal"
             ? "Confirmation type: confirmed the model's top pick (rank 1)."
             : `Confirmation type: independent -- rank ${selectedCandidate.candidate_rank} was not the model's top pick.`;
-        display.classList.remove("hidden");
+        // Recorded either way; not shown on blinded audit plants (it names the rank).
+        if (!isBlind(currentPlant)) display.classList.remove("hidden");
     } else if (verdict === "reported_correct") {
         // The reported point isn't a Stage 2 candidate at all -- there is no
         // model "proposal" being confirmed here, only Stage 1 flagging

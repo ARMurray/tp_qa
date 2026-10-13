@@ -73,8 +73,11 @@ const ReviewMap = (() => {
         return group;
     }
 
-    function addCandidate(rank, ll_uuid, geometry, popupHtml) {
-        const color = CANDIDATE_COLORS[Math.min(rank - 1, CANDIDATE_COLORS.length - 1)];
+    // label / slot: what to show and which colour to use. Default to the rank;
+    // blinded audit plants pass a shuffled letter and position instead.
+    function addCandidate(rank, ll_uuid, geometry, popupHtml, label = null, slot = null) {
+        const pos = slot != null ? slot : rank;
+        const color = CANDIDATE_COLORS[Math.min(pos - 1, CANDIDATE_COLORS.length - 1)];
         const group = L.layerGroup();
 
         if (geometry) {
@@ -89,7 +92,7 @@ const ReviewMap = (() => {
                 const label = L.marker(center, {
                     icon: L.divIcon({
                         className: "candidate-rank-label",
-                        html: `<div style="background:${color}">${rank}</div>`,
+                        html: `<div style="background:${color}">${label != null ? label : rank}</div>`,
                         iconSize: [22, 22],
                     })
                 }).bindPopup(popupHtml);
