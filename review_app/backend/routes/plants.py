@@ -6,11 +6,27 @@ everything the frontend needs -- plant info, candidates (if any), and
 LIVE parcel context (geometry + owner/LBCS/acreage) for the reported point
 and every shown candidate, via a single batched DuckDB lookup.
 """
-from fastapi import APIRouter, HTTPException
+from datetime import datetime
 
+from fastapi import APIRouter, HTTPException, Request
+
+import config as C
 from backend import db, parcels, facilities
 
 router = APIRouter()
+
+# DEBUG LOG (2026-10-13): one line per plant the app serves, plus any browser
+# error (posted by review.js). Plain text in data/outgoing/ so it can be
+# committed and read without copy-paste. Small; delete it any time.
+DEBUG_LOG = C.OUTGOING_DIR / "review_debug.log"
+
+
+def debug_log(line: str) -> None:
+    try:
+        with open(DEBUG_LOG, "a", encoding="utf-8") as f:
+            f.write(f"{datetime.now().isoformat(timespec='seconds')}  {line}\n")
+    except OSError:
+        pass
 
 
 @router.get("/status")
@@ -62,6 +78,11 @@ def _load_plant_with_context(plant: dict, candidates: list[dict]) -> dict:
     reported_geometry = reported_entry.get("geometry")
     reported_context = {col: reported_entry.get(col) for col in parcels.ATTR_COLS}
 
+    debug_log(f"plant {plant['cwns_id']} {state} round={plant.get('review_round')} "
+              f"slice={plant.get('queue_slice')} task={plant.get('review_task')} "
+              f"candidates={len(candidates)} with_outline={sum(1 for c in candidates if c.get('geometry'))} "
+              f"reported_parcel={'yes' if plant['reported_ll_uuid'] else 'none'} "
+              f"reported_outline={'yes' if reported_geometry else 'no'}")
     return {
         "plant": plant,
         "candidates": candidates,
@@ -100,3 +121,17 @@ def get_plant_by_id(cwns_id: str):
 
     return _load_plant_with_context(plant, candidates)
 
+
+
+@router.post("/debug/client_error")
+async def client_error(request: Request):
+    """Browser-side errors from review.js, appended to review_debug.log."""
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    kind = body.get("kind") if isinstance(body, dict) else None
+    tag = "BROWSER drew" if kind == "rendered" else "BROWSER ERROR"
+    debug_log(f"{tag} plant={body.get('plant') if isinstance(body, dict) else None} "
+              f"{str(body.get('detail') if isinstance(body, dict) else body)[:1500]}")
+    return {"ok": True}

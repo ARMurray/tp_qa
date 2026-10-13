@@ -37,6 +37,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("reviewer-name").addEventListener("change", saveReviewerName);
 });
 
+// Browser errors go to the server's data/outgoing/review_debug.log, so a
+// failure can be read from git without copy-paste (2026-10-13).
+function reportClientError(kind, detail) {
+    try {
+        fetch("/api/plants/debug/client_error", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ kind, detail, plant: currentPlant ? currentPlant.cwns_id : null }),
+        });
+    } catch (e) { /* never let reporting break the app */ }
+}
+window.addEventListener("error", (e) =>
+    reportClientError("error", `${e.message} at ${e.filename}:${e.lineno}:${e.colno}`));
+window.addEventListener("unhandledrejection", (e) =>
+    reportClientError("promise", String(e.reason && (e.reason.stack || e.reason.message) || e.reason)));
+
 function formatScores(c) {
     const b = c.stage2b_score;
     const a = c.stage2a_score;
@@ -202,6 +217,9 @@ function renderPlant(plant, candidates, reportedGeometry, reportedContext) {
 
     ReviewMap.fitToAllLayers();
     renderVerdictButtons(plant.review_task, candidates.length > 0);
+    reportClientError("rendered", `rows=${document.querySelectorAll(".candidate-row").length} ` +
+        `outlines=${candidates.filter(c => c.geometry).length}/${candidates.length} ` +
+        `reported_outline=${reportedGeometry ? "yes" : "no"}`);
 }
 
 function renderDock(plant) {
