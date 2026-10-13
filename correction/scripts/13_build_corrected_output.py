@@ -408,6 +408,15 @@ def main():
         df["status"].isin(["moved", "verified_corrected"]),
         haversine_m(df["reported_lat"], df["reported_lon"], df["out_lat"], df["out_lon"]),
         0.0)
+    # A reviewer's point is final (owner, 2026-10-13): verified_corrected
+    # plants carry the master's Corrected_X/Y exactly -- never moved, snapped
+    # or re-centred. Checked on every run rather than assumed.
+    vc = df["status"] == "verified_corrected"
+    off = vc & ((df["out_lat"] - df["Corrected_Y"]).abs().gt(1e-9)
+                | (df["out_lon"] - df["Corrected_X"]).abs().gt(1e-9))
+    print(f"  reviewer points kept exactly: {int(vc.sum() - off.sum()):,} of {int(vc.sum()):,}"
+          + (f"  <-- {int(off.sum())} CHANGED, investigate" if off.any() else ""))
+
     df["move_cutoff"] = args.cutoff
     df["require_detection"] = args.require_detection
     df["built"] = date.today().isoformat()

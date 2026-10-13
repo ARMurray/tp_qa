@@ -228,6 +228,14 @@ is the first precision estimate on a random sample of actual moves; rounds
 Round 6 plants now go into training, so the next audit must be a fresh draw
 from the next cycle's moves.
 
+**Reviewer points are final (owner, 2026-10-13).** A point a reviewer
+clicked (truth_outside_candidates, in the review app or the viewer) is stored
+exactly in the master (Corrected_X/Y; checked: all 82 clicked points of rounds
+1-6) and 13 copies it unchanged (`coord_method = reviewer`; 13 now prints
+"reviewer points kept exactly: N of N" every run). Any snapping of points that
+fall between parcels applies only to MODEL moves (status `moved`), never to a
+verified plant.
+
 ### A Stage 1 guardrail for utility-owned reported parcels
 
 Held, deliberately (2026-10-02). Utility-owned reported parcels are 99% Correct
