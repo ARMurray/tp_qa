@@ -74,3 +74,319 @@
     at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
 2026-10-13T11:15:07  plant 20000213001 KS round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
 2026-10-13T11:15:07  BROWSER drew plant=20000213001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T11:17:58  plant 01000349002 AL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:17:58  BROWSER drew plant=01000349002 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:18:02  plant 01000348001 AL round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:18:02  BROWSER drew plant=01000348001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:18:20  plant 01000349002 AL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:18:20  BROWSER drew plant=01000349002 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:19:07  plant 01000384001 AL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:19:07  BROWSER drew plant=01000384001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:20:20  plant 05000016001 AR round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:20:20  BROWSER drew plant=05000016001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:20:52  plant 06005245002 CA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:20:52  BROWSER drew plant=06005245002 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:21:18  plant 08000121001 CO round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:21:18  BROWSER drew plant=08000121001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:22:27  plant 08209000060 CO round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:22:27  BROWSER drew plant=08209000060 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:23:24  plant 09001280001 CT round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:23:24  BROWSER drew plant=09001280001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:24:04  plant 09001380001 CT round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:24:04  BROWSER drew plant=09001380001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:24:24  plant 12000124001 FL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:24:24  BROWSER drew plant=12000124001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:24:54  plant 12000185003 FL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:24:54  BROWSER drew plant=12000185003 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:25:20  plant 16000023001 ID round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:25:20  BROWSER drew plant=16000023001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:25:39  plant 16000163001 ID round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:25:39  BROWSER drew plant=16000163001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:28:28  plant 17000000032 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:28:28  BROWSER drew plant=17000000032 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:28:46  plant 17000326001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:28:46  BROWSER drew plant=17000326001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:29:22  plant 17000367001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:29:22  BROWSER drew plant=17000367001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:29:43  plant 17000648001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:29:43  BROWSER drew plant=17000648001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:29:46  plant 17000367001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:29:46  BROWSER drew plant=17000367001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:29:57  plant 17000247001 IL round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:29:57  BROWSER drew plant=17000247001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:30:27  plant 17000648001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:30:27  BROWSER drew plant=17000648001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:30:40  plant 17002911001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:30:40  BROWSER drew plant=17002911001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:30:45  plant 17000648001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:30:45  BROWSER drew plant=17000648001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:31:06  plant 17002911001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:31:06  BROWSER drew plant=17002911001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:31:32  plant 17005007001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:31:32  BROWSER drew plant=17005007001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:32:00  plant 17005302002 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:32:00  BROWSER drew plant=17005302002 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:32:19  plant 17005804001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:32:19  BROWSER drew plant=17005804001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:32:42  plant 17006911001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:32:42  BROWSER drew plant=17006911001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:32:54  plant 17007414001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:32:54  BROWSER drew plant=17007414001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:33:19  plant 17008505001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:33:19  BROWSER drew plant=17008505001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:33:29  plant 17009959001 IL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:33:29  BROWSER drew plant=17009959001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:36:48  plant 18000075001 IN round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:36:48  BROWSER drew plant=18000075001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:37:48  plant 18002101001 IN round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:37:48  BROWSER drew plant=18002101001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:39:26  plant 18005373001 IN round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:39:26  BROWSER drew plant=18005373001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:39:34  plant 18120000025 IN round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:39:34  BROWSER drew plant=18120000025 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:43:09  plant 18120000040 IN round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:43:09  BROWSER drew plant=18120000040 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:46:53  plant 19000426001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:46:53  BROWSER drew plant=19000426001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:49:31  plant 19000522001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:49:31  BROWSER drew plant=19000522001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:50:07  plant 19000581001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:50:07  BROWSER drew plant=19000581001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:50:35  plant 19000701001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:50:35  BROWSER drew plant=19000701001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:51:08  plant 19000727001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:51:08  BROWSER drew plant=19000727001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:51:25  plant 19000735001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:51:25  BROWSER drew plant=19000735001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:52:45  plant 19001019001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:52:45  BROWSER drew plant=19001019001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:52:58  plant 19001049001 IA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:52:58  BROWSER drew plant=19001049001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:54:28  plant 21000398001 KY round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:54:28  BROWSER drew plant=21000398001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:54:49  plant 22003226001 LA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:54:49  BROWSER drew plant=22003226001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:55:39  plant 24000014001 MD round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:55:39  BROWSER drew plant=24000014001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:56:15  plant 24000300234 MD round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:56:15  BROWSER drew plant=24000300234 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:56:39  plant 25000390001 MA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:56:39  BROWSER drew plant=25000390001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:57:01  plant 27003518001 MN round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:57:01  BROWSER drew plant=27003518001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:57:14  plant 29002472001 MO round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:57:14  BROWSER drew plant=29002472001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:57:25  plant 29004999001 MO round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:57:25  BROWSER drew plant=29004999001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:57:37  plant 31000505001 NE round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:57:37  BROWSER drew plant=31000505001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:58:02  plant 31001357001 NE round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:58:02  BROWSER drew plant=31001357001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:58:17  plant 31001815001 NE round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:58:17  BROWSER drew plant=31001815001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:58:49  plant 31002355001 NE round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:58:49  BROWSER drew plant=31002355001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T11:59:18  plant 35000048001 NM round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:59:18  BROWSER drew plant=35000048001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T11:59:27  plant 34001112006 NJ round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:59:27  BROWSER drew plant=34001112006 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:00:05  plant 35000048001 NM round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:00:05  BROWSER drew plant=35000048001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:00:24  plant 36001005001 NY round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:00:24  BROWSER drew plant=36001005001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:00:51  plant 36006093001 NY round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:00:51  BROWSER drew plant=36006093001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:01:05  plant 36009043001 NY round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:01:05  BROWSER drew plant=36009043001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:01:17  plant 37005004007 NC round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:01:17  BROWSER drew plant=37005004007 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:01:37  plant 37005101001 NC round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:01:37  BROWSER drew plant=37005101001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:01:55  plant 37008205001 NC round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:01:55  BROWSER drew plant=37008205001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:06:33  plant 37009402001 NC round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:06:33  BROWSER drew plant=37009402001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:06:50  plant 39000221001 OH round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:06:50  BROWSER drew plant=39000221001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:08:47  plant 39000369001 OH round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:08:47  BROWSER drew plant=39000369001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:09:05  plant 39007479005 OH round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:09:05  BROWSER drew plant=39007479005 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:10:18  plant 39007546001 OH round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:10:18  BROWSER drew plant=39007546001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:12:28  plant 39008330003 OH round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:12:28  BROWSER drew plant=39008330003 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:21:53  plant 40000368001 OK round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:21:53  BROWSER drew plant=40000368001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:22:15  plant 40000574001 OK round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:22:15  BROWSER drew plant=40000574001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:22:44  plant 40000814001 OK round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:22:44  BROWSER drew plant=40000814001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:22:57  plant 41000022013 OR round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:22:57  BROWSER drew plant=41000022013 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:24:14  plant 41000308001 OR round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:24:14  BROWSER drew plant=41000308001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:24:26  plant 42002118001 PA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:24:26  BROWSER drew plant=42002118001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:24:45  plant 42004289001 PA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:24:45  BROWSER drew plant=42004289001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:25:02  plant 44000014001 RI round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:25:02  BROWSER drew plant=44000014001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:25:16  plant 48004099001 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:25:16  BROWSER drew plant=48004099001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:25:31  plant 48006009001 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:25:31  BROWSER drew plant=48006009001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:34:49  plant 48006057001 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:34:49  BROWSER drew plant=48006057001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:41:39  plant 48007014001 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:41:39  BROWSER drew plant=48007014001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:41:56  plant 48007039101 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:41:56  BROWSER drew plant=48007039101 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:42:44  plant 48007056001 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:42:44  BROWSER drew plant=48007056001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:42:59  plant 48007599001 TX round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:42:59  BROWSER drew plant=48007599001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:44:08  plant 49000077001 UT round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:44:08  BROWSER drew plant=49000077001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:44:48  plant 55002155001 WI round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:44:48  BROWSER drew plant=55002155001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T12:45:25  plant 55009711001 WI round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T12:45:25  BROWSER drew plant=55009711001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T12:46:06  plant 04001318001 AZ round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T12:46:06  BROWSER drew plant=04001318001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T12:46:42  plant 04002801033 AZ round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T12:46:42  BROWSER drew plant=04002801033 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T13:04:24  plant 05000243001 AR round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T13:04:24  BROWSER drew plant=05000243001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T13:06:01  plant 08000000197 CO round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:06:01  BROWSER drew plant=08000000197 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:06:20  plant 12000065001 FL round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:06:20  BROWSER drew plant=12000065001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:06:42  plant 17003716001 IL round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T13:06:42  BROWSER drew plant=17003716001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T13:07:29  plant 20000213001 KS round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:07:29  BROWSER drew plant=20000213001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:07:51  plant 21000187001 KY round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T13:07:51  BROWSER drew plant=21000187001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T13:10:10  plant 26002116001 MI round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:10:10  BROWSER drew plant=26002116001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:10:24  plant 27005314001 MN round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:10:24  BROWSER drew plant=27005314001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:10:50  plant 27009203001 MN round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T13:10:50  BROWSER drew plant=27009203001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T13:11:27  plant 36003095001 NY round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:11:27  BROWSER drew plant=36003095001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:12:03  plant 36006043005 NY round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:12:03  BROWSER drew plant=36006043005 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:12:26  plant 39000351009 OH round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T13:12:26  BROWSER drew plant=39000351009 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T13:13:22  plant 41000097001 OR round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:13:22  BROWSER drew plant=41000097001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:17:16  plant 47000770001 TN round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T13:17:16  BROWSER drew plant=47000770001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T13:17:25  plant 48005073001 TX round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T13:17:25  BROWSER drew plant=48005073001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T13:20:04  plant 53002010001 WA round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T13:20:04  BROWSER drew plant=53002010001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:38:54  plant 53002010001 WA round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:38:54  BROWSER drew plant=53002010001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:38:55  plant 05000722001 AR round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:38:55  BROWSER drew plant=05000722001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:40:16  plant 53002010001 WA round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:40:16  BROWSER drew plant=53002010001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:42:16  plant 54005209001 WV round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:42:16  BROWSER drew plant=54005209001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:45:30  plant 55009617001 WI round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T15:45:30  BROWSER drew plant=55009617001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T15:46:01  plant 56000050001 WY round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:46:01  BROWSER drew plant=56000050001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:47:14  plant 12000001038 FL round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:47:14  BROWSER drew plant=12000001038 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:54:17  plant 13000006016 GA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T15:54:17  BROWSER drew plant=13000006016 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T15:57:44  plant 18001002001 IN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T15:57:44  BROWSER drew plant=18001002001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T15:58:10  plant 18120000060 IN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T15:58:10  BROWSER drew plant=18120000060 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:02:22  plant 19000645001 IA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:02:22  BROWSER drew plant=19000645001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:04:06  plant 19000950001 IA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:04:06  BROWSER drew plant=19000950001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:04:48  plant 20000790001 KS round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:04:48  BROWSER drew plant=20000790001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:05:15  plant 21000190001 KY round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:05:15  BROWSER drew plant=21000190001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:05:28  plant 22009087010 LA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:05:28  BROWSER drew plant=22009087010 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:06:56  plant 25000372002 MA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:06:57  BROWSER drew plant=25000372002 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:07:25  plant 27000158001 MN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:07:25  BROWSER drew plant=27000158001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:07:59  plant 27000190001 MN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:07:59  BROWSER drew plant=27000190001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:08:34  plant 27000301001 MN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:08:34  BROWSER drew plant=27000301001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:08:44  plant 27003204001 MN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:08:44  BROWSER drew plant=27003204001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:08:59  plant 27005105001 MN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:08:59  BROWSER drew plant=27005105001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:09:11  plant 28000260003 MS round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:09:11  BROWSER drew plant=28000260003 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:09:43  plant 29000000085 MO round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:09:43  BROWSER drew plant=29000000085 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:10:08  plant 29001237036 MO round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:10:08  BROWSER drew plant=29001237036 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:10:30  plant 29002512001 MO round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:10:30  BROWSER drew plant=29002512001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:11:00  plant 31000229001 NE round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:11:00  BROWSER drew plant=31000229001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:11:49  plant 31000820001 NE round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:11:49  BROWSER drew plant=31000820001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:12:14  plant 35000000028 NM round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:12:14  BROWSER drew plant=35000000028 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:13:02  plant 36004012001 NY round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:13:02  BROWSER drew plant=36004012001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:13:23  plant 36006065001 NY round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:13:23  BROWSER drew plant=36006065001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:13:44  plant 36008096001 NY round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:13:44  BROWSER drew plant=36008096001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:16:58  plant 36009092001 NY round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:16:58  BROWSER drew plant=36009092001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:17:19  plant 39003248001 OH round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:17:19  BROWSER drew plant=39003248001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:17:30  plant 39007479008 OH round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:17:30  BROWSER drew plant=39007479008 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:18:01  plant 40000580001 OK round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:18:01  BROWSER drew plant=40000580001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:18:31  plant 41000125001 OR round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:18:31  BROWSER drew plant=41000125001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:20:23  plant 42000010001 PA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:20:23  BROWSER drew plant=42000010001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:20:37  plant 45000217001 SC round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:20:37  BROWSER drew plant=45000217001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:21:22  plant 47000455501 TN round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:21:22  BROWSER drew plant=47000455501 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:21:56  plant 48001065601 TX round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:21:56  BROWSER drew plant=48001065601 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:22:25  plant 48003118001 TX round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:22:25  BROWSER drew plant=48003118001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:22:50  plant 48005069001 TX round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:22:50  BROWSER drew plant=48005069001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:23:19  plant 48007039061 TX round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:23:19  BROWSER drew plant=48007039061 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:24:01  plant 48007429001 TX round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:24:01  BROWSER drew plant=48007429001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:24:49  plant 51000192001 VA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:24:49  BROWSER drew plant=51000192001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:25:18  plant 51000219004 VA round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:25:18  BROWSER drew plant=51000219004 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:36:46  plant 54001304001 WV round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:36:46  BROWSER drew plant=54001304001 rows=5 outlines=5/5 reported_outline=no
+2026-10-13T16:39:16  plant 54002415001 WV round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:39:16  BROWSER drew plant=54002415001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:39:37  plant 54002908001 WV round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:39:37  BROWSER drew plant=54002908001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:40:19  plant 55001810001 WI round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T16:40:19  BROWSER drew plant=55001810001 rows=5 outlines=5/5 reported_outline=yes
+2026-10-13T16:42:53  plant 55007720002 WI round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T16:42:53  BROWSER drew plant=55007720002 rows=5 outlines=5/5 reported_outline=no
