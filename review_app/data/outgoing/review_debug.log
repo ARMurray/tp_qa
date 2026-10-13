@@ -1,0 +1,76 @@
+2026-10-13T11:14:18  plant 01000349002 AL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:18  BROWSER ERROR plant=01000349002 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadNextPlant (http://127.0.0.1:8000/static/js/review.js:101:5)
+2026-10-13T11:14:22  plant 01000349002 AL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:22  BROWSER ERROR plant=01000349002 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:14:27  plant 01000384001 AL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:27  BROWSER ERROR plant=01000384001 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:14:31  plant 04001318001 AZ round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:31  BROWSER drew plant=04001318001 rows=0 outlines=0/0 reported_outline=yes
+2026-10-13T11:14:38  plant 04002801033 AZ round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:38  BROWSER ERROR plant=04002801033 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:14:41  plant 05000016001 AR round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:14:41  BROWSER ERROR plant=05000016001 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:14:46  plant 05000243001 AR round=6 slice=random task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:46  BROWSER ERROR plant=05000243001 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:14:49  plant 05000722001 AR round=6 slice=uncertain task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:49  BROWSER ERROR plant=05000722001 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:14:55  plant 06005245002 CA round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=yes reported_outline=yes
+2026-10-13T11:14:55  BROWSER ERROR plant=06005245002 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:15:00  plant 12000185003 FL round=6 slice=audit task=candidate_pick candidates=5 with_outline=5 reported_parcel=none reported_outline=no
+2026-10-13T11:15:00  BROWSER ERROR plant=12000185003 ReferenceError: Cannot access 'label' before initialization
+    at Object.addCandidate (http://127.0.0.1:8000/static/js/map.js:95:67)
+    at http://127.0.0.1:8000/static/js/review.js:279:19
+    at Array.forEach (<anonymous>)
+    at renderCandidatePickTask (http://127.0.0.1:8000/static/js/review.js:275:16)
+    at renderPlant (http://127.0.0.1:8000/static/js/review.js:213:9)
+    at loadPlantById (http://127.0.0.1:8000/static/js/review.js:112:5)
+2026-10-13T11:15:07  plant 20000213001 KS round=6 slice=random task=confirm_reported candidates=0 with_outline=0 reported_parcel=yes reported_outline=yes
+2026-10-13T11:15:07  BROWSER drew plant=20000213001 rows=0 outlines=0/0 reported_outline=yes
