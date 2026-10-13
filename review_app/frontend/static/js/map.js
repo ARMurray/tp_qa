@@ -73,9 +73,11 @@ const ReviewMap = (() => {
         return group;
     }
 
-    // label / slot: what to show and which colour to use. Default to the rank;
-    // blinded audit plants pass a shuffled letter and position instead.
-    function addCandidate(rank, ll_uuid, geometry, popupHtml, label = null, slot = null) {
+    // shownLabel / slot: what to show and which colour to use. Default to the
+    // rank; blinded audit plants pass a shuffled letter and position instead.
+    // (Not called `label`: the marker below is a `const label`, and the name
+    // clash threw "Cannot access 'label' before initialization" -- 2026-10-13.)
+    function addCandidate(rank, ll_uuid, geometry, popupHtml, shownLabel = null, slot = null) {
         const pos = slot != null ? slot : rank;
         const color = CANDIDATE_COLORS[Math.min(pos - 1, CANDIDATE_COLORS.length - 1)];
         const group = L.layerGroup();
@@ -92,7 +94,7 @@ const ReviewMap = (() => {
                 const label = L.marker(center, {
                     icon: L.divIcon({
                         className: "candidate-rank-label",
-                        html: `<div style="background:${color}">${label != null ? label : rank}</div>`,
+                        html: `<div style="background:${color}">${shownLabel != null ? shownLabel : rank}</div>`,
                         iconSize: [22, 22],
                     })
                 }).bindPopup(popupHtml);
