@@ -98,13 +98,14 @@ const enabled = new Set(Object.keys(STATUS));
 let stateFilter = "";
 // Population served filter: two sliders over these steps (log-like, since
 // plants run from tens of people to millions). Index 0 = no lower bound, the
-// last index = no upper bound. Plants with no population are a checkbox.
+// last index = no upper bound. Plants with no population count as 0 (set at
+// load; popUnknown keeps the fact for the panel), so any minimum above 0
+// hides them.
 const POP_STEPS = [0, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000,
                    100000, 250000, 500000, 1000000, Infinity];
-let popLo = 0, popHi = POP_STEPS.length - 1, popUnknown = true;
+let popLo = 0, popHi = POP_STEPS.length - 1;
 const popActive = () => popLo > 0 || popHi < POP_STEPS.length - 1;
 function popOk(p) {
-  if (p.pop === null || p.pop === undefined) return popUnknown;
   return p.pop >= POP_STEPS[popLo] && p.pop <= POP_STEPS[popHi];
 }
 const fmtPop = (v) => v === Infinity ? "no limit"
@@ -166,7 +167,11 @@ function radiusPx() {
 
 // ---- filtering ------------------------------------------------------------
 function applyFilters() {
-  filtered = ALL.filter((p) => enabled.has(p.status) && (!stateFilter || p.state === stateFilter) && popOk(p));
+  // Legend counts follow the state and population filters (not the status
+  // checkboxes, so a hidden status still shows how many it would add).
+  const inScope = ALL.filter((p) => (!stateFilter || p.state === stateFilter) && popOk(p));
+  updateLegendCounts(inScope);
+  filtered = inScope.filter((p) => enabled.has(p.status));
   moves = filtered.filter(
     (p) => MOVE_STATUSES.has(p.status) && p.rlat !== null && p.rlon !== null && (p.moved_m || 0) > 1
   );
@@ -561,7 +566,7 @@ function showPanel(p) {
     <div class="detail-section-title">Location</div>
     <dl class="detail-facts">
       ${fact("CWNS ID", esc(p.id))}
-      ${fact("Population served", p.pop !== null && p.pop !== undefined ? Math.round(p.pop).toLocaleString() : '<span style="color:#888;font-weight:400">unknown</span>')}
+      ${fact("Population served", Math.round(p.pop || 0).toLocaleString() + (p.popUnknown ? ' <span style="color:#888;font-weight:400">(not reported)</span>' : ""))}
       ${fact("Shown at", `${fmt(p.lat, 6)}, ${fmt(p.lon, 6)}`)}
       ${moved ? fact("Reported at", `${fmt(p.rlat, 6)}, ${fmt(p.rlon, 6)}`) : ""}
       ${moved ? fact("Moved by", fmtDist(p.moved_m)) : ""}
@@ -968,7 +973,7 @@ function buildLegend(counts) {
     head.title = g.hint;
     head.innerHTML =
       `<input type="checkbox" data-group="${g.key}" checked>${g.label}` +
-      `<span class="n">${total.toLocaleString()}</span>`;
+      `<span class="n" data-group-n="${g.key}">${total.toLocaleString()}</span>`;
     sec.appendChild(head);
     // A group with a single status (not assessed) needs no sub-rows: its
     // swatch goes on the header.
@@ -986,7 +991,7 @@ function buildLegend(counts) {
         row.innerHTML =
           `<input type="checkbox" data-status="${key}" checked>` +
           `<span class="swatch" style="background:${hex(s.color)}"></span>${s.label}` +
-          `<span class="n">${n.toLocaleString()}</span>`;
+          `<span class="n" data-status-n="${key}">${n.toLocaleString()}</span>`;
         sec.appendChild(row);
       }
     }
@@ -1031,6 +1036,21 @@ function buildLegend(counts) {
   $("only-model").onclick = () => setAll(["moved", "flagged_not_moved", "kept_osm", "kept_model", "kept_site"]);
 }
 
+function updateLegendCounts(plants) {
+  const box = $("status-filters");
+  if (!box) return;
+  const by = {};
+  for (const p of plants) by[p.status] = (by[p.status] || 0) + 1;
+  const set = (el, n) => {
+    el.textContent = n.toLocaleString();
+    el.closest(".row").classList.toggle("empty", !n);
+  };
+  box.querySelectorAll("[data-status-n]").forEach((el) => set(el, by[el.dataset.statusN] || 0));
+  box.querySelectorAll("[data-group-n]").forEach((el) => set(el,
+    Object.keys(STATUS).filter((k) => STATUS[k].group === el.dataset.groupN)
+      .reduce((a, k) => a + (by[k] || 0), 0)));
+}
+
 function buildStateFilter() {
   const states = [...new Set(ALL.map((p) => p.state).filter(Boolean))].sort();
   const sel = $("state-filter");
@@ -1047,7 +1067,7 @@ function buildStateFilter() {
 }
 
 function setupPopFilter() {
-  const lo = $("pop-lo"), hi = $("pop-hi"), unk = $("pop-unknown");
+  const lo = $("pop-lo"), hi = $("pop-hi");
   lo.max = hi.max = POP_STEPS.length - 1;
   lo.value = popLo; hi.value = popHi;
   const label = () => {
@@ -1055,8 +1075,6 @@ function setupPopFilter() {
       : popHi === POP_STEPS.length - 1 ? `≥ ${fmtPop(POP_STEPS[popLo])}`
       : popLo === 0 ? `≤ ${fmtPop(POP_STEPS[popHi])}`
       : `${fmtPop(POP_STEPS[popLo])} – ${fmtPop(POP_STEPS[popHi])}`;
-    const n = ALL.filter((p) => p.pop === null || p.pop === undefined).length;
-    $("pop-unknown-n").textContent = n.toLocaleString();
   };
   const update = (which) => {
     popLo = Number(lo.value); popHi = Number(hi.value);
@@ -1068,7 +1086,6 @@ function setupPopFilter() {
   };
   lo.oninput = () => update("lo");
   hi.oninput = () => update("hi");
-  unk.onchange = () => { popUnknown = unk.checked; applyFilters(); };
   label();
 }
 
@@ -1211,6 +1228,9 @@ async function main() {
   const data = await res.json();
   ALL = data.plants;
   CUTOFF = data.cutoff ?? null;
+  for (const p of ALL) {               // unknown population -> 0 (see popOk)
+    if (p.pop === null || p.pop === undefined) { p.pop = 0; p.popUnknown = true; }
+  }
   BY_ID = new Map(ALL.map((p) => [p.id, p]));
   buildLegend(data.counts || {});
   buildStateFilter();

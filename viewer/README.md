@@ -42,8 +42,10 @@ restart or open `http://localhost:8050/api/reload`.
     (orange).
   - **Not assessed** (grey).
 - Population served filter: min and max sliders over steps from 100 to 1M
-  (ends = no limit), plus a checkbox for plants with unknown population.
-  Applies to points, move lines, site outlines and detections alike.
+  (ends = no limit). Plants with no population count as 0, so any minimum
+  hides them (the panel shows "0 (not reported)"). Applies to points, move
+  lines, site outlines and detections alike. Legend counts follow the state
+  and population filters.
   "model decisions only" shows moved / flagged / kept.
 - Moved and verified-corrected plants are drawn at the NEW location with a
   line back to the reported one; from zoom 9 a grey ring marks the reported
