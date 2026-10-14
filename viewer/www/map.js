@@ -26,20 +26,36 @@ const CLASS_COLORS = {
 };
 const CLASS_FALLBACK = [229, 231, 235];
 
-// Order here = legend order (most important first). Colours chosen to stay
-// distinct on both the street and imagery basemaps.
+// Three confidence groups, each with its sub-categories (legend order = this
+// order). Colour encodes the group first: high confidence is cool (greens for
+// a reviewer's verdict, blues for the model's), low confidence is warm
+// (red/orange), not assessed is grey. Within a group the hues stay far enough
+// apart to read on both the street and imagery basemaps.
+const GROUPS = [
+  { key: "high", label: "High confidence",
+    hint: "A reviewer verified it, or the model is confident (moved at ≥ the cutoff, or kept)" },
+  { key: "low", label: "Low confidence",
+    hint: "The reported location is doubted and no confident correction exists yet" },
+  { key: "none", label: "Not assessed",
+    hint: "Outside the model's scope" },
+];
 const STATUS = {
-  moved:               { label: "Moved (model)",          color: [249, 115, 22],  hint: "Stage 1 flagged it and the re-ranker's #1 parcel cleared the cutoff" },
-  flagged_not_moved:   { label: "Flagged, not moved",     color: [220, 38, 38],   hint: "Stage 1 doubts the reported location; no candidate cleared the cutoff" },
-  kept_site:           { label: "Kept – split site",      color: [234, 179, 8],   hint: "The re-ranker's #1 is a neighbouring parcel of the same plant site as the reported parcel (split parcels), so it was not moved" },
-  verified_corrected:  { label: "Verified – corrected",   color: [37, 99, 235],   hint: "A reviewer supplied the corrected location" },
-  verified_correct:    { label: "Verified – correct",     color: [22, 163, 74],   hint: "A reviewer confirmed the reported location" },
-  reviewed_unresolved: { label: "Reviewed – unresolved",  color: [147, 51, 234],  hint: "Reviewed as wrong, no corrected location yet" },
-  kept_osm:            { label: "Kept – OSM tagged",      color: [20, 184, 166],  hint: "Reported parcel carries an OSM wastewater tag" },
-  kept_model:          { label: "Kept – model",           color: [163, 230, 53],  hint: "Stage 1 scored the reported location as correct" },
-  pending:             { label: "Pending (no model run)", color: [156, 163, 175], hint: "Preview mode: model output not loaded yet" },
-  not_assessed:        { label: "Not assessed",           color: [107, 114, 128], hint: "Outside model scope (no NAIP, population ≤ 100 or unknown, …)" },
+  // high confidence -- reviewer (greens)
+  verified_correct:    { group: "high", label: "Verified – correct",     color: [21, 128, 61],   hint: "A reviewer confirmed the reported location" },
+  verified_corrected:  { group: "high", label: "Verified – corrected",   color: [74, 222, 128],  hint: "A reviewer supplied the corrected location" },
+  // high confidence -- model (blues)
+  moved:               { group: "high", label: "Moved (model)",          color: [37, 99, 235],   hint: "Stage 1 flagged it and the re-ranker's #1 parcel cleared the cutoff" },
+  kept_model:          { group: "high", label: "Kept – model",           color: [56, 189, 248],  hint: "Stage 1 scored the reported location as correct" },
+  kept_osm:            { group: "high", label: "Kept – OSM tagged",      color: [20, 184, 166],  hint: "Reported parcel carries an OSM wastewater tag" },
+  kept_site:           { group: "high", label: "Kept – split site",      color: [129, 140, 248], hint: "The re-ranker's #1 is a neighbouring parcel of the same plant site as the reported parcel (split parcels), so it was not moved" },
+  // low confidence (warm)
+  flagged_not_moved:   { group: "low",  label: "Flagged, not moved",     color: [220, 38, 38],   hint: "Stage 1 doubts the reported location; no candidate cleared the cutoff" },
+  reviewed_unresolved: { group: "low",  label: "Reviewed – unresolved",  color: [234, 88, 12],   hint: "Reviewed as wrong, no corrected location yet" },
+  // not assessed (greys)
+  not_assessed:        { group: "none", label: "Not assessed",           color: [107, 114, 128], hint: "Outside model scope (no NAIP, population ≤ 100 or unknown, …)" },
+  pending:             { group: "none", label: "Pending (no model run)", color: [156, 163, 175], hint: "Preview mode: model output not loaded yet" },
 };
+const groupOf = (status) => GROUPS.find((g) => g.key === (STATUS[status] || {}).group);
 const UNKNOWN_COLOR = [0, 0, 0];
 const SELECTED_COLOR = [255, 255, 0];
 const REPORTED_COLOR = [80, 80, 80];
@@ -352,7 +368,7 @@ function layers() {
         radiusUnits: "pixels",
         getRadius: 9,
         filled: true,
-        getFillColor: [37, 99, 235, 200],
+        getFillColor: [...STATUS.verified_corrected.color, 220],   // becomes "Verified – corrected" once saved
         stroked: true,
         getLineColor: [255, 255, 255, 255],
         lineWidthUnits: "pixels",
@@ -524,6 +540,7 @@ function showPanel(p) {
   panel.innerHTML = `
     <button class="detail-close" id="detail-close">×</button>
     <div class="detail-badge" style="background:${hex(c)}">${esc(labelOf(p.status))}</div>
+    ${groupOf(p.status) ? `<span class="detail-group">${esc(groupOf(p.status).label)}</span>` : ""}
     <div class="detail-title">${esc(p.name || "(no name)")}</div>
     <div class="detail-sub">${esc([p.city, p.county, p.state].filter(Boolean).join(", "))}</div>
     <p class="detail-note">${esc((STATUS[p.status] || {}).hint || "")}${p.reason ? ` — <i>${esc(p.reason)}</i>` : ""}</p>
@@ -926,38 +943,79 @@ async function loadVerdictStatus() {
 function buildLegend(counts) {
   const box = $("status-filters");
   box.innerHTML = "";
-  for (const [key, s] of Object.entries(STATUS)) {
-    const n = counts[key] || 0;
-    if (!n && key === "pending") continue;
-    const row = document.createElement("label");
-    row.className = "row" + (n ? "" : " empty");
-    row.title = s.hint;
-    row.innerHTML =
-      `<input type="checkbox" data-status="${key}" checked>` +
-      `<span class="swatch" style="background:${hex(s.color)}"></span>${s.label}` +
-      `<span class="n">${n.toLocaleString()}</span>`;
-    box.appendChild(row);
+  for (const g of GROUPS) {
+    const keys = Object.keys(STATUS).filter(
+      (k) => STATUS[k].group === g.key && !(k === "pending" && !counts[k]));
+    if (!keys.length) continue;
+    const total = keys.reduce((a, k) => a + (counts[k] || 0), 0);
+    const sec = document.createElement("div");
+    sec.className = "status-group";
+    const head = document.createElement("label");
+    head.className = "row group-head" + (total ? "" : " empty");
+    head.title = g.hint;
+    head.innerHTML =
+      `<input type="checkbox" data-group="${g.key}" checked>${g.label}` +
+      `<span class="n">${total.toLocaleString()}</span>`;
+    sec.appendChild(head);
+    // A group with a single status (not assessed) needs no sub-rows: its
+    // swatch goes on the header.
+    if (keys.length === 1) {
+      head.querySelector("input").insertAdjacentHTML("afterend",
+        `<span class="swatch" style="background:${hex(STATUS[keys[0]].color)}"></span>`);
+      head.querySelector("input").dataset.status = keys[0];
+      head.title = STATUS[keys[0]].hint;
+    } else {
+      for (const key of keys) {
+        const s = STATUS[key], n = counts[key] || 0;
+        const row = document.createElement("label");
+        row.className = "row status-sub" + (n ? "" : " empty");
+        row.title = s.hint;
+        row.innerHTML =
+          `<input type="checkbox" data-status="${key}" checked>` +
+          `<span class="swatch" style="background:${hex(s.color)}"></span>${s.label}` +
+          `<span class="n">${n.toLocaleString()}</span>`;
+        sec.appendChild(row);
+      }
+    }
+    box.appendChild(sec);
   }
   const links = document.createElement("div");
   links.className = "legend-links";
   links.innerHTML = '<a id="all-on">all</a><a id="all-off">none</a><a id="only-model">model decisions only</a>';
   box.appendChild(links);
 
+  // Group checkbox: checked when all its statuses are on, indeterminate when some.
+  const syncBoxes = () => {
+    box.querySelectorAll("input[data-status]").forEach((i) => (i.checked = enabled.has(i.dataset.status)));
+    box.querySelectorAll("input[data-group]").forEach((i) => {
+      if (i.dataset.status) return;
+      const ks = [...box.querySelectorAll(`.status-group input[data-status]`)]
+        .map((x) => x.dataset.status).filter((k) => STATUS[k].group === i.dataset.group);
+      const on = ks.filter((k) => enabled.has(k)).length;
+      i.checked = on === ks.length;
+      i.indeterminate = on > 0 && on < ks.length;
+    });
+  };
   box.addEventListener("change", (e) => {
-    const k = e.target.dataset.status;
-    if (!k) return;
-    e.target.checked ? enabled.add(k) : enabled.delete(k);
+    const t = e.target;
+    if (t.dataset.status) {
+      t.checked ? enabled.add(t.dataset.status) : enabled.delete(t.dataset.status);
+    } else if (t.dataset.group) {
+      Object.keys(STATUS).filter((k) => STATUS[k].group === t.dataset.group)
+        .forEach((k) => (t.checked ? enabled.add(k) : enabled.delete(k)));
+    } else return;
+    syncBoxes();
     applyFilters();
   });
   const setAll = (keys) => {
     enabled.clear();
     keys.forEach((k) => enabled.add(k));
-    box.querySelectorAll("input[data-status]").forEach((i) => (i.checked = enabled.has(i.dataset.status)));
+    syncBoxes();
     applyFilters();
   };
   $("all-on").onclick = () => setAll(Object.keys(STATUS));
   $("all-off").onclick = () => setAll([]);
-  $("only-model").onclick = () => setAll(["moved", "flagged_not_moved", "kept_osm", "kept_model"]);
+  $("only-model").onclick = () => setAll(["moved", "flagged_not_moved", "kept_osm", "kept_model", "kept_site"]);
 }
 
 function buildStateFilter() {

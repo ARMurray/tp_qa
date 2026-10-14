@@ -32,7 +32,15 @@ restart or open `http://localhost:8050/api/reload`.
 
 ## On the map
 
-- Colour = status (legend; click a row to hide/show it, counts per status).
+- Colour = status, grouped into three confidence groups (legend; click a row
+  to hide/show it, or a group header to toggle the whole group; counts per
+  status and per group):
+  - **High confidence** (cool colours) -- reviewer verdicts in greens
+    (verified correct / corrected), model decisions in blues (moved, kept by
+    the model, kept OSM tagged, kept split site).
+  - **Low confidence** (warm) -- flagged not moved (red), reviewed unresolved
+    (orange).
+  - **Not assessed** (grey).
   "model decisions only" shows moved / flagged / kept.
 - Moved and verified-corrected plants are drawn at the NEW location with a
   line back to the reported one; from zoom 9 a grey ring marks the reported
