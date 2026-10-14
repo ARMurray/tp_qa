@@ -96,6 +96,19 @@ let selected = null;
 let basemap = "street";
 const enabled = new Set(Object.keys(STATUS));
 let stateFilter = "";
+// Population served filter: two sliders over these steps (log-like, since
+// plants run from tens of people to millions). Index 0 = no lower bound, the
+// last index = no upper bound. Plants with no population are a checkbox.
+const POP_STEPS = [0, 100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000,
+                   100000, 250000, 500000, 1000000, Infinity];
+let popLo = 0, popHi = POP_STEPS.length - 1, popUnknown = true;
+const popActive = () => popLo > 0 || popHi < POP_STEPS.length - 1;
+function popOk(p) {
+  if (p.pop === null || p.pop === undefined) return popUnknown;
+  return p.pop >= POP_STEPS[popLo] && p.pop <= POP_STEPS[popHi];
+}
+const fmtPop = (v) => v === Infinity ? "no limit"
+  : v >= 1e6 ? `${v / 1e6}M` : v >= 1000 ? `${v / 1000}k` : String(v);
 let showMoves = true;
 let sizeBase = 4;
 let SITES = { type: "FeatureCollection", features: [] };
@@ -153,13 +166,13 @@ function radiusPx() {
 
 // ---- filtering ------------------------------------------------------------
 function applyFilters() {
-  filtered = ALL.filter((p) => enabled.has(p.status) && (!stateFilter || p.state === stateFilter));
+  filtered = ALL.filter((p) => enabled.has(p.status) && (!stateFilter || p.state === stateFilter) && popOk(p));
   moves = filtered.filter(
     (p) => MOVE_STATUSES.has(p.status) && p.rlat !== null && p.rlon !== null && (p.moved_m || 0) > 1
   );
   const keep = (id) => {
     const p = BY_ID.get(id);
-    return p && enabled.has(p.status) && (!stateFilter || p.state === stateFilter);
+    return p && enabled.has(p.status) && (!stateFilter || p.state === stateFilter) && popOk(p);
   };
   sitesShown = { type: "FeatureCollection", features: SITES.features.filter((f) => keep(f.properties.CWNS_ID)) };
   detsShown = DETS.filter((d) => keep(d.id));
@@ -1033,6 +1046,32 @@ function buildStateFilter() {
   });
 }
 
+function setupPopFilter() {
+  const lo = $("pop-lo"), hi = $("pop-hi"), unk = $("pop-unknown");
+  lo.max = hi.max = POP_STEPS.length - 1;
+  lo.value = popLo; hi.value = popHi;
+  const label = () => {
+    $("pop-range").textContent = !popActive() ? "all"
+      : popHi === POP_STEPS.length - 1 ? `≥ ${fmtPop(POP_STEPS[popLo])}`
+      : popLo === 0 ? `≤ ${fmtPop(POP_STEPS[popHi])}`
+      : `${fmtPop(POP_STEPS[popLo])} – ${fmtPop(POP_STEPS[popHi])}`;
+    const n = ALL.filter((p) => p.pop === null || p.pop === undefined).length;
+    $("pop-unknown-n").textContent = n.toLocaleString();
+  };
+  const update = (which) => {
+    popLo = Number(lo.value); popHi = Number(hi.value);
+    if (popLo > popHi) {                 // the dragged handle pushes the other
+      if (which === "lo") { popHi = popLo; hi.value = popHi; } else { popLo = popHi; lo.value = popLo; }
+    }
+    label();
+    applyFilters();
+  };
+  lo.oninput = () => update("lo");
+  hi.oninput = () => update("hi");
+  unk.onchange = () => { popUnknown = unk.checked; applyFilters(); };
+  label();
+}
+
 function fitTo(points) {
   if (!points.length) return;
   let w = 180, s = 90, e = -180, n = -90;
@@ -1175,6 +1214,7 @@ async function main() {
   BY_ID = new Map(ALL.map((p) => [p.id, p]));
   buildLegend(data.counts || {});
   buildStateFilter();
+  setupPopFilter();
   setupSearch();
   statusEl.textContent =
     `${data.source}` + (data.cutoff !== null && data.cutoff !== undefined ? ` · move cutoff ${data.cutoff}` : "");

@@ -47,6 +47,9 @@ html, body { margin: 0; height: 100%; font: 13px -apple-system, "Segoe UI", sans
   text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 4px;
 }
 .filter-group select { width: 100%; padding: 4px; border-radius: 4px; border: 1px solid #ccc; }
+.pop-filter .pop-range { float: right; text-transform: none; letter-spacing: 0; color: #0f5c82; font-size: 12px; }
+.pop-sliders input[type="range"] { width: 100%; margin: 2px 0; accent-color: #0f5c82; }
+.pop-ends { display: flex; justify-content: space-between; font-size: 10px; color: #999; margin-top: -2px; }
 .opacity-control { margin-top: 10px; padding-top: 8px; border-top: 1px solid #eee; }
 .opacity-control label {
   display: block; font-size: 11px; font-weight: 600; color: #888;

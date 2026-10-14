@@ -41,6 +41,9 @@ restart or open `http://localhost:8050/api/reload`.
   - **Low confidence** (warm) -- flagged not moved (red), reviewed unresolved
     (orange).
   - **Not assessed** (grey).
+- Population served filter: min and max sliders over steps from 100 to 1M
+  (ends = no limit), plus a checkbox for plants with unknown population.
+  Applies to points, move lines, site outlines and detections alike.
   "model decisions only" shows moved / flagged / kept.
 - Moved and verified-corrected plants are drawn at the NEW location with a
   line back to the reported one; from zoom 9 a grey ring marks the reported
