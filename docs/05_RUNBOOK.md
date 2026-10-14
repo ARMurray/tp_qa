@@ -20,6 +20,21 @@ python -m sync.close_round --round N
 Omit `--round` to close every reviewed round at once — the catch-up case,
 for a machine with review history that has never folded any of it in.
 
+**Viewer verdicts are round 900.** Locations verified or corrected in the
+viewer (`viewer/`, "Verify / correct" in the plant panel) are stored in
+`app.db` as review round 900 and reach the master the same way. Close them
+before the HPC part of a cycle so they are in training:
+
+```bash
+python -m sync.close_round --round 900 --dry-run
+python -m sync.close_round --round 900
+```
+
+Round 900 can be closed any number of times; each close exports only the
+verdicts added or changed since the last. It feeds TRAINING only, never the
+move-rule calibration or an audit (a plant someone chose to look at is not a
+random sample).
+
 Step 4 (NAIP tiles) runs with `detection/.venv`'s Python and only for round
 N's plants, tiling just the grid cells that touch each parcel. New tiles show
 up in `label_app.R` after a restart.
@@ -82,10 +97,19 @@ sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm
 sbatch 06b_build_rerank_training.slurm
 sbatch 07b_train_rerank.slurm                   # refuses a stale 17_ table
 
-# 7. Holdout candidates, re-rank, score
+# 7. Detection on every candidate nationally (resume: only new candidates;
+#    the array defaults to INFERENCE_STATES), then holdout, re-rank, score
+sbatch --array=0-47%6 01e_run_od_candidates_array.slurm
 sbatch 01e_run_od_candidates.slurm              # holdout scope (NORESUME=1 after a detector change)
 sbatch 05b_rerank_candidates.slurm
 sbatch 12_score_holdout.slurm
+
+# 7b. Corrected output (the product) + the viewer's data. 13's slurm also
+#     runs export_viewer_data.py. Commit correction/diagnostics/output/ --
+#     the viewer and sewershed_plus both read it from there.
+sbatch --export=CUTOFF=0.95 13_build_corrected_output.slurm
+#     check: moved count, the population-band crosstab, and
+#     "reviewer points kept exactly: N of N" (must be N of N)
 
 # 8. Logs back through git. Every job copies its log to
 #    correction/diagnostics/latest_logs/<step>.log when it ends, overwriting
@@ -101,8 +125,8 @@ Before step 5 on a fresh setup, `sbatch preflight_inference.slurm` checks that
 columns; 05 prints the OSM-confirmed count; 07b's model is newer than 04's.
 Step 5 is `05_run_inference_array.slurm` — the national
 `05_run_inference.slurm` now refuses `--array`, and `merge_05_shards` refuses
-shards older than the models. `TRAINING=1` collect_logs does not pick up the
-01e / 05b logs; collect those with `PATTERN=`.
+shards older than the models. Every step's log lands in
+`correction/diagnostics/latest_logs/` on its own (collect_logs is retired).
 
 Re-running one failed 02 state: array indices follow `DEFAULT_STATES` in
 `_common.sh` (51 states, DC excluded — **OH is 34**). Re-run with
@@ -130,7 +154,11 @@ git commit -m "round 5 queue" && git push
 From round 6, add `AUDIT=80` to the first 10 call (not the `KEEP=1` one):
 80 plants drawn at random from 13's `moved` plants, before the
 uncertain/random split, so 13 must be current (10 refuses a 13 output older
-than 05b). See `docs/RUN_20261008_round6.md`.
+than 05b). See `docs/RUN_20261008_round6.md`. An audit measures the models
+that produced the moves, so draw a fresh one after every retrain; the review
+app shows audit plants blind (shuffled, lettered candidates, no scores).
+Score it with `calibrate_move_rule.py --rounds N` (the audit is its own
+slice row).
 
 10's wrapper copies prior rounds' review logs from the repo itself, so earlier
 plants (including `needs_info`) are excluded automatically. Check its log for
@@ -140,9 +168,8 @@ plants (including `needs_info`) are excluded automatically. Check its log for
 ### A7. Review (local)
 
 ```bash
-# Copy down from HPC into review_app/data/incoming/:
-#   review_queue_round{N+1}.parquet   (from data/review_queue/)
-#   holdout_manifest.parquet          (from data/holdout/)
+# The queue arrives with git pull (A5 commits it to review_app/data/incoming/).
+# holdout_manifest.parquet (from data/holdout/) only if it changed.
 
 cd review_app
 python -m backend.queue_loader --round N+1

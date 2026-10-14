@@ -207,12 +207,41 @@ evaluation.
 
 ---
 
+## Audit plants are reviewed blind (from round 6)
+
+10's `AUDIT=N` slice is a uniform random sample of the plants 13 moved; its
+precision is the product's precision. Seeing the model's pick on top at 0.95+
+would anchor the verdict, so the app shows audit plants with candidates in a
+fixed shuffled order, lettered A-E, with no scores, ranks or slice label (the
+true rank is still what gets submitted). Detection results and parcel facts
+stay visible. The plant list shows the whole round as one list ordered by
+CWNS ID, so it does not reveal which plants are audit moves.
+
+## Verdicts from the viewer (round 900)
+
+The viewer (`viewer/`) can verify or correct any plant: "the reported
+location is right", "this parcel is the plant" (any parcel, scored candidate
+or not, plus "also part" parcels), a clicked point, or needs_info. It writes
+into `review_app/data/app.db` as review round **900**
+(`viewer/verdicts.py`), and `close_round --round 900` carries it to the master
+like any round (`How_Corrected = "Viewer"`). Rules:
+
+- A plant already in app.db under another round (reviewed, or queued and not
+  yet reviewed) is locked in the viewer; change it in the review app.
+- Round 900 feeds training only. It is not a random sample, so it never goes
+  into `calibrate_move_rule.py` or an audit.
+- A clicked point is final: stored exactly in the master and copied unchanged
+  by 13 (`coord_method = reviewer`).
+
+---
+
 ## Known limitations of the app
 
 - **No undo.** `POST /api/verdict` returns 409 on a second submission rather
   than overwriting. To correct a mis-click:
   `UPDATE plants SET reviewed = 0 WHERE cwns_id = '...'` directly in SQLite.
-- **No out-of-order review.** `GET /api/plants/{cwns_id}` exists as a raw
-  endpoint; there is no UI for it.
+- The plant list (whole round, by CWNS ID) allows out-of-order review.
+- Debugging: browser errors are reported to the server and written to
+  `review_app/data/outgoing/review_debug.log` -- push that file to share it.
 - **`pull_round.sh` is a template** with placeholder host and paths, never
   confirmed working.

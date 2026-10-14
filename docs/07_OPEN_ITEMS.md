@@ -148,7 +148,7 @@ folded into training. Round 4 (2026-10-01): 15/16 = 93.8% at score ≥ 0.95,
 95% CI 72–99%. Not yet provable; more out-of-sample review at the top of the
 score range is what closes the interval.
 
-### Population floor: plants serving > 1,000 people only (2026-09-25)
+### Population floor: plants serving > 100 people (was > 1,000; lowered 2026-10-05, first run 2026-10-09)
 
 `config.MIN_POP_SERVED`, applied in 02, 05, 12 and preflight. All 8
 zero-population plants in round 3 came back `needs_info`; `needs_info` fell
@@ -156,7 +156,9 @@ from 32% (round 3) to 17% (round 4) after the filter. CWNS includes planned
 facilities that do not exist yet. The holdout is filtered at scoring time,
 never resampled. `--min-pop 0` disables it.
 
-**Planned 2026-10-05 (owner): lower the floor to > 100.** When that runs:
+**Done: the floor is > 100** (round 6 cycle, 2026-10-09 to 10-13; 13 now
+reports 2,124 plants not assessed for population <= 100 or unknown). The plan
+as agreed, now in place:
 slice every performance read (12, `calibrate_move_rule.py`, Stage 1 flag
 rates, `needs_info` rate) by population band (100–1,000 vs > 1,000), and
 label plants serving 100–1,000 as more uncertain in the corrected output
@@ -236,6 +238,19 @@ exactly in the master (Corrected_X/Y; checked: all 82 clicked points of rounds
 fall between parcels applies only to MODEL moves (status `moved`), never to a
 verified plant.
 
+### Open after round 6 (2026-10-14)
+
+- **Small plants on their own.** The 100-1,000 band was 26/27 in the audit
+  (CI 82-99%): not yet shown > 90% by itself. Options: oversample that band in
+  the next audit (10 has no band option yet -- it would need one), or a
+  stricter cutoff for the band if its precision drops.
+- **Flagged, not moved (6,370 plants)** is the biggest bucket. Most have
+  candidates, but none cleared 0.95. Levers: wider candidate generation
+  (owner: not now), an audited lower cutoff, more review.
+- **Model points between parcels.** Some detection-mean points land outside
+  every parcel (6 of 950 on 2026-10-05). Snap them into the site, or accept?
+  Model moves only -- never reviewer points.
+
 ### A Stage 1 guardrail for utility-owned reported parcels
 
 Held, deliberately (2026-10-02). Utility-owned reported parcels are 99% Correct
@@ -304,7 +319,21 @@ state's worth of those.
 
 ## Gaps
 
-### No corrected-output product yet
+### ~~No corrected-output product yet~~ -- DONE
+
+**Exists and runs every cycle (2026-10-13 latest).** `13_build_corrected_output.py`
+writes `correction/diagnostics/output/cwns_corrected_locations.parquet` (one
+row per plant, 17,874) plus sites and detections layers; its slurm also runs
+`export_viewer_data.py`. 2026-10-13 counts: moved 2,070, verified_correct
+2,226, verified_corrected 832, kept_model 3,766, kept_osm 121, kept_site 122,
+flagged_not_moved 6,370, reviewed_unresolved 49, not_assessed 2,318.
+**Consumers outside this repo:** the sewershed_plus map
+(`ARMurray/sewershed_plus`, `pull_tp_qa_locations.py`) copies this file and
+uses `CWNS_ID`, `status`, `out_lat`, `out_lon`, `moved_m`, `built` -- rename or
+drop those columns and it breaks; it groups statuses as High confidence
+(verified_*, moved, kept_*), Low (flagged_not_moved, reviewed_unresolved),
+Not assessed, like `viewer/`. Original note below.
+
 
 Nothing writes the final corrected-locations file. Proposed:
 `13_build_corrected_output.py`, one row per CWNS plant with a decision of

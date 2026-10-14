@@ -31,9 +31,11 @@ run.
 | 4 | [04_REVIEW_LOOP.md](04_REVIEW_LOOP.md) | The review app, and how a verdict becomes training data |
 | 5 | [05_RUNBOOK.md](05_RUNBOOK.md) | **The operational runbook.** Start-to-finish commands for a full cycle |
 | — | [pipeline-map.html](pipeline-map.html) | **Visual map.** Every script, the run order, the branches, and all 181 arguments. Open it in a browser. |
-| — | [RESUME_20261002.md](RESUME_20261002.md) | **Resume here.** State as of 2026-10-02: the goal (>90% precision on automated moves), results so far, and the exact next retrain. |
+| — | [RESUME_20261014.md](RESUME_20261014.md) | **Resume here.** State as of 2026-10-14: the 90% goal met by the round 6 audit, what was built, and the round 7 plan. |
+| — | [RUN_20261008_round6.md](RUN_20261008_round6.md) | The round 6 cycle step by step (floor 100, audit slice) — the template for the next cycle. |
 | — | [review_notes/](review_notes/) | Reviewer notes per round, with the analysis of each. |
-| — | [RESUME_20260924.md](RESUME_20260924.md), [NEXT_STEPS.md](NEXT_STEPS.md) | Earlier snapshots. History only. |
+| — | [RESUME_20261005.md](RESUME_20261005.md), [RESUME_20261002.md](RESUME_20261002.md), [RESUME_20260924.md](RESUME_20260924.md), [NEXT_STEPS.md](NEXT_STEPS.md), [PLAN_20261005_detector_population_sites.md](PLAN_20261005_detector_population_sites.md) | Earlier snapshots. History only. |
+| — | [../viewer/README.md](../viewer/README.md) | The map viewer: corrected locations by confidence, candidates, parcels, verify / correct (round 900). |
 | 6 | [06_TROUBLESHOOTING.md](06_TROUBLESHOOTING.md) | Failures that have actually happened, and what they meant |
 | 7 | [07_OPEN_ITEMS.md](07_OPEN_ITEMS.md) | Known gaps, pending decisions, what to do next |
 | 8 | [08_HANDOFF.md](08_HANDOFF.md) | What only lived in one person's head |
@@ -77,7 +79,7 @@ much you should trust it:
 | Document | Status | Notes |
 |---|---|---|
 | **Script docstrings** | **Authoritative** | Unusually thorough, and kept current. When a docstring and a document disagree, believe the docstring. |
-| `docs/` (this manual) | Current as of 2026-09-21 | |
+| `docs/` (this manual) | Current as of 2026-10-14 (runbook, review loop, open items; resume file) | |
 | `TPQA_MASTER_REFERENCE.md` | Mostly current | Sections 1–6, 9 are good. §7 "No Inference Pipeline Exists" is **stale** — `05_run_inference.py` exists. Counts throughout are from the OH/MS/DE pilot and are now low. |
 | `REVIEW_LOOP_PLAN.md` | Historical | The *plan*, largely delivered. Phase 4 says "extend `app.R`" — the app was built in Python/FastAPI instead. Phase 5's fold-back design was superseded on 2026-09-21. |
 | `correction/README_HPC.md` | Partly stale | Run order references `slurm/` subdirectory; the files are flat in `scripts/`. Use [05_RUNBOOK.md](05_RUNBOOK.md) instead. |
