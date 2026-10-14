@@ -1182,6 +1182,12 @@ function setBasemap(key) {
 async function main() {
   deckgl = new DeckGL({
     container: "map",
+    // Ask for the discrete GPU on dual-GPU machines. Browsers may still pick
+    // the integrated one -- Windows' per-app Graphics setting decides; the
+    // console line below says which GPU WebGL actually got.
+    deviceProps: { powerPreference: "high-performance", webgl: { powerPreference: "high-performance" } },
+    onDeviceInitialized: (device) =>
+      console.info(`[deck.gl] GPU: ${device.info?.vendor || "?"} -- ${device.info?.renderer || "?"}`),
     viewState,
     controller: true,
     layers: [basemapLayer(basemap)],
