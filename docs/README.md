@@ -33,6 +33,7 @@ run.
 | — | [pipeline-map.html](pipeline-map.html) | **Visual map.** Every script, the run order, the branches, and all 181 arguments. Open it in a browser. |
 | — | [RESUME_20261014.md](RESUME_20261014.md) | **Resume here.** State as of 2026-10-14: the 90% goal met by the round 6 audit, what was built, and the round 7 plan. |
 | — | [RUN_20261008_round6.md](RUN_20261008_round6.md) | The round 6 cycle step by step (floor 100, audit slice) — the template for the next cycle. |
+| — | [PLAN_20261023_anchor_points.md](PLAN_20261023_anchor_points.md) | **Draft.** Anchor points (outfalls, CSOs, overflow events, collection-system points, addresses) scored here and exported as a frozen snapshot for sewersheds v2. |
 | — | [review_notes/](review_notes/) | Reviewer notes per round, with the analysis of each. |
 | — | [RESUME_20261005.md](RESUME_20261005.md), [RESUME_20261002.md](RESUME_20261002.md), [RESUME_20260924.md](RESUME_20260924.md), [NEXT_STEPS.md](NEXT_STEPS.md), [PLAN_20261005_detector_population_sites.md](PLAN_20261005_detector_population_sites.md) | Earlier snapshots. History only. |
 | — | [../viewer/README.md](../viewer/README.md) | The map viewer: corrected locations by confidence, candidates, parcels, verify / correct (round 900). |
