@@ -1,0 +1,30 @@
+SSO_KEY,LATITUDE_MEASURE,LONGITUDE_MEASURE,OTHER_SSO_REACTION,OTHER_COMPONENT,OVERFLOW_CAUSE,OVERFLOW_DATE,OVERFLOW_DURATION,OVERFLOW_LOCATION,OVERFLOW_VOLUME,RECEIVING_WATER,STEPS_TAKEN,ICIS_COMP_MON_SSO_COMPONEN_ID,SYSTEM_COMPONENT_CODE,ICIS_COMP_MON_SSO_IMPACT_ID,SSO_IMPACT_CODE,ICIS_COMP_MON_SSO_REACTION_ID,SSO_REACTION_CODE,LATITUDE_MEASURE_DMS,LONGITUDE_MEASURE_DMS,SSO_REACTION_DESC,SSO_IMPACT_DESC,SSO_SYSTEM_COMPONENT_DESC,COMP_MONITOR_KEY,ORIG_GEOCODE_COORD_FORMAT_CODE
+482,NA,NA,NA,NA,No SSO event,2014-05-02T00:00:00Z,0,Not a SSO event.,0,none,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,275571,DD
+483,NA,NA,NA,NA,NA,2007-05-01T00:00:00Z,NA,"Town of Cheektowage, NY",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,276758,DD
+484,NA,NA,NA,NA,NA,2008-06-05T00:00:00Z,NA,"West Seneca, NY",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,277634,DD
+485,NA,NA,NA,NA,NA,2017-12-15T00:00:00Z,NA,Inspection to show compliance with NPDES laws,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,277740,DD
+486,NA,NA,NA,NA,NA,2018-05-23T00:00:00Z,NA,"City of Wynne/ Collection System
+454 Bowden Road
+Wynne AR 72396",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,278117,DD
+487,NA,NA,NA,NA,NA,2018-01-13T00:00:00Z,NA,Visitors Parking Lot,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,278534,DD
+488,NA,NA,NA,NA,root ball,2017-10-30T00:00:00Z,NA,"Wadsworth Interceptor, Auburn, NY ",NA,NA,NA,3600001801,P,3600001621,R,3600001201,B,NA,NA,Removed Blockage,SSO Reached Receiving Water,Pipe Failure,278710,DD
+489,NA,NA,connecting laterals to sewers,NA,NA,2006-09-20T00:00:00Z,NA,"Benton Street
+Branch, PA",NA,NA,NA,600000140,L,600000120,R,600000080,O,NA,NA,Other,SSO Reached Receiving Water,House Lateral,279374,DD
+490,40.839167,-79.920278,NA,NA,NA,2018-09-30T00:00:00Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"+ 40 50' 21"" 0","- 79 55' 13"" 0",NA,NA,NA,279519,DD
+491,0,0,NA,NA,See Final Inspection Report,2019-01-04T00:00:00Z,NA,See final inspection Report,NA,NA,NA,NA,NA,NA,NA,NA,NA,"+ 0 0' 0"" 0","+ 0 0' 0"" 0",NA,NA,NA,280364,DD
+492,39.86889,75.22028,NA,NA,NA,2006-07-02T00:00:00Z,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,"+ 39 52' 8"" 0","+ 75 13' 13"" 0",NA,NA,NA,280577,DD
+493,NA,NA,NA,NA,"2"" rain",2010-05-13T00:00:00Z,NA,MH #C15 &C16 ON B&E MARINA DOCK,1000,TRAIL CREEK STREAM,STUDY UNDERWAY TO RELOCATE SEWER,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,281567,DD
+494,NA,NA,NA,NA,NA,2010-05-19T00:00:00Z,NA,Collection System Inspection,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,281610,DD
+495,NA,NA,NA,NA,NA,2006-10-26T00:00:00Z,NA,"Road # 175 Km 13.3
+Trujillo Alto, Puerto Rico",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,282089,DD
+496,NA,NA,NA,NA,NA,2011-01-19T00:00:00Z,NA,"Pocahontas WWTP 2 miles down Swan Cove Road off Highway #67
+PUMP STATIONS:  Waterloo Pump Station #1 ? located at Waterloo Street and Highway #304, Patrick Manor Pump Station #2 ? located on Pace Road, KPOC Pump Station #3 ? located on Highway #67 across highway from KPOC radio station
+Pocahontas, AR 72455",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,3317601,DD
+497,NA,NA,Periodic flushing of line,collection system blockage,Grease blockage,2017-09-08T00:00:00Z,1,"314 Almond, Euless Texas",50,Trinity River,"Cleared blockage, vacuumed wastewater, disinfected area",3600001560,O,3600001420,L,3600001000,B,NA,NA,Removed Blockage,SSO Reached Public Land Only,Other,3323354,DD
+498,NA,NA,NA,NA,NA,2016-06-06T00:00:00Z,NA,"Pennsauken, NJ",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2800448,DD
+499,NA,NA,NA,NA,NA,2016-11-09T00:00:00Z,NA,"City of Knobel - Collection System
+228 Clay County Road 222
+Knobel AR 72435
+",NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2802377,DD
+500,NA,NA,NA,NA,NA,2017-10-30T00:00:00Z,NA,This was part of a routine compliance inspection; no SSO occurred.,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,2802435,DD
+501,NA,NA,A city wide manhole survey was conducted.,NA,A broken manhole was located on the north end of town that appears to be a heavy contributor of excess rainfall.,2008-06-10T00:00:00Z,NA,"North Orval Avenue, Plainview, AR",NA,NA,A city wide manhole survey was conducted to determine the cause some of the I & I issues faced by the city. A broken manhole was located on the north end of town that appears to be a heavy contributor of excess rainfall. The manhole was broken by landowner while mowing and never reported. Manhole is scheduled to be replaced July 2008. This will hopefully alleviate some of the overflows on North Orval.,1400000041,M,1400000001,L,1400000001,O,NA,NA,Other,SSO Reached Public Land Only,Manhole,2804031,DD

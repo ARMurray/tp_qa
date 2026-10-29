@@ -1,0 +1,9 @@
+PERMIT_TYPE_CODE,PERMIT_TYPE_DESC,STATUS_FLAG
+NPD,NPDES Individual Permit,A
+NGP,NPDES Master General Permit,A
+GPC,General Permit Covered Facility,A
+SNN,State Issued Master General Permit (Non-NPDES),A
+IIU,Individual IU Permit (Non-NPDES),A
+SIN,Individual State Issued Permit (Non-NPDES),A
+APR,Associated Permit Record,A
+UFT,Unpermitted Facility,A

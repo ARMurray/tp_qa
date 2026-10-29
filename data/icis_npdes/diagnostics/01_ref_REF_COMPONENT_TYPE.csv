@@ -1,0 +1,10 @@
+COMPONENT_TYPE_CODE,COMPONENT_TYPE_DESC,STATUS_FLAG
+PRE,Pretreatment,A
+CAF,CAFO,A
+CSO,CSO,A
+POT,POTW,A
+BIO,Biosolids,A
+SWS,Storm Water Small MS4s,A
+SWM,Storm Water Medium/Large MS4s,A
+SWI,Storm Water Industrial,A
+SWC,Storm Water Construction,A

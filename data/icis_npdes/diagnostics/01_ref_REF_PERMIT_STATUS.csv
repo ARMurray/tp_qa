@@ -1,0 +1,9 @@
+PERMIT_STATUS_CODE,PERMIT_STATUS_DESC,STATUS_FLAG
+EFF,Effective,A
+EXP,Expired,A
+PND,Pending,A
+TRM,Terminated,A
+RET,Retired,A
+NON,Not Needed,A
+ADC,Admin Continued,A
+DEN,Denied,A

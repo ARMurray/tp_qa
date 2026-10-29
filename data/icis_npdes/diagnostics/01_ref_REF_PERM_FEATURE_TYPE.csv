@@ -1,0 +1,18 @@
+PERM_FEATURE_TYPE_CODE,PERM_FEATURE_TYPE_DESC,STATUS_FLAG
+EXO,External Outfall,A
+SUM,Sum,A
+INO,Internal Outfall,A
+INS,Intake Structure,A
+INF,Influent Structure,A
+ARW,Receiving Water (Ambient),A
+LAS,Land Application Site,A
+SDS,Surface Disposal Site,A
+INC,Incinerator,A
+CDS,Co-disposal Site,A
+WEL,Monitoring Well,A
+OTR,Other,I
+DOF,Discharge to Offsite Facility,A
+PLA,Platform,A
+MOD,MODU,A
+SUB,Subsea,A
+BIO,Biosolids,A

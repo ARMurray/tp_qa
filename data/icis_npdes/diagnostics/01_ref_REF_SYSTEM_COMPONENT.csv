@@ -1,0 +1,8 @@
+SYSTEM_COMPONENT_CODE,SYSTEM_COMPONENT_DESC,STATUS_FLAG
+M,Manhole,A
+L,House Lateral,A
+P,Pipe Failure,A
+PS,Pump Station Failure,A
+S,Storm Drain,A
+C,Constructed Emergency Outfall,A
+O,Other,A

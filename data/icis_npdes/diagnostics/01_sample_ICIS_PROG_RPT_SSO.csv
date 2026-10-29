@@ -1,0 +1,68 @@
+PROG_RPT_ID,OVERFLOW_CAUSE,OVERFLOW_LOCATION,OVERFLOW_VOLUME,RECEIVING_WATER,OTHER_COMPONENT,OTHER_SSO_REACTION,STEPS_TAKEN,LATITUDE_MEASURE,LONGITUDE_MEASURE,PERM_FEATURE_ID,CREATED_BY,CREATED_DATE,UPDATED_BY,UPDATED_DATE,OVERFLOW_DURATION
+600000693,Lift station backed up due to heavy rain.,East State Park lift station,NA,Enemy Swim Lake,NA,NA,NA,NA,NA,NA,mfb,2007-04-24T09:45:28Z,CJOHNSTO,2023-01-12T14:13:10Z,NA
+600000000,Test Event,1 blackstone blvd.,10,Woonsocket Bay,NA,NA,"aaa
+aaa
+sss
+s
+s
+s
+s
+s",NA,NA,NA,DEBRA_MERRILL,2006-09-12T12:57:45Z,EHARRIST,2015-08-28T16:43:12Z,10
+1800002763,PLUGGED SEWER,"1141 CENTRAL AVE, BILLINGS, MT",NA,NA,PLUGGED SEWER,NA,NA,NA,NA,NA,PETE_BOETTCHER,2009-12-14T13:18:07Z,EHARRIST,2014-04-17T12:00:54Z,1
+1800002764,LIFT STATION FAILURE CAUSED BASEMENT BACKUP,"3044 AND 3052 MANGRUM LANE, BILLINGS, MT",30,NA,NA,NA,NA,NA,NA,NA,PETE_BOETTCHER,2009-12-14T13:21:34Z,SRUBIN,2014-04-17T12:00:57Z,1
+1800002765,PUMP FAILURE IN A LIFT STATION,6122 SAM SNEAD TRAIL,10,NA,NA,NA,NA,NA,NA,NA,PETE_BOETTCHER,2009-12-14T13:25:09Z,ICIS,2012-05-11T16:54:47Z,1
+1800003662,ELECTRICAL FAILURE AT PUMP STATION,"NORTH OF B DRIVE, CIRCLE",20000,HORSE CREEK,NA,CONTACT COMPANY REP,COMPANY REP AND ENGINEER WILL TRY TO DETERMINE CAUSE OF THE FAILURE.,47.42729,-105.58391,NA,DAN_FREELAND,2010-02-03T15:22:11Z,ICIS,2012-05-11T16:54:47Z,NA
+1800002541,Blockage in main sewer line,"1141 Central Avenue, Billings MT",400,NA,NA,Cleaned line,"City employees jetted the sewer line
+sewer started to flow
+basement drained of water
+Homeowner instructed to have basement professionally cleaned.",NA,NA,NA,PETE_BOETTCHER,2009-11-24T17:48:05Z,TOKEN_NOLDER,2015-03-31T17:41:41Z,1
+1800002802,blockage in sewer line,775 West Gold Street,5000,Blacktail Creek,NA,jetted lines,NA,NA,NA,NA,CHRISTOPHER_ROMANKIEWICZ,2009-12-16T11:38:31Z,ICIS,2012-05-11T16:54:47Z,12
+1800004143,ROOTS AND RAGS IN CITY SEWER LINE,"1843 AVENUE E, BILLINGS, MT",30,NONE,PLUGGED COLLECTION LINE,NA,JETTED LINE,NA,NA,NA,PETE_BOETTCHER,2010-03-19T10:11:03Z,ICIS,2012-05-11T16:54:47Z,1
+1800002762,MANHOLE PLUGGED WITH GRAVEL BY CONTRACTOR WHEN REPAIRING SEWER,"2501 CENTRAL AVE, BILLINGS, MT",200,NA,NA,NA,CLEANED OUT GRAVEL FROM MANHOLE,NA,NA,NA,PETE_BOETTCHER,2009-12-14T13:13:06Z,EHARRIST,2014-04-04T14:41:51Z,2
+1800002766,SEWER BACKUP,"1144 MILES AVE., BILLINGS, MT",100,NA,PLUGGED SEWER,NA,NA,NA,NA,NA,PETE_BOETTCHER,2009-12-14T13:29:01Z,SRUBIN,2014-04-17T11:58:51Z,NA
+1800003003,TREE ROOTS,1027 N 22 STREET,4300,BASEMENT BACKUP,NA,CHEMICAL TREATMENT,CHEMICAL TREATMENT TO BE APPLIED SPRING OF 2010,NA,NA,NA,CHRISTOPHER_ROMANKIEWICZ,2009-12-31T10:56:28Z,EHARRIST,2014-04-15T12:15:29Z,1
+1800002801,blockage in sewer line,Victoria Lane,200,Blacktail Creek,NA,jetted lines,NA,NA,NA,NA,CHRISTOPHER_ROMANKIEWICZ,2009-12-16T11:11:21Z,EHARRIST,2014-04-04T14:41:31Z,2
+1800003141,Blockage in main line; caused backup into residential basement.,"305 Cedar Street
+Philipsburg, MT",100,None,main sewer line blockage,Jetted main line clear,"Main line jetted to clear blockage.
+Town contacted its insurance company to cover cost of cleanup of residence.",NA,NA,NA,mlu,2010-01-11T17:32:57Z,EHARRIST,2014-04-15T12:15:41Z,2
+1800004661,Oil and Grease and sediment bloackage,166 Beach Street,100,N/A,NA,CCTV,Cameraed line to ensure blockage was removed,NA,NA,NA,CHRISTOPHER_ROMANKIEWICZ,2010-04-28T20:07:03Z,ICIS,2012-05-11T16:54:47Z,2
+1800005162,blockage of roots and grease in sewer main line,"1801 Lyndale Lane, 1802 Lyndale Lane, 1832 Forest Park Drive",470,NA,Sewer Main Line,Televise,City of Billings will televise the main line,NA,NA,NA,CHRISTOPHER_ROMANKIEWICZ,2010-06-10T12:48:00Z,ICIS,2012-05-11T16:54:47Z,4
+1800005444,"Rain. Lake County Stormwater Management Commission reported 2.85 "" of rainfall onto already saturated soils in Wauconda on May 13, 2010.  Prior to that, on May 11-12, 1.28 inches of rain fell in Waunconda.","Manhole 4-6(collection system)
+910 Pershing(residential basement)
+236 N Main St (residential basement)
+304 N. Main St (residential basement
+308 N. Main St (residential basement)
+633 Lakeshore Blvd/ (residential basement)
+1360 N. Old Rand Rd (commercial toilets)
+629 NE Holcomb Dr
+727 NE Holcomb Dr
+237 N Idlewild Ave
+232 N Ridgemoor Ave
+618 N Emerald Ave
+938 Winthrop Court
+933 Winthrop Court
+256 N Ridgemoor Ave
+3 S Archer Avenue
+225 N Idlewild Ave
+27 S Garfield Ave
+504 N Prairie Ave
+823 Killarney Pass Drive
+112 Wellington Ave
+928 Clearbrook Drive
+703 NE Holcomb Drive",500,Runs on ground and absorbs into the soil; 5 Basement back-ups and 1 sewage back-up out of toilets.,Stormwater infiltration into sanitary sewer CS,NA,Hay bales were placed around Manhole4-6.  Sandbags were placed on top of it.  Every manhole between Manhole 4-6 & Lift Station #4 was checked.  A section of sanitary sewer was rodded out(no blockage was found.  SSO cause:  escessive rain.  Sanitary sewage in basements  had receeded by time Public Work crews responded that morning.,NA,NA,NA,tlz,2010-06-30T10:19:25Z,ICIS,2012-05-11T16:54:47Z,2
+1800005468,Rain,"Nordic & Rt. 53
+Nordic & Neva Rd.
+Club & Terrace Rd.",54000,"Runs on ground and absorbs into the soil.  
+Spring Brook Creek",Excessive rain caused SS to fill quickly,NA,On going repairs are currently being worked on to eliminate any potential infiltration into the Nordic sewer system.,NA,NA,NA,tlz,2010-06-30T14:51:49Z,ICIS,2012-05-11T16:54:47Z,9
+1800005469,Rain.  Received 1.44 inches of rain on 5/12/10.  Then on 5/13/10 received 1.80 inches of rain totaling 3.20 inches of rain.,"004-Park
+Villa & Maple
+Villa & North Ave",NA,Other. Salt Creek,Storm Sewer,NA,"1.  Sand bagged manhoes to contain overflow
+2.  Flushed main sewer. Will televise to determine 
+     any problems with the sewer main.",NA,NA,NA,tlz,2010-06-30T15:07:05Z,ICIS,2012-05-11T16:54:47Z,4
+1800005471,"Rain, Widespread Flooding, Equipment failure","210 East Pine St.- 1,000 GAL.
+MH 187C & Unnumbered MH - 50,000 Gal.
+108 N. Center - 50 GAL.
+124 N. York RD. - 50 GAL.
+116 N. Center - 50 GAL.",1000,"Silver Creek
+Basement Back-ups - 5 Residential",Pump failure,NA,"Actions taken to minimize volume of discharge:  Immediate & thorough customer response.
+Continue executing 2010 Collection System Cleaning & Maintenance Plan",NA,NA,NA,tlz,2010-06-30T16:21:06Z,ICIS,2012-05-11T16:54:47Z,2
