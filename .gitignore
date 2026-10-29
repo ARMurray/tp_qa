@@ -91,3 +91,6 @@ __pycache__/
 .ipynb_checkpoints/
 *.bak-*
 Untitled*.ipynb
+
+# cached ICIS feature pull from diag_icis_npdes.R (large)
+**/icis_npdes/diagnostics/cache_*.rds
