@@ -1,0 +1,113 @@
+PERM_INDUSTRIAL_CAT_CODE,PERM_INDUSTRIAL_CAT_DESC,STATUS_FLAG
+000,Temporary Discharges,A
+001,Agricultural Production Livestock,A
+002,Asphalt Scrubbers,A
+003,Shipyards,A
+004,Coal & Metal Mining,A
+005,Remine & Abandoned Mine Land Reclaim,A
+006,Lumber & Wood Industries,A
+007,Construction,A
+008,Fuel Spill Cleanup,A
+009,Compost Site(s),A
+010,Deep Seabed Mining,A
+011,Concrete Industries,A
+012,Metal Industries,A
+013,Fish Hatcheries & Preserves,A
+014,Transportation,A
+015,Food & Kindred Products,A
+016,Landfill Runoff,A
+017,Paints & Kindred Products,A
+018,Salvage & Recycling,A
+019,Laundry/Cleaning/Garment Services,A
+020,Plastics & Rubber,A
+021,Film Processing,A
+022,Meat Products,A
+023,"Stone, Glass & Clay",A
+024,Textile & Leather Products,A
+025,Non-Contact Cooling Waters,A
+026,Territorial Seas,A
+027,Hydrostatic Test/Wastewater,A
+028,Oil & Gas Extraction-Offshore,A
+029,Non-Construction (Baseline),A
+030,UST Dewatering/Ballast Water,A
+031,Oil & Gas Extraction,A
+032,Oil & Gas Extraction-Onshore,A
+033,Small MS4 (Municipal Separate Storm Sewer Systems),A
+034,Petroleum Bulk Stations & Terminals,A
+035,Medium and Large MS4 (Municipal Separate Storm Sewer Systems),A
+036,Hydroelectric Generating Facility,A
+037,Placer Mining,A
+038,Potable Water Plants,A
+039,Coal Bed Methane Production,A
+040,Private Households,A
+041,Multi-Sector,A
+042,Short Term Discharges,A
+043,Processed Fruits & Vegetables,A
+044,Mechanical/Electronic Equip.,A
+045,Reverse Osmosis Desalinization,A
+046,Paper & Allied Products,A
+047,Auto Sales & Maintenance,A
+048,Light Commercial Discharges,A
+049,Chemicals & Allied Products,A
+050,Sand & Gravel,A
+051,Boatyard,A
+052,Seafood Processing,A
+053,"Class I Sanitary (<5,000 GPD)",A
+054,"Class II Sanitary(<25,000 GPD)",A
+055,Sewerage Systems (Commercial),A
+056,Class III Sanitary (<50K GPD),A
+057,Class IV Sanitary (<100K GPD),A
+058,Sewerage Systems (Municipal),A
+059,CAFO - Dry Litter,A
+060,Minimum Environmental Impact,A
+061,Storm Water Runoff,A
+062,Septic Tanks,A
+063,Agricultural Chemicals,A
+064,Water Supply,A
+065,Sludge,A
+066,Sanitary Landfill ,A
+067,Oil & Gas Lines-Hydrostatic,A
+068,Pressure Testing/Water,A
+069,Dredging/Water Discharge,A
+070,Log Transfer,A
+071,Disinfect Potable Water Lines,A
+072,Well Pump Tests,A
+073,Mine Dewatering,A
+074,Construction Dewatering,A
+075,Car & Truck Washes,A
+076,Swimming Pool Filter Backwash,A
+077,Chlorinated Water,A
+078,Construction & Debris Landfill,A
+079,Aquifer Restoration,A
+080,CAFO/Egg Producers,A
+081,Wood Preserving,A
+082,No Discharge Permit,A
+083,Underground Storage Tanks,A
+084,Non-Coal Mining,A
+085,Nonmetallic Minerals,A
+086,Bulk Storage Tanks (Bulk Terminals),A
+087,Pesticides,A
+088,Gravel Mines,A
+089,Truck Maintenance & Transfer-Type D,A
+090,Coal Gassification,A
+091,Groundwater Cleanup Dewatering,A
+092,Hazardous Waste Treatment,A
+093,CAFO,A
+094,Electric & Combined Services,A
+095,Inactive & Abandoned Mines,A
+096,Land Application Site(s),A
+97I,Treatment Works,A
+98I,Steam Electric/Petroleum Production,A
+99I,Not Yet Classified,I
+NEX,No Exposure,A
+097,Construction Phase II,A
+098,Wasteload Allocations (TMDL),A
+099,Non-Process Discharges to Surface Water,A
+100,Aquaculture & Aquarium,A
+101,Application To Surface Water,A
+102,Vessel,A
+103,Watershed (Basin Plan),A
+104,Asphalt Production,A
+105,Beneficial Reuse,A
+106,Sanitary (Schools),A
+107,Dyes,A

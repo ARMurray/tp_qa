@@ -1,0 +1,18 @@
+18:35:18 A_category_like_columns 188 rows, 0 s 
+18:35:18 B_master_permit_rows 3 rows, 0 s 
+18:35:19 B_coverage_rows 47 rows, 1 s 
+18:35:19 C_features_all_columns 25 rows, 0 s 
+18:35:20 C_components 17 rows, 0 s 
+18:35:20 C_industrial FAILED: [1m[22m[33m![39m ODBC failed with error 42S22 from [32m[Oracle][ODBC][Ora][39m.
+[31m✖[39m ORA-00904: "ACTIVITY_ID": invalid identifier
+[36m•[39m Help: https://docs.oracle.com/error-help/db/ora-00904/
+[36m•[39m 
+[36m•[39m <SQL> 'SELECT * FROM ICIS_PERM_INDUSTRIAL WHERE ACTIVITY_ID IN
+  (3602877846,20028396,2600094565,3603039061,3603036656,3603011654,3603037865,3603039034,3603012473,3603036901,3603037784,3603037744,3603036944)'
+[36mℹ[39m From ]8;line = 1802:col = 1;file://c:/Users/AMURRA02/tp_qa/nanodbc/nanodbc.cpp[34mnanodbc/nanodbc.cpp:1802[39m]8;;. 
+18:35:20 C_permit_all_columns 13 rows, 0 s 
+18:35:20 D_master_general_category_values 0 rows, 0 s 
+18:35:20 E_ref_perm_industrial_cat 112 rows, 0 s 
+18:35:20 E_ref_facility_type 15 rows, 0 s 
+18:35:26 F_phrase_in_permit_names 7 rows, 6 s 
+18:35:27 DONE. Push correction/data/icis_npdes/probe 
