@@ -1,0 +1,15 @@
+FACILITY_TYPE_INDICATOR,pot,own,n
+FEDERAL,FALSE,public,4125
+FEDERAL,TRUE,public,47
+NON-POTW,FALSE,mixed,6345
+NON-POTW,FALSE,no_facility_row,212333
+NON-POTW,FALSE,private,416415
+NON-POTW,FALSE,public,56460
+NON-POTW,FALSE,unknown,14
+NON-POTW,TRUE,no_facility_row,50
+NON-POTW,TRUE,private,464
+NON-POTW,TRUE,public,15
+POTW,TRUE,mixed,180
+POTW,TRUE,public,16251
+NA,FALSE,no_facility_row,1033
+NA,TRUE,no_facility_row,58

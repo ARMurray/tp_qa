@@ -1,0 +1,4 @@
+metric,value
+permit rows with RECEIVING_POTW_ID,11713
+distinct receiving POTWs,1784
+distinct IU permits,7686

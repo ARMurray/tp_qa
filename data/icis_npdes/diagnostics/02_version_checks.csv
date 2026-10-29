@@ -1,0 +1,8 @@
+metric,value
+permits,1267886
+permits with no version 0,502
+permits where lowest version has the latest ISSUE_DATE,1206881
+permits with >1 version,301882
+max versions on one permit,25
+ACTIVITY_ID duplicated across rows,0
+facility rows missing for permit (v0),441994

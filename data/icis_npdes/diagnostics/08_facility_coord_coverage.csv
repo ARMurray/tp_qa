@@ -1,0 +1,16 @@
+uclass,own,permits,with_geocode,with_huc
+A_original_NPD_EFF_ADC_POT,mixed,155,155,0
+A_original_NPD_EFF_ADC_POT,no_facility_row,10,10,0
+A_original_NPD_EFF_ADC_POT,private,321,321,0
+A_original_NPD_EFF_ADC_POT,public,13163,13158,0
+B_POT_GPC_alive2022,no_facility_row,14,13,0
+B_POT_GPC_alive2022,private,123,123,0
+B_POT_GPC_alive2022,public,2078,2077,1
+B_POT_NPD_alive2022,mixed,27,27,0
+B_POT_NPD_alive2022,no_facility_row,23,19,0
+B_POT_NPD_alive2022,private,86,86,0
+B_POT_NPD_alive2022,public,1306,1301,0
+C_noPOT_sewer_named_NPD_alive2022,mixed,149,149,0
+C_noPOT_sewer_named_NPD_alive2022,no_facility_row,194,186,1
+C_noPOT_sewer_named_NPD_alive2022,private,3128,3124,0
+C_noPOT_sewer_named_NPD_alive2022,public,1077,1076,0
