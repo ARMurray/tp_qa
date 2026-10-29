@@ -1,0 +1,9 @@
+REFERENCE_POINT_CODE,REFERENCE_POINT_DESC,STATUS_FLAG
+101,Facility/Station Building Entrance or Street Address,A
+102,Facility Center/Centroid,A
+103,Boundary Point,A
+104,Intake Point,A
+105,Treatment/Storage Point,A
+106,Release Point,A
+107,Monitoring Point,A
+108,Other,A

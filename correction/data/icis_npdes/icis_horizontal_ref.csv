@@ -1,0 +1,39 @@
+HORIZONTAL_COLLECT_METHOD_CODE,HORIZONTAL_COLLECT_METHOD_TEXT,STATUS_FLAG
+001,Address Matching-House Number,A
+002,Address Matching-Block Face,A
+003,Address Matching-Street Centerline,A
+004,Address Matching-Nearest Intersection,A
+005,Address Matching-Primary Name,A
+006,Address Matching-Digitized,A
+007,Address Matching-Other,A
+008,Census Block-1990-Centroid,A
+009,Census Block/Group-1990-Centroid,A
+010,Census Block/Tract-1990-Centroid,A
+011,Census-Other,A
+012,GPS Carrier Phase Static Relative Position,A
+013,GPS Carrier Phase Kinematic Relative Position,A
+014,GPS Code (Pseudo Range) Differential,A
+015,GPS Code (Pseudo Range) Precise Position,A
+016,GPS Code (Pseudo Range) Standard Position (SA Off),A
+017,GPS Code (Pseudo Range) Standard Position (SA On),A
+018,Interpolation-Map,A
+019,Interpolation-Photo,A
+020,Interpolation-Satellite,A
+021,Interpolation-Other,A
+022,Loran C,A
+023,Public Land Survey-Quarter Section,A
+024,Public Land Survey-Section,A
+025,Classical Surveying Techniques,A
+026,ZIP Code-Centroid,A
+027,Unknown,A
+028,GPS-Unspecified,A
+029,GPS with Canadian Active Control System,A
+030,Interpolation - Digital Map Source (TIGER),A
+031,Interpolation-SPOT,A
+032,Interpolation-MSS,A
+033,Interpolation-TM,A
+034,Public Land Survey-Eighth Section,A
+035,Public Land Survey-Sixteenth Section,A
+036,Public Land Survey-Footing,A
+037,ZIP+4 Centroid,A
+038,ZIP+2 Centroid,A

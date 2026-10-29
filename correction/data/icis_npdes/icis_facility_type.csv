@@ -1,0 +1,16 @@
+FACILITY_TYPE_CODE,FACILITY_TYPE_DESC,STATUS_FLAG
+FDF,Federal Facility (U.S. Government),A
+POF,Privately Owned Facility,A
+IND,Individual,I
+CTG,Municipality,A
+CNG,County Government,A
+STF,State Government,A
+TRB,Tribal Government,A
+GOC,GOCO (Gov Owned/Contractor Operated),I
+MWD,Municipal or Water District,A
+MXO,"Mixed Ownership (e.g., Public/Private)",A
+UNK,Unknown,I
+COR,Corporation,A
+SDT,School District,A
+DIS,District,A
+NON,Non-Government,A
