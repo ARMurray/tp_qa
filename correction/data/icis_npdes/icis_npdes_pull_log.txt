@@ -1,0 +1,12 @@
+17:06:34 pulling permits 
+17:17:39 permit-version rows: 1704335  permits: 1197973 
+17:18:01 component rows: 1093262 
+17:19:40 permits at lowest version: 1197973  alive since 2022: 698928 
+17:19:40 pulling facilities 
+17:29:20 facility rows: 1266625 
+17:29:27 universe permits: 49966  POT any version: 17306  sewer-named only: 11173  sewerage-code only: 15775  with facility geocode: 49518 
+17:29:28 pulling features 
+17:33:30 features: 79006  with coordinates: 63944  universe permits with no features pulled: 9457 
+17:33:31 pulling pretreatment links 
+17:33:34 pretreatment permits: 7686  receiving POTWs: 1718  with facility geocode: 7161 
+17:33:35 DONE. Push the files in correction/data/icis_npdes 
