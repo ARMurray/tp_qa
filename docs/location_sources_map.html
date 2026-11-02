@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Location sources map</title>
+<style>
+  :root { --bg:#fff; --text:#1f1e1d; --muted:#5f5e5a; --line:#b4b2a9; --line-strong:#888780; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#1f1e1d; --text:#f1efe8; --muted:#b4b2a9; --line:#5f5e5a; --line-strong:#888780; } }
+  body { margin:0; padding:24px 16px; background:var(--bg); color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+  main { max-width:760px; margin:0 auto; }
+  h1 { font-size:22px; font-weight:500; margin:0 0 4px; }
+  p.sub { margin:0 0 16px; color:var(--muted); font-size:14px; }
+  svg { width:100%; height:auto; display:block; }
+  .t, .ts, .th { fill:var(--text); }
+  .t, .th { font-size:14px; } .ts { font-size:12px; fill:var(--muted); } .th { font-weight:500; }
+  .arr { fill:none; stroke:var(--line-strong); stroke-width:1.5; }
+  .leader { stroke:var(--line-strong); stroke-width:0.5; stroke-dasharray:3 3; }
+  .c-teal > rect   { fill:#E1F5EE; stroke:#0F6E56; } .c-teal .th   { fill:#085041; } .c-teal .ts   { fill:#0F6E56; }
+  .c-purple > rect { fill:#EEEDFE; stroke:#534AB7; } .c-purple .th { fill:#3C3489; } .c-purple .ts { fill:#534AB7; }
+  .c-gray > rect   { fill:#F1EFE8; stroke:#5F5E5A; } .c-gray .th   { fill:#444441; } .c-gray .ts   { fill:#5F5E5A; }
+  @media (prefers-color-scheme: dark) {
+    .c-teal > rect   { fill:#085041; stroke:#9FE1CB; } .c-teal .th   { fill:#E1F5EE; } .c-teal .ts   { fill:#9FE1CB; }
+    .c-purple > rect { fill:#3C3489; stroke:#CECBF6; } .c-purple .th { fill:#EEEDFE; } .c-purple .ts { fill:#CECBF6; }
+    .c-gray > rect   { fill:#444441; stroke:#D3D1C7; } .c-gray .th   { fill:#F1EFE8; } .c-gray .ts   { fill:#D3D1C7; }
+  }
+</style>
+</head>
+<body>
+<main>
+<h1>Location sources map</h1>
+<p class="sub">Where each location comes from, what we build from it, and what it feeds. Dashed boxes are not built yet. Drawn 2026-11-02.</p>
+<svg viewBox="0 0 680 545" role="img"><title>Location sources, what is built from them, and what they feed</title><desc>Left column lists the seven location sources from CWNS, ICIS-NPDES and V2; the middle column shows the permit universe, spatial agreement QA and candidate table; the right column shows the four uses.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<text class="th" x="30" y="30">Location sources</text>
+<text class="th" x="270" y="30">What we build</text>
+<text class="th" x="470" y="30">What it feeds</text>
+<g class="c-teal"><rect x="30" y="50" width="190" height="44" rx="6" stroke-width="0.5"/><text class="th" x="125" y="68" text-anchor="middle" dominant-baseline="central">CWNS coordinates</text><text class="ts" x="125" y="84" text-anchor="middle" dominant-baseline="central">~15k plants, 2022 survey</text></g>
+<g class="c-teal"><rect x="30" y="102" width="190" height="44" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="125" y="120" text-anchor="middle" dominant-baseline="central">CWNS addresses</text><text class="ts" x="125" y="136" text-anchor="middle" dominant-baseline="central">EPA geocoder, pending</text></g>
+<g class="c-purple"><rect x="30" y="154" width="190" height="44" rx="6" stroke-width="0.5"/><text class="th" x="125" y="172" text-anchor="middle" dominant-baseline="central">ICIS facility geocode</text><text class="ts" x="125" y="188" text-anchor="middle" dominant-baseline="central">49,985 permits</text></g>
+<g class="c-purple"><rect x="30" y="206" width="190" height="44" rx="6" stroke-width="0.5"/><text class="th" x="125" y="224" text-anchor="middle" dominant-baseline="central">ICIS permit features</text><text class="ts" x="125" y="240" text-anchor="middle" dominant-baseline="central">outfalls etc., 63.9k pts</text></g>
+<g class="c-purple"><rect x="30" y="258" width="190" height="44" rx="6" stroke-width="0.5"/><text class="th" x="125" y="276" text-anchor="middle" dominant-baseline="central">Industrial users (IU)</text><text class="ts" x="125" y="292" text-anchor="middle" dominant-baseline="central">7,708 permits</text></g>
+<g class="c-gray"><rect x="30" y="310" width="190" height="44" rx="6" stroke-width="0.5"/><text class="th" x="125" y="328" text-anchor="middle" dominant-baseline="central">Sourced polygons</text><text class="ts" x="125" y="344" text-anchor="middle" dominant-baseline="central">V2: state, county areas</text></g>
+<g class="c-gray"><rect x="30" y="362" width="190" height="44" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="125" y="380" text-anchor="middle" dominant-baseline="central">CSO / SSO points</text><text class="ts" x="125" y="396" text-anchor="middle" dominant-baseline="central">possible later</text></g>
+<line class="leader" x1="220" y1="72" x2="245" y2="72"/><line class="leader" x1="220" y1="124" x2="245" y2="124"/><line class="leader" x1="220" y1="176" x2="245" y2="176"/><line class="leader" x1="220" y1="228" x2="245" y2="228"/><line class="leader" x1="220" y1="280" x2="245" y2="280"/><line class="leader" x1="220" y1="332" x2="245" y2="332"/><line class="leader" x1="220" y1="384" x2="245" y2="384"/>
+<line x1="245" y1="72" x2="245" y2="384" stroke="var(--line-strong)" stroke-width="1"/>
+<line x1="245" y1="260" x2="268" y2="260" class="arr" marker-end="url(#arrow)"/>
+<g class="c-gray"><rect x="270" y="50" width="150" height="44" rx="6" stroke-width="0.5"/><text class="th" x="345" y="68" text-anchor="middle" dominant-baseline="central">Permit categories</text><text class="ts" x="345" y="84" text-anchor="middle" dominant-baseline="central">master code, eRule</text></g>
+<g class="c-purple"><rect x="270" y="118" width="150" height="56" rx="6" stroke-width="0.5"/><text class="th" x="345" y="138" text-anchor="middle" dominant-baseline="central">Permit universe</text><text class="ts" x="345" y="156" text-anchor="middle" dominant-baseline="central">4 tiers by category</text></g>
+<g class="c-teal"><rect x="270" y="232" width="150" height="56" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="345" y="252" text-anchor="middle" dominant-baseline="central">Spatial agreement</text><text class="ts" x="345" y="270" text-anchor="middle" dominant-baseline="central">distances per plant</text></g>
+<g class="c-teal"><rect x="270" y="346" width="150" height="56" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="345" y="366" text-anchor="middle" dominant-baseline="central">Candidate points</text><text class="ts" x="345" y="384" text-anchor="middle" dominant-baseline="central">one row per source</text></g>
+<line x1="345" y1="94" x2="345" y2="116" class="arr" marker-end="url(#arrow)"/>
+<line x1="345" y1="174" x2="345" y2="230" class="arr" marker-end="url(#arrow)"/>
+<line x1="345" y1="288" x2="345" y2="344" class="arr" marker-end="url(#arrow)"/>
+<g class="c-purple"><rect x="470" y="118" width="190" height="56" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="565" y="138" text-anchor="middle" dominant-baseline="central">Private-system finding</text><text class="ts" x="565" y="156" text-anchor="middle" dominant-baseline="central">ICIS-only, not in CWNS</text></g>
+<g class="c-teal"><rect x="470" y="232" width="190" height="56" rx="6" stroke-width="0.5" stroke-dasharray="4 3"/><text class="th" x="565" y="252" text-anchor="middle" dominant-baseline="central">ArcGIS review layer</text><text class="ts" x="565" y="270" text-anchor="middle" dominant-baseline="central">flagged plants only</text></g>
+<g class="c-teal"><rect x="470" y="346" width="190" height="56" rx="6" stroke-width="0.5"/><text class="th" x="565" y="366" text-anchor="middle" dominant-baseline="central">Corrected locations</text><text class="ts" x="565" y="384" text-anchor="middle" dominant-baseline="central">tp_qa out_lat, out_lon</text></g>
+<g class="c-gray"><rect x="470" y="438" width="190" height="56" rx="6" stroke-width="0.5"/><text class="th" x="565" y="458" text-anchor="middle" dominant-baseline="central">V2 discharge graph</text><text class="ts" x="565" y="476" text-anchor="middle" dominant-baseline="central">anchored on those points</text></g>
+<line x1="420" y1="146" x2="468" y2="146" class="arr" marker-end="url(#arrow)"/>
+<line x1="420" y1="260" x2="468" y2="260" class="arr" marker-end="url(#arrow)"/>
+<line x1="420" y1="374" x2="468" y2="374" class="arr" marker-end="url(#arrow)"/>
+<line x1="565" y1="402" x2="565" y2="436" class="arr" marker-end="url(#arrow)"/>
+<g class="c-teal"><rect x="30" y="514" width="12" height="12" rx="2" stroke-width="0.5"/></g><text class="ts" x="48" y="521" dominant-baseline="central">CWNS and tp_qa</text>
+<g class="c-purple"><rect x="170" y="514" width="12" height="12" rx="2" stroke-width="0.5"/></g><text class="ts" x="188" y="521" dominant-baseline="central">ICIS-NPDES</text>
+<g class="c-gray"><rect x="290" y="514" width="12" height="12" rx="2" stroke-width="0.5"/></g><text class="ts" x="308" y="521" dominant-baseline="central">other</text>
+<g class="c-gray"><rect x="380" y="514" width="12" height="12" rx="2" stroke-width="0.5" stroke-dasharray="3 2"/></g><text class="ts" x="398" y="521" dominant-baseline="central">dashed: not built yet</text>
+</svg>
+</main>
+</body>
+</html>
