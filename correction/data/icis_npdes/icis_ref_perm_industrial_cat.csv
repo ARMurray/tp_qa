@@ -1,0 +1,113 @@
+PERM_INDUSTRIAL_CAT_CODE,PERM_INDUSTRIAL_CAT_DESC
+000,Temporary Discharges
+001,Agricultural Production Livestock
+002,Asphalt Scrubbers
+003,Shipyards
+004,Coal & Metal Mining
+005,Remine & Abandoned Mine Land Reclaim
+006,Lumber & Wood Industries
+007,Construction
+008,Fuel Spill Cleanup
+009,Compost Site(s)
+010,Deep Seabed Mining
+011,Concrete Industries
+012,Metal Industries
+013,Fish Hatcheries & Preserves
+014,Transportation
+015,Food & Kindred Products
+016,Landfill Runoff
+017,Paints & Kindred Products
+018,Salvage & Recycling
+019,Laundry/Cleaning/Garment Services
+020,Plastics & Rubber
+021,Film Processing
+022,Meat Products
+023,"Stone, Glass & Clay"
+024,Textile & Leather Products
+025,Non-Contact Cooling Waters
+026,Territorial Seas
+027,Hydrostatic Test/Wastewater
+028,Oil & Gas Extraction-Offshore
+029,Non-Construction (Baseline)
+030,UST Dewatering/Ballast Water
+031,Oil & Gas Extraction
+032,Oil & Gas Extraction-Onshore
+033,Small MS4 (Municipal Separate Storm Sewer Systems)
+034,Petroleum Bulk Stations & Terminals
+035,Medium and Large MS4 (Municipal Separate Storm Sewer Systems)
+036,Hydroelectric Generating Facility
+037,Placer Mining
+038,Potable Water Plants
+039,Coal Bed Methane Production
+040,Private Households
+041,Multi-Sector
+042,Short Term Discharges
+043,Processed Fruits & Vegetables
+044,Mechanical/Electronic Equip.
+045,Reverse Osmosis Desalinization
+046,Paper & Allied Products
+047,Auto Sales & Maintenance
+048,Light Commercial Discharges
+049,Chemicals & Allied Products
+050,Sand & Gravel
+051,Boatyard
+052,Seafood Processing
+053,"Class I Sanitary (<5,000 GPD)"
+054,"Class II Sanitary(<25,000 GPD)"
+055,Sewerage Systems (Commercial)
+056,Class III Sanitary (<50K GPD)
+057,Class IV Sanitary (<100K GPD)
+058,Sewerage Systems (Municipal)
+059,CAFO - Dry Litter
+060,Minimum Environmental Impact
+061,Storm Water Runoff
+062,Septic Tanks
+063,Agricultural Chemicals
+064,Water Supply
+065,Sludge
+066,Sanitary Landfill 
+067,Oil & Gas Lines-Hydrostatic
+068,Pressure Testing/Water
+069,Dredging/Water Discharge
+070,Log Transfer
+071,Disinfect Potable Water Lines
+072,Well Pump Tests
+073,Mine Dewatering
+074,Construction Dewatering
+075,Car & Truck Washes
+076,Swimming Pool Filter Backwash
+077,Chlorinated Water
+078,Construction & Debris Landfill
+079,Aquifer Restoration
+080,CAFO/Egg Producers
+081,Wood Preserving
+082,No Discharge Permit
+083,Underground Storage Tanks
+084,Non-Coal Mining
+085,Nonmetallic Minerals
+086,Bulk Storage Tanks (Bulk Terminals)
+087,Pesticides
+088,Gravel Mines
+089,Truck Maintenance & Transfer-Type D
+090,Coal Gassification
+091,Groundwater Cleanup Dewatering
+092,Hazardous Waste Treatment
+093,CAFO
+094,Electric & Combined Services
+095,Inactive & Abandoned Mines
+096,Land Application Site(s)
+97I,Treatment Works
+98I,Steam Electric/Petroleum Production
+99I,Not Yet Classified
+NEX,No Exposure
+097,Construction Phase II
+098,Wasteload Allocations (TMDL)
+099,Non-Process Discharges to Surface Water
+100,Aquaculture & Aquarium
+101,Application To Surface Water
+102,Vessel
+103,Watershed (Basin Plan)
+104,Asphalt Production
+105,Beneficial Reuse
+106,Sanitary (Schools)
+107,Dyes
