@@ -113,6 +113,20 @@ def build_rows(df, a1_col, a2_col):
     return pd.DataFrame(sel, columns=["STREET", "STREET_2", "PO_BOX"], index=df.index)
 
 
+def write_schema_ini(tables):
+    """schema.ini beside the CSVs: ArcGIS reads it to type every column as Text.
+    Without it ArcGIS guesses the all-numeric 11-digit CWNS IDs are numbers and
+    refuses the table ('incompatible field type [ID]')."""
+    lines = []
+    for name, df in tables:
+        lines += [f"[{name}]", "ColNameHeader=True", "Format=CSVDelimited", "CharacterSet=65001"]
+        for i, col in enumerate(df.columns, start=1):
+            width = min(255, max(10, int(df[col].astype(str).str.len().max()) + 20))
+            lines.append(f"Col{i}={col} Text Width {width}")
+        lines.append("")
+    (OUT / "schema.ini").write_text("\r\n".join(lines), encoding="ascii")
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
 
@@ -140,6 +154,8 @@ def main():
     ic = finish(ic)
     ic["ADDRESS_KEY"] = ic.STREET.str.upper() + "|" + ic.CITY.str.upper() + "|" + ic.STATE + "|" + ic.ZIP
     ic.to_csv(OUT / "icis_npdes_addresses_to_geocode.csv", index=False)
+
+    write_schema_ini([("cwns_addresses_to_geocode.csv", cw), ("icis_npdes_addresses_to_geocode.csv", ic)])
 
     for name, d in (("CWNS", cw), ("ICIS", ic)):
         print(f"\n{name}: {len(d)} rows, unique ids {d.ID.nunique()}, ready {int(d.GEOCODE_READY.sum())}, "
