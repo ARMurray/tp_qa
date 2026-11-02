@@ -1,16 +1,16 @@
-10:24:19 pulling permits 
-10:32:31 permit-version rows: 1705781  permits: 1198575 
-10:32:33 master permits with a category: 1029 of 1063 
-10:32:54 component rows: 1094852 
-10:35:03 permits at lowest version: 1198575  alive since 2022: 699531 
-10:35:03 pulling facilities 
-10:41:46 facility rows: 1267255 
-10:41:51 universe permits: 49985  POT any version: 17309  sewer-named only: 11188  sewerage-code only: 15776  with facility geocode: 49532 
-10:41:51 tiers: code_household 13924; code_large 1852; core 34209 
-10:41:51 category present (own / master / either): 0 / 28200 / 28200 
-10:41:51 top categories: 040=9491; 007=6446; 058=1723; 041=1321; 053=1162; 054=1144; 97I=1071; 055=945; 033=650; 061=581; 057=442; 062=439 
-10:41:52 pulling features 
-10:44:47 features: 78951  with coordinates: 63863  universe permits with no features pulled: 9503 
-10:44:48 pulling pretreatment links 
-10:44:51 pretreatment permits: 7708  receiving POTWs: 1720  with facility geocode: 7161 
-10:44:51 DONE. Push the files in correction/data/icis_npdes 
+12:31:05 pulling permits 
+12:38:52 permit-version rows: 1705781  permits: 1198575 
+12:38:54 master permits with a category: 1029 of 1063 
+12:39:11 component rows: 1094852 
+12:41:15 permits at lowest version: 1198575  alive since 2022: 699531 
+12:41:15 pulling facilities 
+12:47:47 facility rows: 1267255 
+12:47:53 universe permits: 49985  POT any version: 17309  sewer-named only: 11188  sewerage-code only: 15776  with facility geocode: 49532 
+12:47:53 tiers: code_household 12695; code_large 1836; core 24337; nonsewer_category 11117 
+12:47:53 category present (own / master / either): 0 / 28200 / 28200 
+12:47:53 top categories: 040=9491; 007=6446; 058=1723; 041=1321; 053=1162; 054=1144; 97I=1071; 055=945; 033=650; 061=581; 057=442; 062=439 
+12:47:54 pulling features 
+12:50:41 features: 78951  with coordinates: 63863  universe permits with no features pulled: 9503 
+12:50:41 pulling pretreatment links 
+12:50:44 pretreatment permits: 7708  receiving POTWs: 1720  with facility geocode: 7161 
+12:50:45 DONE. Push the files in correction/data/icis_npdes 
