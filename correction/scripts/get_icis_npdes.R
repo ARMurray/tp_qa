@@ -54,11 +54,24 @@ perm <- dbGetQuery(con, "SELECT ACTIVITY_ID, EXTERNAL_PERMIT_NMBR, VERSION_NMBR,
                          FACILITY_TYPE_INDICATOR, MAJOR_RATING_NMBR, MAJOR_MINOR_STATUS_FLAG, ORIGINAL_ISSUE_DATE,
                          ISSUE_DATE, EFFECTIVE_DATE, EXPIRATION_DATE, RETIREMENT_DATE, TERMINATION_DATE,
                          TOTAL_DESIGN_FLOW_NMBR, ACTUAL_AVERAGE_FLOW_NMBR, MASTER_EXTERNAL_PERMIT_NMBR,
-                         ISSUING_AGENCY, AGENCY_TYPE_CODE, RECEIVING_POTW_ID, PERMIT_NAME
+                         ISSUING_AGENCY, AGENCY_TYPE_CODE, RECEIVING_POTW_ID, PERMIT_NAME, PERM_INDUSTRIAL_CAT_CODE
                          FROM ICIS_PERMIT WHERE PERMIT_TYPE_CODE IN ('NPD', 'GPC')") %>%
   mutate(ACTIVITY_ID = fmt_id(ACTIVITY_ID), VERSION_NMBR = as.integer(VERSION_NMBR),
          across(all_of(date_cols), as.Date))
 logmsg("permit-version rows:", nrow(perm), " permits:", n_distinct(perm$EXTERNAL_PERMIT_NMBR))
+
+# category of the master permit: general-permit coverages carry no category of their own
+# (MAG580000 coverages are blank, the NGP master has 058); masters can be NGP or NPD
+master_cat <- dbGetQuery(con, "SELECT ACTIVITY_ID, EXTERNAL_PERMIT_NMBR, VERSION_NMBR, PERM_INDUSTRIAL_CAT_CODE
+                               FROM ICIS_PERMIT WHERE EXTERNAL_PERMIT_NMBR IN
+                                 (SELECT DISTINCT MASTER_EXTERNAL_PERMIT_NMBR FROM ICIS_PERMIT
+                                  WHERE PERMIT_TYPE_CODE = 'GPC' AND MASTER_EXTERNAL_PERMIT_NMBR IS NOT NULL)") %>%
+  group_by(EXTERNAL_PERMIT_NMBR) %>% slice_min(VERSION_NMBR, n = 1, with_ties = FALSE) %>% ungroup() %>%
+  transmute(MASTER_EXTERNAL_PERMIT_NMBR = EXTERNAL_PERMIT_NMBR, cat_master = na_if(trimws(PERM_INDUSTRIAL_CAT_CODE), ""))
+cat_ref <- dbGetQuery(con, "SELECT PERM_INDUSTRIAL_CAT_CODE, PERM_INDUSTRIAL_CAT_DESC FROM REF_PERM_INDUSTRIAL_CAT") %>%
+  mutate(PERM_INDUSTRIAL_CAT_CODE = trimws(PERM_INDUSTRIAL_CAT_CODE))
+write_csv(cat_ref, file.path(out_dir, "icis_ref_perm_industrial_cat.csv"), na = "")
+logmsg("master permits with a category:", sum(!is.na(master_cat$cat_master)), "of", nrow(master_cat))
 
 # components (POT = POTW, PRE = pretreatment, CSO, ...) for every version
 comp <- dbGetQuery(con, "SELECT ACTIVITY_ID, COMPONENT_TYPE_CODE FROM XREF_PERM_COMPONENT_TYPE") %>%
@@ -75,6 +88,7 @@ comp_str <- comp %>% group_by(ACTIVITY_ID) %>% summarise(components = paste(sort
 v0 <- perm %>% group_by(EXTERNAL_PERMIT_NMBR) %>% slice_min(VERSION_NMBR, n = 1, with_ties = FALSE) %>% ungroup() %>%
   left_join(pot_any, by = "EXTERNAL_PERMIT_NMBR") %>%
   left_join(comp_str, by = "ACTIVITY_ID") %>%
+  left_join(master_cat, by = "MASTER_EXTERNAL_PERMIT_NMBR") %>%
   rename(pot_lowest_version = pot) %>%
   mutate(alive_since_2022 = (is.na(TERMINATION_DATE) | TERMINATION_DATE >= cutoff) &
                             (is.na(RETIREMENT_DATE) | RETIREMENT_DATE >= cutoff) &
@@ -103,6 +117,11 @@ if (file.exists(code_file)) {
   logmsg("WARNING: sewerage_code_permits.csv not found; SIC/NAICS flags will be FALSE")
   codes <- tibble(EXTERNAL_PERMIT_NMBR = character(), sic_4952 = integer(), naics_221320 = integer())
 }
+# sewerage categories that keep a code-only permit out of the household tier:
+# 055 Sewerage (Commercial), 056/057 Sanitary class III/IV, 058 Sewerage (Municipal), 97I Treatment Works
+# (053/054 Class I/II sanitary and 106 schools are household-scale and do not rescue a permit)
+rescue_cats <- c("055", "056", "057", "058", "97I")
+household_flow <- 0.1   # MGD
 permits <- v0 %>% filter(alive_since_2022) %>%
   left_join(fac, by = c("EXTERNAL_PERMIT_NMBR" = "PGM_SYS_ID")) %>%
   left_join(codes, by = "EXTERNAL_PERMIT_NMBR") %>%
@@ -110,12 +129,25 @@ permits <- v0 %>% filter(alive_since_2022) %>%
          sewerage_code = sic_4952 | naics_221320,
          sewer_named = grepl(sewer_rx, toupper(coalesce(FACILITY_NAME, PERMIT_NAME, ""))),
          has_pre_component = grepl("PRE", coalesce(components, "")),
-         has_cso_component = grepl("CSO", coalesce(components, ""))) %>%
-  filter(pot_any_version | sewer_named | sewerage_code)
+         has_cso_component = grepl("CSO", coalesce(components, "")),
+         cat_own = na_if(trimws(PERM_INDUSTRIAL_CAT_CODE), ""),
+         cat_code = coalesce(cat_own, cat_master)) %>%
+  select(-PERM_INDUSTRIAL_CAT_CODE) %>%
+  left_join(cat_ref %>% rename(cat_code = PERM_INDUSTRIAL_CAT_CODE, cat_desc = PERM_INDUSTRIAL_CAT_DESC), by = "cat_code") %>%
+  filter(pot_any_version | sewer_named | sewerage_code) %>%
+  mutate(tier = case_when(pot_any_version | sewer_named ~ "core",
+                          coalesce(cat_code, "") %in% rescue_cats |
+                            coalesce(TOTAL_DESIGN_FLOW_NMBR, 0) >= household_flow ~ "code_large",
+                          TRUE ~ "code_household"))
 logmsg("universe permits:", nrow(permits), " POT any version:", sum(permits$pot_any_version),
        " sewer-named only:", sum(permits$sewer_named & !permits$pot_any_version & !permits$sewerage_code),
        " sewerage-code only:", sum(permits$sewerage_code & !permits$pot_any_version & !permits$sewer_named),
        " with facility geocode:", sum(!is.na(permits$GEOCODE_LATITUDE)))
+logmsg("tiers:", paste(names(table(permits$tier)), table(permits$tier), collapse = "; "))
+logmsg("category present (own / master / either):", sum(!is.na(permits$cat_own)), "/",
+       sum(!is.na(permits$cat_master)), "/", sum(!is.na(permits$cat_code)))
+logmsg("top categories:", paste(head(paste0(names(sort(table(permits$cat_code), decreasing = TRUE)),
+                                           "=", sort(table(permits$cat_code), decreasing = TRUE)), 12), collapse = "; "))
 write_csv(permits, file.path(out_dir, "icis_npdes_permits.csv"), na = "")
 
 # ---- permitted features with coordinates ----------------------------------------
