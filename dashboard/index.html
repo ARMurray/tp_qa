@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plant location QA</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root {
+  color-scheme: light;
+  --bg:#fcfcfb; --panel:#ffffff; --text:#0b0b0b; --text2:#52514e; --muted:#7a7975; --line:#e2e1dc; --grid:#efeeea;
+  --c0:#2a78d6; --c1:#1baf7a; --c2:#eb6834; --c3:#eda100; --c4:#e87ba4; --c5:#8a8985;
+  --f-cwns:#6250d6; --f-fac:#e34948; --f-feat:#008300; --f-iu:#52514e; --truth:#0b0b0b; --halo:#ffffff; --accent:#0b0b0b;
+}
+@media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) {
+  color-scheme: dark;
+  --bg:#1a1a19; --panel:#232322; --text:#f0efec; --text2:#c3c2b7; --muted:#8f8e88; --line:#3a3a37; --grid:#2d2d2b;
+  --c0:#3987e5; --c1:#199e70; --c2:#d95926; --c3:#c98500; --c4:#d55181; --c5:#8a8985;
+  --f-cwns:#9085e9; --f-fac:#e66767; --f-feat:#2fa82f; --f-iu:#c3c2b7; --truth:#ffffff; --halo:#1a1a19; --accent:#f0efec;
+} }
+* { box-sizing:border-box; }
+html, body { height:100%; margin:0; background:var(--bg); color:var(--text); font:13px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; }
+#app { display:grid; grid-template-columns:1fr 560px; height:100%; }
+#mapwrap { position:relative; min-width:0; }
+#map { position:absolute; inset:0; z-index:0; background:#ddd; }
+#side { overflow-y:auto; background:var(--bg); border-left:1px solid var(--line); padding:0 16px 24px; }
+@media (max-width:900px) { #app { grid-template-columns:1fr; grid-template-rows:55vh auto; height:auto; } #side { border-left:0; } }
+h1 { font-size:16px; font-weight:600; margin:14px 0 2px; }
+h2 { font-size:13px; font-weight:600; margin:0; }
+.sub { color:var(--text2); font-size:12px; }
+section { border-top:1px solid var(--line); padding:12px 0; }
+.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.row.sb { justify-content:space-between; }
+select, input[type=search], button { font:inherit; color:var(--text); background:var(--panel); border:1px solid var(--line); border-radius:6px; padding:4px 8px; }
+button { cursor:pointer; } button:hover { border-color:var(--muted); }
+input[type=search] { width:100%; }
+.chips { display:flex; flex-direction:column; gap:3px; margin-top:8px; }
+.chip { display:grid; grid-template-columns:14px 1fr auto; gap:8px; align-items:center; padding:3px 6px; border-radius:6px; cursor:pointer; user-select:none; }
+.chip:hover { background:var(--grid); }
+.chip.off { opacity:.4; }
+.chip i { width:12px; height:12px; border-radius:50%; display:block; border:1.5px solid var(--halo); box-shadow:0 0 0 1px var(--line); }
+.chip .n { color:var(--text2); font-variant-numeric:tabular-nums; }
+.plotbox { position:relative; width:100%; }
+.plotbox canvas { position:absolute; left:0; top:0; }
+.pt { margin:2px 0 6px; }
+#detail table { width:100%; border-collapse:collapse; margin-top:8px; }
+#detail td { padding:3px 4px; border-top:1px solid var(--line); vertical-align:top; }
+#detail tr.cand:hover td { background:var(--grid); cursor:pointer; }
+#detail .d { color:var(--muted); font-size:11px; }
+#detail .sw { display:inline-block; width:10px; height:10px; margin-right:6px; vertical-align:-1px; }
+.pill { display:inline-block; padding:1px 8px; border-radius:10px; color:#fff; font-size:12px; }
+#tip { position:fixed; z-index:3000; pointer-events:none; background:var(--panel); color:var(--text); border:1px solid var(--line); border-radius:6px;
+       padding:5px 8px; box-shadow:0 2px 8px rgba(0,0,0,.25); font-size:12px; max-width:320px; display:none; }
+#tools { position:absolute; z-index:1000; top:10px; right:10px; display:flex; gap:6px; }
+#tools button.on { background:var(--accent); color:var(--bg); border-color:var(--accent); }
+#results { position:relative; }
+#results div.r { padding:4px 8px; cursor:pointer; border-top:1px solid var(--line); }
+#results div.r:hover { background:var(--grid); }
+#results .box { position:absolute; left:0; right:0; background:var(--panel); border:1px solid var(--line); border-radius:6px; z-index:20; max-height:260px; overflow:auto; }
+.note { color:var(--text2); font-size:12px; margin-top:6px; }
+details summary { cursor:pointer; font-weight:600; }
+details p { margin:6px 0; color:var(--text2); }
+.legend { display:flex; flex-wrap:wrap; gap:4px 12px; margin-top:8px; color:var(--text2); font-size:12px; }
+.legend svg { vertical-align:-3px; margin-right:3px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="mapwrap">
+    <div id="map"></div>
+    <div id="tools">
+      <button id="bmMap" class="on">Map</button><button id="bmStreet">Streets</button><button id="bmImg">Imagery</button><button id="fitShown">Zoom to shown</button>
+    </div>
+  </div>
+  <aside id="side">
+    <h1>Plant location QA</h1>
+    <div class="sub" id="count"></div>
+
+    <section>
+      <div id="results"><input type="search" id="q" placeholder="Find a plant by name or CWNS id" autocomplete="off"><div class="box" id="resbox" hidden></div></div>
+      <div class="row sb" style="margin-top:10px"><h2>Agreement between sources</h2><span class="row"><select id="stateSel"></select><button id="reset">Reset</button></span></div>
+      <div class="chips" id="chips"></div>
+      <div class="note">Click a row to show or hide it, double-click to show only that row.</div>
+    </section>
+
+    <section id="detail"><h2>Selected plant</h2><div class="note">Click a point on the map or in a plot.</div></section>
+
+    <section>
+      <div class="row sb"><h2>Distribution</h2><span class="row"><select id="histK"></select><select id="histY"><option value="sqrt">sqrt counts</option><option value="lin">linear counts</option></select></span></div>
+      <div class="note pt" id="histNote">Drag across the bars to filter the map to that range. Click to clear.</div>
+      <div class="plotbox" id="hist"></div>
+    </section>
+
+    <section>
+      <div class="row sb"><h2>By category</h2><select id="stripK"></select></div>
+      <div class="note pt">One dot per plant. Hover a dot to enlarge it on the map, click to zoom the map to it. Line = median.</div>
+      <div class="plotbox" id="strip"></div>
+    </section>
+
+    <section>
+      <div class="row sb"><h2>Compare two measures</h2><span class="row"><select id="scX"></select><span class="sub">vs</span><select id="scY"></select></span></div>
+      <div class="note pt" id="scNote"></div>
+      <div class="plotbox" id="scatter"></div>
+    </section>
+
+    <section>
+      <details><summary>How to read this</summary>
+        <p><b>Sources.</b> Each plant can have up to five plant-role points from three independent origins: the CWNS record (its point and the geocode of its address), the ICIS facility record (its FRS coordinate and the geocode of its address), and ICIS permit features (influent structures). Points from the same origin are not independent evidence.</p>
+        <p><b>Consensus.</b> Plant-role points within 1 km of each other (chained) form a cluster. The cluster with the most independent origins is the consensus. "CWNS point isolated" means the other origins agree with each other and the CWNS point is not in their cluster.</p>
+        <p><b>Not scored.</b> External outfalls and industrial users sit away from the plant by design. They are shown for context and measured from the consensus point.</p>
+        <p><b>Verified.</b> For plants reviewed in tp_qa, the verified location is shown as a star, and the "CWNS point to verified location" measure is available.</p>
+      </details>
+    </section>
+  </aside>
+</div>
+<div id="tip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="data/plants.js"></script>
+<script src="data/cands.js"></script>
+<script>
+(() => {
+const P = PLANTS, N = P.rows.length, CI = {};
+P.cols.forEach((c, i) => CI[c] = i);
+
+// ---- metrics -------------------------------------------------------------
+const METRICS = [
+  {k:'cwns_other', t:'m', label:'CWNS point to nearest independent source', short:'CWNS point to nearest independent source'},
+  {k:'cwns_to_cons', t:'m', label:'CWNS point to consensus point', short:'CWNS point to consensus'},
+  {k:'farthest', t:'m', label:'Farthest plant point from consensus', short:'farthest point from consensus'},
+  {k:'max_pair', t:'m', label:'Spread: largest distance between two plant points', short:'spread (max pair)'},
+  {k:'median_pair', t:'m', label:'Median distance between plant point pairs', short:'median pair distance'},
+  {k:'cwns_fac', t:'m', label:'CWNS point to ICIS facility coordinate', short:'CWNS to ICIS facility coord.'},
+  {k:'cwns_addr', t:'m', label:'CWNS point to CWNS address geocode', short:'CWNS point to CWNS address'},
+  {k:'cwns_facaddr', t:'m', label:'CWNS point to ICIS address geocode', short:'CWNS point to ICIS address'},
+  {k:'cwns_inf', t:'m', label:'CWNS point to ICIS influent structure', short:'CWNS to ICIS influent'},
+  {k:'iu_median', t:'m', label:'Industrial users: median distance to consensus', short:'industrial users, median'},
+  {k:'exo_min', t:'m', label:'Nearest external outfall to consensus', short:'nearest external outfall'},
+  {k:'cwns_truth', t:'m', label:'CWNS point to verified location (verified only)', short:'CWNS point to verified'},
+  {k:'n_origins', t:'c', label:'Independent origins with a point', short:'independent origins'},
+  {k:'n_pts', t:'c', label:'Plant-role points', short:'plant points'},
+  {k:'iu_n', t:'cl', label:'Industrial users linked', short:'industrial users'},
+  {k:'exo_n', t:'cl', label:'External outfalls', short:'external outfalls'},
+  {k:'n_permits', t:'cl', label:'ICIS permits linked', short:'permits'},
+];
+const MET = Object.fromEntries(METRICS.map(m => [m.k, m]));
+const isLog = m => m.t !== 'c';
+const ID = new Array(N), NAME = new Array(N), ST = new Array(N);
+const LAT = new Float64Array(N), LON = new Float64Array(N), CAT = new Uint8Array(N), JIT = new Float32Array(N);
+const V = Object.fromEntries(METRICS.map(m => [m.k, new Float64Array(N).fill(NaN)]));
+let seed = 12345;
+P.rows.forEach((r, i) => {
+  ID[i] = r[CI.id]; NAME[i] = r[CI.name] || '(unnamed)'; ST[i] = r[CI.state]; LAT[i] = r[CI.lat]; LON[i] = r[CI.lon]; CAT[i] = r[CI.cat];
+  seed = (seed * 1664525 + 1013904223) >>> 0; JIT[i] = seed / 4294967296;
+  for (const m of METRICS) { const v = r[CI[m.k]]; if (v == null || (m.t === 'cl' && v === 0)) continue; V[m.k][i] = v; }
+});
+const DOM = {};
+for (const m of METRICS) {
+  let mx = 0, mn = Infinity; const a = V[m.k];
+  for (let i = 0; i < N; i++) if (a[i] === a[i]) { if (a[i] > mx) mx = a[i]; if (a[i] < mn) mn = a[i]; }
+  DOM[m.k] = isLog(m) ? [1, Math.pow(10, Math.max(1, Math.ceil(Math.log10(Math.max(mx, 10)))))] : [mn - 0.5, mx + 0.5];
+}
+
+const LABEL = ['All sources agree', 'CWNS agrees, others scattered', 'CWNS point isolated', 'Split: two equal clusters', 'No two sources agree', 'Thin: one source', 'No CWNS point', ''];
+const SHORT = ['All agree', 'CWNS agrees', 'CWNS isolated', 'Split', 'No consensus', 'Thin', 'No CWNS pt', ''];
+const DESC = [
+  'Every plant point is within 1 km of the others.',
+  'The CWNS point is in the best-supported cluster; some other point is elsewhere.',
+  'The other origins agree with each other, but the CWNS point is not in their cluster.',
+  'Two clusters are supported by the same number of origins.',
+  'No two independent origins have points within 1 km of each other.',
+  'Only one origin has a point (for example CWNS with no ICIS match).',
+  'Two origins agree but the plant has no CWNS point.', ''];
+const ORDER = [5, 6, 0, 1, 3, 4, 2];       // map draw order, problem plants on top
+const STACK = [2, 4, 3, 6, 1, 0, 5];       // histogram stack, bottom to top
+const SRCN = ['CWNS point', 'CWNS address geocode', 'ICIS facility coordinate (FRS)', 'ICIS address geocode', 'ICIS influent structure',
+              'ICIS internal outfall', 'ICIS external outfall', 'Industrial user (pretreatment)', 'Other ICIS feature'];
+const SRCF = ['cwns', 'cwns', 'fac', 'fac', 'feat', 'feat', 'feat', 'iu', 'feat'];
+const SRCS = ['circle', 'circle', 'circle', 'circle', 'circle', 'square', 'triangle', 'square', 'diamond'];
+const SRCH = [false, true, false, true, false, true, false, false, true];   // hollow = geocode / secondary
+
+// ---- state, theme ----------------------------------------------------------
+const S = {on: new Set([0, 1, 2, 3, 4, 5, 6]), state: '', brush: null, hover: -1, sel: -1, hc: -1};
+const vis = new Uint8Array(N);
+const darkMQ = matchMedia('(prefers-color-scheme: dark)');
+let T = {};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function readTheme() {
+  T = {cat: [0, 1, 2, 3, 4, 5, 5, 5].map(i => css('--c' + i)), text: css('--text'), text2: css('--text2'), muted: css('--muted'),
+       line: css('--line'), grid: css('--grid'), halo: css('--halo'), accent: css('--accent'), truth: css('--truth'), panel: css('--panel'),
+       fam: {cwns: css('--f-cwns'), fac: css('--f-fac'), feat: css('--f-feat'), iu: css('--f-iu')}};
+}
+readTheme();
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+const fmtM = v => v < 1000 ? Math.round(v) + ' m' : v < 10000 ? (v / 1000).toFixed(1) + ' km' : Math.round(v / 1000).toLocaleString() + ' km';
+const fmtMi = v => { const mi = v / 1609.344; return mi < 0.1 ? '' : ' (' + (mi < 10 ? mi.toFixed(1) : Math.round(mi).toLocaleString()) + ' mi)'; };
+const fmtV = (k, v) => v !== v ? 'n/a' : MET[k].t === 'm' ? fmtM(v) + fmtMi(v) : Math.round(v).toLocaleString();
+const tickFmt = (m, v) => m.t === 'm' ? (v < 1000 ? v + ' m' : (v / 1000).toLocaleString() + ' km') : v.toLocaleString();
+
+// ---- tooltip ---------------------------------------------------------------
+const tipEl = document.getElementById('tip');
+function tip(html, cx, cy) {
+  tipEl.innerHTML = html; tipEl.style.display = 'block';
+  const w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+  let x = cx + 14, y = cy + 14;
+  if (x + w > innerWidth - 4) x = cx - w - 14;
+  if (y + h > innerHeight - 4) y = cy - h - 14;
+  tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px';
+}
+const hideTip = () => tipEl.style.display = 'none';
+const plantTip = i => `<b>${esc(NAME[i])}</b>, ${esc(ST[i])}<br><span style="color:${T.cat[CAT[i]]}">&#9679;</span> ${LABEL[CAT[i]]}`;
+const mapTip = i => plantTip(i) + `<br><span class="sub">CWNS point to nearest independent source: ${fmtV('cwns_other', V.cwns_other[i])}</span>`;
+
+// ---- map -------------------------------------------------------------------
+const map = L.map('map', {zoomAnimation: false, fadeAnimation: false, markerZoomAnimation: false, minZoom: 3, maxZoom: 19, zoomSnap: 0.5})
+  .fitBounds([[24.5, -125], [49.5, -66]]);
+const esri = (svc, o) => L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/${svc}/MapServer/tile/{z}/{y}/{x}`, {maxZoom: 19, ...o});
+const tiles = {
+  map: () => esri(darkMQ.matches ? 'Canvas/World_Dark_Gray_Base' : 'Canvas/World_Light_Gray_Base', {maxNativeZoom: 16, attribution: 'Tiles &copy; Esri'}),
+  street: () => L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19, attribution: '&copy; OpenStreetMap contributors'}),
+  imagery: () => esri('World_Imagery', {attribution: 'Imagery &copy; Esri, Maxar, Earthstar Geographics'})
+};
+let baseKind = 'map', baseLayer = tiles.map().addTo(map);
+const bm = {map: document.getElementById('bmMap'), street: document.getElementById('bmStreet'), imagery: document.getElementById('bmImg')};
+function setBase(k) {
+  baseKind = k; map.removeLayer(baseLayer); baseLayer = tiles[k]().addTo(map); baseLayer.bringToBack();
+  for (const n in bm) bm[n].classList.toggle('on', n === k);
+}
+for (const n in bm) bm[n].onclick = () => setBase(n);
+
+const pane = map.createPane('dots'); pane.style.zIndex = 450; pane.style.pointerEvents = 'none';
+const mb = document.createElement('canvas'), mt = document.createElement('canvas');
+for (const c of [mb, mt]) { c.style.position = 'absolute'; c.style.left = '0'; c.style.top = '0'; pane.appendChild(c); }
+const MX = new Float32Array(N).fill(NaN), MY = new Float32Array(N).fill(NaN);
+let inView = [], dpr = window.devicePixelRatio || 1;
+function sizeMap() {
+  const s = map.getSize(); dpr = window.devicePixelRatio || 1;
+  for (const c of [mb, mt]) { c.width = s.x * dpr; c.height = s.y * dpr; c.style.width = s.x + 'px'; c.style.height = s.y + 'px'; }
+}
+function place() { const p = map.containerPointToLayerPoint([0, 0]); L.DomUtil.setPosition(mb, p); L.DomUtil.setPosition(mt, p); }
+const dotR = () => { const z = map.getZoom(); return z < 5 ? 2.2 : z < 8 ? 3 : z < 11 ? 4.5 : 6; };
+
+function drawMapBase() {
+  place();
+  const ctx = mb.getContext('2d'), s = map.getSize();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, s.x, s.y);
+  const byCat = [[], [], [], [], [], [], [], []]; inView = [];
+  for (let i = 0; i < N; i++) {
+    if (!vis[i]) { MX[i] = NaN; continue; }
+    const p = map.latLngToContainerPoint([LAT[i], LON[i]]);
+    MX[i] = p.x; MY[i] = p.y;
+    if (p.x < -10 || p.y < -10 || p.x > s.x + 10 || p.y > s.y + 10) continue;
+    byCat[CAT[i]].push(i); inView.push(i);
+  }
+  const r = dotR();
+  ctx.lineWidth = 1; ctx.strokeStyle = T.halo;
+  for (const c of ORDER) {
+    const a = byCat[c]; if (!a.length) continue;
+    ctx.beginPath();
+    for (const i of a) { ctx.moveTo(MX[i] + r, MY[i]); ctx.arc(MX[i], MY[i], r, 0, 6.2832); }
+    ctx.fillStyle = T.cat[c]; ctx.fill(); if (r > 2.5) ctx.stroke();
+  }
+}
+
+function marker(ctx, x, y, style, size, color, hollow) {
+  ctx.beginPath();
+  if (style === 'circle') ctx.arc(x, y, size, 0, 6.2832);
+  else if (style === 'square') ctx.rect(x - size, y - size, size * 2, size * 2);
+  else if (style === 'triangle') { ctx.moveTo(x, y - size * 1.2); ctx.lineTo(x + size * 1.1, y + size * .8); ctx.lineTo(x - size * 1.1, y + size * .8); ctx.closePath(); }
+  else { ctx.moveTo(x, y - size * 1.3); ctx.lineTo(x + size * 1.3, y); ctx.lineTo(x, y + size * 1.3); ctx.lineTo(x - size * 1.3, y); ctx.closePath(); }
+  ctx.lineWidth = 3; ctx.strokeStyle = T.halo; ctx.stroke();
+  if (hollow) { ctx.lineWidth = 2; ctx.strokeStyle = color; ctx.stroke(); } else { ctx.fillStyle = color; ctx.fill(); }
+}
+function star(ctx, x, y, r) {
+  ctx.beginPath();
+  for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, rr = k % 2 ? r * .45 : r; ctx[k ? 'lineTo' : 'moveTo'](x + rr * Math.cos(a), y + rr * Math.sin(a)); }
+  ctx.closePath(); ctx.lineWidth = 3; ctx.strokeStyle = T.halo; ctx.stroke(); ctx.fillStyle = T.truth; ctx.fill();
+}
+const cp = (lat, lon) => map.latLngToContainerPoint([lat, lon]);
+let candPx = [];   // {x,y,idx} of the selected plant's candidate markers
+
+function pop(ctx, i, label) {
+  const p = cp(LAT[i], LON[i]);
+  ctx.beginPath(); ctx.arc(p.x, p.y, 13, 0, 6.2832); ctx.lineWidth = 4; ctx.strokeStyle = T.halo; ctx.stroke();
+  ctx.fillStyle = T.cat[CAT[i]]; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = T.accent; ctx.stroke();
+  if (label) {
+    ctx.font = '600 12px system-ui,sans-serif'; const t = NAME[i], w = ctx.measureText(t).width + 12;
+    ctx.fillStyle = T.panel; ctx.strokeStyle = T.line; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(p.x - w / 2, p.y - 40, w, 20, 5); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = T.text; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(t, p.x, p.y - 30);
+  }
+}
+
+function drawMapTop() {
+  place();
+  const ctx = mt.getContext('2d'), s = map.getSize();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, s.x, s.y);
+  candPx = [];
+  if (S.sel >= 0) {
+    const i = S.sel, c = CANDS[ID[i]] || [], cons = P.rows[i][CI.cons_lat] != null ? cp(P.rows[i][CI.cons_lat], P.rows[i][CI.cons_lon]) : null;
+    if (cons) {   // 1 km cluster ring and consensus cross
+      const z = map.getZoom(), mpp = 156543.03392 * Math.cos(P.rows[i][CI.cons_lat] * Math.PI / 180) / Math.pow(2, z);
+      ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = T.accent; ctx.beginPath(); ctx.arc(cons.x, cons.y, 1000 / mpp, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]);
+      for (let k = 0; k < c.length; k++) if (c[k][0] <= 5) {
+        const q = cp(c[k][1], c[k][2]); ctx.setLineDash([2, 3]); ctx.lineWidth = 1; ctx.strokeStyle = T.muted;
+        ctx.beginPath(); ctx.moveTo(cons.x, cons.y); ctx.lineTo(q.x, q.y); ctx.stroke(); ctx.setLineDash([]);
+      }
+    }
+    if (vis[i]) pop(ctx, i, false);
+    for (let k = 0; k < c.length; k++) {
+      const q = cp(c[k][1], c[k][2]), sx = c[k][0], big = k === S.hc;
+      marker(ctx, q.x, q.y, SRCS[sx], big ? 9 : 6, T.fam[SRCF[sx]], SRCH[sx]);
+      candPx.push({x: q.x, y: q.y, k});
+    }
+    if (cons) {
+      ctx.lineWidth = 5; ctx.strokeStyle = T.halo; ctx.beginPath(); ctx.moveTo(cons.x - 11, cons.y); ctx.lineTo(cons.x + 11, cons.y); ctx.moveTo(cons.x, cons.y - 11); ctx.lineTo(cons.x, cons.y + 11); ctx.stroke();
+      ctx.lineWidth = 2; ctx.strokeStyle = T.accent; ctx.stroke();
+    }
+    const tl = P.rows[i][CI.truth_lat];
+    if (tl != null) { const q = cp(tl, P.rows[i][CI.truth_lon]); star(ctx, q.x, q.y, 11); }
+  }
+  if (S.hover >= 0 && vis[S.hover]) pop(ctx, S.hover, true);
+}
+
+let rafB = 0, rafT = 0;
+const redrawBase = () => { if (!rafB) rafB = requestAnimationFrame(() => { rafB = 0; drawMapBase(); drawMapTop(); }); };
+const redrawTop = () => { if (!rafT) rafT = requestAnimationFrame(() => { rafT = 0; drawMapTop(); }); };
+map.on('move zoom', redrawBase);
+map.on('resize', () => { sizeMap(); redrawBase(); });
+map.on('mousemove', e => {
+  const p = e.containerPoint, ev = e.originalEvent;
+  let best = -1, bd = 1e9;
+  for (const c of candPx) { const d = (c.x - p.x) ** 2 + (c.y - p.y) ** 2; if (d < 100 && d < bd) { bd = d; best = c.k; } }
+  if (best >= 0) {
+    const c = CANDS[ID[S.sel]][best];
+    if (S.hc !== best) { S.hc = best; markRow(); redrawTop(); }
+    tip(`<b>${SRCN[c[0]]}</b><br>${c[3] ? esc(c[3]) + '<br>' : ''}<span class="sub">${esc(c[4])}</span><br>${fmtM(c[5] ?? 0)} from consensus`, ev.clientX, ev.clientY);
+    map.getContainer().style.cursor = 'pointer'; return;
+  }
+  if (S.hc !== -1) { S.hc = -1; markRow(); redrawTop(); }
+  let bi = -1; bd = 1e9; const lim = Math.max(8, dotR() + 3) ** 2;
+  for (const i of inView) { const d = (MX[i] - p.x) ** 2 + (MY[i] - p.y) ** 2; if (d < lim && d < bd) { bd = d; bi = i; } }
+  map.getContainer().style.cursor = bi >= 0 ? 'pointer' : '';
+  if (bi !== S.hover) { S.hover = bi; redrawTop(); drawPlotTops(); }
+  bi >= 0 ? tip(mapTip(bi), ev.clientX, ev.clientY) : hideTip();
+});
+map.on('mouseout', () => { if (S.hover !== -1 || S.hc !== -1) { S.hover = -1; S.hc = -1; markRow(); redrawTop(); drawPlotTops(); } hideTip(); });
+map.on('click', e => {
+  if (S.hc >= 0) { const c = CANDS[ID[S.sel]][S.hc]; map.panTo([c[1], c[2]]); return; }
+  if (S.hover >= 0) select(S.hover, false);
+});
+
+function zoomTo(i) {
+  const r = P.rows[i], pts = [[LAT[i], LON[i]]];
+  if (r[CI.cons_lat] != null) pts.push([r[CI.cons_lat], r[CI.cons_lon]]);
+  if (r[CI.truth_lat] != null) pts.push([r[CI.truth_lat], r[CI.truth_lon]]);
+  for (const c of CANDS[ID[i]] || []) if (c[0] <= 5) pts.push([c[1], c[2]]);
+  const b = L.latLngBounds(pts);
+  b.getNorthEast().equals(b.getSouthWest(), 1e-5) ? map.setView(pts[0], 16) : map.fitBounds(b, {padding: [80, 80], maxZoom: 16});
+}
+document.getElementById('fitShown').onclick = () => {
+  const pts = []; for (let i = 0; i < N; i++) if (vis[i]) pts.push([LAT[i], LON[i]]);
+  if (pts.length) map.fitBounds(L.latLngBounds(pts), {padding: [30, 30], maxZoom: 14});
+};
+
+// ---- plots -----------------------------------------------------------------
+class Plot {
+  constructor(el, h, m) {
+    this.el = el; this.h = h; this.m = m;
+    el.style.height = h + 'px';
+    this.base = document.createElement('canvas'); this.top = document.createElement('canvas');
+    el.append(this.base, this.top);
+    this.px = new Float32Array(N).fill(NaN); this.py = new Float32Array(N).fill(NaN);
+    this.qt = null;
+    this.top.addEventListener('mousemove', e => this.move(e));
+    this.top.addEventListener('mouseleave', () => this.leave());
+    this.top.addEventListener('click', e => this.click(e));
+    new ResizeObserver(() => { this.size(); this.draw(); }).observe(el);
+  }
+  size() {
+    this.w = this.el.clientWidth; dpr = window.devicePixelRatio || 1;
+    for (const c of [this.base, this.top]) { c.width = this.w * dpr; c.height = this.h * dpr; c.style.width = this.w + 'px'; c.style.height = this.h + 'px'; }
+    this.pw = this.w - this.m.l - this.m.r; this.ph = this.h - this.m.t - this.m.b;
+  }
+  ctx(c) { const x = c.getContext('2d'); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, this.w, this.h); return x; }
+  scale(k, range) {
+    const d = DOM[k];
+    return (isLog(MET[k]) ? d3.scaleLog().clamp(true) : d3.scaleLinear()).domain(d).range(range);
+  }
+  pos(sc, k, v) { return sc(isLog(MET[k]) ? Math.max(v, 1) : v); }
+  ticks(k) {
+    if (isLog(MET[k])) { const t = []; for (let v = 1; v <= DOM[k][1]; v *= 10) t.push(v); return t; }
+    return d3.range(Math.ceil(DOM[k][0]), Math.floor(DOM[k][1]) + 1);
+  }
+  axisX(ctx, sc, k, label) {
+    const {l, t} = this.m, y = t + this.ph, m = MET[k];
+    ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (const v of this.ticks(k)) {
+      const x = sc(v); ctx.strokeStyle = T.grid; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, t); ctx.lineTo(x, y); ctx.stroke();
+      ctx.fillStyle = T.text2; ctx.fillText(tickFmt(m, v), x, y + 4);
+    }
+    ctx.fillStyle = T.text2; ctx.fillText(label ?? m.short, l + this.pw / 2, y + 17);
+  }
+  axisY(ctx, sc, k, label) {
+    const {l, t} = this.m, m = MET[k];
+    ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    for (const v of this.ticks(k)) {
+      const y = sc(v); ctx.strokeStyle = T.grid; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(l, y); ctx.lineTo(l + this.pw, y); ctx.stroke();
+      ctx.fillStyle = T.text2; ctx.fillText(tickFmt(m, v), l - 5, y);
+    }
+    ctx.save(); ctx.translate(11, t + this.ph / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillStyle = T.text2; ctx.fillText(label ?? m.short, 0, 0); ctx.restore();
+  }
+  dots(ctx, list, r) {
+    const by = [[], [], [], [], [], [], [], []]; for (const i of list) by[CAT[i]].push(i);
+    ctx.globalAlpha = 0.6;
+    for (const c of ORDER) {
+      const a = by[c]; if (!a.length) continue;
+      ctx.beginPath(); for (const i of a) { ctx.moveTo(this.px[i] + r, this.py[i]); ctx.arc(this.px[i], this.py[i], r, 0, 6.2832); }
+      ctx.fillStyle = T.cat[c]; ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    this.qt = d3.quadtree().x(i => this.px[i]).y(i => this.py[i]).addAll(list);
+  }
+  reset() { this.px.fill(NaN); this.py.fill(NaN); }
+  hit(e) { const b = this.top.getBoundingClientRect(); const x = e.clientX - b.left, y = e.clientY - b.top; return {x, y, i: this.qt ? this.qt.find(x, y, 9) : undefined}; }
+  move(e) {
+    const {i} = this.hit(e), h = i === undefined ? -1 : i;
+    this.top.style.cursor = h >= 0 ? 'pointer' : '';
+    if (h !== S.hover) { S.hover = h; redrawTop(); drawPlotTops(); }
+    h >= 0 ? tip(plantTip(h) + this.tipExtra(h), e.clientX, e.clientY) : hideTip();
+  }
+  leave() { if (S.hover !== -1) { S.hover = -1; redrawTop(); drawPlotTops(); } hideTip(); }
+  click(e) { const {i} = this.hit(e); if (i !== undefined) select(i, true); }
+  tipExtra() { return ''; }
+  drawTop() {
+    const ctx = this.ctx(this.top);
+    for (const [i, big] of [[S.sel, false], [S.hover, true]]) {
+      if (i < 0 || this.px[i] !== this.px[i]) continue;
+      ctx.beginPath(); ctx.arc(this.px[i], this.py[i], big ? 8 : 6, 0, 6.2832);
+      ctx.lineWidth = 4; ctx.strokeStyle = T.halo; ctx.stroke();
+      if (big) { ctx.fillStyle = T.cat[CAT[i]]; ctx.fill(); }
+      ctx.lineWidth = 2; ctx.strokeStyle = T.accent; ctx.stroke();
+    }
+    this.extraTop?.(ctx);
+  }
+}
+
+// histogram with a brush that filters everything
+class Hist extends Plot {
+  constructor(el) { super(el, 170, {l: 44, r: 8, t: 8, b: 32}); this.k = 'cwns_other'; this.yMode = 'sqrt'; this.drag = null; this.bins = null; this.bindBrush(); }
+  basePass(i) { return S.on.has(CAT[i]) && (!S.state || ST[i] === S.state); }
+  draw() {
+    if (!this.w) return;
+    const k = this.k, m = MET[k], ctx = this.ctx(this.base), l = this.m.l, t = this.m.t;
+    this.sx = this.scale(k, [l, l + this.pw]);
+    const log = isLog(m), nb = log ? Math.round(Math.log10(DOM[k][1]) * 4) : Math.round(DOM[k][1] - DOM[k][0]);
+    const counts = Array.from({length: nb}, () => new Array(8).fill(0)), a = V[k];
+    for (let i = 0; i < N; i++) {
+      const v = a[i]; if (v !== v || !this.basePass(i)) continue;
+      const b = log ? Math.min(nb - 1, Math.floor(Math.log10(Math.max(v, 1)) * 4 + 1e-9)) : Math.min(nb - 1, Math.max(0, Math.round(v - (DOM[k][0] + 0.5))));
+      counts[b][CAT[i]]++;
+    }
+    this.nb = nb; this.counts = counts;
+    const edge = b => log ? Math.pow(10, b / 4) : DOM[k][0] + b;
+    this.edge = edge;
+    const tot = counts.map(c => c.reduce((x, y) => x + y, 0)), ymax = Math.max(1, ...tot);
+    const f = this.yMode === 'sqrt' ? Math.sqrt : (x => x);
+    this.sy = d3.scaleLinear().domain([0, f(ymax)]).range([t + this.ph, t]);
+    ctx.font = '11px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+    const yt = this.yMode === 'sqrt' ? d3.range(0, 6).map(j => Math.round(ymax * (j / 5) ** 2)) : this.sy.ticks(4).map(v => v);
+    for (const v of [...new Set(yt)]) { const y = this.sy(f(v)); ctx.strokeStyle = T.grid; ctx.beginPath(); ctx.moveTo(l, y); ctx.lineTo(l + this.pw, y); ctx.stroke(); ctx.fillStyle = T.text2; ctx.fillText(v.toLocaleString(), l - 5, y); }
+    this.axisX(ctx, this.sx, k);
+    for (let b = 0; b < nb; b++) {
+      let run = 0; const x0 = this.sx(edge(b)), x1 = this.sx(edge(b + 1)), w = Math.max(1, x1 - x0 - 1);
+      for (const c of STACK) {
+        const n = counts[b][c]; if (!n) continue;
+        const ya = this.sy(f(run)), yb = this.sy(f(run + n)); run += n;
+        ctx.fillStyle = T.cat[c]; ctx.fillRect(x0 + 0.5, yb, w, Math.max(0.8, ya - yb));
+      }
+    }
+    this.drawTop();
+  }
+  drawTop() {
+    const ctx = this.ctx(this.top), l = this.m.l, t = this.m.t;
+    const br = this.drag ? {a: this.drag.a, b: this.drag.b} : S.brush && S.brush.k === this.k ? {a: this.sx(Math.max(S.brush.lo, 1e-9)), b: this.sx(S.brush.hi)} : null;
+    if (br) {
+      const x0 = Math.min(br.a, br.b), x1 = Math.max(br.a, br.b);
+      ctx.fillStyle = T.accent; ctx.globalAlpha = .12; ctx.fillRect(x0, t, x1 - x0, this.ph); ctx.globalAlpha = 1;
+      ctx.strokeStyle = T.accent; ctx.lineWidth = 1.5; ctx.strokeRect(x0, t, x1 - x0, this.ph);
+    }
+  }
+  inv(x) { return isLog(MET[this.k]) ? this.sx.invert(x) : this.sx.invert(x); }
+  bindBrush() {
+    const cv = this.top;
+    cv.addEventListener('mousedown', e => {
+      const b = cv.getBoundingClientRect(), x = e.clientX - b.left;
+      if (x < this.m.l || x > this.m.l + this.pw) return;
+      this.drag = {a: x, b: x}; e.preventDefault();
+    });
+    cv.addEventListener('mousemove', e => {
+      const b = cv.getBoundingClientRect(), x = Math.min(this.m.l + this.pw, Math.max(this.m.l, e.clientX - b.left));
+      if (this.drag) { this.drag.b = x; this.drawTop(); hideTip(); return; }
+      if (!this.counts || x < this.m.l || x > this.m.l + this.pw) { hideTip(); return; }
+      const v = this.inv(x), bin = isLog(MET[this.k]) ? Math.min(this.nb - 1, Math.floor(Math.log10(Math.max(v, 1)) * 4)) : Math.min(this.nb - 1, Math.max(0, Math.floor(v - DOM[this.k][0])));
+      const c = this.counts[bin], n = c.reduce((p, q) => p + q, 0), lo = this.edge(bin), hi = this.edge(bin + 1);
+      tip(`<b>${this.k && MET[this.k].t === 'm' ? fmtM(lo) + ' to ' + fmtM(hi) : tickFmt(MET[this.k], Math.round(lo + .5))}</b><br>${n.toLocaleString()} plants` +
+        STACK.slice().reverse().filter(q => c[q]).map(q => `<br><span style="color:${T.cat[q]}">&#9679;</span> ${SHORT[q]}: ${c[q].toLocaleString()}`).join(''), e.clientX, e.clientY);
+    });
+    cv.addEventListener('mouseleave', () => hideTip());
+    addEventListener('mouseup', () => {
+      if (!this.drag) return;
+      const d = this.drag; this.drag = null;
+      if (Math.abs(d.a - d.b) < 4) S.brush = null;
+      else { const a = this.inv(Math.min(d.a, d.b)), b = this.inv(Math.max(d.a, d.b)); S.brush = {k: this.k, lo: a, hi: b}; }
+      refresh();
+    });
+  }
+  click() {}
+  move() {}
+  leave() {}
+}
+
+class Strip extends Plot {
+  constructor(el) { super(el, 230, {l: 112, r: 10, t: 6, b: 32}); this.k = 'cwns_other'; }
+  draw() {
+    if (!this.w) return;
+    const k = this.k, ctx = this.ctx(this.base), {l, t} = this.m; this.reset();
+    const has = new Set(); for (let i = 0; i < N; i++) if (vis[i] && V[k][i] === V[k][i]) has.add(CAT[i] === 6 ? 5 : CAT[i]);
+    const sx = this.scale(k, [l, l + this.pw]), rows = [0, 1, 2, 3, 4, 5].filter(c => S.on.has(c) && has.has(c)), bh = this.ph / Math.max(rows.length, 1);
+    this.axisX(ctx, sx, k);
+    const list = [], a = V[k], vals = rows.map(() => []);
+    for (let i = 0; i < N; i++) {
+      const v = a[i]; if (v !== v || !vis[i]) continue;
+      const r = rows.indexOf(CAT[i] === 6 ? 5 : CAT[i]); if (r < 0) continue;
+      this.px[i] = this.pos(sx, k, v) + (isLog(MET[k]) ? 0 : (JIT[i] - .5) * 10);
+      this.py[i] = t + bh * (r + 0.5) + (JIT[i] - .5) * bh * 0.78; list.push(i); vals[r].push(v);
+    }
+    rows.forEach((c, r) => {
+      ctx.fillStyle = T.text; ctx.font = '12px system-ui,sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+      ctx.fillText(SHORT[c], l - 8, t + bh * (r + .5));
+      ctx.fillStyle = T.cat[c]; ctx.beginPath(); ctx.arc(8, t + bh * (r + .5), 4, 0, 6.2832); ctx.fill();
+      ctx.strokeStyle = T.grid; ctx.beginPath(); ctx.moveTo(l, t + bh * (r + 1)); ctx.lineTo(l + this.pw, t + bh * (r + 1)); ctx.stroke();
+      if (vals[r].length) {
+        const med = d3.median(vals[r]), x = this.pos(sx, k, med);
+        ctx.strokeStyle = T.accent; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, t + bh * r + 3); ctx.lineTo(x, t + bh * (r + 1) - 3); ctx.stroke();
+      }
+    });
+    this.dots(ctx, list, 2);
+    this.drawTop();
+  }
+  tipExtra(i) { return `<br><span class="sub">${MET[this.k].short}: ${fmtV(this.k, V[this.k][i])}</span>`; }
+}
+
+class Scatter extends Plot {
+  constructor(el) { super(el, 300, {l: 52, r: 10, t: 8, b: 34}); this.x = 'cwns_fac'; this.y = 'cwns_addr'; }
+  draw() {
+    if (!this.w) return;
+    const {x: kx, y: ky} = this, ctx = this.ctx(this.base), {l, t} = this.m; this.reset();
+    const sx = this.scale(kx, [l, l + this.pw]), sy = this.scale(ky, [t + this.ph, t]);
+    this.axisX(ctx, sx, kx); this.axisY(ctx, sy, ky);
+    if (MET[kx].t === 'm' && MET[ky].t === 'm') {   // 1:1 line
+      ctx.setLineDash([4, 4]); ctx.strokeStyle = T.muted; ctx.beginPath(); ctx.moveTo(sx(1), sy(1)); ctx.lineTo(sx(DOM[kx][1]), sy(Math.min(DOM[ky][1], DOM[kx][1]))); ctx.stroke(); ctx.setLineDash([]);
+    }
+    const list = [], ax = V[kx], ay = V[ky], jx = !isLog(MET[kx]), jy = !isLog(MET[ky]);
+    for (let i = 0; i < N; i++) {
+      if (!vis[i] || ax[i] !== ax[i] || ay[i] !== ay[i]) continue;
+      this.px[i] = this.pos(sx, kx, ax[i]) + (jx ? (JIT[i] - .5) * 14 : 0);
+      this.py[i] = this.pos(sy, ky, ay[i]) + (jy ? (((JIT[i] * 7919) % 1) - .5) * 14 : 0); list.push(i);
+    }
+    this.dots(ctx, list, 2.2);
+    document.getElementById('scNote').textContent = `${list.length.toLocaleString()} shown plants have both measures. Dashed line = equal distance.`;
+    this.drawTop();
+  }
+  tipExtra(i) { return `<br><span class="sub">${MET[this.x].short}: ${fmtV(this.x, V[this.x][i])}<br>${MET[this.y].short}: ${fmtV(this.y, V[this.y][i])}</span>`; }
+}
+
+const hist = new Hist(document.getElementById('hist'));
+const strip = new Strip(document.getElementById('strip'));
+const scat = new Scatter(document.getElementById('scatter'));
+const plots = [hist, strip, scat];
+const drawPlotTops = () => { strip.drawTop(); scat.drawTop(); };
+
+for (const [id, getK] of [['histK', k => hist.k = k], ['stripK', k => strip.k = k], ['scX', k => scat.x = k], ['scY', k => scat.y = k]]) {
+  const sel = document.getElementById(id);
+  sel.innerHTML = METRICS.map(m => `<option value="${m.k}">${esc(m.label)}</option>`).join('');
+  sel.value = {histK: hist.k, stripK: strip.k, scX: scat.x, scY: scat.y}[id];
+  sel.onchange = () => { getK(sel.value); if (id === 'histK' && S.brush) { S.brush = null; refresh(); } else (id === 'histK' ? hist : id === 'stripK' ? strip : scat).draw(); };
+}
+document.getElementById('histY').onchange = e => { hist.yMode = e.target.value; hist.draw(); };
+
+// ---- filters ---------------------------------------------------------------
+const chipsEl = document.getElementById('chips');
+const present = [0, 1, 2, 3, 4, 5, 6].filter(c => CAT.includes(c));
+chipsEl.innerHTML = present.map(c => `<div class="chip" data-c="${c}" title="${esc(DESC[c])}"><i style="background:var(--c${c > 5 ? 5 : c})"></i><span>${LABEL[c]}</span><span class="n" id="n${c}"></span></div>`).join('');
+chipsEl.addEventListener('click', e => {
+  const ch = e.target.closest('.chip'); if (!ch) return; const c = +ch.dataset.c;
+  S.on.has(c) ? S.on.delete(c) : S.on.add(c); refresh();
+});
+chipsEl.addEventListener('dblclick', e => {
+  const ch = e.target.closest('.chip'); if (!ch) return; S.on = new Set([+ch.dataset.c]); refresh();
+});
+const stSel = document.getElementById('stateSel');
+stSel.innerHTML = '<option value="">All states</option>' + [...new Set(ST)].filter(Boolean).sort().map(s => `<option>${s}</option>`).join('');
+stSel.onchange = () => { S.state = stSel.value; refresh(); if (S.state) fitShown(); };
+const fitShown = () => document.getElementById('fitShown').click();
+document.getElementById('reset').onclick = () => { S.on = new Set([0, 1, 2, 3, 4, 5, 6]); S.state = ''; stSel.value = ''; S.brush = null; refresh(); };
+
+function refresh() {
+  const cnt = new Array(8).fill(0); let shown = 0, total = 0;
+  const b = S.brush, bv = b ? V[b.k] : null;
+  for (let i = 0; i < N; i++) {
+    const ok = (!S.state || ST[i] === S.state) && (!b || (bv[i] >= b.lo && bv[i] <= b.hi));
+    if (ok) { cnt[CAT[i]]++; total++; }
+    const v = ok && S.on.has(CAT[i]) ? 1 : 0; vis[i] = v; shown += v;
+  }
+  for (const c of present) {
+    document.getElementById('n' + c).textContent = cnt[c].toLocaleString();
+    chipsEl.querySelector(`[data-c="${c}"]`).classList.toggle('off', !S.on.has(c));
+  }
+  document.getElementById('count').textContent = `${shown.toLocaleString()} of ${N.toLocaleString()} plants shown`;
+  document.getElementById('histNote').innerHTML = b
+    ? `Filtering to ${esc(MET[b.k].short)}: ${MET[b.k].t === 'm' ? fmtM(Math.max(b.lo, 0)) + ' to ' + fmtM(b.hi) : Math.round(b.lo) + ' to ' + Math.round(b.hi)}. <a href="#" id="clrBrush">Clear</a>`
+    : 'Drag across the bars to filter the map to that range. Click to clear.';
+  const cb = document.getElementById('clrBrush'); if (cb) cb.onclick = ev => { ev.preventDefault(); S.brush = null; refresh(); };
+  if (S.sel >= 0 && !vis[S.sel]) { /* keep the selection visible in the detail panel even if filtered out */ }
+  drawMapBase(); drawMapTop(); for (const p of plots) p.draw();
+}
+
+// ---- selection and detail --------------------------------------------------
+const detail = document.getElementById('detail');
+function markRow() {
+  detail.querySelectorAll('tr.cand').forEach(tr => tr.style.background = +tr.dataset.k === S.hc ? 'var(--grid)' : '');
+}
+function select(i, zoom) {
+  S.sel = i; S.hc = -1;
+  if (i >= 0) history.replaceState(null, '', '#id=' + ID[i]); else history.replaceState(null, '', location.pathname);
+  renderDetail(); drawMapTop(); drawPlotTops();
+  if (zoom && i >= 0) zoomTo(i);
+}
+function renderDetail() {
+  const i = S.sel;
+  if (i < 0) { detail.innerHTML = '<h2>Selected plant</h2><div class="note">Click a point on the map or in a plot.</div>'; return; }
+  const r = P.rows[i], c = (CANDS[ID[i]] || []).map((x, k) => ({x, k})).sort((a, b) => (a.x[0] > 5) - (b.x[0] > 5) || a.x[0] - b.x[0] || a.x[5] - b.x[5]);
+  const co = r[CI.cons_lat] != null ? `${r[CI.cons_lat].toFixed(5)}, ${r[CI.cons_lon].toFixed(5)}` : '';
+  const trow = r[CI.truth_lat] != null
+    ? `<tr><td><svg width="12" height="12" viewBox="-6 -6 12 12" class="sw"><path d="M0-6L1.8-1.8 6-1.8 2.7 1 3.7 5.5 0 3 -3.7 5.5 -2.7 1 -6-1.8 -1.8-1.8z" fill="${T.truth}"/></svg>Verified location (${r[CI.truth_kind] === 'corrected' ? 'corrected' : 'original correct'})</td>
+       <td>${r[CI.truth_lat].toFixed(5)}, ${r[CI.truth_lon].toFixed(5)}</td><td>CWNS point is ${fmtV('cwns_truth', V.cwns_truth[i])} away</td></tr>` : '';
+  detail.innerHTML = `
+    <div class="row sb"><h2>${esc(NAME[i])}</h2><span class="row"><button id="dZoom">Zoom</button><button id="dClear">Clear</button></span></div>
+    <div class="sub">CWNS ${esc(ID[i])} &middot; ${esc(ST[i])}${r[CI.permit] ? ' &middot; permit ' + esc(r[CI.permit]) : ''}</div>
+    <div style="margin:6px 0"><span class="pill" style="background:${T.cat[CAT[i]]}">${LABEL[CAT[i]]}</span> <span class="sub">${V.n_origins[i] ?? 0} origins, ${V.n_pts[i] ?? 0} plant points</span></div>
+    <div class="note" style="margin-top:0">${esc(DESC[CAT[i]])}</div>
+    <table><tr><td class="d">Source</td><td class="d">Position</td><td class="d">From consensus</td></tr>
+    ${c.map(({x, k}) => `<tr class="cand" data-k="${k}"><td>${legendSvg(x[0])}${SRCN[x[0]]}<div class="d">${esc(x[3])} ${esc(x[4])}</div></td>
+       <td>${x[1].toFixed(5)}, ${x[2].toFixed(5)}</td><td>${x[5] == null ? '' : fmtM(x[5]) + fmtMi(x[5])}</td></tr>`).join('')}
+    ${trow}
+    </table>
+    ${co ? `<div class="row" style="margin-top:8px"><button id="dCopy">Copy consensus ${co}</button></div>` : ''}
+    <div class="legend"><span><svg width="14" height="14" viewBox="-7 -7 14 14"><path d="M-6 0H6M0-6V6" stroke="${T.accent}" stroke-width="2"/></svg>consensus</span>
+      <span><svg width="14" height="14" viewBox="-7 -7 14 14"><circle r="6" fill="none" stroke="${T.accent}" stroke-width="1.5" stroke-dasharray="3 2"/></svg>1 km</span>
+      <span>filled = coordinate, hollow = geocoded address</span></div>`;
+  document.getElementById('dClear').onclick = () => select(-1, false);
+  document.getElementById('dZoom').onclick = () => zoomTo(i);
+  const cpb = document.getElementById('dCopy'); if (cpb) cpb.onclick = () => navigator.clipboard?.writeText(co);
+  detail.querySelectorAll('tr.cand').forEach(tr => {
+    tr.onmouseenter = () => { S.hc = +tr.dataset.k; markRow(); drawMapTop(); };
+    tr.onmouseleave = () => { S.hc = -1; markRow(); drawMapTop(); };
+    tr.onclick = () => { const q = CANDS[ID[i]][+tr.dataset.k]; map.setView([q[1], q[2]], Math.max(map.getZoom(), 15)); };
+  });
+}
+function legendSvg(s) {
+  const col = T.fam[SRCF[s]], h = SRCH[s], st = h ? `fill="none" stroke="${col}" stroke-width="2"` : `fill="${col}"`;
+  const sh = SRCS[s] === 'circle' ? `<circle r="4.5" ${st}/>` : SRCS[s] === 'square' ? `<rect x="-4" y="-4" width="8" height="8" ${st}/>`
+    : SRCS[s] === 'triangle' ? `<path d="M0-5.5L5 4 -5 4z" ${st}/>` : `<path d="M0-6L6 0 0 6 -6 0z" ${st}/>`;
+  return `<svg class="sw" width="12" height="12" viewBox="-6.5 -6.5 13 13">${sh}</svg>`;
+}
+
+// ---- search ----------------------------------------------------------------
+const q = document.getElementById('q'), resbox = document.getElementById('resbox');
+q.addEventListener('input', () => {
+  const t = q.value.trim().toLowerCase(); if (t.length < 2) { resbox.hidden = true; return; }
+  const out = [];
+  for (let i = 0; i < N && out.length < 8; i++) if (NAME[i].toLowerCase().includes(t) || ID[i].startsWith(t)) out.push(i);
+  resbox.innerHTML = out.map(i => `<div class="r" data-i="${i}"><b>${esc(NAME[i])}</b>, ${esc(ST[i])} <span class="sub">${esc(ID[i])}</span></div>`).join('') || '<div class="r sub">No match</div>';
+  resbox.hidden = false;
+});
+resbox.addEventListener('click', e => {
+  const r = e.target.closest('.r'); if (!r || !r.dataset.i) return;
+  resbox.hidden = true; q.value = ''; const i = +r.dataset.i;
+  if (!vis[i]) { S.on.add(CAT[i]); S.state = ''; stSel.value = ''; S.brush = null; refresh(); }
+  select(i, true);
+});
+document.addEventListener('click', e => { if (!e.target.closest('#results')) resbox.hidden = true; });
+
+// ---- theme + start ---------------------------------------------------------
+darkMQ.addEventListener('change', () => { readTheme(); if (baseKind === 'map') setBase('map'); drawMapBase(); drawMapTop(); for (const p of plots) p.draw(); renderDetail(); });
+sizeMap();
+refresh();
+addEventListener('load', () => { map.invalidateSize(); if (!/#id=/.test(location.hash)) map.fitBounds([[24.5, -125], [49.5, -66]]); });
+const m0 = /#id=(\d+)/.exec(location.hash);
+if (m0) { const i = ID.indexOf(m0[1]); if (i >= 0) select(i, true); }
+})();
+</script>
+</body>
+</html>

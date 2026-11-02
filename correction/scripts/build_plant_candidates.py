@@ -23,9 +23,22 @@ Draft agreement class (max pairwise distance among the plant-role points in the 
 table): identical <=250 m, close <=1 km, same_town <=5 km, region <=25 km, conflict >25 km,
 single_source when fewer than two points. Thresholds are the THRESH list below.
 
+Consensus category (the one the QA dashboard uses): plant-role points within CLUSTER_M of each
+other (chained) form clusters, and a cluster is supported by the number of independent ORIGINS in
+it (CWNS, ICIS facility, ICIS feature), not by the number of points. The best-supported cluster is
+the consensus. Categories:
+  all_agree        every point is in one cluster
+  cwns_ok_outliers the CWNS point is in the consensus; other points are elsewhere
+  cwns_isolated    the other origins agree with each other, the CWNS point does not
+  split            two clusters are equally supported
+  no_consensus     no two origins fall in the same cluster
+  thin             only one origin has a point
+  cwns_missing     no CWNS point, two or more origins
+
 Run:  python -I build_plant_candidates.py [path/to/sewersheds_v2.duckdb]
 """
 import sys
+import warnings
 from itertools import combinations
 from pathlib import Path
 
@@ -33,6 +46,8 @@ import duckdb
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+from scipy.sparse import csr_matrix
+from scipy.sparse.csgraph import connected_components
 
 REPO = Path(__file__).resolve().parents[2]
 DB = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("C:/Github/sewersheds/V2/data/db/sewersheds_v2.duckdb")
@@ -43,6 +58,8 @@ OUT = REPO / "correction/data/candidates"
 
 THRESH = [(250, "identical"), (1000, "close"), (5000, "same_town"), (25000, "region")]
 PLANT_SRC = ["cwns_point", "cwns_addr", "icis_fac_frs", "icis_fac_addr", "icis_feat_INF"]
+CLUSTER_M = 1000
+ORIGIN = np.array([0, 0, 1, 1, 2])   # per PLANT_SRC: 0 CWNS, 1 ICIS facility, 2 ICIS feature
 
 
 def hav(lat1, lon1, lat2, lon2):
@@ -182,6 +199,41 @@ def main():
     cls = np.where(W.n_plant_points.values == 0, "no_location", cls)
     W["agreement_class"] = cls
 
+    # consensus cluster: points within CLUSTER_M (chained) are one cluster, support = independent origins
+    out = []
+    for i in range(len(W)):
+        present = np.where(~np.isnan(lat[i]))[0]
+        if len(present) == 0:
+            out.append(("no_location", 0, 0, 0, np.nan, np.nan, np.nan, np.nan))
+            continue
+        n_orig = len(set(ORIGIN[present]))
+        nc, lab = connected_components(csr_matrix(D[i][np.ix_(present, present)] <= CLUSTER_M), directed=False)
+        cl = sorted(((len(set(ORIGIN[present[lab == c]])), int((lab == c).sum()), present[lab == c]) for c in range(nc)),
+                    key=lambda t: (-t[0], -t[1]))
+        best = cl[0]
+        clat, clon = lat[i, best[2]].mean(), lon[i, best[2]].mean()
+        if n_orig < 2:
+            cat = "thin"
+        elif nc == 1:
+            cat = "all_agree"
+        elif best[0] < 2:
+            cat = "no_consensus"
+        elif len(cl) > 1 and cl[1][:2] == best[:2]:
+            cat = "split"
+        elif 0 not in present:
+            cat = "cwns_missing"
+        else:
+            cat = "cwns_ok_outliers" if 0 in best[2] else "cwns_isolated"
+        far = hav(lat[i, present], lon[i, present], clat, clon).max()
+        cw = hav(lat[i, 0], lon[i, 0], clat, clon) if 0 in present and n_orig >= 2 else np.nan
+        out.append((cat, n_orig, best[0], nc, clat, clon, cw, far))
+    W[["consensus_category", "n_origins", "consensus_origins", "n_clusters", "consensus_lat", "consensus_lon",
+       "cwns_to_consensus_m", "farthest_from_consensus_m"]] = pd.DataFrame(out, index=W.index)
+    # CWNS point to the nearest point from an independent origin (ICIS facility or feature)
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", RuntimeWarning)
+        W["cwns_to_other_m"] = np.nanmin(D[:, 0, 2:], axis=1)
+
     # downstream / dispersed context, measured from the medoid
     def ctx(src, prefix):
         d = long[long.source == src].merge(W[["medoid_lat", "medoid_lon"]], left_on="cwns_id", right_index=True)
@@ -219,7 +271,9 @@ def main():
     W["medoid_to_truth_m"] = hav(W.truth_lat, W.truth_lon, W.medoid_lat, W.medoid_lon)
 
     num = W.select_dtypes("number").columns
-    W[num] = W[num].round(1)
+    is_coord = num.str.contains("lat|lon")
+    W[num[~is_coord]] = W[num[~is_coord]].round(1)   # distances in metres
+    W[num[is_coord]] = W[num[is_coord]].round(6)
     W.reset_index().to_csv(OUT / "plant_agreement.csv", index=False)
     long[["cwns_id", "source", "role", "lat", "lon", "permit_number", "detail", "quality", "is_primary", "dist_to_medoid_m"]] \
         .round({"lat": 6, "lon": 6}).to_csv(OUT / "plant_candidates_long.csv", index=False)
@@ -227,7 +281,11 @@ def main():
     print(f"\nplants {len(W)}, long rows {len(long)}")
     print(long.groupby(["role", "source"]).size().to_string())
     print("\nagreement_class:\n" + W.agreement_class.value_counts().to_string())
+    print("\nconsensus_category:\n" + W.consensus_category.value_counts().to_string())
     t = W[W.truth_lat.notna()]
+    print(t.groupby("consensus_category").agg(n=("cwns_point_to_truth_m", "size"),
+                                              cwns_pt_within_500m=("cwns_point_to_truth_m", lambda s: (s <= 500).mean()),
+                                              cwns_pt_over_2km=("cwns_point_to_truth_m", lambda s: (s > 2000).mean())).round(3).to_string())
     print(f"\nverified plants with truth: {len(t)}")
     print(t.groupby("agreement_class").agg(n=("cwns_point_to_truth_m", "size"),
                                             cwns_pt_within_500m=("cwns_point_to_truth_m", lambda s: (s <= 500).mean()),
