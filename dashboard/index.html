@@ -302,10 +302,14 @@ function drawMapTop() {
     const i = S.sel, c = CANDS[ID[i]] || [], cons = P.rows[i][CI.cons_lat] != null ? cp(P.rows[i][CI.cons_lat], P.rows[i][CI.cons_lon]) : null;
     if (cons) {   // 1 km cluster ring and consensus cross
       const z = map.getZoom(), mpp = 156543.03392 * Math.cos(P.rows[i][CI.cons_lat] * Math.PI / 180) / Math.pow(2, z);
-      ctx.setLineDash([5, 4]); ctx.lineWidth = 1.5; ctx.strokeStyle = T.accent; ctx.beginPath(); ctx.arc(cons.x, cons.y, 1000 / mpp, 0, 6.2832); ctx.stroke(); ctx.setLineDash([]);
+      const dashed = (path, color, dash) => {   // dark casing under a bright dashed line, readable on any basemap
+        ctx.beginPath(); path(); ctx.setLineDash([]); ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.stroke();
+        ctx.setLineDash(dash); ctx.lineWidth = 2.5; ctx.strokeStyle = color; ctx.stroke(); ctx.setLineDash([]);
+      };
+      dashed(() => ctx.arc(cons.x, cons.y, 1000 / mpp, 0, 6.2832), '#ffffff', [7, 5]);
       for (let k = 0; k < c.length; k++) if (c[k][0] <= 5) {
-        const q = cp(c[k][1], c[k][2]); ctx.setLineDash([2, 3]); ctx.lineWidth = 1; ctx.strokeStyle = T.muted;
-        ctx.beginPath(); ctx.moveTo(cons.x, cons.y); ctx.lineTo(q.x, q.y); ctx.stroke(); ctx.setLineDash([]);
+        const q = cp(c[k][1], c[k][2]);
+        dashed(() => { ctx.moveTo(cons.x, cons.y); ctx.lineTo(q.x, q.y); }, '#4cff4c', [6, 5]);
       }
     }
     if (vis[i]) pop(ctx, i, false);
@@ -659,7 +663,8 @@ function renderDetail() {
     </table>
     ${co ? `<div class="row" style="margin-top:8px"><button id="dCopy">Copy consensus ${co}</button></div>` : ''}
     <div class="legend"><span><svg width="14" height="14" viewBox="-7 -7 14 14"><path d="M-6 0H6M0-6V6" stroke="${T.accent}" stroke-width="2"/></svg>consensus</span>
-      <span><svg width="14" height="14" viewBox="-7 -7 14 14"><circle r="6" fill="none" stroke="${T.accent}" stroke-width="1.5" stroke-dasharray="3 2"/></svg>1 km</span>
+      <span><svg width="14" height="14" viewBox="-7 -7 14 14"><circle r="6" fill="none" stroke="#000" stroke-opacity=".6" stroke-width="4"/><circle r="6" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 3"/></svg>1 km</span>
+      <span><svg width="22" height="14" viewBox="0 -7 22 14"><path d="M1 0H21" stroke="#000" stroke-opacity=".6" stroke-width="4"/><path d="M1 0H21" stroke="#4cff4c" stroke-width="2" stroke-dasharray="4 3"/></svg>to consensus</span>
       <span>filled = coordinate, hollow = geocoded address</span></div>`;
   document.getElementById('dClear').onclick = () => select(-1, false);
   document.getElementById('dZoom').onclick = () => zoomTo(i);
