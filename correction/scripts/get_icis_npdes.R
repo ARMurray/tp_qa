@@ -121,6 +121,11 @@ if (file.exists(code_file)) {
 # 055 Sewerage (Commercial), 056/057 Sanitary class III/IV, 058 Sewerage (Municipal), 97I Treatment Works
 # (053/054 Class I/II sanitary and 106 schools are household-scale and do not rescue a permit)
 rescue_cats <- c("055", "056", "057", "058", "97I")
+# master categories (REF_PERM_INDUSTRIAL_CAT) that describe a sewage / wastewater system. General-permit
+# coverages under any other master category (construction, stormwater, water supply, ...) are tiered
+# "nonsewer_category" even when their name sounds like a sewer. Hand-picked from the 112 category
+# descriptions; 055, 058, 062 and 082 are confirmed by the eRule "Domestic Wastewater" masters.
+sewer_cats <- c("040", "053", "054", "055", "056", "057", "058", "062", "082", "096", "97I")
 household_flow <- 0.1   # MGD
 permits <- v0 %>% filter(alive_since_2022) %>%
   left_join(fac, by = c("EXTERNAL_PERMIT_NMBR" = "PGM_SYS_ID")) %>%
@@ -135,7 +140,8 @@ permits <- v0 %>% filter(alive_since_2022) %>%
   select(-PERM_INDUSTRIAL_CAT_CODE) %>%
   left_join(cat_ref %>% rename(cat_code = PERM_INDUSTRIAL_CAT_CODE, cat_desc = PERM_INDUSTRIAL_CAT_DESC), by = "cat_code") %>%
   filter(pot_any_version | sewer_named | sewerage_code) %>%
-  mutate(tier = case_when(pot_any_version | sewer_named ~ "core",
+  mutate(tier = case_when(PERMIT_TYPE_CODE == "GPC" & !is.na(cat_code) & !cat_code %in% sewer_cats ~ "nonsewer_category",
+                          pot_any_version | sewer_named ~ "core",
                           coalesce(cat_code, "") %in% rescue_cats |
                             coalesce(TOTAL_DESIGN_FLOW_NMBR, 0) >= household_flow ~ "code_large",
                           TRUE ~ "code_household"))
