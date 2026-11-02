@@ -32,6 +32,7 @@ correction/data/training/*
 !correction/data/training/Updates.gpkg
 !correction/data/icis_npdes/
 !correction/data/geocode/
+!correction/data/candidates/
 
 # ...and the CWNS facility names (FACILITIES.txt, ~31k rows, public CWNS
 # data). The review app has always read it locally; the correction pipeline
