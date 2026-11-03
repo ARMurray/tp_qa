@@ -18,9 +18,10 @@ around it. We now have up to five plant-role points per plant, from CWNS and ICI
 | Consensus point | 70% |
 
 Sometimes the CWNS point is right, sometimes the ICIS facility point, and when all are
-wrong there is often one near the truth. Caveat: reviewers may have used the ICIS pins
-to find the answer, so these numbers may be optimistic. New out-of-sample review rounds
-are the real test.
+wrong there is often one near the truth. The reviewers did not use the ICIS
+pins to find the corrections (owner, 2026-11-03), so this is not circular. The truth set is
+still the reviewed plants, which lean toward doubted ones; new out-of-sample review rounds
+are the real test of the end-to-end result.
 
 ## Terms
 
@@ -92,19 +93,21 @@ source and the independent-origin count.
 Decided 2026-11-03: no long-lived branch. The HPC checkout and `config.ROOT` are shared
 by everything, so a second tree there would write over master's artifacts, and a diverging
 branch would collide with edits made for ongoing review rounds. Instead, every change
-lands on master as an addition that leaves current behavior untouched until we choose to
-switch.
+lands on master as a small, separately runnable step.
 
-- **Seed mode is a setting, default off.** Add `SEED_MODE` to `config.py` (`cwns_only` by
-  default, `multi` for the new flow), also settable by environment variable. With the
-  default, every script behaves exactly as it does today.
+- **Seed mode defaults to `multi`** (owner's decision, 2026-11-03: use all possible
+  locations). `SEED_MODE` in `config.py` is `multi` or `cwns_only`, overridable with the
+  `TPQA_SEED_MODE` environment variable. `cwns_only` is kept only so the old behavior can be
+  reproduced as the baseline for holdout comparisons. A script that has been converted runs
+  multi-seed by default; one that has not is unchanged.
 - **New outputs get new names.** Multi-seed tables, models and output files are written
   under their own folders or suffixes (for example `*_multi`). Nothing existing is
   overwritten. Retrained models are saved beside the current ones, not over them.
 - **Small, separately runnable steps.** Each change is committed on its own so a bad one
   is a single revert, and the build order below keeps the pipeline runnable at each step.
-- **Flip only after a holdout comparison.** Switch the default to `multi` once
-  `12_score_holdout` shows it at least matches the current pipeline on the frozen holdout.
+- **Compare against the old pipeline, but do not gate on it.** Run `12_score_holdout` for both
+  modes on the frozen holdout and record the difference. The current single-seed models and
+  outputs stay in place as the baseline because new outputs are written beside them.
 - Retraining changes every score. Scores from before and after are not comparable except
   through the `12_score_holdout` series.
 
@@ -126,7 +129,7 @@ switch.
       window grows a median 1.07x, mean 1.2x, 12.6% of plants above 1.5x a single disk. Five plants stay
       outside (CWNS point 9 km or more off). Cell level only: it ignores parcel gaps, so it is not
       comparable to 08's 91.4%
-- [ ] `SEED_MODE` setting in `config.py`, default `cwns_only`
+- [x] `SEED_MODE` setting in `config.py`, default `multi`, `TPQA_SEED_MODE` override
 - [ ] 01a / 01e multi-seed windows
 - [ ] Stage 1 retrain and plant-level calibration
 - [ ] Stage 2 pool and features

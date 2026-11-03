@@ -32,6 +32,7 @@ DIFFERENCES FROM THE LOCAL config.py:
     only a trained best.pt gets uploaded to MODELS_DIR for 01b to consume.
 """
 
+import os
 from pathlib import Path
 
 # ===========================================================================
@@ -239,6 +240,16 @@ NAIP_WORKERS = 32
 # the local OH run produced 73k Stage 2 candidates off this radius, and cost
 # scales ~k^2, so it is not a knob to change casually.
 K_RINGS = 18
+
+# Which locations seed the candidate search and Stage 1 (docs/PLAN_20261103_multi_source_seeds.md).
+#   multi      every plant-role location for the plant: CWNS point, CWNS geocode, ICIS-NPDES (default)
+#   cwns_only  the CWNS reported point alone, the pipeline as it was before 2026-11-03
+# cwns_only is kept to reproduce the old behavior as the baseline for 12_score_holdout comparisons.
+# Override per run with the TPQA_SEED_MODE environment variable. Scripts read this as they are
+# converted (build_plant_seeds.py writes the seeds); until then nothing consumes it.
+SEED_MODE = os.environ.get("TPQA_SEED_MODE", "multi")
+if SEED_MODE not in ("multi", "cwns_only"):
+    raise ValueError(f"TPQA_SEED_MODE must be 'multi' or 'cwns_only', got {SEED_MODE!r}")
 
 # Some Regrid parcels are digitization artifacts, not real parcels -- an
 # entire town represented as one polygon where actual parcel boundaries were
