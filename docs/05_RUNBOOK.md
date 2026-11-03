@@ -58,10 +58,9 @@ Skip this step entirely on the very first cycle — there is no review yet.
 ### A2–A6. Retrain, infer, score (HPC) — the order that works
 
 > **Multi-source seeds (the default since 2026-11-03):** the steps below also run with the new seed stages and
-> `*_multi` outputs; see [RUNBOOK_multi_source.md](RUNBOOK_multi_source.md) for the added steps. After **any** step,
-> send its results back through git with
-> `bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "<step> done"`. It refreshes
-> `correction/diagnostics/multi_status.txt` and pushes `correction/diagnostics/`. To keep running the old pipeline,
+> `*_multi` outputs; see [RUNBOOK_multi_source.md](RUNBOOK_multi_source.md) for the added steps. Each job's log and
+> `correction/diagnostics/multi_status.txt` are committed and pushed automatically when it ends (fallback:
+> `bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh`). To keep running the old pipeline,
 > `setenv TPQA_SEED_MODE cwns_only` first (tcsh).
 
 Updated 2026-10-02. **Submit each step only after the previous one has

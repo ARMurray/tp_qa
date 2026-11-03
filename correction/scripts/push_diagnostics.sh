@@ -1,5 +1,6 @@
 #!/bin/bash
-# Refresh the multi-source status file and push everything under correction/diagnostics/ (job logs, the status
+# FALLBACK -- jobs now commit and push their own diagnostics when they end (_latest_log.sh). Use this if a compute node
+# could not reach GitHub. Refresh the multi-source status file and push everything under correction/diagnostics/ (job logs, the status
 # file, diagnostics) to GitHub, so it can be read from anywhere with `git pull`.
 #
 #   bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh            # after any step

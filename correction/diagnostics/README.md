@@ -12,13 +12,9 @@ committed and pushed. The other end pulls and reads it.
 ## Multi-source run status
 
 `multi_status.txt` is rewritten when each job ends (multi mode) and says where every step of the multi-source run
-stands. Push it, with the job logs, from an HPC login node:
-
-```bash
-bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "<step> done"
-```
-
-See `docs/RUNBOOK_multi_source.md`.
+stands. The job's log and this file are committed and pushed automatically (`_latest_log.sh`); if a compute node cannot
+reach GitHub, run `bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh` on a login node. See
+`docs/RUNBOOK_multi_source.md`.
 
 ## Producing one
 

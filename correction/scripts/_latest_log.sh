@@ -64,7 +64,37 @@ _tpqa_refresh_status() {
     return 0
 }
 
+# ...and push it, with the logs, so the results are on GitHub when the job is done (multi mode, best effort).
+# Commits ONLY correction/diagnostics/ (a path-limited commit: anything else staged or modified is left alone) and
+# pushes; if the push is rejected because the remote moved, it pulls --rebase once and retries. An array commits
+# once, from the last task still in the queue (a race between two tasks ending together can skip it -- then run
+# `bash push_diagnostics.sh`). Needs the compute node to reach GitHub with the same credentials as the login node;
+# when it cannot, nothing breaks and the log and status file are simply not pushed until push_diagnostics.sh runs.
+# TPQA_NO_AUTOPUSH=1 turns it off.
+_tpqa_push_diagnostics() {
+    [ "${TPQA_SEED_MODE:-multi}" = "multi" ] || return 0
+    [ "${TPQA_NO_AUTOPUSH:-0}" = "1" ] && return 0
+    command -v git >/dev/null 2>&1 || return 0
+    local repo="${TPQA_REPO:-/work/GRDVULN/tp_qa}"
+    if [ -n "${SLURM_ARRAY_JOB_ID:-}" ] && command -v squeue >/dev/null 2>&1; then
+        local left
+        left=$(squeue -h -j "$SLURM_ARRAY_JOB_ID" -t PENDING,RUNNING 2>/dev/null | wc -l)
+        [ "${left:-1}" -le 1 ] || return 0
+    fi
+    (
+        if command -v flock >/dev/null 2>&1; then flock -n 8 || exit 0; fi
+        cd "$repo" 2>/dev/null || exit 0
+        git add correction/diagnostics >/dev/null 2>&1
+        git diff --cached --quiet -- correction/diagnostics && exit 0
+        timeout 60 git commit -q -m "diagnostics: ${SLURM_JOB_NAME:-job} ${SLURM_ARRAY_JOB_ID:-${SLURM_JOB_ID:-}} ($(date '+%Y-%m-%d %H:%M'))" -- correction/diagnostics || exit 0
+        timeout 120 git push -q origin HEAD || {
+            timeout 120 git pull --rebase --autostash -q && timeout 120 git push -q origin HEAD
+        }
+    ) 8>"${TPQA_PUSH_LOCK:-/work/GRDVULN/tp_qa/correction/logs/.push_diagnostics.lock}" >/dev/null 2>&1
+    return 0
+}
+
 # Bash does not run the EXIT trap when killed by an untrapped signal, and
 # SLURM's time limit arrives as SIGTERM -- turn it into an ordinary exit.
 trap 'exit 143' TERM
-trap '_tpqa_copy_latest_log $?; _tpqa_refresh_status' EXIT
+trap '_tpqa_copy_latest_log $?; _tpqa_refresh_status; _tpqa_push_diagnostics' EXIT
