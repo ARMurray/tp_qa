@@ -111,26 +111,6 @@ def main():
         assert SS.merge_parcels(["P1", "P2"], pair) == {"P1": 0, "P2": 1}
         assert SS.merge_parcels(["P3", "P4"], SS.fetch_parcels(con, "ZZ", ["P3", "P4"])) == {"P3": 0, "P4": 1}  # owners differ
 
-
-        # sources that agree to within geocoder scatter are one site even when the parcels have different owners
-        la, lo = centre(0, 20)
-        near_p4 = (la, LON0 + 1.05 * DLON)                 # P4's west edge: ~72 m from the seed on P3
-        far_p4 = centre(1, 20)                              # P4's middle: ~110 m from it
-        two = pd.DataFrame([
-            seed("M_cwns_point_1", "cwns_point", "cwns", la, lo, cid="M"),
-            seed("M_icis_fac_frs_1", "icis_fac_frs", "icis_facility", *near_p4, cid="M"),
-            seed("N_cwns_point_1", "cwns_point", "cwns", la, lo, cid="N"),
-            seed("N_icis_fac_frs_1", "icis_fac_frs", "icis_facility", *far_p4, cid="N"),
-        ])
-        tm = two.merge(SS.match_seeds_to_parcels(con, "ZZ", two), on="seed_id")
-        assert list(tm.ll_uuid) == ["P3", "P4", "P3", "P4"]
-        pp = SS.fetch_parcels(con, "ZZ", ["P3", "P4"])
-        _, tsites = SS.build_sites(tm, pp)
-        per = tsites.groupby("CWNS_ID").size().to_dict()
-        assert per == {"M": 1, "N": 2}, per
-        m1 = tsites[tsites.CWNS_ID == "M"].iloc[0]
-        assert m1.ll_uuids == ["P3", "P4"] and m1.rep_ll_uuid == "P3" and m1.n_origins == 2 and m1.site_n_parcels == 2
-
         # 01f end to end on the same store: files land per state and read back
         import importlib.util
         spec = importlib.util.spec_from_file_location("build_sites_01f", Path(C.__file__).parent / "01f_build_seed_sites.py")

@@ -279,9 +279,6 @@ SEED_SNAP_M = 100.0
 # Parcels of the same plant merge into one seed site when they are within this gap and share an owner.
 # Same figure as site_geometry.SITE_GAP_M (that module cannot import config, so it is repeated there).
 SEED_SITE_GAP_M = 50.0
-# Parcels also merge into one site when seeds on them are this close, whoever owns them (geocoder scatter: a snap
-# alone moves a seed up to SEED_SNAP_M).
-SEED_MERGE_M = 100.0
 # A seed counts toward a site's support only if it is more than this far from every earlier seed
 # (build_plant_seeds.py COPY_M).
 SEED_COPY_M = 1.0

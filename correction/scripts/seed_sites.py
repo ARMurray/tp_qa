@@ -12,9 +12,7 @@ seeds are collapsed so a parcel is judged once however many sources point at it:
      02 already use). A seed on no parcel snaps to the nearest parcel within SEED_SNAP_M; beyond that
      it stays unparcelled and is kept as point-only evidence (no site).
   2. Parcels -> site. Parcels of one plant merge into one site when they are within SEED_SITE_GAP_M of
-     each other and share a normalised owner (the parcel-only part of site_geometry's rule), or when seeds
-     on them are within SEED_MERGE_M of each other (two sources agreeing to within geocoder scatter; added
-     2026-11-03 after OH showed 48% of sites with another site of the same plant within 250 m). Detections
+     each other and share a normalised owner, the parcel-only part of site_geometry's rule. Detections
      are not used, so sites exist before any detector has run. Oversized parcels (whole-town
      digitisation artifacts) only ever merge with themselves.
   3. Each site carries its sources, its support counted in INDEPENDENT ORIGINS (a seed that copies an
@@ -212,34 +210,22 @@ def _components(n: int, edges) -> np.ndarray:
     return np.array([find(i) for i in range(n)])
 
 
-def merge_parcels(uuids: list[str], parcels: gpd.GeoDataFrame, gap_m: float = C.SEED_SITE_GAP_M,
-                  seeds: pd.DataFrame | None = None, seed_gap_m: float = C.SEED_MERGE_M) -> dict[str, int]:
-    """Group a plant's parcels into sites. Two parcels merge when
-      * they are within gap_m of each other and share a non-empty owner, or
-      * (when seeds -- ll_uuid, lat, lon -- are given) a seed on one is within seed_gap_m of a seed on the other,
-        whoever owns them: two sources that agree to within geocoder scatter are naming the same facility, and a
-        snapped or street-level geocode can land on the neighbouring parcel.
-    An oversized parcel merges with nothing. Returns ll_uuid -> component id (smallest index in group)."""
+def merge_parcels(uuids: list[str], parcels: gpd.GeoDataFrame, gap_m: float = C.SEED_SITE_GAP_M) -> dict[str, int]:
+    """Group a plant's parcels into sites. Two merge when within gap_m and with the same non-empty owner;
+    an oversized parcel merges with nothing. Returns ll_uuid -> component id (smallest index in group)."""
     uuids = sorted(uuids)
-    idx = {u: i for i, u in enumerate(uuids)}
-    big = {u: bool(u in parcels.index and parcels.at[u, "area_m2"] > C.MAX_PARCEL_AREA_M2) for u in uuids}
     edges = []
     for i in range(len(uuids)):
-        if uuids[i] not in parcels.index or big[uuids[i]]:
+        if uuids[i] not in parcels.index:
             continue
         for j in range(i + 1, len(uuids)):
-            if uuids[j] not in parcels.index or big[uuids[j]]:
+            if uuids[j] not in parcels.index:
                 continue
             a, b = parcels.loc[uuids[i]], parcels.loc[uuids[j]]
+            if a["area_m2"] > C.MAX_PARCEL_AREA_M2 or b["area_m2"] > C.MAX_PARCEL_AREA_M2:
+                continue
             if a["owner_norm"] and a["owner_norm"] == b["owner_norm"] and a.geometry.distance(b.geometry) <= gap_m:
                 edges.append((i, j))
-    if seeds is not None and len(seeds) > 1:
-        s = seeds[seeds["ll_uuid"].isin(idx)]
-        u = s["ll_uuid"].to_numpy()
-        d = hav_m(s["lat"].to_numpy()[:, None], s["lon"].to_numpy()[:, None], s["lat"].to_numpy()[None, :], s["lon"].to_numpy()[None, :])
-        for a_, b_ in zip(*np.nonzero(np.triu(d <= seed_gap_m, k=1))):
-            if u[a_] != u[b_] and not big[u[a_]] and not big[u[b_]]:
-                edges.append((idx[u[a_]], idx[u[b_]]))
     comp = _components(len(uuids), edges)
     return dict(zip(uuids, comp))
 
@@ -252,7 +238,7 @@ def build_sites(sp: pd.DataFrame, parcels: gpd.GeoDataFrame) -> tuple[pd.DataFra
     site_rows = []
     for cid, g in sp.groupby("CWNS_ID", sort=False):
         have = g[g["ll_uuid"].map(lambda u: isinstance(u, str))]
-        comp = merge_parcels(list(have["ll_uuid"].unique()), parcels, seeds=have) if len(have) else {}
+        comp = merge_parcels(list(have["ll_uuid"].unique()), parcels) if len(have) else {}
         plant = _plant_sites(cid, g, have, comp, parcels)
         for site_id, members in plant["members"].items():
             sp.loc[members, "site_id"] = site_id

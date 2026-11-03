@@ -133,8 +133,7 @@ Built 2026-11-03 and tested on synthetic parcel stores; **not yet run on the HPC
       outside (CWNS point 9 km or more off). Cell level only: it ignores parcel gaps, so it is not
       comparable to 08's 91.4%
 - [x] `SEED_MODE` setting in `config.py`, default `multi`, `TPQA_SEED_MODE` override; mode-suffixed output directories
-- [x] Seed -> parcel -> site (`seed_sites.py`, `01f_build_seed_sites.py`). Parcels merge on owner within 50 m, and (added after the
-      OH run) on seeds within 100 m of each other whoever owns them
+- [x] Seed -> parcel -> site (`seed_sites.py`, `01f_build_seed_sites.py`)
 - [x] 01a seed window centers; 01e `--seed-sites` detection
 - [x] Stage 1 on sites: 02 table, 03 grouped splits and plant-level accept threshold, label-leak guard
 - [x] Stage 2 window and per-candidate seed features (02, `seed_sites.add_seed_features`)
