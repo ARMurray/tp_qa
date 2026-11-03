@@ -1,0 +1,34 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01a_7606437_24.log
+# job 7606437 task 24 on r7n17, exit status 0, copied 2026-11-03 15:56:28
+#
+==========================================
+Node:    r7n17
+Job ID:  7606516
+CPUs:    16
+Started: Tue Nov  3 15:54:35 EST 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Processing state: MS  (array index 24 of 51)
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01a_extract_parcels.py --states MS --full-universe --no-resume
+=== 01a_extract_parcels.py ===
+K rings: 18   seed mode: multi   output: /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi
+
+  Dropped 1 rows with non-numeric/missing LATITUDE or LONGITUDE
+Treatment plants loaded: 66
+  Plant seed points: 249 for 66 plants
+Window centers after adding plant seeds: 315
+
+--- State MS: 315 plants ---
+  Unique H3 cells to query: 77750
+  Parcels retrieved: 343908
+  Dropping 180 candidate parcels over 2.0 km2 (largest: 6.5 km2) -- treated as digitization artifacts, not real candidate locations
+  Extracting NLCD stats...
+  77027 parcels had 0 pixels at >=50% coverage -- falling back to nearest-pixel centroid sample for these
+  Results: 343728 parcels, 7296 with water, 77027 used centroid fallback, 0 with 0 pixels (real gaps, after fallback)
+  Written: /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi/nlcd_MS_k18.parquet
+
+=== 01a_extract_parcels.py complete ===
+Outputs in: /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi
+Finished: Tue Nov  3 15:56:28 EST 2026

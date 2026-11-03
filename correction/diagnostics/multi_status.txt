@@ -3,22 +3,22 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-03 15:37:26
+generated   : 2026-11-03 17:08:05
 seed mode   : multi   suffix '_multi'
-git commit  : 9334247  (Tue Nov 3 15:28:09 2026 -0500 Pin the rule: neighbouring parcels with different owners stay separate sites)
+git commit  : eb518b9  (Tue Nov 3 15:37:27 2026 -0500 diagnostics: corr_01f 7606448 (2026-11-03 15:37))
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 1.7 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+training gpkg: 3.2 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 holdout manifest: 70.3 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
 detector best.pt: 35.8 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
 ==============================================================================
 01a  candidate windows (seeds as centers)
 ==============================================================================
-/work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 4 state file(s)
-total parcels 5,371,920; newest file 0.0 h ago
-vs single-seed run (4,900,390): ratio median 1.21, min 1.06, max 5.51  (the recall check expected ~1.0-1.3)
-largest growth: AK 5.51, DE 1.31, HI 1.11, OH 1.06
-states: AK DE HI OH
+/work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 51 state file(s)
+total parcels 85,587,556; newest file 0.0 h ago
+vs single-seed run (77,679,378): ratio median 1.09, min 1.01, max 5.51  (the recall check expected ~1.0-1.3)
+largest growth: AK 5.51, PR 2.73, SC 1.40, DE 1.31, SD 1.29
+states: AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
 
 ==============================================================================
 01f  seed sites
@@ -70,30 +70,30 @@ sites holding the CWNS point: 16,279; oversized parcel: 808; merged parcels (sit
 ==============================================================================
 JOB LOGS
 ==============================================================================
-266 log(s); newest first (name, age, exit status):
-  01f_43.log                           0.0 h ago   exit 0
-  01a_10.log                           0.0 h ago   exit 0
-  01f_48.log                           0.0 h ago   exit 0
-  01f_47.log                           0.0 h ago   exit 0
-  01f_49.log                           0.0 h ago   exit 0
-  01f_45.log                           0.0 h ago   exit 0
-  01f_50.log                           0.0 h ago   exit 0
-  01f_42.log                           0.0 h ago   exit 0
-  01f_44.log                           0.0 h ago   exit 0
-  01f_46.log                           0.0 h ago   exit 0
-  01f_34.log                           0.0 h ago   exit 0
-  01f_37.log                           0.0 h ago   exit 0
-  01f_40.log                           0.0 h ago   exit 0
-  01f_33.log                           0.0 h ago   exit 0
-  01f_38.log                           0.0 h ago   exit 0
-  01f_41.log                           0.0 h ago   exit 0
-  01f_39.log                           0.0 h ago   exit 0
-  01f_35.log                           0.0 h ago   exit 0
-  01a_7.log                            0.0 h ago   exit 0
-  01f_36.log                           0.0 h ago   exit 0
-  01f_13.log                           0.0 h ago   exit 0
-  01f_23.log                           0.0 h ago   exit 0
-  01f_32.log                           0.0 h ago   exit 0
-  01f_26.log                           0.0 h ago   exit 0
-  01f_30.log                           0.0 h ago   exit 0
+313 log(s); newest first (name, age, exit status):
+  01a_43.log                           0.0 h ago   exit 0
+  01a_48.log                           0.6 h ago   exit 0
+  01a_34.log                           0.7 h ago   exit 0
+  01a_47.log                           0.7 h ago   exit 0
+  01a_33.log                           0.7 h ago   exit 0
+  01a_42.log                           0.8 h ago   exit 0
+  01a_49.log                           0.8 h ago   exit 0
+  01a_45.log                           0.8 h ago   exit 0
+  01a_50.log                           0.8 h ago   exit 0
+  01a_8.log                            0.8 h ago   exit 0
+  01a_37.log                           0.8 h ago   exit 0
+  01a_44.log                           0.8 h ago   exit 0
+  01a_46.log                           0.9 h ago   exit 0
+  01a_13.log                           0.9 h ago   exit 0
+  01a_4.log                            0.9 h ago   exit 0
+  01a_40.log                           0.9 h ago   exit 0
+  01a_35.log                           0.9 h ago   exit 0
+  01a_39.log                           0.9 h ago   exit 0
+  01a_41.log                           1.0 h ago   exit 0
+  01a_36.log                           1.0 h ago   exit 0
+  01a_26.log                           1.0 h ago   exit 0
+  01a_38.log                           1.0 h ago   exit 0
+  01a_30.log                           1.0 h ago   exit 0
+  01a_23.log                           1.0 h ago   exit 0
+  01a_21.log                           1.1 h ago   exit 0
 
