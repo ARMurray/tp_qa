@@ -120,7 +120,7 @@ switch.
 ## Status
 
 - [x] Plan written; decided to build on master, not a branch
-- [ ] `plant_seeds` table
+- [x] `plant_seeds` table (`build_plant_seeds.py`, 58,130 seeds for 17,538 plants)
 - [ ] Recall-ceiling check on the HPC (today 91.4% of corrections fall inside the CWNS-centered window)
 - [ ] `SEED_MODE` setting in `config.py`, default `cwns_only`
 - [ ] 01a / 01e multi-seed windows
