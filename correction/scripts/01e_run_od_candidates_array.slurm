@@ -60,6 +60,9 @@
 #                 a timed-out task: leave it off and it picks up where it
 #                 stopped.
 #   DRYRUN=1      report the per-state work plan, fetch nothing
+#   SEEDSITES=1   multi-source mode: run detection on every plant's SEED SITES (from 01f) instead of Stage 2a's
+#                 top-K candidates. Writes od_features_seed_sites/. Run before 02. Does not need 05.
+#                   sbatch --array=0-47%6 --export=SEEDSITES="1" 01e_run_od_candidates_array.slurm
 #
 # RESTARTING FAILED TASKS
 #   sacct -j <arrayjobid> --format=JobID,State,Elapsed -X | grep -v COMPLETED
@@ -89,7 +92,12 @@ fi
 
 echo "Processing state: $STATE  (array index $SLURM_ARRAY_TASK_ID of ${#STATE_LIST[@]})"
 
-CMD="python $SCRIPTS/01e_run_od_candidates.py --all --states $STATE"
+if [ "${SEEDSITES:-0}" = "1" ]; then
+    # Multi-source: detection on each seed site's parcel (Stage 1's input). Needs 01f, not 05.
+    CMD="python $SCRIPTS/01e_run_od_candidates.py --seed-sites --states $STATE"
+else
+    CMD="python $SCRIPTS/01e_run_od_candidates.py --all --states $STATE"
+fi
 CMD="$CMD --workers ${WORKERS:-8}"
 [ -n "${TOPK:-}" ]     && CMD="$CMD --top-k $TOPK"
 [ -n "${NORESUME:-}" ] && CMD="$CMD --no-resume"
