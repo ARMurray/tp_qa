@@ -9,6 +9,17 @@ always somewhere things can be run interactively. Git already works in both
 directions, so a diagnostic runs as a job, writes a text file here, and gets
 committed and pushed. The other end pulls and reads it.
 
+## Multi-source run status
+
+`multi_status.txt` is rewritten when each job ends (multi mode) and says where every step of the multi-source run
+stands. Push it, with the job logs, from an HPC login node:
+
+```bash
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "<step> done"
+```
+
+See `docs/RUNBOOK_multi_source.md`.
+
 ## Producing one
 
 ```bash

@@ -47,15 +47,28 @@ It regenerates the status file, commits only `correction/diagnostics/`, and push
 Submit each step after the previous one has finished (see [05_RUNBOOK.md](05_RUNBOOK.md) A2-A6 for why).
 `cd /work/GRDVULN/tp_qa && git pull && cd correction/scripts`
 
+**After every step finishes** (check `sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`), send the results back:
+
+```bash
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "<step> done"
+```
+
+It is the `bash push_diagnostics.sh` line under each group below. A failed step needs it too: the traceback is in the file.
+
 ```bash
 # 1. labels (unchanged)
 sbatch 00_build_training_bins.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "00 bins done"
 
 # 2. NEW, in this order. All three take the FULL universe: the Stage 1 table only uses labelled plants, but
 #    inference needs every plant, and 01f/01e resume per state / per parcel.
+#    First a one-state check (OH is array index 34): sbatch --array=34 ... 01a, push, read, then the full array.
 sbatch --array=0-50%6 --export=FULLUNIVERSE=1,NORESUME=1 01a_extract_parcels.slurm      # nlcd_features_multi/
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "01a done"
 sbatch --array=0-50%6 --export=FULLUNIVERSE=1,NORESUME=1 01f_build_seed_sites.slurm     # seed_sites/
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "01f done"
 sbatch --array=0-47%6 --export=SEEDSITES=1 01e_run_od_candidates_array.slurm            # od_features_seed_sites/
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "01e seed sites done"
 #    01d top-up is only needed if 08 shows parcels missing from 01a; it appends to nlcd_features_multi/.
 #    01e: about 24.6k sites nationally, ~4.1k for the labelled plants. At the measured 39 candidates/min that
 #    is ~10.5 h aggregate (1.7 h for labelled plants alone). Rate-limited, not CPU-limited: see the array wrapper.
@@ -63,23 +76,30 @@ sbatch --array=0-47%6 --export=SEEDSITES=1 01e_run_od_candidates_array.slurm    
 # 3. features. 02 refuses to build the Stage 1 table without seed-site detections (--no-seed-od overrides).
 sbatch --export=FULL_UNIVERSE=1 02_feature_engineering.slurm
 sbatch 02b_merge_feature_shards.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "02/02b done"
 
 # 4. models
 sbatch 03_train_stage1.slurm        # models_multi/stage1_*; read the "Plant-level accept analysis" block
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "03 done"
 sbatch 04_train_stage2.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "04 done"
 
 # 5. inference, then the rest exactly as in 05_RUNBOOK.md steps 5-7b (they now read and write *_multi/)
 sbatch --array=0-39,41-47%8 05_run_inference_array.slurm
 sbatch --array=40 --mem=128G 05_run_inference_array.slurm
 sbatch merge_05_shards.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "05 + merge done"
 sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm      # re-ranker training detections
 sbatch 06b_build_rerank_training.slurm
 sbatch 07b_train_rerank.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "06b/07b done"
 sbatch --array=0-47%6 01e_run_od_candidates_array.slurm        # detection on every candidate
 sbatch 01e_run_od_candidates.slurm                             # holdout scope
 sbatch 05b_rerank_candidates.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "05b done"
 sbatch 12_score_holdout.slurm
 sbatch --export=CUTOFF=0.95 13_build_corrected_output.slurm
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "12/13 done"
 ```
 
 To score the old pipeline for the comparison, run `12_score_holdout` with `TPQA_SEED_MODE=cwns_only`: it reads the
