@@ -40,16 +40,34 @@ from pathlib import Path
 # ===========================================================================
 ROOT = Path("/work/GRDVULN/tp_qa/correction")
 
+# ---------------------------------------------------------------------------
+# Seed mode (docs/PLAN_20261103_multi_source_seeds.md)
+#   multi      every plant-role location for the plant seeds the pipeline: CWNS point, CWNS
+#              geocode, ICIS-NPDES. The default.
+#   cwns_only  the CWNS reported point alone, the pipeline as it was before 2026-11-03.
+# Override per run with the TPQA_SEED_MODE environment variable.
+#
+# Every artifact the seeds change lives in a directory with the suffix SFX, so the two modes never
+# overwrite each other: cwns_only keeps the original names and is the baseline for 12_score_holdout
+# comparisons, multi writes "<name>_multi". Inputs and artifacts the seeds do not change (CWNS
+# exports, training labels, holdout, reported-location detection, review logs) are shared.
+# ---------------------------------------------------------------------------
+SEED_MODE = os.environ.get("TPQA_SEED_MODE", "multi")
+if SEED_MODE not in ("multi", "cwns_only"):
+    raise ValueError(f"TPQA_SEED_MODE must be 'multi' or 'cwns_only', got {SEED_MODE!r}")
+MULTI = SEED_MODE == "multi"
+SFX = "_multi" if MULTI else ""
+
 SCRIPTS_DIR = ROOT / "scripts"
 LOGS_DIR    = ROOT / "logs"
 DATA_DIR    = ROOT / "data"
-MODELS_DIR   = ROOT / "models"                       # 03/04 write stage1_*/stage2_* here
-OD_MODEL_DIR = MODELS_DIR / "object_detection"       # best.pt from detection/ lands here
+MODELS_DIR   = ROOT / f"models{SFX}"                 # 03/04 write stage1_*/stage2_* here
+OD_MODEL_DIR = ROOT / "models" / "object_detection"  # best.pt from detection/ lands here (shared)
 
 # --- data subdirectories ---------------------------------------------------
 CWNS_DIR           = DATA_DIR / "cwns"           # PHYSICAL_LOCATION.txt, FACILITY_TYPES.txt, DISCHARGES.csv, POPULATION_WASTEWATER.txt
 TRAINING_DIR       = DATA_DIR / "training"       # training_locations.gpkg, Updates.gpkg
-NLCD_OUTPUT_DIR    = DATA_DIR / "nlcd_features"  # 01a output: nlcd_{STATE}_k{K}.parquet
+NLCD_OUTPUT_DIR    = DATA_DIR / f"nlcd_features{SFX}"  # 01a output: nlcd_{STATE}_k{K}.parquet
 OD_OUTPUT_DIR      = DATA_DIR / "od_features"    # 01b output: tiles/ detections/ objects/ plants/
                                                     # (reported/possibly-wrong locations)
 OD_OUTPUT_DIR_CORRECTED = DATA_DIR / "od_features_corrected"  # 01c output: same schema,
@@ -59,7 +77,7 @@ OD_OUTPUT_DIR_CORRECTED = DATA_DIR / "od_features_corrected"  # 01c output: same
                                                     # reader of OD_OUTPUT_DIR ever accidentally
                                                     # unions reported and corrected-location rows
                                                     # for the same CWNS_ID together.
-FEATURES_OUTPUT_DIR = DATA_DIR / "features"      # 02 output: 05_/10_/14_/15_*.parquet
+FEATURES_OUTPUT_DIR = DATA_DIR / f"features{SFX}"      # 02 output: 05_/10_/14_/15_*.parquet
 REFERENCE_DIR      = DATA_DIR / "reference"      # census gdb, OSM gpkg
 
 # 02 run as a per-state ARRAY writes here instead of straight to
@@ -73,7 +91,21 @@ REFERENCE_DIR      = DATA_DIR / "reference"      # census gdb, OSM gpkg
 #
 # 10_parcel_features has no shard dir of its own -- FEATURES_OUTPUT_DIR /
 # "10_parcel_features_by_state" already is one, and predates this.
-FEATURE_SHARD_DIR  = DATA_DIR / "feature_shards"  # state=XX/05_,14_,15_*.parquet
+FEATURE_SHARD_DIR  = DATA_DIR / f"feature_shards{SFX}"  # state=XX/05_,14_,15_*.parquet
+
+# Downstream artifacts the seeds change (named here so no script hardcodes them).
+INFERENCE_DIR       = DATA_DIR / f"inference{SFX}"         # 05/merge_05_shards: plant_summary, stage2_candidates
+INFERENCE_SHARD_DIR = DATA_DIR / f"inference_shards{SFX}"  # 05 array shards
+OD_CAND_DIR         = DATA_DIR / f"od_features_candidates{SFX}"        # 01e, holdout / --all scope
+OD_CAND_TRAIN_DIR   = DATA_DIR / f"od_features_candidates_train{SFX}"  # 01e --training-corrections
+OD_CAND_QUEUE_DIR   = DATA_DIR / f"od_features_candidates_queue{SFX}"  # 01e --from-queue
+OUTPUT_DIR          = DATA_DIR / f"output{SFX}"            # 13: cwns_corrected_locations.*
+REVIEW_QUEUE_DIR    = DATA_DIR / f"review_queue{SFX}"      # 10: review_queue_round{N}.parquet
+
+# Seed sites (multi mode only; 01f writes them, 01e detects on them, 02 and 05 read them).
+SEEDS_CSV         = ROOT / "data" / "candidates" / "plant_seeds.csv"   # repo-tracked; build_plant_seeds.py
+SEED_SITES_DIR    = DATA_DIR / "seed_sites"             # 01f: seed_sites.parquet, seed_parcels.parquet
+OD_SEED_SITES_DIR = DATA_DIR / "od_features_seed_sites"  # 01e --seed-sites: objects/ plants/ ...
 
 # ===========================================================================
 # 2. EXTERNAL INPUTS  (shared, outside ROOT)
@@ -241,15 +273,15 @@ NAIP_WORKERS = 32
 # scales ~k^2, so it is not a knob to change casually.
 K_RINGS = 18
 
-# Which locations seed the candidate search and Stage 1 (docs/PLAN_20261103_multi_source_seeds.md).
-#   multi      every plant-role location for the plant: CWNS point, CWNS geocode, ICIS-NPDES (default)
-#   cwns_only  the CWNS reported point alone, the pipeline as it was before 2026-11-03
-# cwns_only is kept to reproduce the old behavior as the baseline for 12_score_holdout comparisons.
-# Override per run with the TPQA_SEED_MODE environment variable. Scripts read this as they are
-# converted (build_plant_seeds.py writes the seeds); until then nothing consumes it.
-SEED_MODE = os.environ.get("TPQA_SEED_MODE", "multi")
-if SEED_MODE not in ("multi", "cwns_only"):
-    raise ValueError(f"TPQA_SEED_MODE must be 'multi' or 'cwns_only', got {SEED_MODE!r}")
+# Seed-site parameters (seed_sites.py; docs/PLAN_20261103_multi_source_seeds.md).
+# A seed that falls on no parcel is snapped to the nearest parcel within this distance.
+SEED_SNAP_M = 100.0
+# Parcels of the same plant merge into one seed site when they are within this gap and share an owner.
+# Same figure as site_geometry.SITE_GAP_M (that module cannot import config, so it is repeated there).
+SEED_SITE_GAP_M = 50.0
+# A seed counts toward a site's support only if it is more than this far from every earlier seed
+# (build_plant_seeds.py COPY_M).
+SEED_COPY_M = 1.0
 
 # Some Regrid parcels are digitization artifacts, not real parcels -- an
 # entire town represented as one polygon where actual parcel boundaries were
@@ -462,7 +494,7 @@ def ensure_dirs():
     for d in (SCRIPTS_DIR, LOGS_DIR, DATA_DIR, MODELS_DIR, OD_MODEL_DIR,
               CWNS_DIR, TRAINING_DIR, NLCD_OUTPUT_DIR, OD_OUTPUT_DIR,
               OD_OUTPUT_DIR_CORRECTED, FEATURES_OUTPUT_DIR, FEATURE_SHARD_DIR,
-              REFERENCE_DIR):
+              INFERENCE_DIR, OUTPUT_DIR, SEED_SITES_DIR, REFERENCE_DIR):
         d.mkdir(parents=True, exist_ok=True)
 
 # ===========================================================================
