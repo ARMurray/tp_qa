@@ -98,7 +98,7 @@ KEY_SEP = "::"
 
 
 def load_candidates(top_k: int) -> pd.DataFrame:
-    path = C.DATA_DIR / "inference" / "stage2_candidates.parquet"
+    path = C.INFERENCE_DIR / "stage2_candidates.parquet"
     if not path.exists():
         print(f"ERROR: {path} not found.\n"
               f"  Run 05_run_inference.py (or the array + merge_05_shards.py) first.")
@@ -108,6 +108,18 @@ def load_candidates(top_k: int) -> pd.DataFrame:
     df["CWNS_ID"] = df["CWNS_ID"].astype(str)
     df = df.sort_values(["CWNS_ID", "stage2_prob_correct"], ascending=[True, False])
     return df.groupby("CWNS_ID", group_keys=False).head(top_k).reset_index(drop=True)
+
+
+def load_seed_site_parcels(states: str | None) -> pd.DataFrame:
+    """One row per seed site: its representative parcel, in the same columns as load_candidates (the
+    Stage 2a score is absent). Sites sharing a representative parcel across a plant do not occur -- a
+    parcel belongs to one site -- but the frame is deduplicated on (CWNS_ID, ll_uuid) anyway."""
+    import seed_sites as SS
+    st = [s.strip() for s in states.split(",")] if states else None
+    sites, _ = SS.load_sites(states=st)
+    out = sites[["CWNS_ID", "rep_ll_uuid", "STATE_CODE"]].rename(columns={"rep_ll_uuid": "ll_uuid"})
+    out["stage2_prob_correct"] = float("nan")
+    return out.drop_duplicates(["CWNS_ID", "ll_uuid"]).reset_index(drop=True)
 
 
 def restrict_to_holdout(cands: pd.DataFrame, bins: list[str]) -> pd.DataFrame:
@@ -324,6 +336,11 @@ def main():
     ap.add_argument("--shown-only", action="store_true",
                     help="with --from-queue: only the candidate parcels the "
                          "queue shows (the pre-2026-10-03 scope)")
+    ap.add_argument("--seed-sites", action="store_true",
+                    help="multi-source mode: detection on each SEED SITE's representative parcel (01f's "
+                         "output), the input to the Stage 1 site table and to Stage 1 inference. Writes to "
+                         "od_features_seed_sites/. Needs no Stage 2a output. Scope the plant universe with "
+                         "01f (training or --full-universe), and --states.")
     ap.add_argument("--holdout-bins", default="corrections",
                     help="comma-separated holdout bins (default: corrections)")
     ap.add_argument("--states", default=None, help="comma-separated filter")
@@ -351,27 +368,37 @@ def main():
     #              because a queue has a holdout slice, which is exactly why it
     #              must not be the same root as _train.
     #   (base)  -> the holdout's own candidates, for scoring.
-    if args.training_corrections:
-        out_root = C.DATA_DIR / "od_features_candidates_train"
+    if args.seed_sites:
+        out_root = C.OD_SEED_SITES_DIR
+    elif args.training_corrections:
+        out_root = C.OD_CAND_TRAIN_DIR
     elif args.from_queue:
-        out_root = C.DATA_DIR / "od_features_candidates_queue"
+        out_root = C.OD_CAND_QUEUE_DIR
     else:
-        out_root = C.DATA_DIR / "od_features_candidates"
+        out_root = C.OD_CAND_DIR
     print("=== 01e_run_od_candidates.py ===")
     print(f"output: {out_root}")
 
-    print("\nLoading Stage 2a candidates...")
-    cands = load_candidates(args.top_k)
-    print(f"  {len(cands)} candidate(s) across {cands['CWNS_ID'].nunique()} plant(s) "
-          f"(top {args.top_k} each)")
-
-    n_scopes = sum(bool(x) for x in (args.all, args.training_corrections, args.from_queue))
+    n_scopes = sum(bool(x) for x in (args.all, args.training_corrections, args.from_queue, args.seed_sites))
     if n_scopes > 1:
-        print("ERROR: --all, --training-corrections and --from-queue are "
+        print("ERROR: --all, --training-corrections, --from-queue and --seed-sites are "
               "mutually exclusive -- each writes a different output root for a "
               "different consumer.")
         sys.exit(2)
-    if args.training_corrections:
+    if args.seed_sites:
+        # Stage 1's input, not a ranked pool: one parcel per seed site, no Stage 2a score.
+        print("\nLoading seed sites...")
+        cands = load_seed_site_parcels(args.states)
+        print(f"  {len(cands)} seed-site parcel(s) across {cands['CWNS_ID'].nunique()} plant(s)")
+    else:
+        print("\nLoading Stage 2a candidates...")
+        cands = load_candidates(args.top_k)
+        print(f"  {len(cands)} candidate(s) across {cands['CWNS_ID'].nunique()} plant(s) "
+              f"(top {args.top_k} each)")
+
+    if args.seed_sites:
+        pass
+    elif args.training_corrections:
         cands = restrict_to_training_corrections(cands)
     elif args.from_queue:
         cands = restrict_to_queue(cands, args.from_queue, args.shown_only)

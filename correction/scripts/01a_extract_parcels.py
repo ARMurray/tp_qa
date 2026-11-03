@@ -17,6 +17,10 @@ of 01b's object detection, which only needs the SINGLE parcel a reported
 point falls on. This script pulls the full k=18 candidate neighborhood,
 which Stage 2 (location correction search) needs to rank alternatives.
 
+MULTI-SOURCE SEEDS (config.SEED_MODE == "multi", the default): every plant-role location -- CWNS point, CWNS
+geocode, ICIS-NPDES -- is a window center, not just the CWNS point, and output goes to nlcd_features_multi/ so
+the single-seed files are untouched. TPQA_SEED_MODE=cwns_only reproduces the old behaviour.
+
 Output: one Parquet file per state, matching the R version's naming:
     data/nlcd_features/nlcd_{STATE_CODE}_k{K_RINGS}.parquet
     columns: ll_uuid, h3_index_9, state, total_pixels, water_pixels,
@@ -114,6 +118,26 @@ def load_correction_seed_points(states: list[str] | None) -> pd.DataFrame:
         out = out[out["STATE_CODE"].isin(states)]
     print(f"  Correction seed points: {len(out)}")
     return out.reset_index(drop=True)
+
+def load_plant_seed_points(plants: pd.DataFrame) -> pd.DataFrame:
+    """Every plant-role location (CWNS point, CWNS geocode, ICIS-NPDES) as an extra window CENTER, in the same
+    shape as the correction seeds below. Multi-source mode only (config.SEED_MODE == "multi").
+
+    Why: the true parcel is sometimes far from the CWNS point but near another source -- on the 837 reviewer-
+    corrected plants, the true location sat inside the window for 95.8% of plants with CWNS points alone and
+    99.4% with every seed (check_seed_recall.py). Seeds only add window centers: the union of k-ring disks
+    already deduplicates cells, and fetch_parcels_for_h3_cells deduplicates on ll_uuid.
+
+    A plant keeps its own STATE_CODE for every seed (parcels are partitioned by the plant's state), so a
+    geocode that landed in another state simply finds no parcels there."""
+    import seed_sites as SS
+    seeds = SS.load_seeds(plants["CWNS_ID"])
+    seeds = seeds.merge(plants[["CWNS_ID", "STATE_CODE"]].drop_duplicates("CWNS_ID"), on="CWNS_ID", how="inner")
+    out = seeds.rename(columns={"lat": "LATITUDE", "lon": "LONGITUDE"})[
+        ["CWNS_ID", "STATE_CODE", "LATITUDE", "LONGITUDE"]]
+    print(f"  Plant seed points: {len(out)} for {out['CWNS_ID'].nunique()} plants")
+    return out.reset_index(drop=True)
+
 
 def load_treatment_plants(states: list[str] | None, training_only: bool = True) -> pd.DataFrame:
     """Same filter as 01b: CWNS_ID, STATE_CODE, LATITUDE, LONGITUDE for
@@ -386,10 +410,15 @@ def main():
     states_filter = [s.strip() for s in args.states.split(",")] if args.states else None
 
     print("=== 01a_extract_parcels.py ===")
-    print(f"K rings: {args.k_rings}\n")
+    print(f"K rings: {args.k_rings}   seed mode: {C.SEED_MODE}   output: {C.NLCD_OUTPUT_DIR}\n")
 
     plants = load_treatment_plants(states_filter, training_only=not args.full_universe)
     print(f"Treatment plants loaded: {len(plants)}")
+
+    # Multi-source seeds: every source location is a window center too (see load_plant_seed_points).
+    if C.MULTI:
+        plants = pd.concat([plants, load_plant_seed_points(plants)], ignore_index=True)
+        print(f"Window centers after adding plant seeds: {len(plants)}")
 
     # Seed the search window from corrected points as well. These are extra
     # window CENTERS only -- they add rows to `plants` purely so the k-ring
