@@ -61,14 +61,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
 import name_match as NM
 
-OD_ROOT = C.DATA_DIR / "od_features_candidates" / "candidates"
+OD_ROOT = C.OD_CAND_DIR / "candidates"
 # 01e --from-queue writes here. Read too (2026-09-30) so a review queue's
 # plants are re-ranked on the detection results fetched for them -- without
 # it, the uncertain/random slices had no candidate OD at all and 05b fell
 # back to Stage 2a's order for nearly every queued plant.
-OD_QUEUE_ROOT = C.DATA_DIR / "od_features_candidates_queue" / "candidates"
+OD_QUEUE_ROOT = C.OD_CAND_QUEUE_DIR / "candidates"
 OD_ROOTS = [OD_ROOT, OD_QUEUE_ROOT]
-INFER_DIR = C.DATA_DIR / "inference"
+INFER_DIR = C.INFERENCE_DIR
 
 
 def load_model(no_od: bool):

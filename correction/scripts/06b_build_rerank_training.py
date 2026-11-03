@@ -68,7 +68,7 @@ import config as C
 import name_match as NM
 from holdout import exclude_holdout
 
-OD_TRAIN_ROOT = C.DATA_DIR / "od_features_candidates_train" / "candidates"
+OD_TRAIN_ROOT = C.OD_CAND_TRAIN_DIR / "candidates"
 OUT_PATH = C.FEATURES_OUTPUT_DIR / "17_rerank_training.parquet"
 
 
@@ -191,7 +191,7 @@ def main():
 
     print("=== 06b_build_rerank_training.py ===\n")
 
-    cand_path = C.DATA_DIR / "inference" / "stage2_candidates.parquet"
+    cand_path = C.INFERENCE_DIR / "stage2_candidates.parquet"
     if not cand_path.exists():
         print(f"ERROR: {cand_path} not found. Run 05 (or the array + merge) first.")
         sys.exit(2)

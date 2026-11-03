@@ -62,9 +62,9 @@ import config as C
 import name_match as NM
 import site_geometry as SG
 
-INFER_DIR = C.DATA_DIR / "inference"
-OUT_DIR = C.DATA_DIR / "output"
-SHARE_DIR = C.ROOT / "diagnostics" / "output"
+INFER_DIR = C.INFERENCE_DIR
+OUT_DIR = C.OUTPUT_DIR
+SHARE_DIR = C.ROOT / "diagnostics" / f"output{C.SFX}"
 MIN_OD_COVERAGE = 0.5
 
 # Per-object detection output, by source. 01b: tiles around the REPORTED
@@ -73,8 +73,8 @@ MIN_OD_COVERAGE = 0.5
 OBJECT_ROOTS = {
     "reported": C.OD_OUTPUT_DIR / "objects",
     "corrected": C.OD_OUTPUT_DIR_CORRECTED / "objects",
-    "candidate": C.DATA_DIR / "od_features_candidates" / "objects",
-    "candidate_queue": C.DATA_DIR / "od_features_candidates_queue" / "objects",
+    "candidate": C.OD_CAND_DIR / "objects",
+    "candidate_queue": C.OD_CAND_QUEUE_DIR / "objects",
 }
 
 

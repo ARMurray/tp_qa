@@ -95,6 +95,16 @@ def main():
         assert not {"STATE_CODE", "site_lat", "ll_uuids", "owner"} & set(s.columns)
         assert {"site_name_pool_rank", "n_origins", "has_cwns", "name_match_score", "d_to_cwns_point_m"} <= set(s.columns)
         assert s.site_id.is_unique
+        leaked = set(fe.SITE_LABEL_COLS) & set(s.columns)
+        assert not leaked, f"label-derived columns reached the model table: {leaked}"
+
+        # a reviewer-marked multi-parcel plant: a site holding ANY marked parcel is the plant
+        ls = fe.label_sites(
+            pd.DataFrame({"CWNS_ID": ["Z", "Z", "Z"], "site_id": ["Z_s1", "Z_s2", "Z_s3"],
+                          "ll_uuids": [["P1"], ["P2"], ["P3"]]}),
+            pd.DataFrame({"CWNS_ID": ["Z"], "class": ["Incorrect"], "reported_ll_uuid": ["P3"],
+                          "corrected_ll_uuid": ["P1"], "truth_ll_uuid": ["P1"], "truth_set": [{"P1", "P2"}]}))
+        assert list(ls["class"]) == ["Correct", "Correct", "Incorrect"]
         assert not [c for c in s.columns if c.endswith(("_x", "_y"))], "a site column collides with a parcel/plant column"
 
         # missing seed-site OD is an error unless asked for

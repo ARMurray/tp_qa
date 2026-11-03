@@ -83,7 +83,7 @@ case "${SCOPE:-holdout}" in
             echo "ERROR: SCOPE=queue needs ROUND, e.g. --export=SCOPE=queue,ROUND=3"
             exit 1
         fi
-        CMD="$CMD --from-queue \"$ROOT/data/review_queue/review_queue_round${ROUND}.parquet\""
+        CMD="$CMD --from-queue \"$ROOT/data/review_queue${SFX}/review_queue_round${ROUND}.parquet\""
         ;;
     holdout)
         [ -n "${BINS:-}" ] && CMD="$CMD --holdout-bins $BINS"

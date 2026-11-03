@@ -250,9 +250,9 @@ def sec_models(r, ctx):
         "14_stage1_training.parquet": C.FEATURES_OUTPUT_DIR / "14_stage1_training.parquet",
         "15_stage2_training.parquet": C.FEATURES_OUTPUT_DIR / "15_stage2_training.parquet",
         "17_rerank_training.parquet": C.FEATURES_OUTPUT_DIR / "17_rerank_training.parquet",
-        "inference/stage2_candidates.parquet": C.DATA_DIR / "inference" / "stage2_candidates.parquet",
+        "inference/stage2_candidates.parquet": C.INFERENCE_DIR / "stage2_candidates.parquet",
         "inference/stage2_candidates_reranked.parquet":
-            C.DATA_DIR / "inference" / "stage2_candidates_reranked.parquet",
+            C.INFERENCE_DIR / "stage2_candidates_reranked.parquet",
     }
     pts = sorted(C.OD_MODEL_DIR.rglob("*.pt"), key=lambda p: p.stat().st_mtime,
                  reverse=True) if C.OD_MODEL_DIR.exists() else []
@@ -281,7 +281,7 @@ def sec_models(r, ctx):
 
 
 def sec_shards(r, ctx):
-    root = C.DATA_DIR / "inference_shards"
+    root = C.INFERENCE_SHARD_DIR
     if not root.exists():
         print("  no inference_shards/ yet -- expected before the first array run")
         return

@@ -32,8 +32,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
 
-INFER_DIR = C.DATA_DIR / "inference"
-SHARE_DIR = C.ROOT / "diagnostics" / "output"
+INFER_DIR = C.INFERENCE_DIR
+SHARE_DIR = C.ROOT / "diagnostics" / f"output{C.SFX}"
 
 CAND_COLS = [
     "CWNS_ID", "STATE_CODE", "ll_uuid",
@@ -48,8 +48,8 @@ CAND_COLS = [
 OBJECT_ROOTS = {
     "reported": C.OD_OUTPUT_DIR / "objects",
     "corrected": C.OD_OUTPUT_DIR_CORRECTED / "objects",
-    "candidate": C.DATA_DIR / "od_features_candidates" / "objects",
-    "candidate_queue": C.DATA_DIR / "od_features_candidates_queue" / "objects",
+    "candidate": C.OD_CAND_DIR / "objects",
+    "candidate_queue": C.OD_CAND_QUEUE_DIR / "objects",
 }
 OBJ_COLS = ["CWNS_ID", "ll_uuid", "lon", "lat", "class_name", "max_confidence"]
 

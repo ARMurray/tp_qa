@@ -54,7 +54,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
 from holdout import MANIFEST_PATH, TRUTH_PATH
 
-INFER_DIR = C.DATA_DIR / "inference"
+INFER_DIR = C.INFERENCE_DIR
 KS = (1, 3, 5, 10)
 
 

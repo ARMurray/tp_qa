@@ -59,7 +59,7 @@ if ! grep -q -- "--out-dir" "$SCRIPTS/05_run_inference.py"; then
     exit 1
 fi
 
-OUT_DIR="$ROOT/data/inference_shards/state=$STATE"
+OUT_DIR="$ROOT/data/inference_shards${SFX}/state=$STATE"
 echo "Processing state: $STATE  (array index $SLURM_ARRAY_TASK_ID of ${#STATE_LIST[@]})"
 echo "Output: $OUT_DIR"
 

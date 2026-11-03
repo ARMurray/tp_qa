@@ -79,7 +79,7 @@ check_output() {
         overall_ok=0
     fi
 }
-check_output "01a (nlcd_features)" "$ROOT/data/nlcd_features/nlcd_\${st}_k18.parquet"
+check_output "01a (nlcd_features)" "$ROOT/data/nlcd_features${SFX}/nlcd_\${st}_k18.parquet"
 check_output "01b (od_features/plants)" "$ROOT/data/od_features/plants/state=\${st}"
 
 # --- 4. per-state fetch-failure summary from 01b logs ---

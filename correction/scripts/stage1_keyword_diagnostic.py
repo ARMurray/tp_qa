@@ -56,7 +56,7 @@ from collect_diagnostics import Report, sec_environment
 OUT_DIR = C.ROOT / "diagnostics"
 S1_PATH = C.FEATURES_OUTPUT_DIR / "14_stage1_training.parquet"
 PARCELS_PATH = C.FEATURES_OUTPUT_DIR / "10_parcel_features.parquet"
-SUMMARY_PATH = C.DATA_DIR / "inference" / "plant_summary_reranked.parquet"
+SUMMARY_PATH = C.INFERENCE_DIR / "plant_summary_reranked.parquet"
 REVIEW_LOG = C.ROOT.parent / "review_app" / "data" / "outgoing" / "review_log_round4.parquet"
 
 FLAGS = ["has_ww_keyword", "owner_is_utility", "owner_water", "owner_is_govt",

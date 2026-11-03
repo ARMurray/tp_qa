@@ -11,6 +11,13 @@
 
 ROOT=/work/GRDVULN/tp_qa/correction
 SCRIPTS="$ROOT/scripts"
+
+# Seed mode (config.py SEED_MODE): "multi" (default) writes everything the seeds change to "<name>_multi"
+# directories; "cwns_only" uses the original names. SFX is the suffix for wrappers that name those paths.
+TPQA_SEED_MODE="${TPQA_SEED_MODE:-multi}"
+export TPQA_SEED_MODE
+SFX=""
+[ "$TPQA_SEED_MODE" = "multi" ] && SFX="_multi"
 VENV_DIR="$ROOT/.venv"
 
 # Copy this job's log to diagnostics/latest_logs/ when it ends (overwriting

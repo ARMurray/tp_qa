@@ -38,7 +38,7 @@ import config as C
 from holdout import exclude_holdout
 from model_utils import (build_preprocessor, spatial_cluster_folds, describe_folds,
                          report_empty_features, youden_threshold,
-                         compute_specificity, plant_accept_table)
+                         compute_specificity, plant_accept_table, find_label_leaks)
 
 # Same drop list as the R version's drop_cols -- IDs/keys/low-value geography
 # text that shouldn't be fed to the model directly (geography's SIGNAL is
@@ -78,6 +78,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--n-iter", type=int, default=20, help="random search iterations (R used grid size=20)")
     ap.add_argument("--n-jobs", type=int, default=-1)
+    ap.add_argument("--allow-leaky", action="store_true",
+                    help="train even if a feature looks like the label (multi-source mode checks this; "
+                         "see model_utils.find_label_leaks). Almost never what you want.")
     ap.add_argument("--allow-no-holdout", action="store_true",
                     help="proceed even if the holdout manifest is missing. Only "
                          "for deliberate pre-holdout runs -- normally a missing "
@@ -145,6 +148,15 @@ def main():
     groups = s1["CWNS_ID"].reset_index(drop=True)
     X = X.reset_index(drop=True)
     y = (y_raw == "Correct").astype(int).reset_index(drop=True)   # 1=Correct, 0=Incorrect
+
+    if C.MULTI:
+        leaks = find_label_leaks(X, y)
+        if leaks:
+            msg = "; ".join(f"{c} ({why})" for c, why in leaks)
+            if not args.allow_leaky:
+                raise SystemExit(f"Refusing to train: feature(s) look label-derived: {msg}. "
+                                 f"Fix 02's Stage 1 site table, or pass --allow-leaky if this is genuine.")
+            print(f"  WARNING (--allow-leaky): label-like feature(s): {msg}")
 
     print(f"  Model columns: {X.shape[1]}")
     report_empty_features(X)

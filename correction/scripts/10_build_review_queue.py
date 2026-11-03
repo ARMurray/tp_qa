@@ -173,9 +173,9 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
     #
     # Ordering matters because of the keep="last" dedup below: later frames win,
     # so the fallbacks are listed after the queue root, not before.
-    roots = [C.DATA_DIR / "od_features_candidates_train" / "candidates",
-             C.DATA_DIR / "od_features_candidates" / "candidates",
-             C.DATA_DIR / "od_features_candidates_queue" / "candidates"]
+    roots = [C.OD_CAND_TRAIN_DIR / "candidates",
+             C.OD_CAND_DIR / "candidates",
+             C.OD_CAND_QUEUE_DIR / "candidates"]
     frames = []
     for root in roots:
         if not root.exists():
@@ -245,7 +245,7 @@ def report_od_provenance(rows: pd.DataFrame) -> None:
     """
     if "_od_root" not in rows.columns or rows.empty:
         return
-    pts = sorted((C.MODELS_DIR / "object_detection").rglob("*.pt"),
+    pts = sorted((C.OD_MODEL_DIR).rglob("*.pt"),
                  key=lambda p: p.stat().st_mtime, reverse=True)
     model_mtime = pts[0].stat().st_mtime if pts else None
     have = rows[rows["_od_root"].notna()]
@@ -376,7 +376,7 @@ def draw_audit(n: int, plant_summary: pd.DataFrame, flagged_with_cands: set,
     restricted to plants still in the pool (not reviewed before, not holdout)
     and with candidates to pick from -- the moved-to parcel is #1 of the five
     shown, so the reviewer judges the move by picking the true parcel."""
-    path = C.DATA_DIR / "output" / "cwns_corrected_locations.parquet"
+    path = C.OUTPUT_DIR / "cwns_corrected_locations.parquet"
     if not path.exists():
         print(f"ERROR: --audit-size needs 13's output at {path}. Run "
               f"13_build_corrected_output.slurm first.")
@@ -449,7 +449,7 @@ def main():
     print(f"States: {args.states}  |  Round: {args.round}  |  "
           f"Model version tag: {model_version}")
 
-    inference_dir = C.DATA_DIR / "inference"
+    inference_dir = C.INFERENCE_DIR
     reranked_summary = inference_dir / "plant_summary_reranked.parquet"
     reranked_cands = inference_dir / "stage2_candidates_reranked.parquet"
     if reranked_summary.exists() and reranked_cands.exists():
@@ -575,7 +575,7 @@ def main():
     # exactly its candidates, 05b re-ranks them -- and that re-rank changes the
     # score margins the 'uncertain' rule selects on, so a plain rebuild would
     # pick DIFFERENT plants, ones 01e never examined. Same --seed is not enough.
-    existing_q = C.DATA_DIR / "review_queue" / f"review_queue_round{args.round}.parquet"
+    existing_q = C.REVIEW_QUEUE_DIR / f"review_queue_round{args.round}.parquet"
     if args.keep_selection:
         if not existing_q.exists():
             print(f"ERROR: --keep-selection but {existing_q} does not exist -- build "
@@ -665,7 +665,7 @@ def main():
         na_position="first"
     ).reset_index(drop=True)
 
-    out_dir = C.DATA_DIR / "review_queue"
+    out_dir = C.REVIEW_QUEUE_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"review_queue_round{args.round}.parquet"
     queue.to_parquet(out_path, index=False)

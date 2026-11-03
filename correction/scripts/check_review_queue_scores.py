@@ -23,7 +23,7 @@ def main():
     ap.add_argument("--round", type=int, required=True)
     args = ap.parse_args()
 
-    path = C.DATA_DIR / "review_queue" / f"review_queue_round{args.round}.parquet"
+    path = C.REVIEW_QUEUE_DIR / f"review_queue_round{args.round}.parquet"
     if not path.exists():
         print(f"ERROR: {path} not found")
         sys.exit(1)

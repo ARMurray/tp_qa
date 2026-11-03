@@ -46,8 +46,8 @@ def find_col(df, names):
 def main():
     print("=== check_competition_losses.py (revised) ===")
 
-    summary_path = C.DATA_DIR / "inference" / "plant_summary.parquet"
-    cand_path = C.DATA_DIR / "inference" / "stage2_candidates.parquet"
+    summary_path = C.INFERENCE_DIR / "plant_summary.parquet"
+    cand_path = C.INFERENCE_DIR / "stage2_candidates.parquet"
 
     if not cand_path.exists():
         print(f"FATAL: {cand_path} not found. This check requires the raw "

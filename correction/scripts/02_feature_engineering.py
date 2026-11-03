@@ -774,6 +774,9 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
 # Kept out of the model table: identifiers, text lists and the site's own coordinates (as live numeric
 # features they invite geographic memorisation, the reason x_5070/y_5070 are dropped in 03/04).
 SITE_DROP_COLS = ["STATE_CODE", "ll_uuids", "seed_ids", "sources", "rep_ll_uuid", "site_lat", "site_lon"]
+# Derived from the truth: any of these in the model table would hand the answer to the model.
+SITE_LABEL_COLS = ["truth_ll_uuid", "truth_set", "reported_ll_uuid", "corrected_ll_uuid", "truth_known",
+                   "site_is_truth", "site_has_reported"]
 
 
 def _plant_label_table(con, plant_features: pd.DataFrame) -> pd.DataFrame:
@@ -833,6 +836,16 @@ def _plant_label_table(con, plant_features: pd.DataFrame) -> pd.DataFrame:
         .merge(reported, on="CWNS_ID", how="left").merge(corrected, on="CWNS_ID", how="left")
     lab["truth_ll_uuid"] = np.where(lab["class"] == "Correct", lab["reported_ll_uuid"], lab["corrected_ll_uuid"])
     lab.loc[lab["truth_ll_uuid"].isna(), "truth_ll_uuid"] = None
+
+    # A reviewer can mark several parcels as one plant (master Site_UUIDs, 2026-10-05, as 06b reads it): a
+    # site holding ANY of them is the plant. Only corrections carry the list.
+    extra = {}
+    if "Site_UUIDs" in corr.columns:
+        for cw, sv in zip(corr["CWNS_ID"], corr["Site_UUIDs"]):
+            if isinstance(sv, str) and sv:
+                extra[cw] = set(sv.split(";"))
+    lab["truth_set"] = [({t} | extra.get(c, set())) if isinstance(t, str) else set()
+                        for c, t in zip(lab["CWNS_ID"], lab["truth_ll_uuid"])]
     return lab
 
 
@@ -848,7 +861,7 @@ def label_sites(sites: pd.DataFrame, lab: pd.DataFrame) -> pd.DataFrame:
     s = sites.merge(lab, on="CWNS_ID", how="inner")
     truth = s["truth_ll_uuid"]
     s["truth_known"] = truth.notna()
-    s["site_is_truth"] = [isinstance(t, str) and t in set(u) for t, u in zip(truth, s["ll_uuids"])]
+    s["site_is_truth"] = [bool(ts & set(u)) for ts, u in zip(s["truth_set"], s["ll_uuids"])]
     s["site_has_reported"] = [isinstance(r, str) and r in set(u) for r, u in zip(s["reported_ll_uuid"], s["ll_uuids"])]
     cls = np.where(s["site_is_truth"], "Correct",
                    np.where(s["truth_known"] | s["site_has_reported"], "Incorrect", None))
@@ -937,7 +950,7 @@ def build_stage1_site_training(con, plant_features: pd.DataFrame, parcel_feature
             f"Without them od_ran would equal 'is the CWNS-point site' and Stage 1 would learn that instead.")
 
     n_unl = int(s["class"].isna().sum())
-    s = s[s["class"].notna()].drop(columns=SITE_DROP_COLS, errors="ignore").reset_index(drop=True)
+    s = s[s["class"].notna()].drop(columns=SITE_DROP_COLS + SITE_LABEL_COLS, errors="ignore").reset_index(drop=True)
     print(f"  {n_unl} unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)")
     print(f"  Stage 1 training rows: {len(s)} over {s['CWNS_ID'].nunique()} plants")
     print(f"  Correct: {(s['class'] == 'Correct').sum()}   Incorrect: {(s['class'] == 'Incorrect').sum()}")

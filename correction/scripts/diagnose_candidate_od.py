@@ -47,7 +47,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
 from holdout import MANIFEST_PATH, TRUTH_PATH
 
-CAND_ROOT = C.DATA_DIR / "od_features_candidates" / "candidates"
+CAND_ROOT = C.OD_CAND_DIR / "candidates"
 
 
 def load_candidate_od() -> pd.DataFrame:

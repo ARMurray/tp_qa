@@ -169,9 +169,9 @@ def _part_counts(root: Path, label: str, r):
 def sec_od_output(r):
     for root, label in ((C.OD_OUTPUT_DIR, "od_features"),
                         (C.OD_OUTPUT_DIR_CORRECTED, "od_features_corrected"),
-                        (C.DATA_DIR / "od_features_candidates_train", "od_..._train"),
-                        (C.DATA_DIR / "od_features_candidates", "od_..._candidates"),
-                        (C.DATA_DIR / "od_features_candidates_queue", "od_..._queue")):
+                        (C.OD_CAND_TRAIN_DIR, "od_..._train"),
+                        (C.OD_CAND_DIR, "od_..._candidates"),
+                        (C.OD_CAND_QUEUE_DIR, "od_..._queue")):
         _part_counts(root, label, r)
 
 

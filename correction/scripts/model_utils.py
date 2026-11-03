@@ -265,3 +265,32 @@ def plant_accept_table(groups, y_true, y_score, target_precision: float, min_acc
     ok = (tab["precision"] >= target_precision) & (tab["n_accepted"] >= min_accepted) & last_of_tie
     thr = float(tab.loc[ok, "threshold"].iloc[-1]) if ok.any() else None
     return thr, tab
+
+
+LABEL_COLUMN_NAMES = ("site_is_truth", "truth_known", "site_has_reported", "truth_ll_uuid", "truth_set",
+                      "reported_ll_uuid", "corrected_ll_uuid", "label", "class")
+
+
+def find_label_leaks(X: pd.DataFrame, y, threshold: float = 0.995) -> list:
+    """Features that give the answer away: a column NAMED like a label, or a numeric/boolean column whose
+    single-feature ROC AUC against the label is >= threshold (or <= 1 - threshold). No real location feature
+    separates correct from incorrect that cleanly, so a hit means a label-derived column reached the model
+    table -- exactly what happened once with the seed-site table (a `site_is_truth` column), caught only by
+    reading it. Returns [(column, reason)]."""
+    from sklearn.metrics import roc_auc_score
+    y = np.asarray(y).astype(int)
+    hits = [(c, "named like a label") for c in X.columns if c in LABEL_COLUMN_NAMES]
+    if len(set(y)) < 2:
+        return hits
+    for c in X.columns:
+        col = X[c]
+        if not (col.dtype == bool or col.dtype.kind in "iuf"):
+            continue
+        v = col.astype(float)
+        v = v.fillna(v.median() if v.notna().any() else 0.0)
+        if v.nunique() < 2:
+            continue
+        auc = roc_auc_score(y, v)
+        if auc >= threshold or auc <= 1 - threshold:
+            hits.append((c, f"single-feature AUC {auc:.4f}"))
+    return hits

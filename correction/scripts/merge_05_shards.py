@@ -43,8 +43,8 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as C
 
-SHARD_ROOT = C.DATA_DIR / "inference_shards"
-OUT_DIR = C.DATA_DIR / "inference"
+SHARD_ROOT = C.INFERENCE_SHARD_DIR
+OUT_DIR = C.INFERENCE_DIR
 
 FILES = ["plant_summary.parquet", "stage2_candidates.parquet"]
 

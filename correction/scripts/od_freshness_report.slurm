@@ -39,8 +39,10 @@ echo "working file : $(git hash-object correction/models/object_detection/best.p
 echo "HEAD blob    : $(git rev-parse HEAD:correction/models/object_detection/best.pt)"
 echo "(equal = same weights as git; a differing mtime is then only a touch/copy)"
 echo
+SFX=""
+[ "${TPQA_SEED_MODE:-multi}" = "multi" ] && SFX="_multi"   # config.py SEED_MODE
 for d in od_features_candidates od_features_candidates_queue od_features_candidates_train; do
-    p="$ROOT/data/$d"
+    p="$ROOT/data/$d$SFX"
     echo "=== $d: parquet files per modification date ==="
     if [ -d "$p" ]; then
         find "$p" -name '*.parquet' -printf '%TY-%Tm-%Td\n' | sort | uniq -c

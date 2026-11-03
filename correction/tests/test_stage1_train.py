@@ -46,7 +46,7 @@ def make_table(n_plants=600, seed=0):
                 CWNS_ID=cid, site_id=f"{cid}_s{k + 1}", ll_uuid=f"u{i}_{k}", **{"class": "Correct" if right else "Incorrect"},
                 n_origins=int(1 + right + (rng.random() < 0.2)), n_seeds=int(1 + rng.integers(0, 3)),
                 has_cwns_point=is_cwns, has_icis=bool(rng.random() < 0.6), site_rank=k + 1,
-                name_match_score=float(np.clip(rng.normal(0.7 if right else 0.2, 0.15), 0, 1)),
+                name_match_score=float(np.clip(rng.normal(0.65 if right else 0.35, 0.25), 0, 1)),
                 lbcs_function=rng.choice(["Utility", "Other"], p=[0.8, 0.2] if right else [0.2, 0.8]),
                 osm_ww=False, log_gisacre=float(rng.normal(2 if right else 1, 1))))
     return pd.DataFrame(rows)
@@ -84,7 +84,18 @@ def test_train():
         assert "site_id" not in model["feature_columns"] and "CWNS_ID" not in model["feature_columns"]
 
 
+def test_leak_guard():
+    t = make_table(n_plants=200)
+    X = t.drop(columns=["class", "CWNS_ID", "site_id", "ll_uuid"])
+    y = (t["class"] == "Correct").astype(int)
+    assert MU.find_label_leaks(X, y) == []                      # name_match_score is strong but not a giveaway
+    leaky = X.assign(site_is_truth=y.astype(bool), sneaky=y * 2.0 + 1.0)
+    found = dict(MU.find_label_leaks(leaky, y))
+    assert "site_is_truth" in found and "sneaky" in found and "AUC" in found["sneaky"]
+
+
 if __name__ == "__main__":
     test_plant_accept_table()
+    test_leak_guard()
     test_train()
     print("stage 1 training tests passed")
