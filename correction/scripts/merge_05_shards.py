@@ -47,6 +47,8 @@ SHARD_ROOT = C.INFERENCE_SHARD_DIR
 OUT_DIR = C.INFERENCE_DIR
 
 FILES = ["plant_summary.parquet", "stage2_candidates.parquet"]
+if C.MULTI:
+    FILES.append("stage1_sites.parquet")   # every seed site 05 scored (audit trail for the accept decision)
 
 
 def main():

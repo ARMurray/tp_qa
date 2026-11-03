@@ -103,6 +103,64 @@ def print_recall(label: str, tbl: dict):
               f"(pool)     {hits:3d}/{n_all:<3d} = {all_pct:6.1%} (all)")
 
 
+def multi_source_outcomes(held: pd.DataFrame, truth: pd.DataFrame, summ: pd.DataFrame, cand: pd.DataFrame,
+                          site_parcels: dict) -> pd.DataFrame:
+    """End-to-end outcome per holdout plant when Stage 1 can accept a SEED SITE (config.SEED_MODE == "multi").
+
+    The recall@k tables above only see plants Stage 1 flagged. In multi mode a misplaced plant can be put right
+    by Stage 1 itself, when a source other than the CWNS point is accepted, and such a plant has no candidates:
+    it would read as a failure there. So each plant gets one outcome:
+      accepted_right   Stage 1 accepted a site holding the truth parcel
+      accepted_wrong   Stage 1 accepted a site that does not (a false accept: the plant stays wrong)
+      moved_right      flagged, and the re-ranked #1 is the truth parcel
+      flagged_wrong    flagged, and the #1 is not (or there is none)
+      truth_unresolved no resolved truth parcel (not scored)
+    plus the sources on the accepted site. site_parcels: site_id -> list of ll_uuid."""
+    s = summ.set_index("CWNS_ID")
+    t = truth.drop_duplicates("CWNS_ID").set_index("CWNS_ID")
+    rank1 = cand[cand["rerank_rank"] == 1].drop_duplicates("CWNS_ID").set_index("CWNS_ID")["ll_uuid"]
+    rows = []
+    for cid, b in zip(held["CWNS_ID"], held["bin"]):
+        if cid not in s.index:
+            rows.append((cid, b, "not_scored", None))
+            continue
+        true_uuid = t["true_ll_uuid"].get(cid) if cid in t.index else None
+        if not isinstance(true_uuid, str) or not true_uuid or true_uuid == "nan":
+            rows.append((cid, b, "truth_unresolved", None))
+            continue
+        row = s.loc[cid]
+        if row["trigger_reason"] == "none":
+            parcels = set(site_parcels.get(row.get("accepted_site_id"), [])) or {str(row["reported_ll_uuid"])}
+            rows.append((cid, b, "accepted_right" if true_uuid in parcels else "accepted_wrong",
+                         row.get("accepted_sources")))
+        else:
+            rows.append((cid, b, "moved_right" if str(rank1.get(cid)) == true_uuid else "flagged_wrong", None))
+    return pd.DataFrame(rows, columns=["CWNS_ID", "bin", "outcome", "accepted_sources"])
+
+
+def print_multi_source(out: pd.DataFrame):
+    print(f"\n{'=' * 66}\nMULTI-SOURCE END TO END -- Stage 1 accept, else re-ranked #1\n{'=' * 66}")
+    for b, g in out.groupby("bin"):
+        vc = g["outcome"].value_counts()
+        scored = g[~g["outcome"].isin(["not_scored", "truth_unresolved"])]
+        n = len(scored)
+        right = int(scored["outcome"].isin(["accepted_right", "moved_right"]).sum())
+        acc = scored[scored["outcome"].str.startswith("accepted")]
+        print(f"\n  {b} bin: {len(g)} plants, {n} scored")
+        for k, v in vc.items():
+            print(f"    {k:<18} {v:>4}")
+        print(f"    END-TO-END right   {right:>4} / {n} = {right / n if n else float('nan'):.1%}")
+        if len(acc):
+            r = int((acc["outcome"] == "accepted_right").sum())
+            print(f"    Stage 1 accepts    {len(acc):>4}  precision {r / len(acc):.1%}  "
+                  f"({len(acc) - r} false accept(s))")
+        src = acc[acc["outcome"] == "accepted_right"]["accepted_sources"].fillna("?").value_counts().head(6)
+        if len(src):
+            print("    accepted-right by sources: " + ", ".join(f"{k} {v}" for k, v in src.items()))
+        if b == "correct":
+            print("    (a correct plant should be accepted_right; flagged_wrong / accepted_wrong are false moves)")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-od", action="store_true",
@@ -259,6 +317,21 @@ def main():
                       f"reported point hit\n  no parcel at all. That is a "
                       f"Regrid coverage gap, not a model error,\n  and is "
                       f"arguably not a 'false move' in the same sense.")
+
+    # =======================================================================
+    # multi-source: Stage 1 may accept a non-CWNS site, which the tables above cannot see
+    # =======================================================================
+    if C.MULTI and summ is not None and "accepted_site_id" in summ.columns:
+        held_all = man[man["bin"].isin([b for b in bins if b in ("corrections", "correct")])]
+        if len(held_all):
+            import seed_sites as SS
+            sites, _ = SS.load_sites(states=sorted(summ["STATE_CODE"].dropna().unique()),
+                                     cwns_ids=held_all["CWNS_ID"])
+            outcomes = multi_source_outcomes(held_all, truth, summ, cand, dict(zip(sites["site_id"], sites["ll_uuids"])))
+            print_multi_source(outcomes)
+            band_rows["corrections"] = (held_all.loc[held_all["bin"] == "corrections", "CWNS_ID"],
+                                        outcomes[outcomes["bin"] == "corrections"].set_index("CWNS_ID")["outcome"]
+                                        .isin(["accepted_right", "moved_right"]))
 
     # =======================================================================
     # by population band (since the floor dropped to 100, 2026-10-05)
