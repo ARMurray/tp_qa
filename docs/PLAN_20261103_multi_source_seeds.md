@@ -121,7 +121,11 @@ switch.
 
 - [x] Plan written; decided to build on master, not a branch
 - [x] `plant_seeds` table (`build_plant_seeds.py`, 58,130 seeds for 17,538 plants)
-- [ ] Recall-ceiling check on the HPC (today 91.4% of corrections fall inside the CWNS-centered window)
+- [x] Recall-ceiling check (`check_seed_recall.py`, cell level, 837 corrected plants): truth inside the
+      window 95.8% today (state union of CWNS-point disks) vs 99.4% with every seed. A plant's own
+      window grows a median 1.07x, mean 1.2x, 12.6% of plants above 1.5x a single disk. Five plants stay
+      outside (CWNS point 9 km or more off). Cell level only: it ignores parcel gaps, so it is not
+      comparable to 08's 91.4%
 - [ ] `SEED_MODE` setting in `config.py`, default `cwns_only`
 - [ ] 01a / 01e multi-seed windows
 - [ ] Stage 1 retrain and plant-level calibration
