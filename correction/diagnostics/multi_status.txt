@@ -3,19 +3,19 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-03 14:23:38
+generated   : 2026-11-03 14:49:53
 seed mode   : multi   suffix '_multi'
-git commit  : 6fb757a  (Tue Nov 3 13:51:14 2026 -0500 Docs: the push_diagnostics command after every step)
+git commit  : 36defaf  (Tue Nov 3 14:28:19 2026 -0500 Every plant gets a cwns_point seed: plant_seeds.csv lacks ~340 master treatment plants (found in the OH check))
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 0.5 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
-holdout manifest: 70.2 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
+training gpkg: 0.9 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+holdout manifest: 70.3 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
 detector best.pt: 35.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
 ==============================================================================
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 1 state file(s)
-total parcels 4,686,473; newest file 0.0 h ago
+total parcels 4,686,473; newest file 0.4 h ago
 vs single-seed run (4,417,789): ratio median 1.06, min 1.06, max 1.06  (the recall check expected ~1.0-1.3)
 largest growth: OH 1.06
 states: OH
@@ -23,7 +23,15 @@ states: OH
 ==============================================================================
 01f  seed sites
 ==============================================================================
-/work/GRDVULN/tp_qa/correction/data/seed_sites: 0 state dir(s)
+/work/GRDVULN/tp_qa/correction/data/seed_sites: 1 state dir(s)
+seeds 3,137 for 844 plants; sites 1,944 for 844 plants
+seed -> parcel match: inside: 2,649, snapped: 486, none: 2
+  by source (share with no parcel): cwns_addr 0.0%, cwns_point 0.0%, icis_fac_addr 0.0%, icis_fac_frs 0.3%, icis_feat_INF 0.0%, icis_feat_INO 0.0%
+  snapped seeds: median 6 m, max 41 m
+plants with no site: 0
+sites per plant: {1: 168, 2: 327, 3: 274, 4: 75}
+independent origins per site: {1: 1535, 2: 404, 3: 5}  (counting copies: {1: 1279, 2: 660, 3: 5})
+sites holding the CWNS point: 844; oversized parcel: 14; merged parcels (site_n_parcels>1): 93
 
 ==============================================================================
 01e --seed-sites  detection
@@ -59,17 +67,18 @@ states: OH
 ==============================================================================
 JOB LOGS
 ==============================================================================
-212 log(s); newest first (name, age, exit status):
-  01a_34.log                           0.0 h ago   exit 0
-  00_bins.log                          0.5 h ago   exit 0
+213 log(s); newest first (name, age, exit status):
+  01f_34.log                           0.0 h ago   exit 0
+  01a_34.log                           0.4 h ago   exit 0
+  00_bins.log                          0.9 h ago   exit 0
   13_output.log                       20.9 d ago   exit 0
   10_review_queue.log                 21.2 d ago   exit 0
   12_holdout.log                      21.3 d ago   exit 0
   05b_rerank.log                      21.3 d ago   exit 0
   01e_arr_40.log                      24.8 d ago   exit 0
   01e_arr_45.log                      24.8 d ago   exit 0
-  01e_arr_46.log                      24.8 d ago   exit 0
-  01e_arr_32.log                      24.8 d ago   exit 0
+  01e_arr_46.log                      24.9 d ago   exit 0
+  01e_arr_32.log                      24.9 d ago   exit 0
   01e_arr_44.log                      24.9 d ago   exit 0
   01e_arr_47.log                      24.9 d ago   exit 0
   01e_arr_26.log                      24.9 d ago   exit 0
@@ -84,5 +93,4 @@ JOB LOGS
   01e_arr_37.log                      24.9 d ago   exit 0
   01e_arr_36.log                      24.9 d ago   exit 0
   01e_arr_34.log                      24.9 d ago   exit 0
-  01e_arr_33.log                      24.9 d ago   exit 0
 
