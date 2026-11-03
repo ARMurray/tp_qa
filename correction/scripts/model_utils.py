@@ -239,3 +239,29 @@ def compute_specificity(y_true: np.ndarray, y_pred: np.ndarray, pos_label) -> fl
     tn = cm[i, i]
     fp = cm[i, :].sum() - tn
     return tn / (tn + fp) if (tn + fp) > 0 else np.nan
+
+def plant_accept_table(groups, y_true, y_score, target_precision: float, min_accepted: int = 30):
+    """Stage 1 with several candidate sites per plant: the decision is per PLANT, not per row.
+
+    A plant is accepted when its best-scoring site reaches the threshold, and the accepted site is right
+    when that site is labelled Correct. Taking the best of several looks raises the chance a wrong site
+    passes, so the threshold is calibrated on this plant-level precision instead of on the per-row
+    Youden J.
+
+    Returns (threshold, table). table has one row per candidate cut (plants ranked by best score):
+    threshold, n_accepted, n_right, precision, and capture = right / plants that have a Correct site.
+    threshold is the lowest score whose accepted set still has precision >= target_precision over at
+    least min_accepted plants, or None when no cut qualifies (then the caller falls back to Youden J)."""
+    df = pd.DataFrame({"g": np.asarray(groups), "y": np.asarray(y_true).astype(int), "p": np.asarray(y_score, float)})
+    has_correct = df.groupby("g")["y"].max()
+    best = df.sort_values("p", ascending=False).drop_duplicates("g")      # best site of each plant
+    best = best.sort_values("p", ascending=False).reset_index(drop=True)
+    n_right = best["y"].cumsum().to_numpy()
+    n_acc = np.arange(1, len(best) + 1)
+    tab = pd.DataFrame({"threshold": best["p"], "n_accepted": n_acc, "n_right": n_right,
+                        "precision": n_right / n_acc, "capture": n_right / max(int(has_correct.sum()), 1)})
+    # a cut is only a real threshold where the next plant scores lower (ties are accepted together)
+    last_of_tie = ~best["p"].duplicated(keep="last")
+    ok = (tab["precision"] >= target_precision) & (tab["n_accepted"] >= min_accepted) & last_of_tie
+    thr = float(tab.loc[ok, "threshold"].iloc[-1]) if ok.any() else None
+    return thr, tab

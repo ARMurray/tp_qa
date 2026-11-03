@@ -767,6 +767,186 @@ def build_stage1_training(con, plant_features: pd.DataFrame, parcel_features: pd
     return stage1
 
 
+# ---------------------------------------------------------------------------
+# Multi-source seeds: Stage 1 judges SEED SITES, not the one reported parcel
+# (docs/PLAN_20261103_multi_source_seeds.md). One row per (plant, site).
+# ---------------------------------------------------------------------------
+# Kept out of the model table: identifiers, text lists and the site's own coordinates (as live numeric
+# features they invite geographic memorisation, the reason x_5070/y_5070 are dropped in 03/04).
+SITE_DROP_COLS = ["STATE_CODE", "ll_uuids", "seed_ids", "sources", "rep_ll_uuid", "site_lat", "site_lon"]
+
+
+def _plant_label_table(con, plant_features: pd.DataFrame) -> pd.DataFrame:
+    """One row per labelled plant: class, the parcel of its original (CWNS) point, the parcel of its
+    corrected point, and the TRUTH parcel (Correct -> the original parcel; Incorrect -> the corrected
+    parcel; Incorrect with no correction -> unknown).
+
+    Independent of build_stage1_training on purpose: that function drops a plant whose original point
+    is on no parcel, but such a plant can still have valid seed sites, and a correction needs no
+    original parcel at all."""
+    classes = gpd.read_file(C.TRAINING_GPKG, layer=C.TRAINING_LAYER_CLASSES)
+    classes["CWNS_ID"] = classes["CWNS_ID"].astype(str)
+    classes = classes.to_crs(4326)
+    classes = C.apply_population_filter(classes, "02 stage1 site labels", min_pop=POP_FLOOR)
+    classes["h3_res9"] = classes.geometry.apply(lambda g: h3.latlng_to_cell(g.y, g.x, 9))
+    classes = classes.merge(plant_features[["CWNS_ID", "STATE_CODE"]], on="CWNS_ID", how="left")
+    n_no_state = int(classes["STATE_CODE"].isna().sum())
+    if n_no_state:
+        print(f"  NOTE: {n_no_state} labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)")
+    classes = classes.dropna(subset=["STATE_CODE"])
+
+    reported = []
+    for state, grp in classes.groupby("STATE_CODE"):
+        pts = pd.DataFrame({"CWNS_ID": grp["CWNS_ID"], "h3_res9": grp["h3_res9"],
+                            "geom_wkb": grp.geometry.apply(lambda g: g.wkb)})
+        m = point_in_parcel_lookup(con, state, pts)
+        if len(m):
+            reported.append(m)
+    reported = (pd.concat(reported, ignore_index=True) if reported
+                else pd.DataFrame(columns=["CWNS_ID", "ll_uuid"]))
+    # lowest ll_uuid when a point is inside several parcels: the rule 01b and build_stage1_training use
+    reported = (reported.sort_values(["CWNS_ID", "ll_uuid"]).drop_duplicates("CWNS_ID")
+                .rename(columns={"ll_uuid": "reported_ll_uuid"})[["CWNS_ID", "reported_ll_uuid"]])
+
+    corr = gpd.read_file(C.TRAINING_GPKG, layer=C.TRAINING_LAYER_CORRECTIONS).to_crs(4326)
+    corr["CWNS_ID"] = corr["CWNS_ID"].astype(str)
+    corr_sf = gpd.GeoDataFrame(corr[["CWNS_ID"]],
+                               geometry=gpd.points_from_xy(corr["Corrected_X"], corr["Corrected_Y"]),
+                               crs=4269).to_crs(4326)
+    corr_sf["h3_res9"] = corr_sf.geometry.apply(lambda g: h3.latlng_to_cell(g.y, g.x, 9))
+    corrected = []
+    for state, grp in plant_features.groupby("STATE_CODE"):
+        p = corr_sf[corr_sf["CWNS_ID"].isin(set(grp["CWNS_ID"]))]
+        if not len(p):
+            continue
+        pts = pd.DataFrame({"CWNS_ID": p["CWNS_ID"], "h3_res9": p["h3_res9"],
+                            "geom_wkb": p.geometry.apply(lambda g: g.wkb)})
+        m = point_in_parcel_lookup(con, state, pts)
+        if len(m):
+            corrected.append(m)
+    corrected = (pd.concat(corrected, ignore_index=True) if corrected
+                 else pd.DataFrame(columns=["CWNS_ID", "ll_uuid"]))
+    corrected = (corrected.sort_values(["CWNS_ID", "ll_uuid"]).drop_duplicates("CWNS_ID")
+                 .rename(columns={"ll_uuid": "corrected_ll_uuid"})[["CWNS_ID", "corrected_ll_uuid"]])
+
+    lab = classes[["CWNS_ID", "class"]].drop_duplicates("CWNS_ID") \
+        .merge(reported, on="CWNS_ID", how="left").merge(corrected, on="CWNS_ID", how="left")
+    lab["truth_ll_uuid"] = np.where(lab["class"] == "Correct", lab["reported_ll_uuid"], lab["corrected_ll_uuid"])
+    lab.loc[lab["truth_ll_uuid"].isna(), "truth_ll_uuid"] = None
+    return lab
+
+
+def label_sites(sites: pd.DataFrame, lab: pd.DataFrame) -> pd.DataFrame:
+    """Adds site_is_truth, site_has_reported, truth_known and the Stage 1 label `class` to sites that
+    belong to a labelled plant.
+
+    A site is Correct when it holds the truth parcel. When the truth parcel is known but no site holds
+    it, every site of that plant is Incorrect: the answer was never a seed, which is exactly the case
+    Stage 2 exists for. When the truth is unknown (a plant known wrong with no correction) only the
+    site holding the original parcel is labelled, Incorrect; its other sites say nothing and are left
+    unlabelled (class NaN)."""
+    s = sites.merge(lab, on="CWNS_ID", how="inner")
+    truth = s["truth_ll_uuid"]
+    s["truth_known"] = truth.notna()
+    s["site_is_truth"] = [isinstance(t, str) and t in set(u) for t, u in zip(truth, s["ll_uuids"])]
+    s["site_has_reported"] = [isinstance(r, str) and r in set(u) for r, u in zip(s["reported_ll_uuid"], s["ll_uuids"])]
+    cls = np.where(s["site_is_truth"], "Correct",
+                   np.where(s["truth_known"] | s["site_has_reported"], "Incorrect", None))
+    s["class"] = pd.Series(cls, index=s.index, dtype=object)
+    return s
+
+
+def load_site_od(states: list[str]) -> pd.DataFrame:
+    """Detection summary per seed-site parcel from 01e --seed-sites, keyed (CWNS_ID, ll_uuid). Same
+    one-file-at-a-time read as the OD block in main(), for the same schema-merge reason."""
+    root = C.OD_SEED_SITES_DIR / "candidates"
+    # Rows written before the deployed detector are stale (01e's resume and 05b ignore them the same way).
+    pts = sorted(C.OD_MODEL_DIR.rglob("*.pt"), key=lambda p: p.stat().st_mtime, reverse=True)         if C.OD_MODEL_DIR.exists() else []
+    model_t = pts[0].stat().st_mtime if pts else None
+    frames, n_stale = [], 0
+    for st in states:
+        for f in sorted((root / f"state={st}").glob("part-*.parquet"), key=lambda f: f.stat().st_mtime):
+            if model_t is not None and f.stat().st_mtime < model_t:
+                n_stale += 1
+                continue
+            d = pd.read_parquet(f)
+            for col in d.select_dtypes(include=["category"]).columns:
+                d[col] = d[col].astype(str)
+            frames.append(d)
+    if n_stale:
+        print(f"  WARNING: {n_stale} seed-site OD file(s) predate the deployed detector and were ignored; "
+              f"rerun 01e --seed-sites")
+    if not frames:
+        return pd.DataFrame()
+    od = pd.concat(frames, ignore_index=True)
+    od["CWNS_ID"] = od["CWNS_ID"].astype(str)
+    od = od.drop_duplicates(subset=["CWNS_ID", "ll_uuid"], keep="last")
+    return od.drop(columns=["state", "orig_lon", "orig_lat", "n_objects_total", "n_objects_in_parcel",
+                            "processed_at"], errors="ignore")
+
+
+def build_stage1_site_training(con, plant_features: pd.DataFrame, parcel_features: pd.DataFrame,
+                               states: list[str], allow_no_od: bool = False) -> pd.DataFrame:
+    print("\nSTEP 14 (multi-source): Building Stage 1 training data on seed sites")
+    import seed_sites as SS
+    lab = _plant_label_table(con, plant_features)
+    print(f"  Labelled plants: {len(lab)} "
+          f"(Correct {int((lab['class'] == 'Correct').sum())}, Incorrect {int((lab['class'] == 'Incorrect').sum())}; "
+          f"truth parcel known for {int(lab['truth_ll_uuid'].notna().sum())})")
+
+    sites, _ = SS.load_sites(states=states, cwns_ids=lab["CWNS_ID"])
+    print(f"  Seed sites for labelled plants: {len(sites)} across {sites['CWNS_ID'].nunique()} plants")
+    s = label_sites(sites, lab)
+    no_site = lab.loc[~lab["CWNS_ID"].isin(s["CWNS_ID"]), "CWNS_ID"]
+    if len(no_site):
+        print(f"  NOTE: {len(no_site)} labelled plant(s) have no seed site (no seed fell on a parcel) and are absent")
+
+    s["ll_uuid"] = s["rep_ll_uuid"]
+    s = s.merge(plant_features.drop(columns=["STATE_CODE", "LATITUDE", "LONGITUDE"], errors="ignore"),
+                on="CWNS_ID", how="left")
+    s = s.merge(parcel_features.drop(columns=["state"], errors="ignore"), on="ll_uuid", how="left")
+    n_nopf = int(s["geoid"].isna().sum()) if "geoid" in s.columns else 0
+    if n_nopf:
+        print(f"  NOTE: {n_nopf} site(s) have a representative parcel with no parcel features (parcel outside "
+              f"01a's window or dropped as oversized); their parcel columns are NaN")
+
+    # Owner vs facility name on the site's parcel, and the plant-wide context across ALL its sites: it must be
+    # computed before unlabelled sites are dropped, because inference sees every site of a plant.
+    s = NM.add_name_features(s)
+    s = NM.add_pool_features(s, "site_name_pool")
+    s = add_name_matching(s)
+
+    od = load_site_od(sorted(set(s["STATE_CODE"].dropna()))) if "STATE_CODE" in s.columns else pd.DataFrame()
+    if len(od):
+        n_before = len(s)
+        s = s.merge(od, on=["CWNS_ID", "ll_uuid"], how="left")
+        s["od_ran"] = s["od_ran"].fillna(False)
+        s["od_has_detection"] = s["od_has_detection"].fillna(False)
+        for c in [c for c in s.columns if c.startswith("od_has_")]:
+            s[c] = s[c].fillna(False)
+        for c in [c for c in s.columns if c.startswith("od_n_")]:
+            s[c] = s[c].fillna(0)
+        assert len(s) == n_before, "OD join changed the row count -- duplicate (CWNS_ID, ll_uuid) in seed-site OD"
+        print(f"  Seed-site OD joined: od_ran True for {int(s['od_ran'].sum())} / {len(s)}")
+    elif allow_no_od:
+        print("  WARNING: no seed-site OD found; od_* columns absent (--no-seed-od)")
+    else:
+        raise SystemExit(
+            f"No seed-site detection results under {C.OD_SEED_SITES_DIR / 'candidates'}. Run "
+            f"01e_run_od_candidates.py --seed-sites first, or pass --no-seed-od to build a table without od_*. "
+            f"Without them od_ran would equal 'is the CWNS-point site' and Stage 1 would learn that instead.")
+
+    n_unl = int(s["class"].isna().sum())
+    s = s[s["class"].notna()].drop(columns=SITE_DROP_COLS, errors="ignore").reset_index(drop=True)
+    print(f"  {n_unl} unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)")
+    print(f"  Stage 1 training rows: {len(s)} over {s['CWNS_ID'].nunique()} plants")
+    print(f"  Correct: {(s['class'] == 'Correct').sum()}   Incorrect: {(s['class'] == 'Incorrect').sum()}")
+    per = s.groupby("CWNS_ID")["class"].apply(lambda c: (c == "Correct").sum())
+    print(f"  Correct sites per plant: {per.value_counts().sort_index().to_dict()}")
+    print(f"  Sites per plant: {s.groupby('CWNS_ID').size().value_counts().sort_index().to_dict()}")
+    return s
+
+
 def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd.DataFrame,
                            states: list[str] | None) -> pd.DataFrame:
     print("\nSTEP 15: Building Stage 2 training data")
@@ -927,6 +1107,10 @@ def main():
                          "--states value. Run 02b_merge_feature_shards.py "
                          "afterwards -- without it, the flat files downstream "
                          "reads are whatever the last run left behind.")
+    ap.add_argument("--no-seed-od", action="store_true",
+                    help="multi-seed mode only: build the Stage 1 site table even though no seed-site detection "
+                         "results exist (01e --seed-sites). The od_* columns are then absent, so the table is "
+                         "for plumbing tests, not for training.")
     ap.add_argument("--min-pop", type=int, default=C.MIN_POP_SERVED,
                     help="only plants serving MORE than this many residents "
                          f"(default {C.MIN_POP_SERVED:,}; 0 disables). See "
@@ -1099,7 +1283,11 @@ def main():
                                                   "processed_at"], errors="ignore")
 
     # ---- PART 3 ----
-    stage1 = build_stage1_training(con, plant_features, parcel_features, od_features)
+    if C.MULTI:
+        stage1 = build_stage1_site_training(con, plant_features, parcel_features, state_list,
+                                            allow_no_od=args.no_seed_od)
+    else:
+        stage1 = build_stage1_training(con, plant_features, parcel_features, od_features)
     stage1.to_parquet(feature_out("14_stage1_training.parquet", shard_state), index=False)
 
     stage2 = build_stage2_training(con, plant_features, parcel_features, states)

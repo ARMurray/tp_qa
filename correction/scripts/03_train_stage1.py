@@ -6,6 +6,11 @@ location correct or incorrect? See model_utils.py's docstring for the
 porting decisions shared with 04_train_stage2.py (preprocessing, spatial
 CV approximation, hyperparameter search method).
 
+MULTI-SOURCE SEEDS (config.SEED_MODE == "multi", the default): a row is a SEED SITE, so a plant has
+several rows and the question is "is this site the plant?". Splits are by plant (StratifiedGroupKFold,
+and spatial folds already cluster on the plant's coordinates), and the accept threshold is calibrated
+on the plant-level outcome -- see model_utils.plant_accept_table and config.STAGE1_ACCEPT_PRECISION.
+
 Model: sklearn RandomForestClassifier with an explicit class-weight dict
 (closest direct port of ranger's class.weights= argument).
 
@@ -23,7 +28,8 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import accuracy_score, roc_auc_score, brier_score_loss, confusion_matrix
-from sklearn.model_selection import train_test_split, StratifiedKFold, RandomizedSearchCV, PredefinedSplit
+from sklearn.model_selection import (train_test_split, StratifiedKFold, StratifiedGroupKFold,
+                                     RandomizedSearchCV, PredefinedSplit)
 from sklearn.pipeline import Pipeline
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -32,7 +38,7 @@ import config as C
 from holdout import exclude_holdout
 from model_utils import (build_preprocessor, spatial_cluster_folds, describe_folds,
                          report_empty_features, youden_threshold,
-                         compute_specificity)
+                         compute_specificity, plant_accept_table)
 
 # Same drop list as the R version's drop_cols -- IDs/keys/low-value geography
 # text that shouldn't be fed to the model directly (geography's SIGNAL is
@@ -63,6 +69,8 @@ DROP_COLS = [
     "pct_lbcs_activity_known", "pct_owner_known",
     "subdivision", "place", "county", "zoning_type",
     "geom_wkb", "x_5070", "y_5070",
+    # multi-source seeds: the site's own identifier is a row ID, not signal
+    "site_id",
 ]
 
 
@@ -98,7 +106,7 @@ def main():
 
     s1 = s1.merge(plant_coords, on="CWNS_ID", how="left")
     n_before = len(s1)
-    s1 = s1.dropna(subset=["LATITUDE", "LONGITUDE"])
+    s1 = s1.dropna(subset=["LATITUDE", "LONGITUDE"]).reset_index(drop=True)
     if len(s1) < n_before:
         print(f"  Dropped {n_before - len(s1)} rows with no plant coordinates for spatial CV")
 
@@ -134,6 +142,7 @@ def main():
     if "place_match" in X.columns:
         X["place_match"] = X["place_match"].fillna(False)
     coords = s1[["x_5070", "y_5070"]].reset_index(drop=True)
+    groups = s1["CWNS_ID"].reset_index(drop=True)
     X = X.reset_index(drop=True)
     y = (y_raw == "Correct").astype(int).reset_index(drop=True)   # 1=Correct, 0=Incorrect
 
@@ -154,7 +163,10 @@ def main():
     # here. Assert it rather than assume it: if that ever stops being true the
     # random test split below starts leaking, silently.
     n_rows, n_plants = len(s1), s1["CWNS_ID"].nunique()
-    if n_rows != n_plants:
+    if C.MULTI:
+        print(f"  Multi-source: {n_rows} site rows for {n_plants} plants; standard folds and the test split "
+              f"are grouped by plant")
+    elif n_rows != n_plants:
         print(f"  WARNING: {n_rows} rows for {n_plants} plant(s). Stage 1 is "
               f"supposed to be one row per plant; with duplicates, the random "
               f"test split below puts the same plant on both sides.")
@@ -164,8 +176,11 @@ def main():
     # old train-only print hid -- see its docstring and spatial_cluster_folds'.
     describe_folds(spatial_folds, y, label="Spatial fold")
 
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
-    standard_folds = list(skf.split(X, y))
+    if C.MULTI:
+        standard_folds = list(StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=123).split(X, y, groups))
+    else:
+        skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
+        standard_folds = list(skf.split(X, y))
     print(f"  Spatial folds: {len(spatial_folds)}  |  Standard folds: {len(standard_folds)}")
 
     # ---- Pipeline + search space ----
@@ -209,8 +224,13 @@ def main():
     # ---- Final fit on held-out test split, using SPATIAL CV's best params
     #      (matches the R version's choice: select_best(rf_spatial_results)) ----
     print(f"\n{'=' * 40}\nFitting final model on full training data...\n{'=' * 40}")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.25, stratify=y, random_state=456)
+    if C.MULTI:
+        # whole plants on one side: a plant's sites share plant features and compete with each other
+        tr_i, te_i = next(StratifiedGroupKFold(n_splits=4, shuffle=True, random_state=456).split(X, y, groups))
+        X_train, X_test, y_train, y_test = X.iloc[tr_i], X.iloc[te_i], y.iloc[tr_i], y.iloc[te_i]
+    else:
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.25, stratify=y, random_state=456)
 
     best_params = spatial_search.best_params_
     final_pipeline = make_pipeline()
@@ -269,18 +289,46 @@ def main():
         print(f"  Optimal Stage 1 threshold (Youden J): {optimal_threshold:.3f}")
     roc_df.to_parquet(C.MODELS_DIR / "stage1_threshold_analysis.parquet", index=False)
 
+    # ---- Plant-level accept threshold (multi-source) ----
+    accept_threshold = optimal_threshold
+    if C.MULTI:
+        g_test = groups.iloc[te_i].reset_index(drop=True)
+        tagged_plants = set(groups[osm_mask.to_numpy()]) if C.STAGE1_OSM_PASS else set()
+        sel = ~g_test.isin(tagged_plants).to_numpy()
+        plant_thr, plant_tab = plant_accept_table(
+            g_test[sel], y_test.to_numpy()[sel], y_pred_proba[sel], C.STAGE1_ACCEPT_PRECISION)
+        plant_tab.to_parquet(C.MODELS_DIR / "stage1_plant_threshold_analysis.parquet", index=False)
+        n_pl = g_test[sel].nunique()
+        print(f"\nPlant-level accept analysis ({n_pl} held-out plants, "
+              f"{len(tagged_plants & set(g_test))} OSM-tagged plants left out):")
+        for q in (0.5, 0.7, 0.85, 0.95):
+            r = plant_tab.iloc[(plant_tab["threshold"] - q).abs().argmin()]
+            print(f"  accept at score >= {r['threshold']:.2f}: {int(r['n_accepted'])} plants, "
+                  f"precision {r['precision']:.3f}, captures {r['capture']:.1%} of plants that have a Correct site")
+        if plant_thr is None:
+            print(f"  No cut reaches {C.STAGE1_ACCEPT_PRECISION:.0%} plant-level precision over >= 30 plants; "
+                  f"keeping the Youden threshold {optimal_threshold:.3f}")
+        else:
+            accept_threshold = max(optimal_threshold, plant_thr)
+            print(f"  Plant-level threshold for {C.STAGE1_ACCEPT_PRECISION:.0%} precision: {plant_thr:.3f}; "
+                  f"Youden {optimal_threshold:.3f}; ACCEPT THRESHOLD = {accept_threshold:.3f}")
+
     # ---- Save model ----
     print("\nSaving model...")
     model_path = C.MODELS_DIR / "stage1_rf_model.joblib"
     joblib.dump(dict(pipeline=final_pipeline, feature_columns=list(X.columns),
                      class_labels={1: "Correct", 0: "Incorrect"}), model_path)
     joblib.dump(optimal_threshold, C.MODELS_DIR / "stage1_optimal_threshold.joblib")
+    if C.MULTI:
+        joblib.dump(accept_threshold, C.MODELS_DIR / "stage1_accept_threshold.joblib")
     print(f"  {model_path.name} saved: {model_path.stat().st_size / 1e6:.1f} MB")
 
     print("\n=== Stage 1 training complete ===")
     print(f"\nFINAL RESULTS SUMMARY")
     print(f"  Test roc_auc: {roc_auc_score(y_test, y_pred_proba):.4f}")
     print(f"  Optimal threshold: {optimal_threshold:.3f}")
+    if C.MULTI:
+        print(f"  Accept threshold (plant level): {accept_threshold:.3f}")
     print(f"  CV comparison:\n{compare_cv}")
 
 

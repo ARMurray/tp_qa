@@ -449,6 +449,12 @@ def pop_band(pop) -> str:
 # the independent check. Set False to restore osm_ww as a Stage 1 feature.
 STAGE1_OSM_PASS = True
 
+# Multi-source seeds: a plant is accepted by Stage 1 when its best seed site scores at or above the accept
+# threshold, which 03 sets at the lowest score whose ACCEPTED PLANTS are right at least this often on the
+# held-out test split (model_utils.plant_accept_table). The final threshold is the larger of that and the
+# per-row Youden J, so an accept is never looser than the old rule. Everything not accepted goes to Stage 2.
+STAGE1_ACCEPT_PRECISION = 0.95
+
 
 def population_ok_ids(min_pop: int | None = None) -> set[str]:
     """CWNS_IDs serving MORE than min_pop residents. Plants with no
