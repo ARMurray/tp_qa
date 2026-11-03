@@ -26,6 +26,22 @@ untouched. `TPQA_SEED_MODE=cwns_only` reproduces the old behaviour and old paths
 any command). Shared and never suffixed: CWNS exports, training labels, the frozen holdout, 01b/01c detection, review logs,
 `best.pt`.
 
+## Reading results without HPC access
+
+Every job already copies its log to `correction/diagnostics/latest_logs/`. In multi mode each job also refreshes
+**`correction/diagnostics/multi_status.txt`** when it ends: one file with, in run order, the window sizes against the
+single-seed run, seed -> parcel matching, seed-site detection coverage, the Stage 1 / Stage 2 tables, thresholds and
+top features, 05's decisions, 13's provenance, and the last 60 lines of any job whose exit status was not 0.
+
+Getting it back through git is one command on a login node, run after a step finishes:
+
+```bash
+bash /work/GRDVULN/tp_qa/correction/scripts/push_diagnostics.sh "01a OH done"
+```
+
+It regenerates the status file, commits only `correction/diagnostics/`, and pushes. Then `git pull` anywhere and read
+`multi_status.txt`. It never touches data, models or code.
+
 ## Order
 
 Submit each step after the previous one has finished (see [05_RUNBOOK.md](05_RUNBOOK.md) A2-A6 for why).

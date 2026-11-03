@@ -50,7 +50,21 @@ _tpqa_copy_latest_log() {
     return 0
 }
 
+# Multi-source runs: refresh correction/diagnostics/multi_status.txt (one file saying where every step stands)
+# after the log copy, so it is current whenever a job ends. flock keeps array tasks from running it at once; a
+# task that finds it busy skips -- the next one to end refreshes it. Does nothing in cwns_only mode, and never
+# affects the job's exit status. Pushing it is manual: bash push_diagnostics.sh
+_tpqa_refresh_status() {
+    [ "${TPQA_SEED_MODE:-multi}" = "multi" ] || return 0
+    command -v python >/dev/null 2>&1 || return 0
+    command -v flock >/dev/null 2>&1 || return 0
+    ( flock -n 9 || exit 0
+      timeout 240 python /work/GRDVULN/tp_qa/correction/scripts/multi_status.py --quiet
+    ) 9>/work/GRDVULN/tp_qa/correction/logs/.multi_status.lock >/dev/null 2>&1
+    return 0
+}
+
 # Bash does not run the EXIT trap when killed by an untrapped signal, and
 # SLURM's time limit arrives as SIGTERM -- turn it into an ordinary exit.
 trap 'exit 143' TERM
-trap '_tpqa_copy_latest_log $?' EXIT
+trap '_tpqa_copy_latest_log $?; _tpqa_refresh_status' EXIT
