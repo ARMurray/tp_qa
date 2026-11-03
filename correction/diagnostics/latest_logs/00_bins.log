@@ -1,35 +1,35 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/00_bins_7562585.log
-# job 7562585 on a0n15, exit status 0, copied 2026-10-09 09:31:27
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/00_bins_7606288.log
+# job 7606288 on a0n15, exit status 0, copied 2026-11-03 13:55:17
 #
 ==========================================
 Node:    a0n15
-Job ID:  7562585
+Job ID:  7606288
 CPUs:    4
-Started: Fri Oct  9 09:31:24 EDT 2026
+Started: Tue Nov  3 13:55:07 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
 Running: python "/work/GRDVULN/tp_qa/correction/scripts/build_training_bins.py"     --master "/work/GRDVULN/tp_qa/correction/data/training/Updates.gpkg"     --out    "/work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg"
-Resolved newest master layer: CWNS_Locations_20261005
-Loading CWNS_Locations_20261005 from /work/GRDVULN/tp_qa/correction/data/training/Updates.gpkg ...
+Resolved newest master layer: CWNS_Locations_20261014
+Loading CWNS_Locations_20261014 from /work/GRDVULN/tp_qa/correction/data/training/Updates.gpkg ...
   Loaded 32296 rows
   Filtered to treatment plants: 17874 rows
 
-Verified: 2941  |  Unverified: 14933
-Correct bin candidates  : 2218
-Incorrect bin candidates: 723
-'classes' layer final size: 2941 (2218 Correct, 723 Incorrect)
-'corrections' layer final size: 723
-'unverified' layer size: 14933
+Verified: 3068  |  Unverified: 14806
+Correct bin candidates  : 2227
+Incorrect bin candidates: 841
+'classes' layer final size: 3068 (2227 Correct, 841 Incorrect)
+'corrections' layer final size: 841
+'unverified' layer size: 14806
 
 Writing /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg ...
 
 === Done ===
-  classes     : 2941 rows (2218 Correct / 723 Incorrect)
-  corrections : 723 rows
-  unverified  : 14933 rows
+  classes     : 3068 rows (2227 Correct / 841 Incorrect)
+  corrections : 841 rows
+  unverified  : 14806 rows
 
 Output: /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 Point config.py's / config_hpc.py's TRAINING_GPKG at this file (with TRAINING_LAYER_CLASSES='classes', TRAINING_LAYER_CORRECTIONS='corrections') once you're satisfied with these counts.
-Finished: Fri Oct  9 09:31:27 EDT 2026
+Finished: Tue Nov  3 13:55:17 EST 2026

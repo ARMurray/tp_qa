@@ -1,0 +1,88 @@
+multi_status.txt -- written by multi_status.py; see its docstring
+
+==============================================================================
+ENVIRONMENT
+==============================================================================
+generated   : 2026-11-03 14:23:38
+seed mode   : multi   suffix '_multi'
+git commit  : 6fb757a  (Tue Nov 3 13:51:14 2026 -0500 Docs: the push_diagnostics command after every step)
+seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
+training gpkg: 0.5 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+holdout manifest: 70.2 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
+detector best.pt: 35.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+
+==============================================================================
+01a  candidate windows (seeds as centers)
+==============================================================================
+/work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 1 state file(s)
+total parcels 4,686,473; newest file 0.0 h ago
+vs single-seed run (4,417,789): ratio median 1.06, min 1.06, max 1.06  (the recall check expected ~1.0-1.3)
+largest growth: OH 1.06
+states: OH
+
+==============================================================================
+01f  seed sites
+==============================================================================
+/work/GRDVULN/tp_qa/correction/data/seed_sites: 0 state dir(s)
+
+==============================================================================
+01e --seed-sites  detection
+==============================================================================
+/work/GRDVULN/tp_qa/correction/data/od_features_seed_sites/candidates: 0 part file(s)
+
+==============================================================================
+02   feature tables
+==============================================================================
+/work/GRDVULN/tp_qa/correction/data/features_multi
+  05_plant_features     missing
+  10_parcel_features    missing
+  14_stage1_training    missing
+  15_stage2_training    missing
+
+==============================================================================
+03/04 models
+==============================================================================
+/work/GRDVULN/tp_qa/correction/models_multi
+
+==============================================================================
+05   inference decisions
+==============================================================================
+/work/GRDVULN/tp_qa/correction/data/inference_multi
+  plant_summary.parquet missing
+
+==============================================================================
+13   corrected output + provenance
+==============================================================================
+/work/GRDVULN/tp_qa/correction/data/output_multi/cwns_corrected_locations.parquet
+  missing
+
+==============================================================================
+JOB LOGS
+==============================================================================
+212 log(s); newest first (name, age, exit status):
+  01a_34.log                           0.0 h ago   exit 0
+  00_bins.log                          0.5 h ago   exit 0
+  13_output.log                       20.9 d ago   exit 0
+  10_review_queue.log                 21.2 d ago   exit 0
+  12_holdout.log                      21.3 d ago   exit 0
+  05b_rerank.log                      21.3 d ago   exit 0
+  01e_arr_40.log                      24.8 d ago   exit 0
+  01e_arr_45.log                      24.8 d ago   exit 0
+  01e_arr_46.log                      24.8 d ago   exit 0
+  01e_arr_32.log                      24.8 d ago   exit 0
+  01e_arr_44.log                      24.9 d ago   exit 0
+  01e_arr_47.log                      24.9 d ago   exit 0
+  01e_arr_26.log                      24.9 d ago   exit 0
+  01e_arr_31.log                      24.9 d ago   exit 0
+  01e_arr_42.log                      24.9 d ago   exit 0
+  01e_arr_43.log                      24.9 d ago   exit 0
+  01e_arr_41.log                      24.9 d ago   exit 0
+  01e_arr_39.log                      24.9 d ago   exit 0
+  01e_arr_38.log                      24.9 d ago   exit 0
+  01e_arr_21.log                      24.9 d ago   exit 0
+  01e_arr_35.log                      24.9 d ago   exit 0
+  01e_arr_37.log                      24.9 d ago   exit 0
+  01e_arr_36.log                      24.9 d ago   exit 0
+  01e_arr_34.log                      24.9 d ago   exit 0
+  01e_arr_33.log                      24.9 d ago   exit 0
+
