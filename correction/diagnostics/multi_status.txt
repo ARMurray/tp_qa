@@ -3,38 +3,38 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-03 14:58:15
+generated   : 2026-11-03 15:37:26
 seed mode   : multi   suffix '_multi'
-git commit  : 9e50bf7  (Tue Nov 3 14:51:31 2026 -0500 Status: site spacing diagnostics; runbook 01e volume from the OH measurement)
+git commit  : 9334247  (Tue Nov 3 15:28:09 2026 -0500 Pin the rule: neighbouring parcels with different owners stay separate sites)
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 1.0 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+training gpkg: 1.7 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 holdout manifest: 70.3 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
-detector best.pt: 35.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+detector best.pt: 35.8 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
 ==============================================================================
 01a  candidate windows (seeds as centers)
 ==============================================================================
-/work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 1 state file(s)
-total parcels 4,686,473; newest file 0.6 h ago
-vs single-seed run (4,417,789): ratio median 1.06, min 1.06, max 1.06  (the recall check expected ~1.0-1.3)
-largest growth: OH 1.06
-states: OH
+/work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 4 state file(s)
+total parcels 5,371,920; newest file 0.0 h ago
+vs single-seed run (4,900,390): ratio median 1.21, min 1.06, max 5.51  (the recall check expected ~1.0-1.3)
+largest growth: AK 5.51, DE 1.31, HI 1.11, OH 1.06
+states: AK DE HI OH
 
 ==============================================================================
 01f  seed sites
 ==============================================================================
-/work/GRDVULN/tp_qa/correction/data/seed_sites: 1 state dir(s)
-seeds 3,137 for 844 plants; sites 1,944 for 844 plants
-seed -> parcel match: inside: 2,649, snapped: 486, none: 2
-  by source (share with no parcel): cwns_addr 0.0%, cwns_point 0.0%, icis_fac_addr 0.0%, icis_fac_frs 0.3%, icis_feat_INF 0.0%, icis_feat_INO 0.0%
-  snapped seeds: median 6 m, max 41 m
-plants with no site: 0
-sites per plant: {1: 168, 2: 327, 3: 274, 4: 75}
-independent origins per site: {1: 1535, 2: 404, 3: 5}  (counting copies: {1: 1279, 2: 660, 3: 5})
-distance to the plant's nearest OTHER site (1,776 sites in multi-site plants) -- close ones may be one facility split across owners:
-  0-50 m: 10%   50-100 m: 13%   100-250 m: 25%   250-500 m: 19%   500-1000 m: 12%   1000+ m: 19%
-sites WITHOUT the CWNS point (1,100): distance to the CWNS point median 429 m; <250 m 36%, <500 m 54%, <1000 m 70%, <5000 m 90%
-sites holding the CWNS point: 844; oversized parcel: 14; merged parcels (site_n_parcels>1): 93
+/work/GRDVULN/tp_qa/correction/data/seed_sites: 51 state dir(s)
+seeds 55,945 for 16,430 plants; sites 34,482 for 16,349 plants
+seed -> parcel match: inside: 43,947, snapped: 11,385, none: 613
+  by source (share with no parcel): cwns_addr 0.9%, cwns_point 0.9%, icis_fac_addr 1.1%, icis_fac_frs 1.2%, icis_feat_INF 2.2%, icis_feat_INO 2.1%
+  snapped seeds: median 7 m, max 100 m
+plants with no site: 81
+sites per plant: {1: 4440, 2: 6952, 3: 3884, 4: 976, 5: 69, 6: 16, 7: 3, 8: 2}
+independent origins per site: {1: 27141, 2: 6484, 3: 857}  (counting copies: {1: 22552, 2: 10462, 3: 1468})
+distance to the plant's nearest OTHER site (30,042 sites in multi-site plants) -- close ones may be one facility split across owners:
+  0-50 m: 6%   50-100 m: 8%   100-250 m: 20%   250-500 m: 18%   500-1000 m: 16%   1000+ m: 32%
+sites WITHOUT the CWNS point (18,203): distance to the CWNS point median 716 m; <250 m 25%, <500 m 41%, <1000 m 58%, <5000 m 87%
+sites holding the CWNS point: 16,279; oversized parcel: 808; merged parcels (site_n_parcels>1): 1,424
 
 ==============================================================================
 01e --seed-sites  detection
@@ -70,30 +70,30 @@ sites holding the CWNS point: 844; oversized parcel: 14; merged parcels (site_n_
 ==============================================================================
 JOB LOGS
 ==============================================================================
-213 log(s); newest first (name, age, exit status):
-  01f_34.log                           0.1 h ago   exit 0
-  01a_34.log                           0.6 h ago   exit 0
-  00_bins.log                          1.0 h ago   exit 0
-  13_output.log                       20.9 d ago   exit 0
-  10_review_queue.log                 21.2 d ago   exit 0
-  12_holdout.log                      21.3 d ago   exit 0
-  05b_rerank.log                      21.3 d ago   exit 0
-  01e_arr_40.log                      24.8 d ago   exit 0
-  01e_arr_45.log                      24.8 d ago   exit 0
-  01e_arr_46.log                      24.9 d ago   exit 0
-  01e_arr_32.log                      24.9 d ago   exit 0
-  01e_arr_44.log                      24.9 d ago   exit 0
-  01e_arr_47.log                      24.9 d ago   exit 0
-  01e_arr_26.log                      24.9 d ago   exit 0
-  01e_arr_31.log                      24.9 d ago   exit 0
-  01e_arr_42.log                      24.9 d ago   exit 0
-  01e_arr_43.log                      24.9 d ago   exit 0
-  01e_arr_41.log                      24.9 d ago   exit 0
-  01e_arr_39.log                      24.9 d ago   exit 0
-  01e_arr_38.log                      24.9 d ago   exit 0
-  01e_arr_21.log                      24.9 d ago   exit 0
-  01e_arr_35.log                      24.9 d ago   exit 0
-  01e_arr_37.log                      24.9 d ago   exit 0
-  01e_arr_36.log                      24.9 d ago   exit 0
-  01e_arr_34.log                      24.9 d ago   exit 0
+266 log(s); newest first (name, age, exit status):
+  01f_43.log                           0.0 h ago   exit 0
+  01a_10.log                           0.0 h ago   exit 0
+  01f_48.log                           0.0 h ago   exit 0
+  01f_47.log                           0.0 h ago   exit 0
+  01f_49.log                           0.0 h ago   exit 0
+  01f_45.log                           0.0 h ago   exit 0
+  01f_50.log                           0.0 h ago   exit 0
+  01f_42.log                           0.0 h ago   exit 0
+  01f_44.log                           0.0 h ago   exit 0
+  01f_46.log                           0.0 h ago   exit 0
+  01f_34.log                           0.0 h ago   exit 0
+  01f_37.log                           0.0 h ago   exit 0
+  01f_40.log                           0.0 h ago   exit 0
+  01f_33.log                           0.0 h ago   exit 0
+  01f_38.log                           0.0 h ago   exit 0
+  01f_41.log                           0.0 h ago   exit 0
+  01f_39.log                           0.0 h ago   exit 0
+  01f_35.log                           0.0 h ago   exit 0
+  01a_7.log                            0.0 h ago   exit 0
+  01f_36.log                           0.0 h ago   exit 0
+  01f_13.log                           0.0 h ago   exit 0
+  01f_23.log                           0.0 h ago   exit 0
+  01f_32.log                           0.0 h ago   exit 0
+  01f_26.log                           0.0 h ago   exit 0
+  01f_30.log                           0.0 h ago   exit 0
 

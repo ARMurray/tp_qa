@@ -1,0 +1,28 @@
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01f_7606448_7.log
+# job 7606448 task 7 on r5n04, exit status 0, copied 2026-11-03 15:36:13
+#
+==========================================
+Node:    r5n04
+Job ID:  7606456
+CPUs:    8
+Started: Tue Nov  3 15:36:06 EST 2026
+==========================================
+Loaded module: python/3.11
+Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
+------------------------------------------
+Processing state: DE  (array index 7 of 51)
+Seed mode: multi
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01f_build_seed_sites.py --states DE --full-universe --no-resume
+=== 01f_build_seed_sites.py ===
+  Dropped 1 rows with non-numeric/missing LATITUDE or LONGITUDE
+Plants: 19; seeds loaded: 56
+
+--- State DE: 19 plants ---
+  Seeds: 56 for 19 plants (0 plants have no seed)
+  Seed -> parcel: {'inside': 44, 'snapped': 6, 'none': 6}
+  Sites: 36 for 19 plants; sites per plant {1: 7, 2: 9, 3: 1, 4: 2}
+  Written: /work/GRDVULN/tp_qa/correction/data/seed_sites/state=DE
+
+=== 01f_build_seed_sites.py complete ===
+Outputs in: /work/GRDVULN/tp_qa/correction/data/seed_sites
+Finished: Tue Nov  3 15:36:13 EST 2026

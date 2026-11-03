@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01f_7606349_34.log
-# job 7606349 task 34 on r7n17, exit status 0, copied 2026-11-03 14:49:52
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01f_7606448_34.log
+# job 7606448 task 34 on r5n04, exit status 0, copied 2026-11-03 15:36:55
 #
 ==========================================
-Node:    r7n17
-Job ID:  7606349
+Node:    r5n04
+Job ID:  7606484
 CPUs:    8
-Started: Tue Nov  3 14:49:31 EST 2026
+Started: Tue Nov  3 15:36:41 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -20,9 +20,9 @@ Plants: 844; seeds loaded: 3137
 --- State OH: 844 plants ---
   Seeds: 3137 for 844 plants (0 plants have no seed)
   Seed -> parcel: {'inside': 2649, 'snapped': 486, 'none': 2}
-  Sites: 1944 for 844 plants; sites per plant {1: 168, 2: 327, 3: 274, 4: 75}
+  Sites: 1943 for 844 plants; sites per plant {1: 169, 2: 326, 3: 274, 4: 75}
   Written: /work/GRDVULN/tp_qa/correction/data/seed_sites/state=OH
 
 === 01f_build_seed_sites.py complete ===
 Outputs in: /work/GRDVULN/tp_qa/correction/data/seed_sites
-Finished: Tue Nov  3 14:49:52 EST 2026
+Finished: Tue Nov  3 15:36:55 EST 2026
