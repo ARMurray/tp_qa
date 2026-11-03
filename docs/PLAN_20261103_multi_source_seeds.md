@@ -122,6 +122,9 @@ lands on master as a small, separately runnable step.
 
 ## Status
 
+Built 2026-11-03 and tested on synthetic parcel stores; **not yet run on the HPC**. How to run it:
+[RUNBOOK_multi_source.md](RUNBOOK_multi_source.md).
+
 - [x] Plan written; decided to build on master, not a branch
 - [x] `plant_seeds` table (`build_plant_seeds.py`, 58,130 seeds for 17,538 plants)
 - [x] Recall-ceiling check (`check_seed_recall.py`, cell level, 837 corrected plants): truth inside the
@@ -129,9 +132,12 @@ lands on master as a small, separately runnable step.
       window grows a median 1.07x, mean 1.2x, 12.6% of plants above 1.5x a single disk. Five plants stay
       outside (CWNS point 9 km or more off). Cell level only: it ignores parcel gaps, so it is not
       comparable to 08's 91.4%
-- [x] `SEED_MODE` setting in `config.py`, default `multi`, `TPQA_SEED_MODE` override
-- [ ] 01a / 01e multi-seed windows
-- [ ] Stage 1 retrain and plant-level calibration
-- [ ] Stage 2 pool and features
-- [ ] Output provenance columns
-- [ ] Holdout comparison against master
+- [x] `SEED_MODE` setting in `config.py`, default `multi`, `TPQA_SEED_MODE` override; mode-suffixed output directories
+- [x] Seed -> parcel -> site (`seed_sites.py`, `01f_build_seed_sites.py`)
+- [x] 01a seed window centers; 01e `--seed-sites` detection
+- [x] Stage 1 on sites: 02 table, 03 grouped splits and plant-level accept threshold, label-leak guard
+- [x] Stage 2 window and per-candidate seed features (02, `seed_sites.add_seed_features`)
+- [x] 05 site decision, near-tie and multi-pass rules, union pool with nothing excluded
+- [x] 13 provenance columns; 12 end-to-end outcomes; 02b/merge_05 keys
+- [ ] Run on the HPC, then holdout comparison against the single-seed pipeline
+- [ ] Review app: show each candidate's sources on its card (not started)

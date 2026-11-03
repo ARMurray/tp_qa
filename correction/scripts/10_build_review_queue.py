@@ -176,6 +176,10 @@ def attach_candidate_od(cand: pd.DataFrame) -> pd.DataFrame:
     roots = [C.OD_CAND_TRAIN_DIR / "candidates",
              C.OD_CAND_DIR / "candidates",
              C.OD_CAND_QUEUE_DIR / "candidates"]
+    if C.MULTI:
+        # confirm_reported rows show the site Stage 1 judged (a seed site); its detections are in 01e
+        # --seed-sites output. First = lowest priority under the keep="last" dedup below.
+        roots.insert(0, C.OD_SEED_SITES_DIR / "candidates")
     frames = []
     for root in roots:
         if not root.exists():
