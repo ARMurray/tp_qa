@@ -53,7 +53,8 @@ def main():
             .to_parquet(d / "seed_parcels.parquet")
         pd.DataFrame({"CWNS_ID": ["A", "B"], "site_id": ["A_s1", "B_s1"], "rep_ll_uuid": ["u1", "u2"], "n_origins": [1, 1],
                       "n_origins_all": [2, 1], "n_seeds": [2, 1], "site_n_parcels": [1, 2], "oversized": [False, False],
-                      "snapped": [False, True], "has_cwns_point": [True, True], "n_sites": [1, 1]}).to_parquet(d / "seed_sites.parquet")
+                      "snapped": [False, True], "has_cwns_point": [True, False], "n_sites": [2, 2],
+                      "d_nearest_other_site_m": [80.0, 80.0], "d_to_cwns_point_m": [0.0, 80.0]}).to_parquet(d / "seed_sites.parquet")
         od = tmp / "data/od_seed_sites/candidates/state=OH"
         od.mkdir(parents=True)
         pd.DataFrame({"CWNS_ID": ["A"], "ll_uuid": ["u1"], "od_ran": [True], "od_has_detection": [False]}).to_parquet(od / "part-1.parquet")
@@ -88,7 +89,7 @@ def main():
         assert "section failed" not in txt, txt
         for needle in ("ratio median 2.00", "seed -> parcel match", "coverage of seed sites: 1 / 2", "Correct sites per plant",
                        "stage1_accept_threshold.joblib", "= 0.700", "accepted by sources: icis_fac_frs", "moved plants led by: icis_fac_frs",
-                       "last 60 lines of 01f_3.log", "Traceback boom", "precision 1.000"):
+                       "last 60 lines of 01f_3.log", "Traceback boom", "precision 1.000", "50-100 m: 100%", "WITHOUT the CWNS point (1)"):
             assert needle in txt, needle
         print("multi status tests passed")
 

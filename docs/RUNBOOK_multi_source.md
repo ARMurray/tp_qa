@@ -63,8 +63,9 @@ sbatch --array=0-50%6 --export=FULLUNIVERSE=1,NORESUME=1 01a_extract_parcels.slu
 sbatch --array=0-50%6 --export=FULLUNIVERSE=1,NORESUME=1 01f_build_seed_sites.slurm     # seed_sites/
 sbatch --array=0-47%6 --export=SEEDSITES=1 01e_run_od_candidates_array.slurm            # od_features_seed_sites/
 #    01d top-up is only needed if 08 shows parcels missing from 01a; it appends to nlcd_features_multi/.
-#    01e: about 24.6k sites nationally, ~4.1k for the labelled plants. At the measured 39 candidates/min that
-#    is ~10.5 h aggregate (1.7 h for labelled plants alone). Rate-limited, not CPU-limited: see the array wrapper.
+#    01e volume: OH came out at 2.3 sites per plant (1,944 sites for 844 plants), so nationally about 40k sites, ~7k for the
+#    labelled plants. At the measured 39 candidates/min that is ~17 h aggregate (~3 h for labelled plants alone).
+#    Rate-limited, not CPU-limited: see the array wrapper.
 
 # 3. features. 02 refuses to build the Stage 1 table without seed-site detections (--no-seed-od overrides).
 sbatch --export=FULL_UNIVERSE=1 02_feature_engineering.slurm

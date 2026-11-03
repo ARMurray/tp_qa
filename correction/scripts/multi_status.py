@@ -101,7 +101,8 @@ def sec_01f(L):
         return
     sp = pd.concat([read_cols(x / "seed_parcels.parquet", ["CWNS_ID", "match_kind", "snap_m", "site_id", "source"]) for x in dirs])
     si = pd.concat([read_cols(x / "seed_sites.parquet", ["CWNS_ID", "site_id", "n_origins", "n_origins_all", "n_seeds",
-                                                         "site_n_parcels", "oversized", "snapped", "has_cwns_point", "n_sites"])
+                                                         "site_n_parcels", "oversized", "snapped", "has_cwns_point", "n_sites",
+                                                         "d_nearest_other_site_m", "d_to_cwns_point_m"])
                     for x in dirs])
     L.append(f"seeds {len(sp):,} for {sp['CWNS_ID'].nunique():,} plants; sites {len(si):,} for {si['CWNS_ID'].nunique():,} plants")
     L.append(f"seed -> parcel match: {vc(sp['match_kind'])}")
@@ -114,6 +115,17 @@ def sec_01f(L):
     L.append(f"sites per plant: {si.groupby('CWNS_ID').size().value_counts().sort_index().head(8).to_dict()}")
     L.append(f"independent origins per site: {si['n_origins'].value_counts().sort_index().to_dict()}  "
              f"(counting copies: {si['n_origins_all'].value_counts().sort_index().to_dict()})")
+    if "d_nearest_other_site_m" in si:
+        multi = si[si["n_sites"] > 1]
+        d = multi["d_nearest_other_site_m"].dropna()
+        edges = [(0, 50), (50, 100), (100, 250), (250, 500), (500, 1000), (1000, 1e9)]
+        L.append(f"distance to the plant's nearest OTHER site ({len(d):,} sites in multi-site plants) -- close ones may be one "
+                 f"facility split across owners:")
+        L.append("  " + "   ".join(f"{a:g}-{b:g} m: {((d >= a) & (d < b)).mean():.0%}" for a, b in edges).replace("-1e+09", "+"))
+        nc = si.loc[~si["has_cwns_point"] & si["d_to_cwns_point_m"].notna(), "d_to_cwns_point_m"]
+        if len(nc):
+            L.append(f"sites WITHOUT the CWNS point ({len(nc):,}): distance to the CWNS point median {nc.median():,.0f} m; "
+                     + ", ".join(f"<{t} m {(nc < t).mean():.0%}" for t in (250, 500, 1000, 5000)))
     L.append(f"sites holding the CWNS point: {int(si['has_cwns_point'].sum()):,}; oversized parcel: {int(si['oversized'].sum()):,}; "
              f"merged parcels (site_n_parcels>1): {int((si['site_n_parcels'] > 1).sum()):,}")
 
