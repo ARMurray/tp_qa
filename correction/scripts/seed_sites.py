@@ -15,6 +15,8 @@ seeds are collapsed so a parcel is judged once however many sources point at it:
      each other and share a normalised owner, the parcel-only part of site_geometry's rule. Detections
      are not used, so sites exist before any detector has run. Oversized parcels (whole-town
      digitisation artifacts) only ever merge with themselves.
+     Seeds are NOT merged by proximity: a geocode can sit on the wrong parcel, so a seed on a neighbour with a
+     different owner stays its own site and Stage 1 judges each parcel (tried and reversed 2026-11-03).
   3. Each site carries its sources, its support counted in INDEPENDENT ORIGINS (a seed that copies an
      earlier seed within SEED_COPY_M adds nothing), and plant-level context: how many sites the plant
      has, this site's rank, its distance to the CWNS point and to the nearest other site.

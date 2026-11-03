@@ -111,6 +111,19 @@ def main():
         assert SS.merge_parcels(["P1", "P2"], pair) == {"P1": 0, "P2": 1}
         assert SS.merge_parcels(["P3", "P4"], SS.fetch_parcels(con, "ZZ", ["P3", "P4"])) == {"P3": 0, "P4": 1}  # owners differ
 
+
+        # A seed can sit on the WRONG parcel, so neighbouring parcels with different owners stay separate sites however
+        # close their seeds are (decided 2026-11-03): Stage 1 judges each, and the one holding the truth is the answer.
+        la, lo = centre(0, 20)
+        close = pd.DataFrame([
+            seed("M_cwns_point_1", "cwns_point", "cwns", la, lo, cid="M"),                                  # on P3 (ACME LLC)
+            seed("M_icis_fac_frs_1", "icis_fac_frs", "icis_facility", la, LON0 + 1.05 * DLON, cid="M"),     # ~72 m away, on P4 (another owner)
+        ])
+        tm = close.merge(SS.match_seeds_to_parcels(con, "ZZ", close), on="seed_id")
+        assert list(tm.ll_uuid) == ["P3", "P4"]
+        _, tsites = SS.build_sites(tm, SS.fetch_parcels(con, "ZZ", ["P3", "P4"]))
+        assert len(tsites) == 2 and sorted(tsites.n_origins) == [1, 1], tsites[["site_id", "ll_uuids", "n_origins"]]
+
         # 01f end to end on the same store: files land per state and read back
         import importlib.util
         spec = importlib.util.spec_from_file_location("build_sites_01f", Path(C.__file__).parent / "01f_build_seed_sites.py")
