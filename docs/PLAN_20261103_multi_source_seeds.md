@@ -122,8 +122,9 @@ lands on master as a small, separately runnable step.
 
 ## Status
 
-Built 2026-11-03 and tested on synthetic parcel stores; **not yet run on the HPC**. How to run it:
-[RUNBOOK_multi_source.md](RUNBOOK_multi_source.md).
+Built 2026-11-03 and tested on synthetic parcel stores. HPC run in progress: 01a and 01f done on all states, 01e
+seed-site detection queued (see the run log in the runbook). How to run it:
+[RUNBOOK_multi_source.md](RUNBOOK_multi_source.md). Session hand-off: [HANDOFF_20261103_multi_source.md](HANDOFF_20261103_multi_source.md).
 
 - [x] Plan written; decided to build on master, not a branch
 - [x] `plant_seeds` table (`build_plant_seeds.py`, 58,130 seeds for 17,538 plants)
@@ -139,5 +140,6 @@ Built 2026-11-03 and tested on synthetic parcel stores; **not yet run on the HPC
 - [x] Stage 2 window and per-candidate seed features (02, `seed_sites.add_seed_features`)
 - [x] 05 site decision, near-tie and multi-pass rules, union pool with nothing excluded
 - [x] 13 provenance columns; 12 end-to-end outcomes; 02b/merge_05 keys
-- [ ] Run on the HPC, then holdout comparison against the single-seed pipeline
+- [x] HPC: 01a, 01f (all 51 states, 2026-11-03)
+- [ ] HPC: 01e seed-site detection (queued), then 02 -> 13, then holdout comparison against the single-seed pipeline
 - [ ] Review app: show each candidate's sources on its card (not started)

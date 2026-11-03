@@ -123,6 +123,24 @@ the old recall@1 on the same holdout.
 Source groups: `cwns_point` = CWNS coordinates, `cwns_addr` = CWNS geocode, `icis_fac_frs` / `icis_fac_addr` /
 `icis_feat_INF` / `icis_feat_INO` = ICIS-NPDES.
 
+## Run log (update as steps finish)
+
+Full-universe run started 2026-11-03, walking the steps one at a time. Results are read from
+`correction/diagnostics/multi_status.txt` after each step.
+
+| Step | State | Result |
+|---|---|---|
+| 00 labels | done | training gpkg current |
+| 01a, all 51 states | done 2026-11-03 | 85.6M parcels vs 77.7M single-seed; median state 1.09x. AK 5.5x and PR 2.7x (no NAIP there, no effect downstream). Largest of the rest: SC 1.40, DE 1.31, SD 1.29 |
+| 01f, all 51 states | done 2026-11-03 | 55,945 seeds / 16,430 plants -> 34,482 sites. 613 seeds (1.1%) on no parcel, similar for every source. 81 plants (0.5%) have no site. Sites per plant: 1: 4,440, 2: 6,952, 3: 3,884, 4+: ~1,070. 18,203 sites lack the CWNS point (median 716 m from it; 58% within 1 km). Different-owner neighbours stay separate sites (6% of sites within 50 m of a sibling) |
+| 01e `--seed-sites` | queued 2026-11-03 evening, `--array=0-47%6 --export=SEEDSITES=1` | expect ~17 h aggregate; check `Candidates processed` per state and `01e --seed-sites detection` in the status file |
+| 02 onward | not started | |
+
+Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a
+timed-out task resumes if resubmitted, since finished parcels are skipped), then 02 -> 02b -> 03 -> 04 -> 05 as in "Order".
+At 02 read `Seed-site OD joined` (should be close to M outside AK/HI/PR) and `Correct sites per plant`; at 03 read the
+plant-level accept table before choosing the precision.
+
 ## What has been tested, and what has not
 
 Tested on synthetic parcel stores (`correction/tests/`, all pass locally): seed -> parcel -> site, the Stage 1 site table
@@ -130,9 +148,9 @@ and its labels (including that no label-derived column reaches the model), 03 on
 window and seed features, 05's Stage 1 decision and Stage 2a pool, 13's provenance, 12's outcomes, 01e's scope
 (detector stubbed), the path switch.
 
-**Not run on real data** (the parcels, NAIP and CWNS exports are HPC-only): every step above on the real Regrid store.
-Expect first-run surprises in 01f's point-in-parcel join, 02's real-data joins, and run time. The recall check
-(`check_seed_recall.py`) was real data at the H3 level.
+**Run on real data so far**: 01a and 01f (all states; see the run log). **Not yet run on real data** (the parcels, NAIP and
+CWNS exports are HPC-only): 01e seed-site detection and everything after it (02, 03, 04, 05, 13, 12). Expect first-run
+surprises in 02's real-data joins and in run time. The recall check (`check_seed_recall.py`) was real data at the H3 level.
 
 Known limits to keep in mind when reading results:
 
