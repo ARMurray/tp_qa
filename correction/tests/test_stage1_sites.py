@@ -144,6 +144,10 @@ def main():
         import seed_sites as _SS
         assert set(_SS.SEED_FEATURE_COLS) <= set(s2.columns)
         assert "name_pool_rank" in s2.columns
+        # a state with no labelled plant gives an empty shard rather than a dead task
+        none_labelled = plant_features.assign(CWNS_ID=["X1", "X2", "X3"])
+        e = fe.build_stage1_site_training(con, none_labelled, parcel_features, ["ZZ"])
+        assert len(e) == 0 and {"CWNS_ID", "site_id", "class"} <= set(e.columns)
         print("stage 1 site table tests passed")
 
 

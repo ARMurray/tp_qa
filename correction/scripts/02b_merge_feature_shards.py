@@ -91,7 +91,8 @@ PARCEL_CACHE = OUT_DIR / "10_parcel_features_by_state"
 # name -> the column that must be unique across the merged table, or None
 SHARD_FILES = {
     "05_plant_features.parquet": "CWNS_ID",
-    "14_stage1_training.parquet": "CWNS_ID",
+    # multi-source seeds (config.SEED_MODE == "multi"): Stage 1 has one row per seed SITE, so the site is the key
+    "14_stage1_training.parquet": "site_id" if C.MULTI else "CWNS_ID",
     "15_stage2_training.parquet": None,   # one row per candidate parcel
 }
 

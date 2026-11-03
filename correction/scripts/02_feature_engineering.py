@@ -907,9 +907,19 @@ def build_stage1_site_training(con, plant_features: pd.DataFrame, parcel_feature
           f"(Correct {int((lab['class'] == 'Correct').sum())}, Incorrect {int((lab['class'] == 'Incorrect').sum())}; "
           f"truth parcel known for {int(lab['truth_ll_uuid'].notna().sum())})")
 
+    # A state with no labelled plant yields an EMPTY shard, not a dead array task: 02b refuses a merge that
+    # is missing a shard but accepts an empty one (the same rule as the single-seed path above).
+    empty = pd.DataFrame(columns=["CWNS_ID", "site_id", "class"])
+    if not len(lab):
+        print("  No labelled plants in these states -- empty Stage 1 shard")
+        return empty
+    # With labelled plants, missing 01f output is an error and propagates (FileNotFoundError names 01f).
     sites, _ = SS.load_sites(states=states, cwns_ids=lab["CWNS_ID"])
     print(f"  Seed sites for labelled plants: {len(sites)} across {sites['CWNS_ID'].nunique()} plants")
     s = label_sites(sites, lab)
+    if not len(s):
+        print("  No labelled plant has a seed site -- empty Stage 1 shard")
+        return empty
     no_site = lab.loc[~lab["CWNS_ID"].isin(s["CWNS_ID"]), "CWNS_ID"]
     if len(no_site):
         print(f"  NOTE: {len(no_site)} labelled plant(s) have no seed site (no seed fell on a parcel) and are absent")
@@ -1266,7 +1276,8 @@ def main():
     # ---- OD features from 01b (Stage 1 only -- see module docstring) ----
     od_plants_dir = C.OD_OUTPUT_DIR / "plants"
     od_features = None
-    if od_plants_dir.exists() and any(od_plants_dir.rglob("*.parquet")):
+    # Multi-source Stage 1 reads seed-site detections (01e --seed-sites) instead; 01b's per-plant rows are unused.
+    if (not C.MULTI) and od_plants_dir.exists() and any(od_plants_dir.rglob("*.parquet")):
         # NOTE: this is a flush_parquet-style append-only output dir. Reading
         # the whole tree with pd.read_parquet() lets pyarrow try to infer ONE
         # unified schema across every part-file at once, which blows up when
