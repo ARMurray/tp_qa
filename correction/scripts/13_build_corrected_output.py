@@ -76,6 +76,18 @@ OBJECT_ROOTS = {
     "candidate": C.OD_CAND_DIR / "objects",
     "candidate_queue": C.OD_CAND_QUEUE_DIR / "objects",
 }
+if C.MULTI:
+    # 01e --seed-sites: detections on each seed site's parcel, the evidence behind Stage 1's accept
+    OBJECT_ROOTS["seed_site"] = C.OD_SEED_SITES_DIR / "objects"
+
+# Multi-source provenance (docs/PLAN_20261103_multi_source_seeds.md): a source "supports" the output point when
+# one of its seeds is within this distance of it. The per-source distances are written too, so the figure can be
+# changed without a rebuild.
+LOC_SOURCE_M = 250.0
+# Columns 05 adds to plant_summary in multi mode and 13 carries through.
+STAGE1_PROVENANCE = ["best_site_id", "best_site_sources", "best_site_n_origins", "best_site_n_seeds",
+                      "accepted_site_id", "accepted_sources", "alt_site_id", "alt_site_sources",
+                      "alt_site_prob", "alt_site_dist_m", "multi_pass", "n_sites"]
 
 
 def haversine_m(lat1, lon1, lat2, lon2):
@@ -179,6 +191,68 @@ def load_parcels(wanted: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def add_provenance(df: pd.DataFrame) -> list[str]:
+    """Where did each output location come from (docs/PLAN_20261103_multi_source_seeds.md)? Adds, in place:
+
+      loc_basis        how the location was decided: reviewer | stage1_accept (the CWNS point's site) |
+                       stage1_accept_seed (Stage 1 accepted a site WITHOUT the CWNS point) | stage2_move |
+                       kept_site | flagged_not_moved | not_assessed
+      loc_sources      every source with a seed within LOC_SOURCE_M of the output point, e.g.
+                       "cwns_point+icis_fac_frs" -- CWNS coordinates, CWNS geocode and/or ICIS-NPDES
+      loc_n_origins    independent origins among them (a copy of another seed counts once)
+      nearest_source   the source whose seed is closest to the output point (ties within 1 m all listed)
+      led_by           nearest_source, only where the location was FOUND by a seed or by Stage 2 (status moved)
+      dist_to_final_<source>_m   the exact distances, so LOC_SOURCE_M can change without a rebuild
+      cwns_point_ll_uuid         the parcel the CWNS point itself falls on (reported_ll_uuid is the parcel
+                                 Stage 1 judged best, which can be another source's)
+    Plus the Stage 1 columns carried from plant_summary (STAGE1_PROVENANCE). Verified plants get the same
+    columns, measured from the reviewer's point, which shows which source agreed with the human."""
+    import seed_sites as SS
+    seeds = SS.load_seeds(df["CWNS_ID"])
+    d = seeds.merge(df[["CWNS_ID", "out_lat", "out_lon"]], on="CWNS_ID")
+    d["dist"] = SS.hav_m(d["out_lat"].astype(float), d["out_lon"].astype(float), d["lat"], d["lon"])
+
+    per = d.pivot_table(index="CWNS_ID", columns="source", values="dist", aggfunc="min")
+    dist_cols = []
+    for s in SS.SOURCES:
+        col = f"dist_to_final_{s}_m"
+        df[col] = df["CWNS_ID"].map(per[s].round(1)) if s in per.columns else np.nan
+        dist_cols.append(col)
+
+    near = d[d["dist"] <= LOC_SOURCE_M]
+    join = lambda g: "+".join(sorted(set(g["source"])))   # noqa: E731
+    df["loc_sources"] = df["CWNS_ID"].map(near.groupby("CWNS_ID").apply(join, include_groups=False))
+    df["loc_n_origins"] = df["CWNS_ID"].map(near[near["independent"]].groupby("CWNS_ID")["origin"].nunique()) \
+        .fillna(0).astype(int)
+    lead = d[d["dist"] <= d.groupby("CWNS_ID")["dist"].transform("min") + 1.0]
+    df["nearest_source"] = df["CWNS_ID"].map(lead.groupby("CWNS_ID").apply(join, include_groups=False))
+    df["led_by"] = df["nearest_source"].where(df["status"] == "moved")
+
+    basis = df["status"].map({"verified_correct": "reviewer", "verified_corrected": "reviewer",
+                              "kept_model": "stage1_accept", "kept_osm": "stage1_accept",
+                              "kept_site": "kept_site", "flagged_not_moved": "flagged_not_moved",
+                              "reviewed_unresolved": "reviewer", "not_assessed": "not_assessed"})
+    basis = basis.where(df["status"] != "moved", df["move_path"].map({"stage1_seed": "stage1_accept_seed",
+                                                                      "stage2": "stage2_move"}))
+    df["loc_basis"] = basis
+
+    # The parcel under the CWNS point itself, from 01f's seed -> parcel match.
+    try:
+        _, sp = SS.load_sites(states=sorted(df["STATE_CODE"].dropna().unique()), cwns_ids=df["CWNS_ID"])
+        cp = sp[sp["source"] == "cwns_point"].drop_duplicates("CWNS_ID").set_index("CWNS_ID")["ll_uuid"]
+        df["cwns_point_ll_uuid"] = df["CWNS_ID"].map(cp)
+    except FileNotFoundError:
+        df["cwns_point_ll_uuid"] = pd.NA
+
+    print("\n  location basis: " + ", ".join(f"{k} {v:,}" for k, v in df["loc_basis"].value_counts().items()))
+    mv = df[df["status"] == "moved"]
+    if len(mv):
+        print("  moved plants led by: " + ", ".join(f"{k} {v:,}" for k, v in
+                                                      mv["led_by"].fillna("(no seed)").value_counts().head(8).items()))
+    return (["loc_basis", "loc_sources", "loc_n_origins", "nearest_source", "led_by", "cwns_point_ll_uuid"]
+            + dist_cols + STAGE1_PROVENANCE)
+
+
 def main():
     import geopandas as gpd
     from shapely.ops import unary_union
@@ -225,7 +299,13 @@ def main():
     keep = ["CWNS_ID", "stage1_route", "trigger_reason", "stage1_prob_correct",
             "reported_ll_uuid", "rerank_top_ll_uuid", "rerank_score",
             "rerank_fallback", "rerank_top_stage2a_rank"]
+    if C.MULTI:
+        keep = keep + STAGE1_PROVENANCE
     df = df.merge(summ[[c for c in keep if c in summ.columns]], on="CWNS_ID", how="left")
+    if C.MULTI:
+        for c in STAGE1_PROVENANCE:        # a summary built before the provenance columns existed
+            if c not in df.columns:
+                df[c] = pd.NA
 
     df["status"] = pd.NA
     df["status_reason"] = ""
@@ -263,9 +343,19 @@ def main():
     df.loc[na & (df["status_reason"] == ""), "status_reason"] = "not_scored"
 
     open_ = df["status"].isna()
-    df.loc[open_ & (df["stage1_route"] == "osm_confirmed"), "status"] = "kept_osm"
+    # Multi-source: Stage 1 can accept a site that does NOT hold the CWNS point (an ICIS or CWNS-geocode
+    # location). That is a correction found without Stage 2, so it is placed like a move (below), not left
+    # at the CWNS coordinates as kept_model/kept_osm would.
+    seed_move = pd.Series(False, index=df.index)
+    if C.MULTI:
+        seed_move = (open_ & (df["trigger_reason"] == "none") & df["accepted_sources"].notna()
+                     & ~df["accepted_sources"].fillna("").astype(str).str.contains("cwns_point"))
+    df["move_path"] = ""
+    df.loc[open_ & (df["stage1_route"] == "osm_confirmed") & ~seed_move, "status"] = "kept_osm"
     open_ = df["status"].isna()
     df.loc[open_ & (df["trigger_reason"] == "none"), "status"] = "kept_model"
+    # until the move below succeeds, a seed move stays at the CWNS coordinates as kept_model
+    df.loc[seed_move, "status_reason"] = "seed_site_not_placed"
 
     open_ = df["status"].isna()
     flagged = open_ & df["trigger_reason"].isin(["low_confidence", "no_parcel"])
@@ -290,14 +380,32 @@ def main():
                       zip(df.loc[has_site_lbl, "CWNS_ID"], df.loc[has_site_lbl, "Site_UUIDs"])}
 
     movers = df.loc[can_move, ["CWNS_ID", "STATE_CODE", "rerank_top_ll_uuid",
-                               "reported_ll_uuid"]]
+                               "reported_ll_uuid"]].copy()
+    movers["move_path"] = "stage2"
+    df.loc[can_move, "move_path"] = "stage2"
     pool = cand[cand["CWNS_ID"].isin(movers["CWNS_ID"])][
         ["CWNS_ID", "STATE_CODE", "ll_uuid", "rerank_score"]]
     rep = movers.dropna(subset=["reported_ll_uuid"]).rename(
         columns={"reported_ll_uuid": "ll_uuid"})[["CWNS_ID", "STATE_CODE", "ll_uuid"]]
     rep["rerank_score"] = np.nan
     pool = pd.concat([pool, rep], ignore_index=True)
+    if seed_move.any():
+        # The accepted site is the answer; its parcels (a site can merge neighbours) are the pool the
+        # site-assembly rule works from, with no re-rank score.
+        import seed_sites as SS
+        sm = df.loc[seed_move, ["CWNS_ID", "STATE_CODE", "reported_ll_uuid", "accepted_site_id"]].copy()
+        sm["rerank_top_ll_uuid"] = sm["reported_ll_uuid"]
+        sm["move_path"] = "stage1_seed"
+        df.loc[seed_move, "move_path"] = "stage1_seed"
+        sites_tbl, _ = SS.load_sites(states=sorted(sm["STATE_CODE"].dropna().unique()), cwns_ids=sm["CWNS_ID"])
+        acc = sm.merge(sites_tbl[["site_id", "ll_uuids"]], left_on="accepted_site_id", right_on="site_id", how="left")
+        acc = acc.explode("ll_uuids").dropna(subset=["ll_uuids"]).rename(columns={"ll_uuids": "ll_uuid"})
+        acc["rerank_score"] = np.nan
+        pool = pd.concat([pool, acc[["CWNS_ID", "STATE_CODE", "ll_uuid", "rerank_score"]]], ignore_index=True)
+        movers = pd.concat([movers, sm[movers.columns]], ignore_index=True)
+        print(f"  Stage 1 accepted a non-CWNS seed site for {int(seed_move.sum()):,} plant(s)")
     pool["ll_uuid"] = pool["ll_uuid"].astype(str)
+    pool = pool.drop_duplicates(["CWNS_ID", "ll_uuid"])
 
     singles = df.loc[df["final_parcel"].notna() & ~can_move,
                      ["CWNS_ID", "STATE_CODE", "final_parcel"]] \
@@ -351,7 +459,7 @@ def main():
         if len(site) > 1:
             n_site += 1
 
-        if pd.notna(r.reported_ll_uuid) and str(r.reported_ll_uuid) in site:
+        if r.move_path == "stage2" and pd.notna(r.reported_ll_uuid) and str(r.reported_ll_uuid) in site:
             df.loc[i, "status"] = "kept_site"
             df.loc[i, "status_reason"] = "reported parcel is part of the #1 site"
             continue
@@ -367,6 +475,8 @@ def main():
         df.loc[i, "coord_in_site"] = bool(union.buffer(1.0).contains(
             gpd.points_from_xy([x], [y])[0]))
         df.loc[i, "status"] = "moved"
+        if r.move_path == "stage1_seed":
+            df.loc[i, "status_reason"] = "stage 1 accepted a seed site that does not hold the CWNS point"
     print(f"\n  moves: {int((df['status'] == 'moved').sum()):,} moved, "
           f"{int((df['status'] == 'kept_site').sum()):,} kept_site (reported parcel "
           f"in the site), {n_site:,} multi-parcel site(s), {n_lost:,} parcel(s) not found")
@@ -452,13 +562,17 @@ def main():
     print(f"\n  sites layer: {len(sites):,} plant site(s)  |  detections layer: "
           f"{len(dets):,} object(s)")
 
+    prov_cols = []
+    if C.MULTI:
+        prov_cols = add_provenance(df)
+
     cols = ["CWNS_ID", "STATE_CODE", "FACILITY_NAME", "pop_served", "pop_band",
             "confidence_tier", "status", "status_reason",
             "reported_lat", "reported_lon", "out_lat", "out_lon", "moved_m",
             "coord_method", "coord_in_site", "n_objects", "site_parcels",
             "n_site_parcels", "moved_to_ll_uuid", "reported_ll_uuid", "stage1_route",
             "stage1_prob_correct", "rerank_top_ll_uuid", "rerank_score",
-            "rerank_fallback", "move_cutoff", "require_detection", "built"]
+            "rerank_fallback", "move_cutoff", "require_detection", "built"] + prov_cols
     out = df[cols].sort_values(["STATE_CODE", "CWNS_ID"]).reset_index(drop=True)
     out["coord_in_site"] = out["coord_in_site"].astype("boolean")
 
