@@ -989,6 +989,23 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
 
     corrected_coords = corrections[["CWNS_ID", "Original_X", "Original_Y"]]
 
+    # Multi-source seeds: the candidate window is the union of disks around every seed, and each candidate
+    # carries its distance to / support from the plant's seeds (seed_sites.add_seed_features). Training sees
+    # the same window and features as 05 does at inference.
+    SS = None
+    if C.MULTI:
+        import seed_sites as SS
+        seeds_all = SS.load_seeds(stage2_plants["CWNS_ID"])
+        try:
+            sites_all, sp_all = SS.load_sites(states=sorted(stage2_plants["STATE_CODE"].dropna().unique()),
+                                              cwns_ids=stage2_plants["CWNS_ID"])
+        except FileNotFoundError:
+            print("  WARNING: no seed sites found (01f) -- seed features will lack parcel and site support")
+            sites_all, sp_all = pd.DataFrame(columns=["CWNS_ID"]), pd.DataFrame(columns=["CWNS_ID"])
+        seeds_by, sites_by, sp_by = (dict(tuple(d.groupby("CWNS_ID"))) for d in (seeds_all, sites_all, sp_all))
+        no_rows = {k: d.iloc[0:0] for k, d in (("seeds", seeds_all), ("sites", sites_all), ("sp", sp_all))}
+        print(f"  Multi-source: seeds for {len(seeds_by)} of {len(stage2_plants)} Stage 2 plants")
+
     rows = []
     for state in stage2_plants["STATE_CODE"].dropna().unique():
         nlcd_path = C.NLCD_OUTPUT_DIR / f"nlcd_{state}_k{C.K_RINGS}.parquet"
@@ -1010,7 +1027,10 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
             if len(coords) == 0:
                 continue
 
-            plant_h3_cells = set(h3.grid_disk(plant["h3_res9"], C.K_RINGS))
+            if SS is not None:
+                plant_h3_cells = SS.window_cells(seeds_by.get(cwns_id, no_rows["seeds"]), plant["h3_res9"], C.K_RINGS)
+            else:
+                plant_h3_cells = set(h3.grid_disk(plant["h3_res9"], C.K_RINGS))
             candidates = state_candidates[state_candidates["h3_index_9"].isin(plant_h3_cells)].copy()
             if len(candidates) == 0:
                 continue
@@ -1035,6 +1055,9 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
             candidates["distance_ring"] = np.floor(distances / 330).astype(int)
             candidates["within_1km"] = distances <= 1000
             candidates["within_5km"] = distances <= 5000
+            if SS is not None:
+                candidates = SS.add_seed_features(candidates, seeds_by.get(cwns_id, no_rows["seeds"]),
+                                                  sp_by.get(cwns_id, no_rows["sp"]), sites_by.get(cwns_id, no_rows["sites"]))
             rows.append(candidates)
 
     if rows:
@@ -1052,6 +1075,8 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
         # crashed add_name_matching() below on AK's real zero-correction case.
         explicit_cols = ["CWNS_ID", "label", "is_reported", "distance_m",
                           "log_distance", "distance_ring", "within_1km", "within_5km"]
+        if SS is not None:
+            explicit_cols = explicit_cols + SS.SEED_FEATURE_COLS
         pf_cols = [c for c in parcel_features.columns if c not in ("state", "h3_index_9")]
         cols = pf_cols + [c for c in explicit_cols if c not in pf_cols]
         stage2 = pd.DataFrame(columns=cols)

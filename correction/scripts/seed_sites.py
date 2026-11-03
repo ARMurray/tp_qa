@@ -244,7 +244,7 @@ def _plant_sites(cid, g, have, comp, parcels):
             rep = sorted(cnt[cnt == cnt.max()].index)[0]
         site = {
             "CWNS_ID": cid, "STATE_CODE": m["STATE_CODE"].iloc[0] if "STATE_CODE" in m else None,
-            "rep_ll_uuid": rep, "ll_uuids": uuids, "n_parcels": len(uuids),
+            "rep_ll_uuid": rep, "ll_uuids": uuids, "site_n_parcels": len(uuids),
             "seed_ids": list(m["seed_id"]), "sources": "+".join(sorted(set(m["source"]))),
             "n_seeds": len(m), "n_independent_seeds": len(ind),
             "n_origins": ind["origin"].nunique(), "n_origins_all": m["origin"].nunique(),
@@ -297,3 +297,102 @@ def load_sites(states=None, cwns_ids=None) -> tuple[pd.DataFrame, pd.DataFrame]:
         keep = set(cwns_ids)
         sites, sp = sites[sites["CWNS_ID"].isin(keep)], sp[sp["CWNS_ID"].isin(keep)]
     return sites.reset_index(drop=True), sp.reset_index(drop=True)
+
+
+# ===========================================================================
+# Stage 2: the candidate window and per-candidate seed features
+# ===========================================================================
+SEED_FEATURE_COLS = (
+    [f"d_seed_{s}" for s in SOURCES]
+    + ["d_seed_nearest", "d_seed_nearest_indep", "n_origins_500m", "n_origins_1km", "n_origins_2km", "n_seeds_1km",
+       "on_seed_parcel", "seed_parcel_n_origins", "on_parcel_cwns_point", "on_parcel_cwns_addr", "on_parcel_icis",
+       "in_seed_site", "seed_site_n_origins", "seed_site_is_best"])
+
+_BOOL_FEATURES = {"on_seed_parcel", "on_parcel_cwns_point", "on_parcel_cwns_addr", "on_parcel_icis", "in_seed_site",
+                  "seed_site_is_best"}
+_COUNT_FEATURES = {"n_origins_500m", "n_origins_1km", "n_origins_2km", "n_seeds_1km", "seed_parcel_n_origins",
+                   "seed_site_n_origins"}
+
+_disk_cache: dict = {}
+
+
+def _disk(cell: str, k: int) -> frozenset:
+    key = (cell, k)
+    if key not in _disk_cache:
+        _disk_cache[key] = frozenset(h3.grid_disk(cell, k))
+    return _disk_cache[key]
+
+
+def window_cells(seeds: pd.DataFrame, plant_cell: str, k: int) -> set:
+    """H3 res-9 cells of a plant's candidate window: the k-ring disk around the plant's own location and
+    around every seed. Seeds are one per source point, so most plants add a few overlapping disks."""
+    cells = {plant_cell}
+    for lat, lon in zip(seeds["lat"], seeds["lon"]):
+        cells.add(h3.latlng_to_cell(float(lat), float(lon), 9))
+    out = set()
+    for c in cells:
+        out |= _disk(c, k)
+    return out
+
+
+def add_seed_features(cand: pd.DataFrame, seeds: pd.DataFrame, sp: pd.DataFrame, sites: pd.DataFrame) -> pd.DataFrame:
+    """Per-candidate evidence from ONE plant's seeds (docs/PLAN_20261103_multi_source_seeds.md). cand needs
+    centroid_lat, centroid_lng, ll_uuid. seeds/sp/sites are that plant's rows of plant_seeds, 01f's seed_parcels
+    and seed_sites (any may be empty). Every column in SEED_FEATURE_COLS is added, so training and inference
+    frames have one schema.
+
+    Distances are from the candidate's H3 cell centre (the same convention as distance_m) to each source's
+    nearest seed. 'Independent' counts a seed once however many sources copy its coordinate, so n_origins_*
+    cannot be inflated by ICIS points that are the CWNS point."""
+    cand = cand.copy()
+    n = len(cand)
+    for c in SEED_FEATURE_COLS:
+        cand[c] = False if c in _BOOL_FEATURES else (0 if c in _COUNT_FEATURES else np.nan)
+    if n == 0:
+        return cand
+
+    if len(seeds):
+        D = hav_m(cand["centroid_lat"].to_numpy()[:, None], cand["centroid_lng"].to_numpy()[:, None],
+                  seeds["lat"].to_numpy()[None, :], seeds["lon"].to_numpy()[None, :])
+        src = seeds["source"].to_numpy()
+        ind = seeds["independent"].to_numpy().astype(bool)
+        org = seeds["origin"].to_numpy()
+        for s in SOURCES:
+            m = src == s
+            cand[f"d_seed_{s}"] = D[:, m].min(axis=1) if m.any() else np.nan
+        cand["d_seed_nearest"] = D.min(axis=1)
+        cand["d_seed_nearest_indep"] = D[:, ind].min(axis=1) if ind.any() else np.nan
+        for r, name in ((500, "n_origins_500m"), (1000, "n_origins_1km"), (2000, "n_origins_2km")):
+            cand[name] = sum((D[:, ind & (org == o)] <= r).any(axis=1).astype(int) for o in ORIGINS if (ind & (org == o)).any()) \
+                if ind.any() else 0
+        cand["n_seeds_1km"] = (D[:, ind] <= 1000).sum(axis=1) if ind.any() else 0
+
+    if len(sp) and len(seeds):
+        j = sp[sp["ll_uuid"].map(lambda u: isinstance(u, str))].merge(
+            seeds[["seed_id", "source", "origin", "independent"]], on="seed_id", how="inner", suffixes=("", "_s"))
+        if len(j):
+            g = j.groupby("ll_uuid")
+            per = pd.DataFrame({
+                "seed_parcel_n_origins": g.apply(lambda d: d.loc[d["independent"], "origin"].nunique(), include_groups=False),
+                "on_parcel_cwns_point": g["source"].apply(lambda s: bool((s == "cwns_point").any())),
+                "on_parcel_cwns_addr": g["source"].apply(lambda s: bool((s == "cwns_addr").any())),
+                "on_parcel_icis": g["source"].apply(lambda s: bool(s.str.startswith("icis").any())),
+            })
+            idx = cand["ll_uuid"].map(lambda u: u in per.index).to_numpy()
+            cand["on_seed_parcel"] = idx
+            for c in per.columns:
+                cand.loc[idx, c] = cand.loc[idx, "ll_uuid"].map(per[c]).to_numpy()
+
+    if len(sites):
+        e = sites[["ll_uuids", "n_origins", "is_best_site"]].explode("ll_uuids").dropna(subset=["ll_uuids"])
+        e = e.sort_values(["n_origins", "is_best_site"], ascending=False).drop_duplicates("ll_uuids").set_index("ll_uuids")
+        idx = cand["ll_uuid"].isin(e.index).to_numpy()
+        cand["in_seed_site"] = idx
+        cand.loc[idx, "seed_site_n_origins"] = cand.loc[idx, "ll_uuid"].map(e["n_origins"]).to_numpy()
+        cand.loc[idx, "seed_site_is_best"] = cand.loc[idx, "ll_uuid"].map(e["is_best_site"]).astype(bool).to_numpy()
+
+    for c in _BOOL_FEATURES:
+        cand[c] = cand[c].fillna(False).astype(bool)
+    for c in _COUNT_FEATURES:
+        cand[c] = cand[c].fillna(0).astype(int)
+    return cand

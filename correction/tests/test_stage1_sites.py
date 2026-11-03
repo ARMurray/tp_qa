@@ -10,6 +10,7 @@ import tempfile
 from pathlib import Path
 
 import geopandas as gpd
+import h3
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point
@@ -67,16 +68,18 @@ def main():
         classes = gpd.GeoDataFrame({"CWNS_ID": ["A", "B", "C"], "class": ["Correct", "Incorrect", "Incorrect"]},
                                    geometry=[Point(orig[k][1], orig[k][0]) for k in "ABC"], crs=4326)
         classes.to_file(gpkg, layer="classes", driver="GPKG")
-        corr = gpd.GeoDataFrame({"CWNS_ID": ["B"], "Corrected_X": [P1[1]], "Corrected_Y": [P1[0]]},
+        corr = gpd.GeoDataFrame({"CWNS_ID": ["B"], "Corrected_X": [P1[1]], "Corrected_Y": [P1[0]],
+                                 "Original_X": [P3[1]], "Original_Y": [P3[0]]},
                                 geometry=[Point(P3[1], P3[0])], crs=4326)
         corr.to_file(gpkg, layer="corrections", driver="GPKG")
         C.TRAINING_GPKG = gpkg
 
         plant_features = pd.DataFrame({
             "CWNS_ID": ["A", "B", "C"], "STATE_CODE": "ZZ", "LATITUDE": 40.0, "LONGITUDE": -100.0,
+            "h3_res9": [h3.latlng_to_cell(*orig[k], 9) for k in "ABC"],
             "subdivision": "xville", "place": "xville", "county": "zz", "is_rural": False, "pop_served": 5000})
         parcel_features = pd.DataFrame({
-            "ll_uuid": ["P1", "P2", "P3", "P4"], "state": "ZZ", "geoid": "00001",
+            "ll_uuid": ["P1", "P2", "P3", "P4"], "state": "ZZ", "geoid": "00001", "n_parcels": 100,
             "owner": ["CITY OF XVILLE", "City of Xville.", "ACME LLC", "SOMEONE ELSE"], "log_gisacre": 1.0})
 
         # label logic on its own
@@ -92,6 +95,7 @@ def main():
         assert not {"STATE_CODE", "site_lat", "ll_uuids", "owner"} & set(s.columns)
         assert {"site_name_pool_rank", "n_origins", "has_cwns", "name_match_score", "d_to_cwns_point_m"} <= set(s.columns)
         assert s.site_id.is_unique
+        assert not [c for c in s.columns if c.endswith(("_x", "_y"))], "a site column collides with a parcel/plant column"
 
         # missing seed-site OD is an error unless asked for
         try:
@@ -110,6 +114,26 @@ def main():
         s2 = fe.build_stage1_site_training(con, plant_features, parcel_features, ["ZZ"])
         assert len(s2) == len(s) and s2["od_ran"].all()
         assert s2.set_index(["CWNS_ID", "has_cwns_point"]).at[("A", True), "od_n_objects"] == 3
+
+        # ---- Stage 2 training in multi mode: window from seeds, seed features per candidate ----
+        C.NLCD_OUTPUT_DIR = tmp / "nlcd"
+        C.NLCD_OUTPUT_DIR.mkdir()
+        store = pd.read_parquet(tmp / "parcels" / "state=ZZ" / "all.parquet")
+        store[["ll_uuid", "h3_index_9"]].to_parquet(C.NLCD_OUTPUT_DIR / f"nlcd_ZZ_k{C.K_RINGS}.parquet", index=False)
+        C.SEEDS_CSV = tmp / "plant_seeds.csv"
+        seeds.rename(columns={"CWNS_ID": "cwns_id"}).assign(copy_of="").to_csv(C.SEEDS_CSV, index=False)
+        # B's seeds include one 40 km away: it must widen the window without breaking the table
+        s2 = fe.build_stage2_training(con, plant_features, parcel_features, ["ZZ"])
+        assert set(s2.CWNS_ID) == {"B"}, set(s2.CWNS_ID)                                   # only the corrected plant
+        s2 = s2.set_index("ll_uuid")
+        assert s2.at["P1", "label"] == 1 and s2["label"].sum() == 1
+        assert s2.at["P1", "on_parcel_icis"] and s2.at["P3", "on_parcel_cwns_point"] and not s2.at["P1", "on_parcel_cwns_point"]
+        assert s2.at["P1", "d_seed_icis_fac_frs"] < 400 and s2.at["P3", "d_seed_cwns_point"] < 400
+        assert s2.at["P3", "distance_m"] < 400 and s2.at["P1", "distance_m"] > 2000          # distance_m is still from the CWNS point
+        assert set(fe.__dict__["SS"].SEED_FEATURE_COLS if "SS" in fe.__dict__ else []) <= set(s2.columns) or True
+        import seed_sites as _SS
+        assert set(_SS.SEED_FEATURE_COLS) <= set(s2.columns)
+        assert "name_pool_rank" in s2.columns
         print("stage 1 site table tests passed")
 
 
