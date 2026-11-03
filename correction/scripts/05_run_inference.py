@@ -160,6 +160,14 @@ def load_model(name: str) -> dict:
             f"04_train_stage2.py) before running inference.")
     bundle = joblib.load(path)
     threshold = joblib.load(C.MODELS_DIR / f"{name}_optimal_threshold.joblib")
+    if name == "stage1" and C.MULTI:
+        # multi-source: Stage 1 accepts a plant when its best seed site clears the PLANT-LEVEL threshold
+        # 03 calibrated (never looser than the per-row Youden J); fall back to Youden if it is absent.
+        accept = C.MODELS_DIR / "stage1_accept_threshold.joblib"
+        if accept.exists():
+            threshold = joblib.load(accept)
+        else:
+            print("  WARNING: stage1_accept_threshold.joblib not found -- using the Youden threshold")
     print(f"  Loaded {path.name}: {len(bundle['feature_columns'])} feature columns, "
           f"threshold={threshold:.3f}")
     return bundle, threshold
@@ -319,9 +327,141 @@ def run_stage1(con, plants: pd.DataFrame, plant_features: pd.DataFrame,
     return out
 
 
+def run_stage1_sites(plants: pd.DataFrame, plant_features: pd.DataFrame, parcel_features: pd.DataFrame,
+                     bundle: dict, threshold: float, states: list[str]) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Multi-source Stage 1 (docs/PLAN_20261103_multi_source_seeds.md): score every SEED SITE of every plant,
+    then decide per plant.
+
+      * a plant is ACCEPTED when its best site clears `threshold` (the plant-level accept threshold from 03),
+        or when a site's parcel carries an OSM wastewater tag (passed by rule, as before);
+      * near-ties (within config.SITE_TIE_MARGIN of the top score) go to the site with more independent
+        origins, then to the one holding the CWNS point;
+      * the runner-up is kept as alt_site_*, and multi_pass is set when two sites both clear the threshold,
+        are more than MULTI_PASS_DIST_M apart and score within MULTI_PASS_MARGIN of each other (the plant
+        may be two facilities, or one source is badly wrong): the best site is still the answer, but the
+        plant is marked for a closer look;
+      * a plant that no site accepts goes to Stage 2 (trigger_reason low_confidence), or no_parcel when none
+        of its seeds fell on a parcel.
+
+    Returns (plant_summary_rows, site_scores). The plant rows keep run_stage1's columns -- reported_ll_uuid is
+    the BEST site's representative parcel, the location under test -- so 10, 12 and 13 read them unchanged;
+    the provenance columns (best_site_*, accepted_*, alt_site_*, multi_pass) are added."""
+    import seed_sites as SS
+    print("\n=== Stage 1: seed-site scoring (multi-source) ===")
+    sites, _ = SS.load_sites(states=states, cwns_ids=plants["CWNS_ID"])
+    print(f"  Plants: {len(plants)}  |  seed sites: {len(sites)} for {sites['CWNS_ID'].nunique()} plants")
+
+    s = sites.copy()
+    s["ll_uuid"] = s["rep_ll_uuid"]
+    s = s.merge(plant_features.drop(columns=["STATE_CODE", "LATITUDE", "LONGITUDE"], errors="ignore"),
+                on="CWNS_ID", how="left")
+    s = s.merge(parcel_features.drop(columns=["state"], errors="ignore"), on="ll_uuid", how="left")
+    # the same features 02's build_stage1_site_training builds, in the same order
+    s = NM.add_name_features(s)
+    s = NM.add_pool_features(s, "site_name_pool")
+    s = add_name_matching(s)
+    od = feat_eng.load_site_od(states)
+    if len(od):
+        n_before = len(s)
+        s = s.merge(od, on=["CWNS_ID", "ll_uuid"], how="left")
+        s["od_ran"] = s["od_ran"].fillna(False)
+        s["od_has_detection"] = s["od_has_detection"].fillna(False)
+        for c in [c for c in s.columns if c.startswith("od_has_")]:
+            s[c] = s[c].fillna(False)
+        for c in [c for c in s.columns if c.startswith("od_n_")]:
+            s[c] = s[c].fillna(0)
+        assert len(s) == n_before, "OD join changed the row count -- duplicate (CWNS_ID, ll_uuid) in seed-site OD"
+        print(f"  Seed-site OD joined: od_ran True for {int(s['od_ran'].sum())} / {len(s)} sites")
+    else:
+        print("  WARNING: no seed-site OD (01e --seed-sites) -- Stage 1 od_* columns will be all-default")
+    s = s.merge(plants[["CWNS_ID", "LATITUDE", "LONGITUDE"]], on="CWNS_ID", how="left")
+    s = add_projected_coords(s)
+    s["stage1_prob_correct"] = score(bundle, s)
+    if "osm_ww" in s.columns:
+        s["osm_site"] = (s["osm_ww"].fillna(False).astype(str).str.lower().isin(["true", "1", "1.0"])
+                         & C.STAGE1_OSM_PASS)
+    else:
+        s["osm_site"] = False
+
+    rows = []
+    for cid, g in s.groupby("CWNS_ID", sort=False):
+        top = g["stage1_prob_correct"].max()
+        osm = g[g["osm_site"]]
+        pool = osm if len(osm) else g
+        near = pool[pool["stage1_prob_correct"] >= pool["stage1_prob_correct"].max() - C.SITE_TIE_MARGIN]
+        near = near.sort_values(["n_origins", "has_cwns_point", "stage1_prob_correct", "site_rank"],
+                                ascending=[False, False, False, True])
+        best = near.iloc[0]
+        rest = g[g["site_id"] != best["site_id"]].sort_values(["stage1_prob_correct", "n_origins"], ascending=False)
+        alt = rest.iloc[0] if len(rest) else None
+        accepted = bool(len(osm)) or bool(best["stage1_prob_correct"] >= threshold)
+        d_alt = float(SS.hav_m(best["site_lat"], best["site_lon"], alt["site_lat"], alt["site_lon"])) \
+            if alt is not None else np.nan
+        multi = bool(accepted and alt is not None and alt["stage1_prob_correct"] >= threshold
+                     and d_alt > C.MULTI_PASS_DIST_M
+                     and abs(best["stage1_prob_correct"] - alt["stage1_prob_correct"]) <= C.MULTI_PASS_MARGIN)
+        rows.append({
+            "CWNS_ID": cid, "reported_ll_uuid": best["rep_ll_uuid"], "stage1_prob_correct": float(best["stage1_prob_correct"]),
+            "stage1_route": "osm_confirmed" if len(osm) else "model",
+            "best_site_id": best["site_id"], "best_site_sources": best["sources"],
+            "best_site_n_origins": int(best["n_origins"]), "best_site_n_seeds": int(best["n_seeds"]),
+            "accepted_site_id": best["site_id"] if accepted else None,
+            "accepted_sources": best["sources"] if accepted else None,
+            "alt_site_id": alt["site_id"] if alt is not None else None,
+            "alt_site_sources": alt["sources"] if alt is not None else None,
+            "alt_site_prob": float(alt["stage1_prob_correct"]) if alt is not None else np.nan,
+            "alt_site_dist_m": d_alt, "multi_pass": multi, "n_sites": int(len(g)), "stage1_accepted": accepted,
+        })
+    verdict = pd.DataFrame(rows)
+
+    out = plants.merge(verdict, on="CWNS_ID", how="left")
+    no_site = out["best_site_id"].isna().to_numpy()
+    out["stage1_route"] = out["stage1_route"].where(~no_site, "no_parcel")
+    out["stage1_accepted"] = out["stage1_accepted"].fillna(False).astype(bool)
+    out["multi_pass"] = out["multi_pass"].fillna(False).astype(bool)
+    out["n_sites"] = out["n_sites"].fillna(0).astype(int)
+    out["trigger_reason"] = np.select([no_site, out["stage1_accepted"].to_numpy()],
+                                      ["no_parcel", "none"], default="low_confidence")
+    print(f"  Accepted by Stage 1: {int(out['stage1_accepted'].sum())} "
+          f"(OSM rule {int((out['stage1_route'] == 'osm_confirmed').sum())})  |  "
+          f"multi_pass flagged: {int(out['multi_pass'].sum())}")
+    print(f"  Flagged for Stage 2: {int((out['trigger_reason'] != 'none').sum())} "
+          f"({int(no_site.sum())} no_parcel + {int((out['trigger_reason'] == 'low_confidence').sum())} low_confidence)")
+    keep = ["CWNS_ID", "site_id", "rep_ll_uuid", "sources", "n_origins", "n_seeds", "site_rank", "stage1_prob_correct",
+            "osm_site", "site_lat", "site_lon"]
+    return out, s[keep]
+
+
 # ===========================================================================
 # Stage 2a
 # ===========================================================================
+def build_candidates_for_plant_multi(plant_row, state_candidates: pd.DataFrame, seeds: pd.DataFrame,
+                                     sp: pd.DataFrame, sites: pd.DataFrame) -> pd.DataFrame | None:
+    """Multi-source counterpart of build_candidates_for_plant: the window is the union of disks around the
+    plant and every seed, NO parcel is excluded (a seed parcel that failed Stage 1 is unconfirmed, not ruled
+    out), and each candidate carries seed_sites.add_seed_features. Same arithmetic as 02's Stage 2 training."""
+    import seed_sites as SS
+    cells = SS.window_cells(seeds, plant_row["h3_res9"], C.K_RINGS)
+    candidates = state_candidates[state_candidates["h3_index_9"].isin(cells)].copy()
+    if len(candidates) == 0:
+        return None
+    centers = candidates["h3_index_9"].apply(h3.cell_to_latlng)
+    candidates["centroid_lat"] = centers.apply(lambda c: c[0])
+    candidates["centroid_lng"] = centers.apply(lambda c: c[1])
+    cand_sf = gpd.GeoDataFrame(
+        candidates, geometry=gpd.points_from_xy(candidates["centroid_lng"], candidates["centroid_lat"]),
+        crs=4326).to_crs(5070)
+    reported_pt = gpd.GeoSeries(
+        gpd.points_from_xy([plant_row["LONGITUDE"]], [plant_row["LATITUDE"]]), crs=4326).to_crs(5070).iloc[0]
+    distances = cand_sf.geometry.distance(reported_pt).to_numpy()
+    candidates["CWNS_ID"] = plant_row["CWNS_ID"]
+    candidates["distance_m"] = distances
+    candidates["log_distance"] = np.log1p(distances)
+    candidates["within_1km"] = distances <= 1000
+    candidates["within_5km"] = distances <= 5000
+    return SS.add_seed_features(candidates, seeds, sp, sites)
+
+
 def build_candidates_for_plant(plant_row, state_candidates: pd.DataFrame) -> pd.DataFrame | None:
     """Mirrors 02_feature_engineering.py's build_stage2_training inner loop
     body (candidate selection within K_RINGS, distance features from the
@@ -366,6 +506,20 @@ def build_candidates_for_plant(plant_row, state_candidates: pd.DataFrame) -> pd.
 def run_stage2a(flagged: pd.DataFrame, plant_features: pd.DataFrame,
                 parcel_features: pd.DataFrame, bundle: dict, top_k: int) -> pd.DataFrame:
     print("\n=== Stage 2a: candidate scoring ===")
+    ctx = None
+    if C.MULTI:
+        import seed_sites as SS
+        seeds_all = SS.load_seeds(flagged["CWNS_ID"])
+        try:
+            sites_all, sp_all = SS.load_sites(states=sorted(flagged["STATE_CODE"].dropna().unique()),
+                                              cwns_ids=flagged["CWNS_ID"])
+        except FileNotFoundError:
+            print("  WARNING: no seed sites (01f) -- seed features will lack parcel and site support")
+            sites_all, sp_all = pd.DataFrame(columns=["CWNS_ID"]), pd.DataFrame(columns=["CWNS_ID"])
+        by = [dict(tuple(d.groupby("CWNS_ID"))) for d in (seeds_all, sp_all, sites_all)]
+        empty = [d.iloc[0:0] for d in (seeds_all, sp_all, sites_all)]
+        ctx = (by, empty)
+        print(f"  Multi-source: seeds for {len(by[0])} of {len(flagged)} flagged plants")
     rows = []
     for state in flagged["STATE_CODE"].dropna().unique():
         nlcd_path = C.NLCD_OUTPUT_DIR / f"nlcd_{state}_k{C.K_RINGS}.parquet"
@@ -380,7 +534,13 @@ def run_stage2a(flagged: pd.DataFrame, plant_features: pd.DataFrame,
         state_plants = flagged[flagged["STATE_CODE"] == state]
         t0 = time.time()
         for i, (_, plant_row) in enumerate(state_plants.iterrows(), 1):
-            cands = build_candidates_for_plant(plant_row, state_candidates)
+            if ctx is not None:
+                (b_seeds, b_sp, b_sites), (e_seeds, e_sp, e_sites) = ctx
+                cid = plant_row["CWNS_ID"]
+                cands = build_candidates_for_plant_multi(
+                    plant_row, state_candidates, b_seeds.get(cid, e_seeds), b_sp.get(cid, e_sp), b_sites.get(cid, e_sites))
+            else:
+                cands = build_candidates_for_plant(plant_row, state_candidates)
             if cands is not None:
                 rows.append(cands)
             if i % 100 == 0:
@@ -474,7 +634,7 @@ def main():
     states = [s.strip() for s in args.states.split(",")]
 
     C.ensure_dirs()
-    inference_dir = Path(args.out_dir) if args.out_dir else C.DATA_DIR / "inference"
+    inference_dir = Path(args.out_dir) if args.out_dir else C.INFERENCE_DIR
     inference_dir.mkdir(parents=True, exist_ok=True)
 
     print("=== 05_run_inference.py ===")
@@ -509,9 +669,16 @@ def main():
     print(f"  Plant features: {len(plant_features)} rows  |  "
           f"Parcel features: {len(parcel_features)} rows")
 
-    print("\nLoading OD features (01b reported-location output)...")
-    od_features = load_od_features(C.OD_OUTPUT_DIR)
-    if od_features is None:
+    if C.MULTI:
+        # Stage 1 reads seed-site detections (01e --seed-sites) itself, keyed by parcel, not 01b's per-plant rows.
+        od_features = None
+        print("\nMulti-source: seed-site OD is loaded inside Stage 1 (01e --seed-sites output)")
+    else:
+        print("\nLoading OD features (01b reported-location output)...")
+        od_features = load_od_features(C.OD_OUTPUT_DIR)
+    if C.MULTI:
+        pass
+    elif od_features is None:
         print("  WARNING: no 01b output found -- proceeding without OD features")
     else:
         print(f"  {len(od_features)} plants with OD output")
@@ -521,8 +688,13 @@ def main():
     # See config.duckdb_connect (added after 08 died at 32G, 2026-09-24).
     con = C.duckdb_connect()
 
-    stage1_out = run_stage1(con, plants, plant_features, parcel_features,
-                            od_features, stage1_bundle, stage1_threshold)
+    if C.MULTI:
+        stage1_out, site_scores = run_stage1_sites(plants, plant_features, parcel_features,
+                                                   stage1_bundle, stage1_threshold, states)
+        site_scores.to_parquet(inference_dir / "stage1_sites.parquet", index=False)
+    else:
+        stage1_out = run_stage1(con, plants, plant_features, parcel_features,
+                                od_features, stage1_bundle, stage1_threshold)
     con.close()
 
     flagged = stage1_out[stage1_out["trigger_reason"] != "none"].copy()

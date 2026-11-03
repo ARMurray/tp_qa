@@ -455,6 +455,14 @@ STAGE1_OSM_PASS = True
 # per-row Youden J, so an accept is never looser than the old rule. Everything not accepted goes to Stage 2.
 STAGE1_ACCEPT_PRECISION = 0.95
 
+# Choosing among a plant's seed sites in 05 (run_stage1_sites): sites scoring within SITE_TIE_MARGIN of the best
+# are a near-tie, broken by independent origins then by holding the CWNS point. Two sites that both clear the
+# accept threshold, more than MULTI_PASS_DIST_M apart and within MULTI_PASS_MARGIN of each other mark the plant
+# multi_pass (possibly two facilities, or one badly wrong source); the best site is still the answer.
+SITE_TIE_MARGIN = 0.02
+MULTI_PASS_DIST_M = 1000.0
+MULTI_PASS_MARGIN = 0.05
+
 
 def population_ok_ids(min_pop: int | None = None) -> set[str]:
     """CWNS_IDs serving MORE than min_pop residents. Plants with no
