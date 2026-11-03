@@ -3,11 +3,11 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-03 14:49:53
+generated   : 2026-11-03 14:58:15
 seed mode   : multi   suffix '_multi'
-git commit  : 36defaf  (Tue Nov 3 14:28:19 2026 -0500 Every plant gets a cwns_point seed: plant_seeds.csv lacks ~340 master treatment plants (found in the OH check))
+git commit  : 9e50bf7  (Tue Nov 3 14:51:31 2026 -0500 Status: site spacing diagnostics; runbook 01e volume from the OH measurement)
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 0.9 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+training gpkg: 1.0 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 holdout manifest: 70.3 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
 detector best.pt: 35.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
@@ -15,7 +15,7 @@ detector best.pt: 35.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_dete
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 1 state file(s)
-total parcels 4,686,473; newest file 0.4 h ago
+total parcels 4,686,473; newest file 0.6 h ago
 vs single-seed run (4,417,789): ratio median 1.06, min 1.06, max 1.06  (the recall check expected ~1.0-1.3)
 largest growth: OH 1.06
 states: OH
@@ -31,6 +31,9 @@ seed -> parcel match: inside: 2,649, snapped: 486, none: 2
 plants with no site: 0
 sites per plant: {1: 168, 2: 327, 3: 274, 4: 75}
 independent origins per site: {1: 1535, 2: 404, 3: 5}  (counting copies: {1: 1279, 2: 660, 3: 5})
+distance to the plant's nearest OTHER site (1,776 sites in multi-site plants) -- close ones may be one facility split across owners:
+  0-50 m: 10%   50-100 m: 13%   100-250 m: 25%   250-500 m: 19%   500-1000 m: 12%   1000+ m: 19%
+sites WITHOUT the CWNS point (1,100): distance to the CWNS point median 429 m; <250 m 36%, <500 m 54%, <1000 m 70%, <5000 m 90%
 sites holding the CWNS point: 844; oversized parcel: 14; merged parcels (site_n_parcels>1): 93
 
 ==============================================================================
@@ -68,9 +71,9 @@ sites holding the CWNS point: 844; oversized parcel: 14; merged parcels (site_n_
 JOB LOGS
 ==============================================================================
 213 log(s); newest first (name, age, exit status):
-  01f_34.log                           0.0 h ago   exit 0
-  01a_34.log                           0.4 h ago   exit 0
-  00_bins.log                          0.9 h ago   exit 0
+  01f_34.log                           0.1 h ago   exit 0
+  01a_34.log                           0.6 h ago   exit 0
+  00_bins.log                          1.0 h ago   exit 0
   13_output.log                       20.9 d ago   exit 0
   10_review_queue.log                 21.2 d ago   exit 0
   12_holdout.log                      21.3 d ago   exit 0
