@@ -83,7 +83,7 @@ def main():
     states_filter = [s.strip() for s in args.states.split(",")] if args.states else None
     print("=== 01f_build_seed_sites.py ===")
     plants = extract_parcels.load_treatment_plants(states_filter, training_only=not args.full_universe)
-    seeds_all = SS.load_seeds(plants["CWNS_ID"])
+    seeds_all = SS.load_seeds(plants=plants)
     print(f"Plants: {len(plants)}; seeds loaded: {len(seeds_all)}")
 
     con = C.duckdb_connect()

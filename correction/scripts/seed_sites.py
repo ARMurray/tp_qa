@@ -50,8 +50,13 @@ PROJ_CRS = 5070
 # ===========================================================================
 # Loading
 # ===========================================================================
-def load_seeds(cwns_ids=None, path: Path | None = None) -> pd.DataFrame:
-    """plant_seeds.csv, optionally restricted to some plants. Column contract: build_plant_seeds.py."""
+def load_seeds(cwns_ids=None, path: Path | None = None, plants: pd.DataFrame | None = None) -> pd.DataFrame:
+    """plant_seeds.csv, optionally restricted to some plants. Column contract: build_plant_seeds.py.
+
+    plants (CWNS_ID, LATITUDE, LONGITUDE): every plant in it is guaranteed a cwns_point seed. plant_seeds.csv is
+    built from the V2 database, which lacks about 340 of the master's 17,874 treatment plants (the 2026-11-03
+    check: 18 in OH, 11 of them verified); without a seed such a plant would have no site and no Stage 1
+    verdict. The missing seed is the plant's own coordinates, marked detail='plant_coordinates'."""
     path = path or C.SEEDS_CSV
     if not path.exists():
         raise FileNotFoundError(
@@ -60,8 +65,28 @@ def load_seeds(cwns_ids=None, path: Path | None = None) -> pd.DataFrame:
     s = pd.read_csv(path, dtype={"cwns_id": str, "permit_number": str}, low_memory=False)
     s = s.rename(columns={"cwns_id": "CWNS_ID"})
     s["copy_of"] = s["copy_of"].fillna("")
+    if plants is not None:
+        cwns_ids = plants["CWNS_ID"] if cwns_ids is None else cwns_ids
     if cwns_ids is not None:
         s = s[s["CWNS_ID"].isin(set(cwns_ids))]
+    if plants is not None:
+        pl = plants[["CWNS_ID", "LATITUDE", "LONGITUDE"]].drop_duplicates("CWNS_ID")
+        pl = pl[pl["CWNS_ID"].isin(set(cwns_ids)) & ~pl["CWNS_ID"].isin(set(s.loc[s["source"] == "cwns_point", "CWNS_ID"]))]
+        pl = pl.assign(LATITUDE=pd.to_numeric(pl["LATITUDE"], errors="coerce"),
+                       LONGITUDE=pd.to_numeric(pl["LONGITUDE"], errors="coerce")).dropna()
+        if len(pl):
+            add = pd.DataFrame({
+                "seed_id": pl["CWNS_ID"] + "_cwns_point_1", "CWNS_ID": pl["CWNS_ID"], "source": "cwns_point",
+                "source_group": "cwns_coords", "origin": "cwns", "lat": pl["LATITUDE"], "lon": pl["LONGITUDE"],
+                "permit_number": None, "detail": "plant_coordinates", "quality": np.nan, "is_primary": True,
+                "copy_of": "", "independent": True, "location_group": 1, "group_n_seeds": 1, "group_n_origins": 1,
+                "group_n_origins_all": 1, "is_best_group": True})
+            # an existing seed on the same spot is a copy of the CWNS point, as build_plant_seeds.py would have said
+            near = s.merge(add[["CWNS_ID", "seed_id", "lat", "lon"]], on="CWNS_ID", suffixes=("", "_c"))
+            near = near[hav_m(near["lat"], near["lon"], near["lat_c"], near["lon_c"]) <= C.SEED_COPY_M]
+            s.loc[s["seed_id"].isin(near["seed_id"]), ["independent"]] = False
+            s.loc[s["seed_id"].isin(near["seed_id"]), "copy_of"] = s.loc[s["seed_id"].isin(near["seed_id"]), "CWNS_ID"] + "_cwns_point_1"
+            s = pd.concat([s, add.reindex(columns=s.columns)], ignore_index=True)
     return s.reset_index(drop=True)
 
 

@@ -509,7 +509,7 @@ def run_stage2a(flagged: pd.DataFrame, plant_features: pd.DataFrame,
     ctx = None
     if C.MULTI:
         import seed_sites as SS
-        seeds_all = SS.load_seeds(flagged["CWNS_ID"])
+        seeds_all = SS.load_seeds(plants=flagged)
         try:
             sites_all, sp_all = SS.load_sites(states=sorted(flagged["STATE_CODE"].dropna().unique()),
                                               cwns_ids=flagged["CWNS_ID"])

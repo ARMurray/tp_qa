@@ -57,4 +57,23 @@ pc = h3.latlng_to_cell(LAT, LON, 9)
 w = SS.window_cells(seeds, pc, 3)
 assert pc in w and len(w) > len(h3.grid_disk(pc, 3))                                            # the 5 km seed widens it
 assert h3.latlng_to_cell(*off(5000), 9) in w
+
+# plants missing from plant_seeds.csv still get a cwns_point seed (V2 lacks ~340 master treatment plants)
+import tempfile
+with tempfile.TemporaryDirectory() as t:
+    csv = Path(t) / "plant_seeds.csv"
+    pd.DataFrame({"seed_id": ["A_cwns_point_1", "B_icis_fac_frs_1"], "cwns_id": ["A", "B"], "source": ["cwns_point", "icis_fac_frs"],
+                  "source_group": ["cwns_coords", "icis_npdes"], "origin": ["cwns", "icis_facility"], "lat": [40.0, 41.0],
+                  "lon": [-100.0, -101.0], "permit_number": [None, None], "detail": ["", ""], "quality": [None, None],
+                  "is_primary": [True, True], "copy_of": [None, None], "independent": [True, True], "location_group": [1, 1],
+                  "group_n_seeds": [1, 1], "group_n_origins": [1, 1], "group_n_origins_all": [1, 1], "is_best_group": [True, True]})         .to_csv(csv, index=False)
+    C.SEEDS_CSV = csv
+    pl = pd.DataFrame({"CWNS_ID": ["A", "B", "C"], "LATITUDE": [40.0, 41.0, 42.0], "LONGITUDE": [-100.0, -101.0, -102.0]})
+    got = SS.load_seeds(plants=pl)
+    cw = got[got.source == "cwns_point"].set_index("CWNS_ID")
+    assert set(cw.index) == {"A", "B", "C"} and cw.at["B", "detail"] == "plant_coordinates" and cw.at["B", "lat"] == 41.0
+    assert cw.at["A", "detail"] != "plant_coordinates" and len(got[got.CWNS_ID == "A"]) == 1      # A's own seed is kept, not doubled
+    b = got[(got.CWNS_ID == "B") & (got.source == "icis_fac_frs")].iloc[0]
+    assert not b["independent"] and b["copy_of"] == "B_cwns_point_1"                                   # ICIS point on the same spot is a copy
+    assert set(SS.load_seeds(["A"], plants=None).CWNS_ID) == {"A"} and len(SS.load_seeds(plants=pl.iloc[:1])) == 1
 print("seed feature tests passed")

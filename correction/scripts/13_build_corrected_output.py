@@ -208,7 +208,7 @@ def add_provenance(df: pd.DataFrame) -> list[str]:
     Plus the Stage 1 columns carried from plant_summary (STAGE1_PROVENANCE). Verified plants get the same
     columns, measured from the reviewer's point, which shows which source agreed with the human."""
     import seed_sites as SS
-    seeds = SS.load_seeds(df["CWNS_ID"])
+    seeds = SS.load_seeds(plants=df.rename(columns={"reported_lat": "LATITUDE", "reported_lon": "LONGITUDE"}))
     d = seeds.merge(df[["CWNS_ID", "out_lat", "out_lon"]], on="CWNS_ID")
     d["dist"] = SS.hav_m(d["out_lat"].astype(float), d["out_lon"].astype(float), d["lat"], d["lon"])
 

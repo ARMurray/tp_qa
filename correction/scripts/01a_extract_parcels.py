@@ -131,7 +131,7 @@ def load_plant_seed_points(plants: pd.DataFrame) -> pd.DataFrame:
     A plant keeps its own STATE_CODE for every seed (parcels are partitioned by the plant's state), so a
     geocode that landed in another state simply finds no parcels there."""
     import seed_sites as SS
-    seeds = SS.load_seeds(plants["CWNS_ID"])
+    seeds = SS.load_seeds(plants=plants)
     seeds = seeds.merge(plants[["CWNS_ID", "STATE_CODE"]].drop_duplicates("CWNS_ID"), on="CWNS_ID", how="inner")
     out = seeds.rename(columns={"lat": "LATITUDE", "lon": "LONGITUDE"})[
         ["CWNS_ID", "STATE_CODE", "LATITUDE", "LONGITUDE"]]

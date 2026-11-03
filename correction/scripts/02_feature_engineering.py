@@ -1018,7 +1018,7 @@ def build_stage2_training(con, plant_features: pd.DataFrame, parcel_features: pd
     SS = None
     if C.MULTI:
         import seed_sites as SS
-        seeds_all = SS.load_seeds(stage2_plants["CWNS_ID"])
+        seeds_all = SS.load_seeds(plants=stage2_plants)
         try:
             sites_all, sp_all = SS.load_sites(states=sorted(stage2_plants["STATE_CODE"].dropna().unique()),
                                               cwns_ids=stage2_plants["CWNS_ID"])
