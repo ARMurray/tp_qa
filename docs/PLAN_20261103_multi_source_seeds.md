@@ -1,6 +1,6 @@
 # Plan — 2026-11-03: feed every plant location into the correction models
 
-**Draft for the owner's review. Branch: `multi-source-seeds`. Nothing here is built yet.**
+**Draft for the owner's review. Built on master (decided 2026-11-03). Nothing here is built yet.**
 Status checklist at the bottom.
 
 ## Why
@@ -87,17 +87,24 @@ source and the independent-origin count.
 | `10`, `13` | provenance columns, `alt_location`, multi-pass flag |
 | `12` | holdout scoring reports per-source recall |
 
-## Branch and run isolation
+## Working on master, safely
 
-- Work on `multi-source-seeds`. Master keeps the current single-seed pipeline as the
-  baseline and for any review round that is already running. Merge only after a holdout
-  comparison.
-- The branch name is deliberately not `claude/*`: the Stop hook in
-  `.claude/hooks/auto-push.sh` commits everything and pushes on those branches.
-- `config.ROOT` is a fixed HPC path, so a branch checked out there would write over
-  master's artifacts. Add a run tag or data-root override (for example a
-  `TPQA_DATA_ROOT` environment variable) before the first HPC run, and keep the frozen
-  holdout shared.
+Decided 2026-11-03: no long-lived branch. The HPC checkout and `config.ROOT` are shared
+by everything, so a second tree there would write over master's artifacts, and a diverging
+branch would collide with edits made for ongoing review rounds. Instead, every change
+lands on master as an addition that leaves current behavior untouched until we choose to
+switch.
+
+- **Seed mode is a setting, default off.** Add `SEED_MODE` to `config.py` (`cwns_only` by
+  default, `multi` for the new flow), also settable by environment variable. With the
+  default, every script behaves exactly as it does today.
+- **New outputs get new names.** Multi-seed tables, models and output files are written
+  under their own folders or suffixes (for example `*_multi`). Nothing existing is
+  overwritten. Retrained models are saved beside the current ones, not over them.
+- **Small, separately runnable steps.** Each change is committed on its own so a bad one
+  is a single revert, and the build order below keeps the pipeline runnable at each step.
+- **Flip only after a holdout comparison.** Switch the default to `multi` once
+  `12_score_holdout` shows it at least matches the current pipeline on the frozen holdout.
 - Retraining changes every score. Scores from before and after are not comparable except
   through the `12_score_holdout` series.
 
@@ -112,11 +119,10 @@ source and the independent-origin count.
 
 ## Status
 
-- [x] Branch created
-- [x] Plan written
+- [x] Plan written; decided to build on master, not a branch
 - [ ] `plant_seeds` table
 - [ ] Recall-ceiling check on the HPC (today 91.4% of corrections fall inside the CWNS-centered window)
-- [ ] Run-isolation override in `config.py`
+- [ ] `SEED_MODE` setting in `config.py`, default `cwns_only`
 - [ ] 01a / 01e multi-seed windows
 - [ ] Stage 1 retrain and plant-level calibration
 - [ ] Stage 2 pool and features
