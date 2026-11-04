@@ -135,6 +135,8 @@ Full-universe run started 2026-11-03, walking the steps one at a time. Results a
 | 01f, all 51 states | done 2026-11-03 | 55,945 seeds / 16,430 plants -> 34,482 sites. 613 seeds (1.1%) on no parcel, similar for every source. 81 plants (0.5%) have no site. Sites per plant: 1: 4,440, 2: 6,952, 3: 3,884, 4+: ~1,070. 18,203 sites lack the CWNS point (median 716 m from it; 58% within 1 km). Different-owner neighbours stay separate sites (6% of sites within 50 m of a sibling) |
 | 01e `--seed-sites`, first pass | 2026-11-03, job 7606633 | 43 of 48 states exit 0 within ~6 h (not 17). CO, ID, NM, UT, WY OOM-killed (exit 137) before finishing a batch, so nothing was written: 01e had no oversized-parcel cap (01b's 2 km2 / 150 tiles) and flushed once per state. 32,193 / 34,482 sites covered (93.4%); od_ran False on 9.2% of rows (rate limiting), which resume counted as done |
 | 01e fix | 2026-11-04 | cap as in 01b (one tile around the site's CWNS point, else an independent seed; `parcel_capped`, `parcel_cap_reason`), flush per 200-parcel batch, resume retries od_ran False rows. Resubmit the same array |
+| 01e rerun | 2026-11-04 | all 48 tasks exit 0; 34,077 / 34,482 sites (98.8%; AK/HI/PR have no NAIP); 181 parcels capped; 2,641 still od_ran False. IL diagnostic: every failure is a 500 m tile crossing its NAIP quad's edge (the old fallback re-resolved the same quad). |
+| 01e mosaic fix | 2026-11-04 | 01b `fetch_naip_mosaic`: a tile crossing a quad edge is filled from the neighbouring quads (same NAIP year first); fails only if under 50% covered. Resubmit the same array; resume retries only od_ran False rows |
 | 02 onward | not started | |
 
 Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a

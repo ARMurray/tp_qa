@@ -342,19 +342,23 @@ def find_naip_item(catalog, lon: float, lat: float):
 class TileOutsideItemCoverage(Exception):
     """Raised when a tile's computed window falls outside the resolved NAIP
     item's actual raster extent. Distinguishable from a genuine network/
-    rate-limit failure so callers can retry against a freshly-resolved item
-    for the tile's own location, instead of just backing off and retrying
+    rate-limit failure so callers can fill the tile from the neighbouring
+    quads (fetch_naip_mosaic), instead of just backing off and retrying
     against an item that was never going to cover it."""
     pass
 
 
-def fetch_naip_tile(bbox_wgs84, item_url: str) -> np.ndarray:
-    ds = _get_dataset(item_url)
+def _tile_window(ds, bbox_wgs84):
     transformer = _get_transformer(ds.crs)
     xmin, ymin, xmax, ymax = bbox_wgs84
     left, bottom = transformer.transform(xmin, ymin)
     right, top = transformer.transform(xmax, ymax)
-    window = from_bounds(left, bottom, right, top, transform=ds.transform)
+    return from_bounds(left, bottom, right, top, transform=ds.transform)
+
+
+def fetch_naip_tile(bbox_wgs84, item_url: str) -> np.ndarray:
+    ds = _get_dataset(item_url)
+    window = _tile_window(ds, bbox_wgs84)
 
     # Validate the window actually falls within the raster's real bounds
     # BEFORE attempting the read. A large/elongated parcel's tiles can span
@@ -364,8 +368,8 @@ def fetch_naip_tile(bbox_wgs84, item_url: str) -> np.ndarray:
     # a KY plant: GDAL's own error for this is a cryptic "Access window out
     # of range in RasterIO()" with the offset landing exactly at the
     # raster's edge. Checking explicitly here (rather than letting that
-    # opaque error propagate) is what lets the caller retry against a
-    # freshly-resolved item for just this tile, instead of wasting retries
+    # opaque error propagate) is what lets the caller mosaic this one tile
+    # from the neighbouring quads, instead of wasting retries
     # against an item that was never going to cover it.
     col_off, row_off = window.col_off, window.row_off
     win_w, win_h = window.width, window.height
@@ -383,6 +387,70 @@ def fetch_naip_tile(bbox_wgs84, item_url: str) -> np.ndarray:
     return arr.astype(np.uint8)
 
 
+# A mosaicked tile with less than this share of its pixels covered by any
+# NAIP quad (a coast, a border, a gap in coverage) counts as failed rather
+# than as an imaged tile with nothing on it.
+MIN_MOSAIC_COVERAGE = 0.5
+
+
+def find_naip_items_bbox(catalog, bbox_wgs84):
+    search = catalog.search(collections=["naip"], bbox=list(bbox_wgs84), max_items=60)
+    return list(search.items())
+
+
+def _read_clipped(ds, window, out, filled) -> int:
+    """Read the part of `window` that lies inside ds's raster into the
+    matching pixels of `out` (4, IMAGE_PX, IMAGE_PX) not yet in `filled`.
+    A quad's own zero padding never overwrites anything. Returns the number
+    of pixels newly filled."""
+    c0, r0 = max(window.col_off, 0), max(window.row_off, 0)
+    c1 = min(window.col_off + window.width, ds.width)
+    r1 = min(window.row_off + window.height, ds.height)
+    sx, sy = C.IMAGE_PX / window.width, C.IMAGE_PX / window.height
+    dc0, dc1 = int(round((c0 - window.col_off) * sx)), int(round((c1 - window.col_off) * sx))
+    dr0, dr1 = int(round((r0 - window.row_off) * sy)), int(round((r1 - window.row_off) * sy))
+    if c1 <= c0 or r1 <= r0 or dc1 <= dc0 or dr1 <= dr0:
+        return 0
+    part = ds.read([1, 2, 3, 4], window=Window(c0, r0, c1 - c0, r1 - r0),
+                   out_shape=(4, dr1 - dr0, dc1 - dc0), resampling=Resampling.bilinear)
+    take = ~filled[dr0:dr1, dc0:dc1] & (part.max(axis=0) > 0)
+    out[:, dr0:dr1, dc0:dc1][:, take] = part[:, take]
+    filled[dr0:dr1, dc0:dc1] |= take
+    return int(take.sum())
+
+
+def fetch_naip_mosaic(bbox_wgs84, item_url: str, catalog) -> np.ndarray:
+    """A tile that crosses the edge of its plant's NAIP quad, filled from
+    every quad that covers part of it: the plant's own quad first, then the
+    other quads of the same NAIP year, then other years (newest first) for
+    whatever is still empty.
+
+    Replaces the old fallback (2026-11-04), which re-resolved one item at
+    the tile's centre: for a tile that only straddles the edge, the centre
+    is still in the plant's own quad, so the same item came back and the
+    tile failed. That was ~8% of seed-site parcels in every state."""
+    def key(url):
+        return url.split("?")[0]   # signed hrefs differ only in the SAS token
+
+    items = with_retry(find_naip_items_bbox, catalog, bbox_wgs84)
+    primary = next((it for it in items if key(it.assets["image"].href) == key(item_url)), None)
+    year = primary.datetime.year if primary is not None else None
+    others = sorted((it for it in items if key(it.assets["image"].href) != key(item_url)),
+                    key=lambda it: (it.datetime.year != year, -it.datetime.timestamp()))
+    out = np.zeros((4, C.IMAGE_PX, C.IMAGE_PX), dtype=np.uint8)
+    filled = np.zeros((C.IMAGE_PX, C.IMAGE_PX), dtype=bool)
+    for url in [item_url] + [it.assets["image"].href for it in others]:
+        ds = _get_dataset(url)
+        with_retry(_read_clipped, ds, _tile_window(ds, bbox_wgs84), out, filled)
+        if filled.all():
+            break
+    if filled.mean() < MIN_MOSAIC_COVERAGE:
+        raise TileOutsideItemCoverage(
+            f"tile crosses a NAIP quad edge and only {filled.mean():.0%} of it is covered "
+            f"by the {1 + len(others)} quad(s) found")
+    return out
+
+
 def timed_fetch(bbox_wgs84, item_url: str, catalog=None):
     t0 = time.time()
     try:
@@ -390,22 +458,9 @@ def timed_fetch(bbox_wgs84, item_url: str, catalog=None):
     except TileOutsideItemCoverage:
         if catalog is None:
             raise
-        # Fall back: resolve a FRESH item for this tile's own centroid,
-        # rather than assuming the whole parcel shares one quad. Only
-        # triggers for the tile(s) that actually need it -- most tiles for
-        # most plants never hit this path, so this doesn't cost anything
-        # for the common case.
-        xmin, ymin, xmax, ymax = bbox_wgs84
-        tile_lon, tile_lat = (xmin + xmax) / 2, (ymin + ymax) / 2
-        fresh_item = with_retry(find_naip_item, catalog, tile_lon, tile_lat)
-        if fresh_item is None:
-            raise
-        fresh_url = fresh_item.assets["image"].href
-        if fresh_url == item_url:
-            # Same item resolved again -- this tile genuinely isn't covered
-            # by any item here, not a wrong-quad problem after all.
-            raise
-        arr = with_retry(fetch_naip_tile, bbox_wgs84, fresh_url)
+        # Only the tile(s) that actually cross a quad edge take this path,
+        # so the extra STAC search costs nothing for the common case.
+        arr = fetch_naip_mosaic(bbox_wgs84, item_url, catalog)
     return arr, time.time() - t0
 
 
