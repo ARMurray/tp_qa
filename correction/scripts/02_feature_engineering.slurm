@@ -69,5 +69,9 @@ CMD="python \"$SCRIPTS/02_feature_engineering.py\" --states $STATE --shard"
 
 echo "Running: $CMD"
 eval "$CMD"
+rc=$?
 
-echo "Finished: $(date)"
+# Exit with Python's status, not echo's: before 2026-11-04 a task that raised still reported exit 0, so
+# afterok let 02b merge over a missing state.
+echo "Finished: $(date)  (exit $rc)"
+exit $rc

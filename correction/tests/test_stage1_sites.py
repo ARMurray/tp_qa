@@ -114,6 +114,19 @@ def main():
         except SystemExit:
             pass
 
+        # a state with no NAIP: no error, the other states' od_* columns, every site od_ran False
+        yy = C.OD_SEED_SITES_DIR / "candidates" / "state=YY"
+        yy.mkdir(parents=True)
+        pd.DataFrame({"CWNS_ID": ["Q"], "ll_uuid": ["Q1"], "od_ran": True, "od_has_detection": True,
+                      "od_n_objects": [1], "state": "YY", "od_fetch_error": None}).to_parquet(yy / "part-y.parquet")
+        C.NO_NAIP_STATES = ["ZZ"]
+        s3 = fe.build_stage1_site_training(con, plant_features, parcel_features, ["ZZ"])
+        assert len(s3) == len(s) and not s3["od_ran"].any() and (s3["od_n_objects"] == 0).all()
+        assert "od_fetch_error" not in s3.columns
+        C.NO_NAIP_STATES = []
+        import shutil
+        shutil.rmtree(yy)
+
         # with OD present it joins on (CWNS_ID, ll_uuid)
         od_dir = C.OD_SEED_SITES_DIR / "candidates" / "state=ZZ"
         od_dir.mkdir(parents=True)

@@ -138,6 +138,7 @@ Full-universe run started 2026-11-03, walking the steps one at a time. Results a
 | 01e rerun | 2026-11-04 | all 48 tasks exit 0; 34,077 / 34,482 sites (98.8%; AK/HI/PR have no NAIP); 181 parcels capped; 2,641 still od_ran False. IL diagnostic: every failure is a 500 m tile crossing its NAIP quad's edge (the old fallback re-resolved the same quad). |
 | 01e mosaic fix | 2026-11-04 | 01b `fetch_naip_mosaic`: a tile crossing a quad edge is filled from the neighbouring quads (same NAIP year first); fails only if under 50% covered. Resubmit the same array; resume retries only od_ran False rows |
 | 01e mosaic rerun | 2026-11-04 | job 7607096: 48/48 exit 0, every task "Every tile failed: 0"; od_ran 100.0% (1 MN row False, no error recorded); detected 24.7% -> 26.7%, so the recovered parcels detect at the usual rate |
+| 02, first pass | 2026-11-04 | two arrays ran at once (7607149, and 7607200 cancelled part-way); AK/HI/PR stopped on 'no seed-site detection' but reported exit 0, so 02b would have merged without them. Elsewhere OD joined 5,338 / 5,338 and correct sites per plant {1: 2560, 0: 282}. Fixed: no-NAIP states get od_ran False (C.NO_NAIP_STATES); the slurm script exits with Python's status. Rerun tasks 0,1,10,28,32,38,39, then 02b |
 | 02 onward | not started | |
 
 Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a

@@ -111,6 +111,10 @@ OD_SEED_SITES_DIR = DATA_DIR / "od_features_seed_sites"  # 01e --seed-sites: obj
 # on rows written after that date and a model could learn the run instead of the parcel.
 OD_BOOKKEEPING_COLS = ["parcel_area_m2", "parcel_bbox_max_dim_m", "parcel_capped", "parcel_cap_reason",
                        "n_tiles_generated", "od_fetch_error"]
+# No NAIP imagery at all, so no detection for any parcel: 02 gives their seed sites od_ran False (as for any
+# parcel whose tiles all failed) instead of refusing the state. Anywhere else a state with no detection results
+# means 01e has not run there.
+NO_NAIP_STATES = ["AK", "HI", "PR"]
 
 # ===========================================================================
 # 2. EXTERNAL INPUTS  (shared, outside ROOT)

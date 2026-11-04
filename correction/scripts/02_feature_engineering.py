@@ -894,8 +894,22 @@ def load_site_od(states: list[str]) -> pd.DataFrame:
     od = pd.concat(frames, ignore_index=True)
     od["CWNS_ID"] = od["CWNS_ID"].astype(str)
     od = od.drop_duplicates(subset=["CWNS_ID", "ll_uuid"], keep="last")
+    return _site_od_columns(od)
+
+
+def _site_od_columns(od: pd.DataFrame) -> pd.DataFrame:
     return od.drop(columns=["state", "orig_lon", "orig_lat", "n_objects_total", "n_objects_in_parcel",
                             "processed_at"] + C.OD_BOOKKEEPING_COLS, errors="ignore")
+
+
+def empty_site_od() -> pd.DataFrame:
+    """No rows, but the seed-site OD columns of any state that has them, so a state with no NAIP gets the same
+    od_* columns as the rest (all False / 0 after the join) and 02b's concat lines up."""
+    root = C.OD_SEED_SITES_DIR / "candidates"
+    f = next(iter(sorted(root.glob("state=*/part-*.parquet"))), None) if root.exists() else None
+    if f is None:
+        return pd.DataFrame(columns=["CWNS_ID", "ll_uuid", "od_ran", "od_has_detection"])
+    return _site_od_columns(pd.read_parquet(f).iloc[:0])
 
 
 def build_stage1_site_training(con, plant_features: pd.DataFrame, parcel_features: pd.DataFrame,
@@ -939,8 +953,12 @@ def build_stage1_site_training(con, plant_features: pd.DataFrame, parcel_feature
     s = NM.add_pool_features(s, "site_name_pool")
     s = add_name_matching(s)
 
-    od = load_site_od(sorted(set(s["STATE_CODE"].dropna()))) if "STATE_CODE" in s.columns else pd.DataFrame()
-    if len(od):
+    od_states = sorted(set(s["STATE_CODE"].dropna())) if "STATE_CODE" in s.columns else []
+    od = load_site_od(od_states) if od_states else pd.DataFrame()
+    if not len(od) and od_states and set(od_states) <= set(C.NO_NAIP_STATES):
+        print(f"  {', '.join(od_states)}: no NAIP, so no seed-site detection; every site gets od_ran False")
+        od = empty_site_od()
+    if len(od.columns):
         n_before = len(s)
         s = s.merge(od, on=["CWNS_ID", "ll_uuid"], how="left")
         s["od_ran"] = s["od_ran"].fillna(False)
