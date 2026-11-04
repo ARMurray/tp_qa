@@ -3,7 +3,7 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-04 13:30:51
+generated   : 2026-11-04 13:30:52
 seed mode   : multi   suffix '_multi'
 git commit  : 27d654c  (Wed Nov 4 13:30:47 2026 -0500 diagnostics: corr_02 7607200 (2026-11-04 13:30))
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
@@ -78,6 +78,7 @@ part files older than best.pt (ignored downstream): 0
 JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
+  02_17.log                            0.0 h ago   exit 0
   02_29.log                            0.0 h ago   exit 143
   02_22.log                            0.0 h ago   exit 0
   02_27.log                            0.0 h ago   exit 143
@@ -102,7 +103,6 @@ JOB LOGS
   02_32.log                            0.0 h ago   exit 0
   02_10.log                            0.0 h ago   exit 0
   02_39.log                            0.0 h ago   exit 0
-  02_7.log                             0.0 h ago   exit 0
 
 --- last 60 lines of 02_29.log (exit status not 0) ---
   df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
