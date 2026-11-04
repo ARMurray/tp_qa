@@ -120,9 +120,12 @@ def main():
         pd.DataFrame({"CWNS_ID": ["A", "A", "B", "B", "C"], "ll_uuid": ["P1", "P3", "P3", "P1", "P3"],
                       "od_ran": True, "od_has_detection": [True, False, False, True, False],
                       "od_n_objects": [3, 0, 0, 2, 0], "od_has_clarifier": [True, False, False, True, False],
-                      "state": "ZZ"}).to_parquet(od_dir / "part-x.parquet", index=False)
+                      "state": "ZZ", "parcel_area_m2": 1e4, "parcel_capped": False, "parcel_cap_reason": None,
+                      "n_tiles_generated": 1, "od_fetch_error": None}).to_parquet(od_dir / "part-x.parquet", index=False)
         s2 = fe.build_stage1_site_training(con, plant_features, parcel_features, ["ZZ"])
         assert len(s2) == len(s) and s2["od_ran"].all()
+        # 01e's bookkeeping columns are not Stage 1 features (03 trains on every column it does not drop)
+        assert not set(C.OD_BOOKKEEPING_COLS) & set(s2.columns), set(C.OD_BOOKKEEPING_COLS) & set(s2.columns)
         assert s2.set_index(["CWNS_ID", "has_cwns_point"]).at[("A", True), "od_n_objects"] == 3
 
         # ---- Stage 2 training in multi mode: window from seeds, seed features per candidate ----

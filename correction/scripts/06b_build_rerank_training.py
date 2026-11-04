@@ -174,7 +174,8 @@ def load_candidate_od() -> pd.DataFrame:
     # mtime-sorted keep="last", matching 02's dedup of 01b's append-only output
     od = od.drop_duplicates(subset=["CWNS_ID", "ll_uuid"], keep="last")
     return od.drop(columns=["state", "orig_lon", "orig_lat", "n_objects_total",
-                            "n_objects_in_parcel", "processed_at"], errors="ignore")
+                            "n_objects_in_parcel", "processed_at"] + C.OD_BOOKKEEPING_COLS,
+                   errors="ignore")
 
 
 def main():

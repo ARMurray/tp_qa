@@ -895,7 +895,7 @@ def load_site_od(states: list[str]) -> pd.DataFrame:
     od["CWNS_ID"] = od["CWNS_ID"].astype(str)
     od = od.drop_duplicates(subset=["CWNS_ID", "ll_uuid"], keep="last")
     return od.drop(columns=["state", "orig_lon", "orig_lat", "n_objects_total", "n_objects_in_parcel",
-                            "processed_at"], errors="ignore")
+                            "processed_at"] + C.OD_BOOKKEEPING_COLS, errors="ignore")
 
 
 def build_stage1_site_training(con, plant_features: pd.DataFrame, parcel_features: pd.DataFrame,

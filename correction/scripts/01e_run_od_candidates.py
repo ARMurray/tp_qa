@@ -516,7 +516,7 @@ def main():
     con = C.duckdb_connect()
 
     t_start = time.time()
-    n_done = n_skipped = n_nogeom = n_capped = 0
+    n_done = n_skipped = n_nogeom = n_capped = n_failed = 0
 
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         for state, state_cands in cands.groupby("STATE_CODE"):
@@ -581,6 +581,14 @@ def main():
                     cwns, uuid = key.split(KEY_SEP, 1)
                     row["CWNS_ID"], row["ll_uuid"] = cwns, uuid
                     row.update(cap_info[key], n_tiles_generated=len(task["grid"]))
+                    # why a parcel got no usable tile: 7.8% of seed sites still failed after a retry
+                    # (2026-11-04) with little rate limiting in the logs, and 01e writes no tile table
+                    errs = [t["fetch_error"] for t in task.get("tile_rows", []) if t.get("fetch_error")]
+                    row["od_fetch_error"] = str(errs[0])[:300] if errs and not row.get("od_ran") else None
+                    if row["od_fetch_error"]:
+                        n_failed += 1
+                        if n_failed <= 20:
+                            print(f"    {key}: every tile failed -- {row['od_fetch_error'][:160]}")
                     rows.append(row)
                     for o in task.get("objects", []):
                         o["CWNS_ID"], o["ll_uuid"] = cwns, uuid
@@ -602,7 +610,8 @@ def main():
     print(f"  Candidates processed : {n_done}")
     print(f"  Skipped (resume)     : {n_skipped}")
     print(f"  No parcel geometry   : {n_nogeom}")
-    print(f"  Parcels capped       : {n_capped}  (area > {C.MAX_PARCEL_AREA_M2 / 1e6:.0f} km2 or "
+    print(f"  Every tile failed    : {n_failed}  (od_fetch_error holds the first error; a rerun retries them)")
+    print(f"  Parcels capped      : {n_capped}  (area > {C.MAX_PARCEL_AREA_M2 / 1e6:.0f} km2 or "
           f"> {C.MAX_TILES_PER_PLANT} tiles: one tile around the seed)")
     print(f"  Elapsed              : {(time.time() - t_start) / 60:.1f} min")
     print(f"\nOutputs in: {out_root}")

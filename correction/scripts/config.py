@@ -106,6 +106,11 @@ REVIEW_QUEUE_DIR    = DATA_DIR / f"review_queue{SFX}"      # 10: review_queue_ro
 SEEDS_CSV         = ROOT / "data" / "candidates" / "plant_seeds.csv"   # repo-tracked; build_plant_seeds.py
 SEED_SITES_DIR    = DATA_DIR / "seed_sites"             # 01f: seed_sites.parquet, seed_parcels.parquet
 OD_SEED_SITES_DIR = DATA_DIR / "od_features_seed_sites"  # 01e --seed-sites: objects/ plants/ ...
+# 01e's per-row bookkeeping (since 2026-11-04): how the parcel was tiled and why it failed. Not features:
+# readers that keep every other column as a model input (02's site OD, 06b) drop these, since they exist only
+# on rows written after that date and a model could learn the run instead of the parcel.
+OD_BOOKKEEPING_COLS = ["parcel_area_m2", "parcel_bbox_max_dim_m", "parcel_capped", "parcel_cap_reason",
+                       "n_tiles_generated", "od_fetch_error"]
 
 # ===========================================================================
 # 2. EXTERNAL INPUTS  (shared, outside ROOT)

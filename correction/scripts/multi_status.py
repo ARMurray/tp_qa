@@ -137,7 +137,8 @@ def sec_01e(L):
     if not files:
         return
     files = sorted(files, key=lambda f: f.stat().st_mtime)  # newest row wins, as in 02's reader
-    od = pd.concat([read_cols(f, ["CWNS_ID", "ll_uuid", "od_ran", "od_has_detection", "parcel_capped"])
+    od = pd.concat([read_cols(f, ["CWNS_ID", "ll_uuid", "od_ran", "od_has_detection", "parcel_capped",
+                                  "od_fetch_error"])
                     .assign(state=f.parent.name[6:]) for f in files]).drop_duplicates(["CWNS_ID", "ll_uuid"], keep="last")
     ran = od["od_ran"].fillna(False).astype(bool)
     L.append(f"parcels examined {len(od):,}; od_ran {ran.mean():.1%}; "
@@ -146,6 +147,13 @@ def sec_01e(L):
         per_fail = od[~ran].groupby("state").size().sort_values(ascending=False)
         L.append(f"od_ran False (every tile failed; a rerun retries them): {int((~ran).sum()):,}  -- top: "
                  + ", ".join(f"{s} {n}" for s, n in per_fail.head(8).items()))
+        if "od_fetch_error" in od:
+            # error kinds, numbers and URLs blanked so one cause is one line
+            e = od.loc[~ran, "od_fetch_error"].dropna().astype(str) \
+                .str.replace(r"https?://\S+", "<url>", regex=True).str.replace(r"\d+(\.\d+)?", "#", regex=True) \
+                .str.slice(0, 110)
+            L.append(f"  first tile error, {len(e):,} of them recorded (rows written before 2026-11-04 have none):")
+            L += [f"    {n:>6,}  {k}" for k, n in e.value_counts().head(6).items()]
     if "parcel_capped" in od:
         L.append(f"oversized parcels capped to one tile around the seed: "
                  f"{int(od['parcel_capped'].fillna(False).astype(bool).sum()):,}")
