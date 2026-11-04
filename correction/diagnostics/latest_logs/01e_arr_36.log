@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606633_36.log
-# job 7606633 task 36 on r7n21, exit status 0, copied 2026-11-03 20:42:43
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_36.log
+# job 7606922 task 36 on r5n05, exit status 0, copied 2026-11-04 09:58:10
 #
 ==========================================
-Node:    r7n21
-Job ID:  7606740
+Node:    r5n05
+Job ID:  7606961
 CPUs:    16
-Started: Tue Nov  3 20:42:19 EST 2026
+Started: Wed Nov  4 09:57:50 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -40,18 +40,20 @@ Connecting to Planetary Computer STAC API...
 Connected.
 
 --- State RI: 23 candidate(s) ---
-    ...23 candidate(s) done (0.3 min elapsed)
-  Flushed 23 candidate row(s)
+  Resume: skipping 22 already done
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145755Z-16b688ff68fbbx9xhC1BL1zw1g0000000yb00000000052wq.) -- retrying in 12s (attempt 1/5)
+    ...1 candidate(s) done, 1 row(s) flushed (0.3 min elapsed)
 
 === Summary ===
-  Candidates processed : 23
-  Skipped (resume)     : 0
+  Candidates processed : 1
+  Skipped (resume)     : 22
   No parcel geometry   : 0
+  Parcels capped       : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
   Elapsed              : 0.3 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Tue Nov  3 20:42:43 EST 2026  (exit 0, 0 min)
+Finished: Wed Nov  4 09:58:10 EST 2026  (exit 0, 0 min)
 THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.
