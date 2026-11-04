@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7564295_4.log
-# job 7564295 task 4 on r7n08, exit status 0, copied 2026-10-09 10:21:30
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607149_4.log
+# job 7607149 task 4 on r7n19, exit status 0, copied 2026-11-04 13:36:51
 #
 ==========================================
-Node:    r7n08
-Job ID:  7564300
+Node:    r7n19
+Job ID:  7607154
 CPUs:    16
-Started: Fri Oct  9 10:14:32 EDT 2026
+Started: Wed Nov  4 13:29:00 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -27,7 +27,7 @@ Running: python "/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.p
 /work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   df["owner_has_llc_corp"] = owner_clean.str.contains(
 === 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards/state=CA
+SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=CA
 Run 02b_merge_feature_shards.py once every task has finished.
 
 PART 1: Building plant features
@@ -40,39 +40,39 @@ PART 1: Building plant features
 PART 2: Building parcel features
 
 --- State CA ---
-  Fetching parcel attributes for 5795330 parcels...
-  has_ww_keyword TRUE: 8473
+  Fetching parcel attributes for 6510737 parcels...
+  has_ww_keyword TRUE: 9551
   Computing OSM wastewater features...
-  Parcels with OSM wastewater tag: 431
+  Parcels with OSM wastewater tag: 445
 
 Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 52 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
+  (Cache directory holds 50 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
   (shard mode: 10_parcel_features.parquet is left to the merge step)
 
-Parcel features combined: 5795330 rows
-  OD plants: 314 part-file(s) found across 51 partition(s); reading and unioning all of them
-  19163 duplicate CWNS_ID rows across part-files (same plant processed more than once, e.g. a --limit test followed by a full run) -- kept the most recently written row for each
+Parcel features combined: 6510737 rows
 
-STEP 14: Building Stage 1 training data
-  [population] 02 stage1 labels: kept plants serving > 100: 2789/2941 plants (152 removed)
-  Classes: 2789
-  NOTE: 2696 labelled plant(s) have no STATE_CODE and are dropped from Stage 1 training: {'Correct': 2001, 'Incorrect': 695}
-        They are in the label file but not in PHYSICAL_LOCATION.txt, which is a smaller export. See this function's comment.
-  1 extra parcel match(es) dropped: a reported point inside several overlapping parcels keeps the lowest ll_uuid, matching 01b
-  Reported parcels found: 87
-  OD features joined -- od_ran True for 79 / 87
-  Stage 1 training rows: 87
-  Correct: 76
-  Incorrect: 11
+STEP 14 (multi-source): Building Stage 1 training data on seed sites
+  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
+  NOTE: 2822 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
+  Labelled plants: 94 (Correct 76, Incorrect 18; truth parcel known for 94)
+  Seed sites for labelled plants: 173 across 94 plants
+  NOTE: 6 site(s) have a representative parcel with no parcel features (parcel outside 01a's window or dropped as oversized); their parcel columns are NaN
+  Seed-site OD joined: od_ran True for 173 / 173
+  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
+  Stage 1 training rows: 173 over 94 plants
+  Correct: 85   Incorrect: 88
+  Correct sites per plant: {0: 9, 1: 85}
+  Sites per plant: {1: 36, 2: 44, 3: 11, 4: 2, 8: 1}
 
 STEP 15: Building Stage 2 training data
-  Corrected parcels found: 17
-  Plants for Stage 2: 17
-  Stage 2 raw candidates labeled: 293866
-  Stage 2 training rows: 293866
-  Positive labels: 17
-  Negative labels: 293849
+  Corrected parcels found: 18
+  Plants for Stage 2: 18
+  Multi-source: seeds for 18 of 18 Stage 2 plants
+  Stage 2 raw candidates labeled: 319085
+  Stage 2 training rows: 319085
+  Positive labels: 18
+  Negative labels: 319067
 
 === 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features
-Finished: Fri Oct  9 10:21:30 EDT 2026
+Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
+Finished: Wed Nov  4 13:36:51 EST 2026

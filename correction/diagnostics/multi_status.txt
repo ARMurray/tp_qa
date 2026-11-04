@@ -3,11 +3,11 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-04 13:31:10
+generated   : 2026-11-04 13:46:59
 seed mode   : multi   suffix '_multi'
-git commit  : a828a12  (Wed Nov 4 13:31:07 2026 -0500 diagnostics: corr_02 7607200 (2026-11-04 13:31))
+git commit  : 0a6ce1e  (Wed Nov 4 13:31:11 2026 -0500 diagnostics: corr_02 7607200 (2026-11-04 13:31))
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 23.6 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+training gpkg: 23.9 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 holdout manifest: 71.2 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
 detector best.pt: 36.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
@@ -15,7 +15,7 @@ detector best.pt: 36.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_dete
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 51 state file(s)
-total parcels 85,587,556; newest file 20.4 h ago
+total parcels 85,587,556; newest file 20.7 h ago
 vs single-seed run (77,679,378): ratio median 1.09, min 1.01, max 5.51  (the recall check expected ~1.0-1.3)
 largest growth: AK 5.51, PR 2.73, SC 1.40, DE 1.31, SD 1.29
 states: AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
@@ -78,31 +78,31 @@ part files older than best.pt (ignored downstream): 0
 JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
-  02_28.log                            0.0 h ago   exit 143
-  02_32.log                            0.0 h ago   exit 143
-  02_47.log                            0.0 h ago   exit 0
-  02_39.log                            0.0 h ago   exit 143
-  02_15.log                            0.0 h ago   exit 0
-  02_11.log                            0.0 h ago   exit 0
-  02_42.log                            0.0 h ago   exit 0
-  02_1.log                             0.0 h ago   exit 143
-  02_17.log                            0.0 h ago   exit 0
-  02_29.log                            0.0 h ago   exit 143
-  02_22.log                            0.0 h ago   exit 0
-  02_27.log                            0.0 h ago   exit 143
-  02_16.log                            0.0 h ago   exit 0
-  02_25.log                            0.0 h ago   exit 143
-  02_30.log                            0.0 h ago   exit 0
-  02_24.log                            0.0 h ago   exit 143
-  02_35.log                            0.0 h ago   exit 0
-  02_20.log                            0.0 h ago   exit 0
-  02_18.log                            0.0 h ago   exit 0
-  02_2.log                             0.0 h ago   exit 0
-  02_36.log                            0.0 h ago   exit 0
-  02_19.log                            0.0 h ago   exit 0
-  02_6.log                             0.0 h ago   exit 0
-  02_44.log                            0.0 h ago   exit 0
-  02_49.log                            0.0 h ago   exit 0
+  02_43.log                            0.0 h ago   exit 0
+  02_4.log                             0.2 h ago   exit 0
+  02_8.log                             0.2 h ago   exit 0
+  02_34.log                            0.2 h ago   exit 0
+  02_13.log                            0.2 h ago   exit 0
+  02_33.log                            0.2 h ago   exit 0
+  02_37.log                            0.2 h ago   exit 0
+  02_9.log                             0.2 h ago   exit 0
+  02_26.log                            0.2 h ago   exit 0
+  02_14.log                            0.2 h ago   exit 0
+  02_21.log                            0.3 h ago   exit 0
+  02_48.log                            0.3 h ago   exit 0
+  02_3.log                             0.3 h ago   exit 0
+  02_23.log                            0.3 h ago   exit 0
+  02_45.log                            0.3 h ago   exit 0
+  02_5.log                             0.3 h ago   exit 0
+  02_28.log                            0.3 h ago   exit 143
+  02_32.log                            0.3 h ago   exit 143
+  02_47.log                            0.3 h ago   exit 0
+  02_39.log                            0.3 h ago   exit 143
+  02_15.log                            0.3 h ago   exit 0
+  02_11.log                            0.3 h ago   exit 0
+  02_42.log                            0.3 h ago   exit 0
+  02_1.log                             0.3 h ago   exit 143
+  02_17.log                            0.3 h ago   exit 0
 
 --- last 60 lines of 02_28.log (exit status not 0) ---
 /work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:379: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
