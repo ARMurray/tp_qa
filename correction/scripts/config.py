@@ -462,7 +462,7 @@ STAGE1_OSM_PASS = True
 # threshold, which 03 sets at the lowest score whose ACCEPTED PLANTS are right at least this often on the
 # held-out test split (model_utils.plant_accept_table). The final threshold is the larger of that and the
 # per-row Youden J, so an accept is never looser than the old rule. Everything not accepted goes to Stage 2.
-STAGE1_ACCEPT_PRECISION = 0.95
+STAGE1_ACCEPT_PRECISION = 0.975   # raised from 0.95 on 2026-11-04 (first multi run: 0.95 -> 0.673, ~85% captured)
 
 # Choosing among a plant's seed sites in 05 (run_stage1_sites): sites scoring within SITE_TIE_MARGIN of the best
 # are a near-tie, broken by independent origins then by holding the CWNS point. Two sites that both clear the
