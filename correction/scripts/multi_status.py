@@ -185,8 +185,9 @@ def sec_02(L):
         corr = s.groupby("CWNS_ID")["class"].apply(lambda c: int((c == "Correct").sum()))
         L.append(f"  Correct sites per plant: {corr.value_counts().sort_index().to_dict()}")
         if "has_cwns_point" in s:
+            hc = s["has_cwns_point"].fillna(False).astype(bool)
             L.append("  Correct rate when site holds the CWNS point / not: " + " / ".join(
-                f"{(g['class'] == 'Correct').mean():.1%} (n={len(g):,})" for _, g in s.groupby("has_cwns_point")))
+                f"{(g['class'] == 'Correct').mean():.1%} (n={len(g):,})" for g in (s[hc], s[~hc])))
         if "n_origins" in s:
             L.append("  Correct rate by independent origins: " + ", ".join(
                 f"{k}: {(g['class'] == 'Correct').mean():.1%}" for k, g in s.groupby("n_origins")))

@@ -89,7 +89,8 @@ def main():
         assert "section failed" not in txt, txt
         for needle in ("ratio median 2.00", "seed -> parcel match", "coverage of seed sites: 1 / 2", "Correct sites per plant",
                        "stage1_accept_threshold.joblib", "= 0.700", "accepted by sources: icis_fac_frs", "moved plants led by: icis_fac_frs",
-                       "last 60 lines of 01f_3.log", "Traceback boom", "precision 1.000", "50-100 m: 100%", "WITHOUT the CWNS point (1)"):
+                       "last 60 lines of 01f_3.log", "Traceback boom", "precision 1.000", "50-100 m: 100%", "WITHOUT the CWNS point (1)",
+                       "holds the CWNS point / not: 50.0% (n=2) / 0.0% (n=1)"):
             assert needle in txt, needle
         print("multi status tests passed")
 
