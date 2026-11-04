@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607149_10.log
-# job 7607149 task 10 on r5n05, exit status 0, copied 2026-11-04 13:29:52
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607750_10.log
+# job 7607750 task 10 on r4n17, exit status 0, copied 2026-11-04 14:37:56
 #
 ==========================================
-Node:    r5n05
-Job ID:  7607160
+Node:    r4n17
+Job ID:  7607753
 CPUs:    16
-Started: Wed Nov  4 13:29:00 EST 2026
+Started: Wed Nov  4 14:36:45 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -46,7 +46,7 @@ PART 2: Building parcel features
   Parcels with OSM wastewater tag: 18
 
 Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 8 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
+  (Cache directory holds 51 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
   (shard mode: 10_parcel_features.parquet is left to the merge step)
 
 Parcel features combined: 318794 rows
@@ -57,5 +57,23 @@ STEP 14 (multi-source): Building Stage 1 training data on seed sites
   Labelled plants: 22 (Correct 8, Incorrect 14; truth parcel known for 22)
   Seed sites for labelled plants: 42 across 22 plants
   NOTE: 2 site(s) have a representative parcel with no parcel features (parcel outside 01a's window or dropped as oversized); their parcel columns are NaN
-No seed-site detection results under /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites/candidates. Run 01e_run_od_candidates.py --seed-sites first, or pass --no-seed-od to build a table without od_*. Without them od_ran would equal 'is the CWNS-point site' and Stage 1 would learn that instead.
-Finished: Wed Nov  4 13:29:52 EST 2026
+  HI: no NAIP, so no seed-site detection; every site gets od_ran False
+  Seed-site OD joined: od_ran True for 0 / 42
+  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
+  Stage 1 training rows: 42 over 22 plants
+  Correct: 16   Incorrect: 26
+  Correct sites per plant: {0: 6, 1: 16}
+  Sites per plant: {1: 7, 2: 12, 3: 1, 4: 2}
+
+STEP 15: Building Stage 2 training data
+  Corrected parcels found: 14
+  Plants for Stage 2: 14
+  Multi-source: seeds for 14 of 14 Stage 2 plants
+  Stage 2 raw candidates labeled: 305479
+  Stage 2 training rows: 305479
+  Positive labels: 13
+  Negative labels: 305466
+
+=== 02_feature_engineering.py complete ===
+Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
+Finished: Wed Nov  4 14:37:56 EST 2026  (exit 0)

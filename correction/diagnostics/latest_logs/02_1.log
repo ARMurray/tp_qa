@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607200_1.log
-# job 7607200 task 1 on r5n11, exit status 143, copied 2026-11-04 13:30:54
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607750_1.log
+# job 7607750 task 1 on r4n17, exit status 0, copied 2026-11-04 14:38:36
 #
 ==========================================
-Node:    r5n11
-Job ID:  7607202
+Node:    r4n17
+Job ID:  7607752
 CPUs:    16
-Started: Wed Nov  4 13:29:02 EST 2026
+Started: Wed Nov  4 14:36:45 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -14,7 +14,6 @@ State: AL  (array index 1 of 51)
 Running: python "/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py" --states AL --shard --full-universe
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/pyogrio/raw.py:200: RuntimeWarning: organizePolygons() received a polygon with more than 100 parts. The processing may be really slow.  You can skip the processing by setting METHOD=SKIP, or only make it analyze counter-clock wise parts by setting METHOD=ONLY_CCW if you can assume that the outline of holes is counter-clock wise defined
   return ogr_read(
-[2026-11-04T13:30:42.026] error: *** JOB 7607202 ON r5n11 CANCELLED AT 2026-11-04T13:30:42 DUE to SIGNAL Terminated ***
 /work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:379: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
 /work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:384: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
@@ -47,7 +46,7 @@ PART 2: Building parcel features
   Parcels with OSM wastewater tag: 103
 
 Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 34 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
+  (Cache directory holds 51 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
   (shard mode: 10_parcel_features.parquet is left to the merge step)
 
 Parcel features combined: 1655191 rows
@@ -76,3 +75,4 @@ STEP 15: Building Stage 2 training data
 
 === 02_feature_engineering.py complete ===
 Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
+Finished: Wed Nov  4 14:38:36 EST 2026  (exit 0)

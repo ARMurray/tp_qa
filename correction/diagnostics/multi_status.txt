@@ -3,11 +3,11 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-04 13:46:59
+generated   : 2026-11-04 14:38:36
 seed mode   : multi   suffix '_multi'
-git commit  : 0a6ce1e  (Wed Nov 4 13:31:11 2026 -0500 diagnostics: corr_02 7607200 (2026-11-04 13:31))
+git commit  : 01606d5  (Wed Nov 4 13:54:45 2026 -0500 02: give no-NAIP states od_ran False; slurm exits with Python's status)
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 23.9 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+training gpkg: 24.7 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 holdout manifest: 71.2 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
 detector best.pt: 36.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
@@ -15,7 +15,7 @@ detector best.pt: 36.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_dete
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 51 state file(s)
-total parcels 85,587,556; newest file 20.7 h ago
+total parcels 85,587,556; newest file 21.5 h ago
 vs single-seed run (77,679,378): ratio median 1.09, min 1.01, max 5.51  (the recall check expected ~1.0-1.3)
 largest growth: AK 5.51, PR 2.73, SC 1.40, DE 1.31, SD 1.29
 states: AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
@@ -78,277 +78,29 @@ part files older than best.pt (ignored downstream): 0
 JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
-  02_43.log                            0.0 h ago   exit 0
-  02_4.log                             0.2 h ago   exit 0
-  02_8.log                             0.2 h ago   exit 0
-  02_34.log                            0.2 h ago   exit 0
-  02_13.log                            0.2 h ago   exit 0
-  02_33.log                            0.2 h ago   exit 0
-  02_37.log                            0.2 h ago   exit 0
-  02_9.log                             0.2 h ago   exit 0
-  02_26.log                            0.2 h ago   exit 0
-  02_14.log                            0.2 h ago   exit 0
-  02_21.log                            0.3 h ago   exit 0
-  02_48.log                            0.3 h ago   exit 0
-  02_3.log                             0.3 h ago   exit 0
-  02_23.log                            0.3 h ago   exit 0
-  02_45.log                            0.3 h ago   exit 0
-  02_5.log                             0.3 h ago   exit 0
-  02_28.log                            0.3 h ago   exit 143
-  02_32.log                            0.3 h ago   exit 143
-  02_47.log                            0.3 h ago   exit 0
-  02_39.log                            0.3 h ago   exit 143
-  02_15.log                            0.3 h ago   exit 0
-  02_11.log                            0.3 h ago   exit 0
-  02_42.log                            0.3 h ago   exit 0
-  02_1.log                             0.3 h ago   exit 143
-  02_17.log                            0.3 h ago   exit 0
-
---- last 60 lines of 02_28.log (exit status not 0) ---
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:379: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:384: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:387: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_govt"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:391: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_utility"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:395: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_electric"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_has_llc_corp"] = owner_clean.str.contains(
-=== 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=NE
-Run 02b_merge_feature_shards.py once every task has finished.
-
-PART 1: Building plant features
-  [population] 02 plants: kept plants serving > 100: 425/469 plants (44 removed)
-  Plants loaded: 425
-  Loading census geographies...
-  Running census spatial joins...
-  Plant features combined: 425 rows, 18 cols
-
-PART 2: Building parcel features
-
---- State NE ---
-  Fetching parcel attributes for 711727 parcels...
-  has_ww_keyword TRUE: 317
-  Computing OSM wastewater features...
-  Parcels with OSM wastewater tag: 46
-
-Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 37 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
-  (shard mode: 10_parcel_features.parquet is left to the merge step)
-
-Parcel features combined: 711727 rows
-
-STEP 14 (multi-source): Building Stage 1 training data on seed sites
-  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
-  NOTE: 2891 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
-  Labelled plants: 25 (Correct 10, Incorrect 15; truth parcel known for 25)
-  Seed sites for labelled plants: 52 across 25 plants
-  Seed-site OD joined: od_ran True for 52 / 52
-  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
-  Stage 1 training rows: 52 over 25 plants
-  Correct: 12   Incorrect: 40
-  Correct sites per plant: {0: 13, 1: 12}
-  Sites per plant: {1: 4, 2: 15, 3: 6}
-
-STEP 15: Building Stage 2 training data
-  Corrected parcels found: 15
-  Plants for Stage 2: 15
-  Multi-source: seeds for 15 of 15 Stage 2 plants
-  Stage 2 raw candidates labeled: 40807
-  Stage 2 training rows: 40807
-  Positive labels: 15
-  Negative labels: 40792
-
-=== 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
-
---- last 60 lines of 02_32.log (exit status not 0) ---
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:379: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:384: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:387: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_govt"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:391: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_utility"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:395: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_electric"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_has_llc_corp"] = owner_clean.str.contains(
-=== 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=NV
-Run 02b_merge_feature_shards.py once every task has finished.
-
-PART 1: Building plant features
-  [population] 02 plants: kept plants serving > 100: 26/30 plants (4 removed)
-  Plants loaded: 26
-  Loading census geographies...
-  Running census spatial joins...
-  Plant features combined: 26 rows, 18 cols
-
-PART 2: Building parcel features
-
---- State NV ---
-  Fetching parcel attributes for 222590 parcels...
-  has_ww_keyword TRUE: 200
-  Computing OSM wastewater features...
-  Parcels with OSM wastewater tag: 9
-
-Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 36 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
-  (shard mode: 10_parcel_features.parquet is left to the merge step)
-
-Parcel features combined: 222590 rows
-
-STEP 14 (multi-source): Building Stage 1 training data on seed sites
-  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
-  NOTE: 2913 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
-  Labelled plants: 3 (Correct 2, Incorrect 1; truth parcel known for 3)
-  Seed sites for labelled plants: 4 across 3 plants
-  Seed-site OD joined: od_ran True for 4 / 4
-  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
-  Stage 1 training rows: 4 over 3 plants
-  Correct: 3   Incorrect: 1
-  Correct sites per plant: {1: 3}
-  Sites per plant: {1: 2, 2: 1}
-
-STEP 15: Building Stage 2 training data
-  Corrected parcels found: 1
-  Plants for Stage 2: 1
-  Multi-source: seeds for 1 of 1 Stage 2 plants
-  Stage 2 raw candidates labeled: 74418
-  Stage 2 training rows: 74418
-  Positive labels: 1
-  Negative labels: 74417
-
-=== 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
-
---- last 60 lines of 02_39.log (exit status not 0) ---
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:379: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:384: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:387: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_govt"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:391: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_utility"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:395: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_electric"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_has_llc_corp"] = owner_clean.str.contains(
-=== 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=RI
-Run 02b_merge_feature_shards.py once every task has finished.
-
-PART 1: Building plant features
-  [population] 02 plants: kept plants serving > 100: 20/20 plants (0 removed)
-  Plants loaded: 20
-  Loading census geographies...
-  Running census spatial joins...
-  Plant features combined: 20 rows, 18 cols
-
-PART 2: Building parcel features
-
---- State RI ---
-  Fetching parcel attributes for 288957 parcels...
-  has_ww_keyword TRUE: 363
-  Computing OSM wastewater features...
-  Parcels with OSM wastewater tag: 15
-
-Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 37 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
-  (shard mode: 10_parcel_features.parquet is left to the merge step)
-
-Parcel features combined: 288957 rows
-
-STEP 14 (multi-source): Building Stage 1 training data on seed sites
-  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
-  NOTE: 2903 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
-  Labelled plants: 13 (Correct 12, Incorrect 1; truth parcel known for 13)
-  Seed sites for labelled plants: 14 across 13 plants
-  Seed-site OD joined: od_ran True for 14 / 14
-  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
-  Stage 1 training rows: 14 over 13 plants
-  Correct: 13   Incorrect: 1
-  Correct sites per plant: {1: 13}
-  Sites per plant: {1: 12, 2: 1}
-
-STEP 15: Building Stage 2 training data
-  Corrected parcels found: 1
-  Plants for Stage 2: 1
-  Multi-source: seeds for 1 of 1 Stage 2 plants
-  Stage 2 raw candidates labeled: 10035
-  Stage 2 training rows: 10035
-  Positive labels: 1
-  Negative labels: 10034
-
-=== 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
-
---- last 60 lines of 02_1.log (exit status not 0) ---
-  df["has_ww_keyword"] = combined_text.str.contains(PARCEL_WW_PATTERN, na=False)
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:384: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  owner_clean.str.contains(r"\b(etux|sfr|borrower|surv)\b", regex=True) |
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:387: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_govt"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:391: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_utility"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:395: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_is_electric"] = owner_clean.str.contains(
-/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
-  df["owner_has_llc_corp"] = owner_clean.str.contains(
-=== 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=AL
-Run 02b_merge_feature_shards.py once every task has finished.
-
-PART 1: Building plant features
-  [population] 02 plants: kept plants serving > 100: 309/327 plants (18 removed)
-  Plants loaded: 309
-  Loading census geographies...
-  Running census spatial joins...
-  Plant features combined: 309 rows, 18 cols
-
-PART 2: Building parcel features
-
---- State AL ---
-  Fetching parcel attributes for 1655191 parcels...
-  has_ww_keyword TRUE: 2008
-  Computing OSM wastewater features...
-  Parcels with OSM wastewater tag: 103
-
-Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 34 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
-  (shard mode: 10_parcel_features.parquet is left to the merge step)
-
-Parcel features combined: 1655191 rows
-
-STEP 14 (multi-source): Building Stage 1 training data on seed sites
-  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
-  NOTE: 2865 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
-  Labelled plants: 51 (Correct 48, Incorrect 3; truth parcel known for 51)
-  Seed sites for labelled plants: 99 across 51 plants
-  NOTE: 1 site(s) have a representative parcel with no parcel features (parcel outside 01a's window or dropped as oversized); their parcel columns are NaN
-  Seed-site OD joined: od_ran True for 99 / 99
-  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
-  Stage 1 training rows: 99 over 51 plants
-  Correct: 51   Incorrect: 48
-  Correct sites per plant: {1: 51}
-  Sites per plant: {1: 18, 2: 20, 3: 11, 4: 2}
-
-STEP 15: Building Stage 2 training data
-  Corrected parcels found: 3
-  Plants for Stage 2: 3
-  Multi-source: seeds for 3 of 3 Stage 2 plants
-  Stage 2 raw candidates labeled: 10325
-  Stage 2 training rows: 10325
-  Positive labels: 2
-  Negative labels: 10323
-
-=== 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
+  02_1.log                             0.0 h ago   exit 0
+  02_28.log                            0.0 h ago   exit 0
+  02_38.log                            0.0 h ago   exit 0
+  02_10.log                            0.0 h ago   exit 0
+  02_32.log                            0.0 h ago   exit 0
+  02_39.log                            0.0 h ago   exit 0
+  02_0.log                             0.0 h ago   exit 0
+  02_43.log                            0.9 h ago   exit 0
+  02_4.log                             1.0 h ago   exit 0
+  02_8.log                             1.0 h ago   exit 0
+  02_34.log                            1.1 h ago   exit 0
+  02_13.log                            1.1 h ago   exit 0
+  02_33.log                            1.1 h ago   exit 0
+  02_37.log                            1.1 h ago   exit 0
+  02_9.log                             1.1 h ago   exit 0
+  02_26.log                            1.1 h ago   exit 0
+  02_14.log                            1.1 h ago   exit 0
+  02_21.log                            1.1 h ago   exit 0
+  02_48.log                            1.1 h ago   exit 0
+  02_3.log                             1.1 h ago   exit 0
+  02_23.log                            1.1 h ago   exit 0
+  02_45.log                            1.1 h ago   exit 0
+  02_5.log                             1.1 h ago   exit 0
+  02_47.log                            1.1 h ago   exit 0
+  02_15.log                            1.1 h ago   exit 0
 
