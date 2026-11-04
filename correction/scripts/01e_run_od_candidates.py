@@ -112,14 +112,61 @@ def load_candidates(top_k: int) -> pd.DataFrame:
 
 def load_seed_site_parcels(states: str | None) -> pd.DataFrame:
     """One row per seed site: its representative parcel, in the same columns as load_candidates (the
-    Stage 2a score is absent). Sites sharing a representative parcel across a plant do not occur -- a
+    Stage 2a score is absent), plus fallback_lat/fallback_lon -- where to look if the parcel is too big to
+    tile (see capped_footprint). Sites sharing a representative parcel across a plant do not occur -- a
     parcel belongs to one site -- but the frame is deduplicated on (CWNS_ID, ll_uuid) anyway."""
     import seed_sites as SS
     st = [s.strip() for s in states.split(",")] if states else None
-    sites, _ = SS.load_sites(states=st)
+    sites, sp = SS.load_sites(states=st)
     out = sites[["CWNS_ID", "rep_ll_uuid", "STATE_CODE"]].rename(columns={"rep_ll_uuid": "ll_uuid"})
     out["stage2_prob_correct"] = float("nan")
+    out["fallback_lat"], out["fallback_lon"] = seed_fallback_points(sites, sp)
     return out.drop_duplicates(["CWNS_ID", "ll_uuid"]).reset_index(drop=True)
+
+
+def seed_fallback_points(sites: pd.DataFrame, sp: pd.DataFrame):
+    """(lat, lon) arrays aligned to `sites`: one real seed on each site's representative parcel -- the CWNS
+    point if it is there, else an independent seed, else any. An oversized parcel is detected around this
+    point instead of being tiled (01b does the same around the reported point). One seed rather than the
+    site's mean, since two seeds on one huge parcel can be kilometres apart and their mean on neither.
+    Falls back to site_lat/site_lon, then NaN (capped_footprint then uses the parcel's own point)."""
+    nan = pd.Series(float("nan"), index=sites.index)
+    lat = sites["site_lat"].astype(float) if "site_lat" in sites else nan.copy()
+    lon = sites["site_lon"].astype(float) if "site_lon" in sites else nan.copy()
+    if "site_id" in sites and {"site_id", "ll_uuid", "lat", "lon", "source", "independent"} <= set(sp.columns):
+        rep = dict(zip(sites["site_id"], sites["rep_ll_uuid"]))
+        s = sp[[rep.get(si) == u for si, u in zip(sp["site_id"], sp["ll_uuid"])]].copy()
+        s["_rank"] = 2 * (s["source"] != "cwns_point") + (~s["independent"].astype(bool))
+        best = s.sort_values(["site_id", "_rank"], kind="stable").drop_duplicates("site_id").set_index("site_id")
+        blat, blon = sites["site_id"].map(best["lat"]), sites["site_id"].map(best["lon"])
+        lat, lon = blat.where(blat.notna(), lat), blon.where(blon.notna(), lon)
+    return lat.to_numpy(), lon.to_numpy()
+
+
+def capped_footprint(pgeom_5070, fb_lon: float, fb_lat: float):
+    """01b's oversized-parcel rule, which 01e lacked until 2026-11-04: CO, ID, NM, UT and WY seed sites were
+    OOM-killed in their first batch, a seed on a large federal or ranch parcel tiling into thousands of
+    tiles. Area above MAX_PARCEL_AREA_M2, or still above MAX_TILES_PER_PLANT tiles after polygon filtering:
+    detect on one tile-sized square around the fallback point (the parcel's representative point when that
+    is NaN). Returns (geometry to tile, the row's cap columns under 01b's names)."""
+    from shapely.geometry import box
+    area = float(pgeom_5070.area)
+    xmin, ymin, xmax, ymax = pgeom_5070.bounds
+    info = dict(parcel_area_m2=area, parcel_bbox_max_dim_m=float(max(xmax - xmin, ymax - ymin)),
+                parcel_capped=False, parcel_cap_reason=None)
+    if area > C.MAX_PARCEL_AREA_M2:
+        reason = "area"
+    elif len(od_lib.generate_tile_grid(pgeom_5070)) > C.MAX_TILES_PER_PLANT:
+        reason = "tile_count"
+    else:
+        return pgeom_5070, info
+    if pd.notna(fb_lon) and pd.notna(fb_lat):
+        pt = gpd.GeoSeries.from_xy([fb_lon], [fb_lat], crs=C.EXPORT_CRS).to_crs(C.PROJECTED_CRS).iloc[0]
+    else:
+        pt = pgeom_5070.representative_point()
+    hw = C.CAPPED_PARCEL_FALLBACK_HALFWIDTH_M
+    info.update(parcel_capped=True, parcel_cap_reason=reason)
+    return box(pt.x - hw, pt.y - hw, pt.x + hw, pt.y + hw), info
 
 
 def restrict_to_holdout(cands: pd.DataFrame, bins: list[str]) -> pd.DataFrame:
@@ -293,7 +340,9 @@ def processed_keys(out_root: Path, state: str) -> set:
     resume. Files older than best.pt are ignored, matching 05b, which skips
     them: before 2026-10-03, resume counted old-detector rows as done, so
     those candidates were never re-run and 05b then saw no detections for
-    them at all."""
+    them at all. Rows with od_ran False (every tile failed, nearly always
+    rate limiting: 9.2% of the first national seed-site run, 2026-11-03) are
+    not done either, so a rerun retries them; readers keep the newest row."""
     d = out_root / "candidates" / f"state={state}"
     if not d.exists():
         return set()
@@ -303,7 +352,11 @@ def processed_keys(out_root: Path, state: str) -> set:
         if model_t is not None and f.stat().st_mtime < model_t:
             continue
         try:
-            df = pd.read_parquet(f, columns=["CWNS_ID", "ll_uuid"])
+            try:
+                df = pd.read_parquet(f, columns=["CWNS_ID", "ll_uuid", "od_ran"])
+                df = df[df["od_ran"].fillna(False).astype(bool)]
+            except Exception:  # a file without od_ran: count its rows as done, as before
+                df = pd.read_parquet(f, columns=["CWNS_ID", "ll_uuid"])
             done |= set(zip(df["CWNS_ID"].astype(str), df["ll_uuid"].astype(str)))
         except Exception:
             continue
@@ -463,7 +516,7 @@ def main():
     con = C.duckdb_connect()
 
     t_start = time.time()
-    n_done = n_skipped = n_nogeom = 0
+    n_done = n_skipped = n_nogeom = n_capped = 0
 
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         for state, state_cands in cands.groupby("STATE_CODE"):
@@ -489,23 +542,30 @@ def main():
                 n_nogeom += int(missing)
                 merged = merged[merged["parcel_wkb"].notna()]
 
-            rows, objs = [], []
             for start in range(0, len(merged), args.batch_size):
                 batch = merged.iloc[start:start + args.batch_size]
-                tasks = {}
+                tasks, cap_info = {}, {}
                 for _, r in batch.iterrows():
                     pgeom_4326 = from_wkb(bytes(r["parcel_wkb"]))
                     pgeom_5070 = gpd.GeoSeries([pgeom_4326], crs=C.EXPORT_CRS) \
                         .to_crs(C.PROJECTED_CRS).iloc[0]
-                    # NAIP item from the CANDIDATE's own centroid -- a candidate
-                    # can be kilometres from the reported point, and resolving
-                    # from the plant's reported location would fetch the wrong
-                    # quad and fail every tile.
-                    ctr = pgeom_4326.centroid
                     key = f"{r['CWNS_ID']}{KEY_SEP}{r['ll_uuid']}"
                     try:
+                        geom, info = capped_footprint(pgeom_5070, r.get("fallback_lon", float("nan")),
+                                                      r.get("fallback_lat", float("nan")))
+                        if info["parcel_capped"]:
+                            n_capped += 1
+                            print(f"    {key}: {info['parcel_area_m2'] / 1e6:.1f} km2 parcel capped "
+                                  f"({info['parcel_cap_reason']}) -- one tile around the seed instead")
+                        # NAIP item from the CANDIDATE's own footprint -- a
+                        # candidate can be kilometres from the reported point,
+                        # and resolving from the plant's reported location would
+                        # fetch the wrong quad and fail every tile.
+                        ctr = gpd.GeoSeries([geom.centroid], crs=C.PROJECTED_CRS) \
+                            .to_crs(C.EXPORT_CRS).iloc[0]
                         tasks[key] = od_lib.prepare_plant(
-                            key, pgeom_5070, float(ctr.x), float(ctr.y), catalog)
+                            key, geom, float(ctr.x), float(ctr.y), catalog)
+                        cap_info[key] = info
                     except Exception as e:
                         print(f"    {key}: prepare failed -- {str(e)[:120]}")
 
@@ -513,26 +573,28 @@ def main():
                     continue
                 od_lib.run_batch(tasks, state, model, class_names, args,
                                  executor, catalog)
+                rows, objs = [], []
                 for key, task in tasks.items():
                     if task.get("item") is None:
                         continue
                     row = od_lib.finalize_plant(task, state)
                     cwns, uuid = key.split(KEY_SEP, 1)
                     row["CWNS_ID"], row["ll_uuid"] = cwns, uuid
+                    row.update(cap_info[key], n_tiles_generated=len(task["grid"]))
                     rows.append(row)
                     for o in task.get("objects", []):
                         o["CWNS_ID"], o["ll_uuid"] = cwns, uuid
                         objs.append(o)
 
                 n_done += len(tasks)
-                print(f"    ...{n_done} candidate(s) done "
+                # flushed per batch, not per state: a killed task keeps what it finished,
+                # and resume picks up from there (until 2026-11-04 a kill lost the whole state)
+                if rows:
+                    od_lib.flush_parquet(rows, out_root, "candidates", state)
+                    if objs:
+                        od_lib.flush_parquet(objs, out_root, "objects", state)
+                print(f"    ...{n_done} candidate(s) done, {len(rows)} row(s) flushed "
                       f"({(time.time() - t_start) / 60:.1f} min elapsed)")
-
-            if rows:
-                od_lib.flush_parquet(rows, out_root, "candidates", state)
-                if objs:
-                    od_lib.flush_parquet(objs, out_root, "objects", state)
-                print(f"  Flushed {len(rows)} candidate row(s)")
 
     con.close()
 
@@ -540,6 +602,8 @@ def main():
     print(f"  Candidates processed : {n_done}")
     print(f"  Skipped (resume)     : {n_skipped}")
     print(f"  No parcel geometry   : {n_nogeom}")
+    print(f"  Parcels capped       : {n_capped}  (area > {C.MAX_PARCEL_AREA_M2 / 1e6:.0f} km2 or "
+          f"> {C.MAX_TILES_PER_PLANT} tiles: one tile around the seed)")
     print(f"  Elapsed              : {(time.time() - t_start) / 60:.1f} min")
     print(f"\nOutputs in: {out_root}")
     print("Next: score these with stage2b_rf_model.joblib and compare rank-1 "

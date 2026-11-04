@@ -136,10 +136,19 @@ def sec_01e(L):
     L.append(f"{d}: {len(files)} part file(s)")
     if not files:
         return
-    od = pd.concat([read_cols(f, ["CWNS_ID", "ll_uuid", "od_ran", "od_has_detection"]).assign(state=f.parent.name[6:])
-                    for f in files]).drop_duplicates(["CWNS_ID", "ll_uuid"], keep="last")
-    L.append(f"parcels examined {len(od):,}; od_ran {od['od_ran'].fillna(False).astype(bool).mean():.1%}; "
+    files = sorted(files, key=lambda f: f.stat().st_mtime)  # newest row wins, as in 02's reader
+    od = pd.concat([read_cols(f, ["CWNS_ID", "ll_uuid", "od_ran", "od_has_detection", "parcel_capped"])
+                    .assign(state=f.parent.name[6:]) for f in files]).drop_duplicates(["CWNS_ID", "ll_uuid"], keep="last")
+    ran = od["od_ran"].fillna(False).astype(bool)
+    L.append(f"parcels examined {len(od):,}; od_ran {ran.mean():.1%}; "
              f"something detected {od['od_has_detection'].fillna(False).astype(bool).mean():.1%}")
+    if (~ran).any():
+        per_fail = od[~ran].groupby("state").size().sort_values(ascending=False)
+        L.append(f"od_ran False (every tile failed; a rerun retries them): {int((~ran).sum()):,}  -- top: "
+                 + ", ".join(f"{s} {n}" for s, n in per_fail.head(8).items()))
+    if "parcel_capped" in od:
+        L.append(f"oversized parcels capped to one tile around the seed: "
+                 f"{int(od['parcel_capped'].fillna(False).astype(bool).sum()):,}")
     sd = C.SEED_SITES_DIR
     if sd.exists():
         need = pd.concat([read_cols(x / "seed_sites.parquet", ["CWNS_ID", "rep_ll_uuid"]).assign(state=x.name[6:])
