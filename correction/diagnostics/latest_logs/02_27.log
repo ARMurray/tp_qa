@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7564295_27.log
-# job 7564295 task 27 on r7n09, exit status 0, copied 2026-10-09 10:15:21
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607149_27.log
+# job 7607149 task 27 on r7n29, exit status 0, copied 2026-11-04 13:29:56
 #
 ==========================================
-Node:    r7n09
-Job ID:  7564323
+Node:    r7n29
+Job ID:  7607177
 CPUs:    16
-Started: Fri Oct  9 10:14:32 EDT 2026
+Started: Wed Nov  4 13:29:00 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -27,7 +27,7 @@ Running: python "/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.p
 /work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   df["owner_has_llc_corp"] = owner_clean.str.contains(
 === 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards/state=ND
+SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=ND
 Run 02b_merge_feature_shards.py once every task has finished.
 
 PART 1: Building plant features
@@ -40,38 +40,38 @@ PART 1: Building plant features
 PART 2: Building parcel features
 
 --- State ND ---
-  Fetching parcel attributes for 277040 parcels...
-  has_ww_keyword TRUE: 20
+  Fetching parcel attributes for 329450 parcels...
+  has_ww_keyword TRUE: 23
   Computing OSM wastewater features...
-  Parcels with OSM wastewater tag: 6
+  Parcels with OSM wastewater tag: 7
 
 Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 52 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
+  (Cache directory holds 10 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
   (shard mode: 10_parcel_features.parquet is left to the merge step)
 
-Parcel features combined: 277040 rows
-  OD plants: 314 part-file(s) found across 51 partition(s); reading and unioning all of them
-  19163 duplicate CWNS_ID rows across part-files (same plant processed more than once, e.g. a --limit test followed by a full run) -- kept the most recently written row for each
+Parcel features combined: 329450 rows
 
-STEP 14: Building Stage 1 training data
-  [population] 02 stage1 labels: kept plants serving > 100: 2789/2941 plants (152 removed)
-  Classes: 2789
-  NOTE: 2779 labelled plant(s) have no STATE_CODE and are dropped from Stage 1 training: {'Correct': 2075, 'Incorrect': 704}
-        They are in the label file but not in PHYSICAL_LOCATION.txt, which is a smaller export. See this function's comment.
-  Reported parcels found: 5
-  OD features joined -- od_ran True for 5 / 5
-  Stage 1 training rows: 5
-  Correct: 2
-  Incorrect: 3
+STEP 14 (multi-source): Building Stage 1 training data on seed sites
+  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
+  NOTE: 2906 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
+  Labelled plants: 10 (Correct 2, Incorrect 8; truth parcel known for 10)
+  Seed sites for labelled plants: 25 across 10 plants
+  Seed-site OD joined: od_ran True for 25 / 25
+  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
+  Stage 1 training rows: 25 over 10 plants
+  Correct: 5   Incorrect: 20
+  Correct sites per plant: {0: 5, 1: 5}
+  Sites per plant: {1: 2, 2: 1, 3: 7}
 
 STEP 15: Building Stage 2 training data
   Corrected parcels found: 8
   Plants for Stage 2: 8
-  Stage 2 raw candidates labeled: 36717
-  Stage 2 training rows: 36717
-  Positive labels: 7
-  Negative labels: 36710
+  Multi-source: seeds for 8 of 8 Stage 2 plants
+  Stage 2 raw candidates labeled: 58234
+  Stage 2 training rows: 58234
+  Positive labels: 8
+  Negative labels: 58226
 
 === 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features
-Finished: Fri Oct  9 10:15:21 EDT 2026
+Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
+Finished: Wed Nov  4 13:29:56 EST 2026

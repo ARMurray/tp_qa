@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7564295_24.log
-# job 7564295 task 24 on r7n09, exit status 0, copied 2026-10-09 10:15:24
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/02_7607200_24.log
+# job 7607200 task 24 on r5n14, exit status 143, copied 2026-11-04 13:30:45
 #
 ==========================================
-Node:    r7n09
-Job ID:  7564320
+Node:    r5n14
+Job ID:  7607225
 CPUs:    16
-Started: Fri Oct  9 10:14:32 EDT 2026
+Started: Wed Nov  4 13:29:58 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -26,8 +26,9 @@ Running: python "/work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.p
   df["owner_is_electric"] = owner_clean.str.contains(
 /work/GRDVULN/tp_qa/correction/scripts/02_feature_engineering.py:399: UserWarning: This pattern is interpreted as a regular expression, and has match groups. To actually get the groups, use str.extract.
   df["owner_has_llc_corp"] = owner_clean.str.contains(
+[2026-11-04T13:30:42.023] error: *** JOB 7607225 ON r5n14 CANCELLED AT 2026-11-04T13:30:42 DUE to SIGNAL Terminated ***
 === 02_feature_engineering.py ===
-SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards/state=MS
+SHARD MODE: writing to /work/GRDVULN/tp_qa/correction/data/feature_shards_multi/state=MS
 Run 02b_merge_feature_shards.py once every task has finished.
 
 PART 1: Building plant features
@@ -40,38 +41,37 @@ PART 1: Building plant features
 PART 2: Building parcel features
 
 --- State MS ---
-  Fetching parcel attributes for 286370 parcels...
-  has_ww_keyword TRUE: 642
+  Fetching parcel attributes for 343728 parcels...
+  has_ww_keyword TRUE: 732
   Computing OSM wastewater features...
   Parcels with OSM wastewater tag: 19
 
 Unioning parcel feature files for this run's 1 state(s)...
-  (Cache directory holds 52 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
+  (Cache directory holds 31 state file(s) total, from earlier runs -- using only this run's 1 requested state(s), as it should.)
   (shard mode: 10_parcel_features.parquet is left to the merge step)
 
-Parcel features combined: 286370 rows
-  OD plants: 314 part-file(s) found across 51 partition(s); reading and unioning all of them
-  19163 duplicate CWNS_ID rows across part-files (same plant processed more than once, e.g. a --limit test followed by a full run) -- kept the most recently written row for each
+Parcel features combined: 343728 rows
 
-STEP 14: Building Stage 1 training data
-  [population] 02 stage1 labels: kept plants serving > 100: 2789/2941 plants (152 removed)
-  Classes: 2789
-  NOTE: 2776 labelled plant(s) have no STATE_CODE and are dropped from Stage 1 training: {'Correct': 2069, 'Incorrect': 707}
-        They are in the label file but not in PHYSICAL_LOCATION.txt, which is a smaller export. See this function's comment.
-  Reported parcels found: 9
-  OD features joined -- od_ran True for 7 / 9
-  Stage 1 training rows: 9
-  Correct: 8
-  Incorrect: 1
+STEP 14 (multi-source): Building Stage 1 training data on seed sites
+  [population] 02 stage1 site labels: kept plants serving > 100: 2916/3068 plants (152 removed)
+  NOTE: 2903 labelled plant(s) have no STATE_CODE and are dropped (see build_stage1_training)
+  Labelled plants: 13 (Correct 8, Incorrect 5; truth parcel known for 13)
+  Seed sites for labelled plants: 28 across 13 plants
+  Seed-site OD joined: od_ran True for 28 / 28
+  0 unlabelled site(s) dropped (plant known wrong, no correction, site is not the original)
+  Stage 1 training rows: 28 over 13 plants
+  Correct: 11   Incorrect: 17
+  Correct sites per plant: {0: 2, 1: 11}
+  Sites per plant: {1: 2, 2: 7, 3: 4}
 
 STEP 15: Building Stage 2 training data
   Corrected parcels found: 5
   Plants for Stage 2: 5
-  Stage 2 raw candidates labeled: 33613
-  Stage 2 training rows: 33613
+  Multi-source: seeds for 5 of 5 Stage 2 plants
+  Stage 2 raw candidates labeled: 34376
+  Stage 2 training rows: 34376
   Positive labels: 5
-  Negative labels: 33608
+  Negative labels: 34371
 
 === 02_feature_engineering.py complete ===
-Outputs in: /work/GRDVULN/tp_qa/correction/data/features
-Finished: Fri Oct  9 10:15:24 EDT 2026
+Outputs in: /work/GRDVULN/tp_qa/correction/data/features_multi
