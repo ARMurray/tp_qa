@@ -1,17 +1,17 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7569079_28.log
-# job 7569079 task 28 on r5n08, exit status 0, copied 2026-10-09 17:39:01
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606633_28.log
+# job 7606633 task 28 on r7n21, exit status 0, copied 2026-11-03 20:16:08
 #
 ==========================================
-Node:    r5n08
-Job ID:  7569367
+Node:    r7n21
+Job ID:  7606729
 CPUs:    16
-Started: Fri Oct  9 17:36:55 EDT 2026
+Started: Tue Nov  3 20:12:13 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
 Processing state: NJ  (array index 28 of 48)
-Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --all --states NJ --workers 8
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --seed-sites --states NJ --workers 8
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
@@ -21,16 +21,15 @@ Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py 
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 === 01e_run_od_candidates.py ===
-output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates
+output: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 
-Loading Stage 2a candidates...
-  189045 candidate(s) across 9459 plant(s) (top 20 each)
-  --all: no scope restriction
-  Restricted to ['NJ']: 720 candidate(s)
+Loading seed sites...
+  284 seed-site parcel(s) across 164 plant(s)
+  Restricted to ['NJ']: 284 candidate(s)
 
 --- work plan ---
-  NJ: 720 candidate parcel(s), 36 plant(s)
-  TOTAL: 720 candidate parcel(s)
+  NJ: 284 candidate parcel(s), 164 plant(s)
+  TOTAL: 284 candidate parcel(s)
   Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
   Using weights: best.pt
 
@@ -40,21 +39,32 @@ Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digest
 Connecting to Planetary Computer STAC API...
 Connected.
 
---- State NJ: 720 candidate(s) ---
-  Resume: skipping 568 already done
-    Transient error (You have exceeded a rate limit. Contact planetarycomputer@microsoft.com) -- retrying in 15s (attempt 1/5)
-    ...152 candidate(s) done (1.7 min elapsed)
-  Flushed 152 candidate row(s)
+--- State NJ: 284 candidate(s) ---
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011237Z-15656b5c7b6mgj7whC1IAD2yw40000000mx00000000042dc.) -- retrying in 15s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011319Z-17b55b9d57f8rrxdhC1IADp4n0000000104g0000000068ft.) -- retrying in 11s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011335Z-er16cb5f4fbjsgtdhC1IADc5fs0000000ndg000000000m0n.) -- retrying in 15s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011351Z-er16cb5f4fbx22kshC1IADg06w0000000q8g000000001d6p.) -- retrying in 20s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011431Z-17449ff54665rn27hC1IADv37g0000000tx0000000008nce.) -- retrying in 16s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011442Z-16995f4f7c6v5vdphC1IADv6xw0000000nbg000000001uem.) -- retrying in 12s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011446Z-16995f4f7c6vpmkshC1IADbmgc000000100g00000000kfpu.) -- retrying in 9s (attempt 1/5)
+    ...200 candidate(s) done (2.8 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011532Z-17b55b9d57fcmpc6hC1IADenn00000000q20000000008bzm.) -- retrying in 9s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011549Z-er16cb5f4fbvtcgmhC1IADpaa40000000tv00000000038mk.) -- retrying in 11s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011550Z-17449ff5466fdvfshC1IADq8xw0000000n9000000000asgb.) -- retrying in 9s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011553Z-er16cb5f4fbnh622hC1IADk0n00000000n30000000004ede.) -- retrying in 12s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T011553Z-er16cb5f4fbxhwpzhC1IADs4pg0000000yb0000000002zn8.) -- retrying in 13s (attempt 1/5)
+    ...284 candidate(s) done (3.8 min elapsed)
+  Flushed 284 candidate row(s)
 
 === Summary ===
-  Candidates processed : 152
-  Skipped (resume)     : 568
+  Candidates processed : 284
+  Skipped (resume)     : 0
   No parcel geometry   : 0
-  Elapsed              : 1.7 min
+  Elapsed              : 3.8 min
 
-Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates
+Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Fri Oct  9 17:39:01 EDT 2026  (exit 0, 2 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 2
+Finished: Tue Nov  3 20:16:08 EST 2026  (exit 0, 3 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 3
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.
