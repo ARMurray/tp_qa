@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_36.log
-# job 7606922 task 36 on r5n05, exit status 0, copied 2026-11-04 09:58:10
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_36.log
+# job 7607096 task 36 on r5n05, exit status 0, copied 2026-11-04 13:12:01
 #
 ==========================================
 Node:    r5n05
-Job ID:  7606961
+Job ID:  7607136
 CPUs:    16
-Started: Wed Nov  4 09:57:50 EST 2026
+Started: Wed Nov  4 13:11:19 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -41,19 +41,20 @@ Connected.
 
 --- State RI: 23 candidate(s) ---
   Resume: skipping 22 already done
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145755Z-16b688ff68fbbx9xhC1BL1zw1g0000000yb00000000052wq.) -- retrying in 12s (attempt 1/5)
-    ...1 candidate(s) done, 1 row(s) flushed (0.3 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181140Z-er16cb5f4fb82mkmhC1IADxrks00000015fg000000003dv3.) -- retrying in 13s (attempt 1/5)
+    ...1 candidate(s) done, 1 row(s) flushed (0.4 min elapsed)
 
 === Summary ===
   Candidates processed : 1
   Skipped (resume)     : 22
   No parcel geometry   : 0
-  Parcels capped       : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.3 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.4 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 09:58:10 EST 2026  (exit 0, 0 min)
+Finished: Wed Nov  4 13:12:01 EST 2026  (exit 0, 0 min)
 THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.

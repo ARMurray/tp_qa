@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_37.log
-# job 7606922 task 37 on r5n05, exit status 0, copied 2026-11-04 09:58:07
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_37.log
+# job 7607096 task 37 on r5n05, exit status 0, copied 2026-11-04 13:12:07
 #
 ==========================================
 Node:    r5n05
-Job ID:  7606962
+Job ID:  7607137
 CPUs:    16
-Started: Wed Nov  4 09:57:55 EST 2026
+Started: Wed Nov  4 13:11:32 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -41,18 +41,20 @@ Connected.
 
 --- State SC: 92 candidate(s) ---
   Resume: skipping 86 already done
-    ...6 candidate(s) done, 6 row(s) flushed (0.1 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181141Z-er16cb5f4fbdllq5hC1IADevfw0000000tc00000000161yd.) -- retrying in 15s (attempt 1/5)
+    ...6 candidate(s) done, 6 row(s) flushed (0.4 min elapsed)
 
 === Summary ===
   Candidates processed : 6
   Skipped (resume)     : 86
   No parcel geometry   : 0
-  Parcels capped       : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.1 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.4 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 09:58:07 EST 2026  (exit 0, 0 min)
+Finished: Wed Nov  4 13:12:07 EST 2026  (exit 0, 0 min)
 THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.

@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_27.log
-# job 7606922 task 27 on r5n05, exit status 0, copied 2026-11-04 09:56:21
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_27.log
+# job 7607096 task 27 on r5n05, exit status 0, copied 2026-11-04 13:10:36
 #
 ==========================================
 Node:    r5n05
-Job ID:  7606952
+Job ID:  7607127
 CPUs:    16
-Started: Wed Nov  4 09:55:16 EST 2026
+Started: Wed Nov  4 13:09:49 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -41,20 +41,20 @@ Connected.
 
 --- State NH: 144 candidate(s) ---
   Resume: skipping 127 already done
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145540Z-17b55b9d57fwwrx6hC1IADt1r40000000y3g00000000xg4e.) -- retrying in 10s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145551Z-r1fcbf6d797lzbslhC1IADnfp000000004k0000000003ys0.) -- retrying in 21s (attempt 2/5)
-    ...17 candidate(s) done, 17 row(s) flushed (0.8 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T180954Z-er16cb5f4fb8v2f7hC1IADpeuw00000015qg0000000012mg.) -- retrying in 15s (attempt 1/5)
+    ...17 candidate(s) done, 17 row(s) flushed (0.7 min elapsed)
 
 === Summary ===
   Candidates processed : 17
   Skipped (resume)     : 127
   No parcel geometry   : 0
-  Parcels capped       : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.8 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.7 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 09:56:21 EST 2026  (exit 0, 1 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 1
+Finished: Wed Nov  4 13:10:36 EST 2026  (exit 0, 0 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.

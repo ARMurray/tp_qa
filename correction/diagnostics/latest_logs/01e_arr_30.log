@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_30.log
-# job 7606922 task 30 on r7n22, exit status 0, copied 2026-11-04 09:57:30
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_30.log
+# job 7607096 task 30 on r5n05, exit status 0, copied 2026-11-04 13:11:05
 #
 ==========================================
-Node:    r7n22
-Job ID:  7606955
+Node:    r5n05
+Job ID:  7607130
 CPUs:    16
-Started: Wed Nov  4 09:56:17 EST 2026
+Started: Wed Nov  4 13:10:44 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -40,22 +40,20 @@ Connecting to Planetary Computer STAC API...
 Connected.
 
 --- State NV: 44 candidate(s) ---
-  Resume: skipping 42 already done
-    32000006001::687b62c3-34cd-4761-9d78-6217e3acd222: 3256.0 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145637Z-15656b5c7b6hcsr2hC1IAD5p4c0000000uq0000000001rgb.) -- retrying in 14s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145651Z-16b94c8dd67f5fz7hC1BL1h46c0000000wqg00000000nrzd.) -- retrying in 23s (attempt 2/5)
-    ...2 candidate(s) done, 2 row(s) flushed (0.9 min elapsed)
+  Resume: skipping 43 already done
+    ...1 candidate(s) done, 1 row(s) flushed (0.1 min elapsed)
 
 === Summary ===
-  Candidates processed : 2
-  Skipped (resume)     : 42
+  Candidates processed : 1
+  Skipped (resume)     : 43
   No parcel geometry   : 0
-  Parcels capped       : 1  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.9 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.1 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 09:57:30 EST 2026  (exit 0, 1 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 1
+Finished: Wed Nov  4 13:11:05 EST 2026  (exit 0, 0 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.

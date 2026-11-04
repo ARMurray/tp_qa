@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_6.log
-# job 7606922 task 6 on r7n22, exit status 0, copied 2026-11-04 09:47:31
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_6.log
+# job 7607096 task 6 on r7n19, exit status 0, copied 2026-11-04 13:05:56
 #
 ==========================================
-Node:    r7n22
-Job ID:  7606929
+Node:    r7n19
+Job ID:  7607103
 CPUs:    16
-Started: Wed Nov  4 09:46:42 EST 2026
+Started: Wed Nov  4 13:04:50 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -41,18 +41,19 @@ Connected.
 
 --- State DE: 36 candidate(s) ---
   Resume: skipping 33 already done
-    ...3 candidate(s) done, 3 row(s) flushed (0.1 min elapsed)
+    ...3 candidate(s) done, 3 row(s) flushed (0.4 min elapsed)
 
 === Summary ===
   Candidates processed : 3
   Skipped (resume)     : 33
   No parcel geometry   : 0
-  Parcels capped       : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.1 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.4 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 09:47:31 EST 2026  (exit 0, 0 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
+Finished: Wed Nov  4 13:05:56 EST 2026  (exit 0, 1 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 1
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.

@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_29.log
-# job 7606922 task 29 on r5n05, exit status 0, copied 2026-11-04 10:01:09
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_29.log
+# job 7607096 task 29 on r5n05, exit status 0, copied 2026-11-04 13:11:15
 #
 ==========================================
 Node:    r5n05
-Job ID:  7606954
+Job ID:  7607129
 CPUs:    16
-Started: Wed Nov  4 09:56:17 EST 2026
+Started: Wed Nov  4 13:10:40 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -40,94 +40,26 @@ Connecting to Planetary Computer STAC API...
 Connected.
 
 --- State NM: 261 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145636Z-15656b5c7b6hcrpshC1IADqxfs0000000uwg00000000bnmb.) -- retrying in 9s (attempt 1/5)
-    35000000018::12047c57-50d2-4d0e-b787-1b324bc3e005: 786.4 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145648Z-16995f4f7c6764xwhC1IADwbns0000000ym000000000199g.) -- retrying in 15s (attempt 1/5)
-    35000000022::a960fc01-6948-4f76-a13e-33c4278707df: 2561.4 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145707Z-16b94c8dd6799l49hC1BL1wbnc0000000x20000000000vpk.) -- retrying in 13s (attempt 1/5)
-    35000000042::db68b0b0-9559-42b2-aa2b-1f8091f6f676: 170.5 km2 parcel capped (area) -- one tile around the seed instead
-    35000000049::9176f248-ab6d-46c6-891f-ec488e446ba3: 44.4 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145726Z-16995f4f7c6rt6b8hC1IADq33s0000000usg000000000t7k.) -- retrying in 10s (attempt 1/5)
-    35000010001::e4e49942-c3d1-4994-b9e0-fb556370c743: 5.0 km2 parcel capped (area) -- one tile around the seed instead
-    35000018001::be770432-39c6-4260-921b-becee080bc86: 96.2 km2 parcel capped (area) -- one tile around the seed instead
-    35000021012::4c1b3ddc-67e5-4755-8495-87f811342a01: 74.5 km2 parcel capped (area) -- one tile around the seed instead
+  Resume: skipping 244 already done
     35000030005::a63a8818-aa2b-44fc-a07d-372095173759: 2.7 km2 parcel capped (area) -- one tile around the seed instead
-    35000034001::5212b5cc-fcba-4412-a6ce-6517442defaa: 2.5 km2 parcel capped (area) -- one tile around the seed instead
-    35000035001::88eb7d23-e57b-405b-a739-5c961bc7644d: 2.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000035001::36b6bac1-af71-4099-a6c3-ca403e9b89b7: 2.5 km2 parcel capped (area) -- one tile around the seed instead
-    35000041001::708cda76-c8c2-4e59-8075-e1702224829d: 1949.4 km2 parcel capped (area) -- one tile around the seed instead
-    35000043001::c87290c6-5a41-4f5f-b6b0-becd0fe88bd5: 132.0 km2 parcel capped (area) -- one tile around the seed instead
     35000044001::1f6e2b8f-99e6-486b-9bf0-820b76f8b29e: 2.9 km2 parcel capped (area) -- one tile around the seed instead
-    35000049001::12047c57-50d2-4d0e-b787-1b324bc3e005: 786.4 km2 parcel capped (area) -- one tile around the seed instead
     35000057001::c94a5c2d-46f2-4921-99fb-1bcb44dd244a: 44.3 km2 parcel capped (area) -- one tile around the seed instead
-    35000060001::f956088e-84db-41bd-adea-6ada40b9297b: 2.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000062001::d84121b2-8c0a-413c-89e2-9052e856eef2: 2.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000063001::d7b5e852-4767-416d-96f0-5fa6d89b8d30: 2.5 km2 parcel capped (area) -- one tile around the seed instead
-    35000068001::396b928f-42e5-44a9-bc91-844a0f9e439f: 486.4 km2 parcel capped (area) -- one tile around the seed instead
-    35000070002::7b66506b-4d14-47d4-8f67-62be40320d70: 4522.8 km2 parcel capped (area) -- one tile around the seed instead
-    35000070005::6cb35300-5bc3-4fc4-9d47-c1d50f086583: 6998.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000071001::a2352b06-8977-4cc4-a6c0-39f664be8030: 15.0 km2 parcel capped (area) -- one tile around the seed instead
-    35000075001::9689af9b-2a8a-459f-99bd-7eca03f9efc6: 2349.5 km2 parcel capped (area) -- one tile around the seed instead
-    35000079001::8819a24c-5523-4c64-a86d-77832d320b5a: 95.3 km2 parcel capped (area) -- one tile around the seed instead
-    35000079001::3c3ae850-5a8c-4f1b-a4b0-3ae6296469ed: 2.7 km2 parcel capped (area) -- one tile around the seed instead
-    35000084001::be243f1a-74d1-49df-921c-e915b97870fc: 3.2 km2 parcel capped (area) -- one tile around the seed instead
-    35000085001::36092684-8a6c-4d91-8dd0-843f0de169af: 4.5 km2 parcel capped (area) -- one tile around the seed instead
-    35000088001::8683bc17-ced0-42a1-b097-47429052883f: 81.9 km2 parcel capped (area) -- one tile around the seed instead
-    35000097001::db68b0b0-9559-42b2-aa2b-1f8091f6f676: 170.5 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145812Z-17449ff54665rn27hC1IADv37g0000000y5000000000d4pu.) -- retrying in 14s (attempt 1/5)
-    35000098001::bc9344ff-f1fb-4a2c-8a59-cd4f4f9f0f84: 255.8 km2 parcel capped (area) -- one tile around the seed instead
-    35000099001::9e12423a-940e-4831-9b4f-033a54f421fb: 257.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000100001::8628fd99-46bd-4759-8089-0ddf7d3783dc: 191.7 km2 parcel capped (area) -- one tile around the seed instead
-    35000103001::4c1b3ddc-67e5-4755-8495-87f811342a01: 74.5 km2 parcel capped (area) -- one tile around the seed instead
     35000107001::0db19a85-155f-4aa3-923f-fbeee692e454: 48.9 km2 parcel capped (area) -- one tile around the seed instead
-    35000107002::0335fee8-8c4e-40ce-a9f1-e85e912007e7: 45.3 km2 parcel capped (area) -- one tile around the seed instead
-    35000125001::492351cc-af1d-4b36-8068-87caa096c4d9: 61.7 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145833Z-er16cb5f4fbxhwpzhC1IADs4pg000000130g0000000036p2.) -- retrying in 9s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145842Z-17b55b9d57ftxdq5hC1IADccsg0000000sk0000000008gt3.) -- retrying in 23s (attempt 2/5)
-    35000132001::44ca247f-79ed-48b5-bee2-fc429136394f: 69.2 km2 parcel capped (area) -- one tile around the seed instead
-    35000135002::fca23ee5-5f3d-4bfb-abc1-d2bcf4733493: 77.3 km2 parcel capped (area) -- one tile around the seed instead
-    35000135002::3653c8ec-1d23-433f-b50f-c578f650e10f: 93.0 km2 parcel capped (area) -- one tile around the seed instead
-    35000135003::fca23ee5-5f3d-4bfb-abc1-d2bcf4733493: 77.3 km2 parcel capped (area) -- one tile around the seed instead
-    35000135004::af8f09eb-852f-4b31-9e61-d5025f989819: 93.8 km2 parcel capped (area) -- one tile around the seed instead
-    35000135004::97e240d0-5b9b-40bb-9fc1-99bc56ec0098: 2.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000135007::3653c8ec-1d23-433f-b50f-c578f650e10f: 93.0 km2 parcel capped (area) -- one tile around the seed instead
-    35001117001::39bf96da-61da-4a97-832f-fe1e802fdd4d: 41.3 km2 parcel capped (area) -- one tile around the seed instead
-    35001117001::9780cea2-ffa3-44df-b5ab-7f0809d26e0c: 15.1 km2 parcel capped (area) -- one tile around the seed instead
     35001119001::a5b6ec54-619b-4e5d-9547-d943b2361b1a: 26.1 km2 parcel capped (area) -- one tile around the seed instead
-    35200900006::9f7aa4ba-3d14-4c80-9bdd-ff99ba472f5e: 24.8 km2 parcel capped (area) -- one tile around the seed instead
-    35200900101::a6c91c38-e62c-484f-9cbd-e95dd451aca7: 859.8 km2 parcel capped (area) -- one tile around the seed instead
-    35200900102::12047c57-50d2-4d0e-b787-1b324bc3e005: 786.4 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145917Z-er16cb5f4fbjk25xhC1IAD8mdc0000001470000000005gst.) -- retrying in 12s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145937Z-17b55b9d57f75bdmhC1IAD4bzn0000000sr000000000hqhp.) -- retrying in 15s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145938Z-17b55b9d57fb9q27hC1IADzxy00000000y3g00000000ak34.) -- retrying in 13s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145938Z-17b55b9d57fhglpvhC1IADdpns0000000yhg000000001nqq.) -- retrying in 14s (attempt 1/5)
-    ...200 candidate(s) done, 200 row(s) flushed (3.4 min elapsed)
-    35201200011::0db19a85-155f-4aa3-923f-fbeee692e454: 48.9 km2 parcel capped (area) -- one tile around the seed instead
-    35201200021::d02ef084-4e72-42b4-853e-3cb1cb8c22a2: 18.9 km2 parcel capped (area) -- one tile around the seed instead
-    35201200025::77878b5e-d24f-4bf9-b43e-a28f26a32472: 32.5 km2 parcel capped (area) -- one tile around the seed instead
-    35201200026::9e8076ff-1bef-422c-af6b-17653e070205: 8.4 km2 parcel capped (area) -- one tile around the seed instead
-    35201200028::a483c77a-0580-4dfb-9778-b4224fbe9e55: 36.3 km2 parcel capped (area) -- one tile around the seed instead
-    35201200028::4ed423bb-37b7-459c-b9cf-3768916899ab: 449.1 km2 parcel capped (area) -- one tile around the seed instead
     35201200030::b6610e76-7a39-41b0-9c4e-855b6dbf4b50: 2.3 km2 parcel capped (area) -- one tile around the seed instead
-    35201200032::5724801d-828b-4cf8-8b9a-8e8db2d06c12: 82.8 km2 parcel capped (area) -- one tile around the seed instead
-    35201200036::0a7f056a-53f7-4022-96e1-05aefffc0368: 2.6 km2 parcel capped (area) -- one tile around the seed instead
-    35000000138::0db19a85-155f-4aa3-923f-fbeee692e454: 48.9 km2 parcel capped (area) -- one tile around the seed instead
-    35000000179::58fc0d46-74f6-4bce-b644-b73a46dea034: 9.0 km2 parcel capped (area) -- one tile around the seed instead
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T150026Z-16b688ff68fpnj27hC1BL1zp5c0000000yh0000000003n0r.) -- retrying in 13s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T150032Z-er16cb5f4fbjk25xhC1IAD8mdc000000146g00000000pzqd.) -- retrying in 15s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T150047Z-r1fcbf6d797fcrpfhC1IAD98tg0000000ugg000000004m3v.) -- retrying in 20s (attempt 2/5)
-    ...261 candidate(s) done, 61 row(s) flushed (4.5 min elapsed)
+    ...17 candidate(s) done, 17 row(s) flushed (0.3 min elapsed)
 
 === Summary ===
-  Candidates processed : 261
-  Skipped (resume)     : 0
+  Candidates processed : 17
+  Skipped (resume)     : 244
   No parcel geometry   : 0
-  Parcels capped       : 61  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 4.6 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 6  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.3 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 10:01:09 EST 2026  (exit 0, 4 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 4
+Finished: Wed Nov  4 13:11:15 EST 2026  (exit 0, 0 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.

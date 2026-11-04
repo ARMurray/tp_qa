@@ -3,19 +3,19 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-04 11:28:25
+generated   : 2026-11-04 13:16:24
 seed mode   : multi   suffix '_multi'
-git commit  : 9a64b2b  (Wed Nov 4 10:21:40 2026 -0500 01e: record why a parcel failed; keep 01e bookkeeping out of the models)
+git commit  : 2c987d8  (Wed Nov 4 11:41:19 2026 -0500 NAIP fetch: mosaic tiles that cross a quad edge)
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 21.6 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
-holdout manifest: 71.1 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
-detector best.pt: 36.6 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+training gpkg: 23.4 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+holdout manifest: 71.2 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
+detector best.pt: 36.7 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
 ==============================================================================
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 51 state file(s)
-total parcels 85,587,556; newest file 18.3 h ago
+total parcels 85,587,556; newest file 20.1 h ago
 vs single-seed run (77,679,378): ratio median 1.09, min 1.01, max 5.51  (the recall check expected ~1.0-1.3)
 largest growth: AK 5.51, PR 2.73, SC 1.40, DE 1.31, SD 1.29
 states: AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
@@ -39,14 +39,10 @@ sites holding the CWNS point: 16,279; oversized parcel: 808; merged parcels (sit
 ==============================================================================
 01e --seed-sites  detection
 ==============================================================================
-/work/GRDVULN/tp_qa/correction/data/od_features_seed_sites/candidates: 104 part file(s)
-parcels examined 34,077; od_ran 92.2%; something detected 24.7%
-od_ran False (every tile failed; a rerun retries them): 2,641  -- top: TX 212, IL 203, OH 170, MO 146, WI 142, NY 118, IA 109, IN 96
-  first tile error, 203 of them recorded (rows written before 2026-11-04 have none):
-        78  tile window (#,-# size #x#) falls outside item raster (#x#) -- likely a different NAIP quad than the one resol
-        74  tile window (#,# size #x#) falls outside item raster (#x#) -- likely a different NAIP quad than the one resolv
-        46  tile window (-#,# size #x#) falls outside item raster (#x#) -- likely a different NAIP quad than the one resol
-         5  tile window (-#,-# size #x#) falls outside item raster (#x#) -- likely a different NAIP quad than the one reso
+/work/GRDVULN/tp_qa/correction/data/od_features_seed_sites/candidates: 154 part file(s)
+parcels examined 34,077; od_ran 100.0%; something detected 26.7%
+od_ran False (every tile failed; a rerun retries them): 1  -- top: MN 1
+  first tile error, 0 of them recorded (rows written before 2026-11-04 have none):
 oversized parcels capped to one tile around the seed: 181
 coverage of seed sites: 34,077 / 34,482 = 98.8%
 states under 95%: AK 0%, HI 0%, PR 0%
@@ -82,29 +78,29 @@ part files older than best.pt (ignored downstream): 0
 JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
+  01e_arr_40.log                       0.0 h ago   exit 0
+  01e_arr_45.log                       0.0 h ago   exit 0
+  01e_arr_46.log                       0.0 h ago   exit 0
+  01e_arr_35.log                       0.0 h ago   exit 0
+  01e_arr_44.log                       0.0 h ago   exit 0
+  01e_arr_32.log                       0.0 h ago   exit 0
+  01e_arr_42.log                       0.0 h ago   exit 0
+  01e_arr_43.log                       0.0 h ago   exit 0
+  01e_arr_47.log                       0.0 h ago   exit 0
   01e_arr_11.log                       0.0 h ago   exit 0
-  01e_arr_46.log                       1.4 h ago   exit 0
-  01e_arr_4.log                        1.4 h ago   exit 0
-  01e_arr_44.log                       1.4 h ago   exit 0
-  01e_arr_40.log                       1.4 h ago   exit 0
-  01e_arr_45.log                       1.4 h ago   exit 0
-  01e_arr_41.log                       1.4 h ago   exit 0
-  01e_arr_47.log                       1.4 h ago   exit 0
-  01e_arr_31.log                       1.4 h ago   exit 0
-  01e_arr_42.log                       1.4 h ago   exit 0
-  01e_arr_32.log                       1.4 h ago   exit 0
-  01e_arr_35.log                       1.4 h ago   exit 0
-  01e_arr_43.log                       1.4 h ago   exit 0
-  01e_arr_38.log                       1.5 h ago   exit 0
-  01e_arr_34.log                       1.5 h ago   exit 0
-  01e_arr_29.log                       1.5 h ago   exit 0
-  01e_arr_33.log                       1.5 h ago   exit 0
-  01e_arr_21.log                       1.5 h ago   exit 0
-  01e_arr_39.log                       1.5 h ago   exit 0
-  01e_arr_36.log                       1.5 h ago   exit 0
-  01e_arr_37.log                       1.5 h ago   exit 0
-  01e_arr_10.log                       1.5 h ago   exit 0
-  01e_arr_25.log                       1.5 h ago   exit 0
-  01e_arr_24.log                       1.5 h ago   exit 0
-  01e_arr_30.log                       1.5 h ago   exit 0
+  01e_arr_39.log                       0.0 h ago   exit 0
+  01e_arr_20.log                       0.0 h ago   exit 0
+  01e_arr_31.log                       0.1 h ago   exit 0
+  01e_arr_41.log                       0.1 h ago   exit 0
+  01e_arr_21.log                       0.1 h ago   exit 0
+  01e_arr_38.log                       0.1 h ago   exit 0
+  01e_arr_33.log                       0.1 h ago   exit 0
+  01e_arr_37.log                       0.1 h ago   exit 0
+  01e_arr_36.log                       0.1 h ago   exit 0
+  01e_arr_34.log                       0.1 h ago   exit 0
+  01e_arr_26.log                       0.1 h ago   exit 0
+  01e_arr_25.log                       0.1 h ago   exit 0
+  01e_arr_29.log                       0.1 h ago   exit 0
+  01e_arr_28.log                       0.1 h ago   exit 0
+  01e_arr_30.log                       0.1 h ago   exit 0
 

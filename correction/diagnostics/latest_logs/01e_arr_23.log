@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7606922_23.log
-# job 7606922 task 23 on r5n05, exit status 0, copied 2026-11-04 09:55:12
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_23.log
+# job 7607096 task 23 on r7n19, exit status 0, copied 2026-11-04 13:09:45
 #
 ==========================================
-Node:    r5n05
-Job ID:  7606948
+Node:    r7n19
+Job ID:  7607123
 CPUs:    16
-Started: Wed Nov  4 09:53:56 EST 2026
+Started: Wed Nov  4 13:09:10 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -41,21 +41,20 @@ Connected.
 
 --- State MT: 307 candidate(s) ---
   Resume: skipping 285 already done
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145417Z-r1fcbf6d797bg8pchC1IAD8q840000000sh000000000cek2.) -- retrying in 9s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145435Z-er16cb5f4fb585nhhC1IADgxag0000000t00000000000hc5.) -- retrying in 14s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T145451Z-15656b5c7b6fbbtkhC1IAD57u80000000y7g00000000rr9p.) -- retrying in 16s (attempt 1/5)
-    ...22 candidate(s) done, 22 row(s) flushed (0.9 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T180928Z-er16cb5f4fb2f72ghC1IADznen00000015pg00000000ag2u.) -- retrying in 14s (attempt 1/5)
+    ...22 candidate(s) done, 22 row(s) flushed (0.5 min elapsed)
 
 === Summary ===
   Candidates processed : 22
   Skipped (resume)     : 285
   No parcel geometry   : 0
-  Parcels capped       : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.9 min
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
+  Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
+  Elapsed              : 0.5 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 09:55:12 EST 2026  (exit 0, 1 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 1
+Finished: Wed Nov  4 13:09:45 EST 2026  (exit 0, 0 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.
