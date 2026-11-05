@@ -3,19 +3,19 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-04 15:11:39
+generated   : 2026-11-05 11:09:50
 seed mode   : multi   suffix '_multi'
-git commit  : 4bab2ca  (Wed Nov 4 14:58:00 2026 -0500 multi_status: print the CWNS-point correct rate in the order its label says)
+git commit  : c698ea6  (Wed Nov 4 15:21:57 2026 -0500 Stage 1: raise the plant-level accept precision target to 97.5%)
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 25.3 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
-holdout manifest: 71.3 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
-detector best.pt: 36.8 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+training gpkg: 45.2 h ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+holdout manifest: 72.1 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
+detector best.pt: 37.6 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
 ==============================================================================
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 51 state file(s)
-total parcels 85,587,556; newest file 22.1 h ago
+total parcels 85,587,556; newest file 42.0 h ago
 vs single-seed run (77,679,378): ratio median 1.09, min 1.01, max 5.51  (the recall check expected ~1.0-1.3)
 largest growth: AK 5.51, PR 2.73, SC 1.40, DE 1.31, SD 1.29
 states: AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
@@ -52,10 +52,10 @@ part files older than best.pt (ignored downstream): 0
 02   feature tables
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/features_multi
-  05_plant_features          15,543 rows   0.4 h ago
-  10_parcel_features     85,587,556 rows   0.4 h ago
-  14_stage1_training          5,435 rows   0.4 h ago
-  15_stage2_training      9,971,866 rows   0.4 h ago
+  05_plant_features          15,543 rows   20.4 h ago
+  10_parcel_features     85,587,556 rows   20.4 h ago
+  14_stage1_training          5,435 rows   20.4 h ago
+  15_stage2_training      9,971,866 rows   20.4 h ago
 Stage 1: 5,435 site rows, 2,901 plants; classes Incorrect: 2,823, Correct: 2,612
   Correct sites per plant: {0: 289, 1: 2612}
   Correct rate when site holds the CWNS point / not: 75.4% (n=2,896) / 16.8% (n=2,539)
@@ -70,7 +70,7 @@ Stage 2: 9,971,866 candidate rows, 818 plants, 802 positives
 03/04 models
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/models_multi
-  stage1_accept_threshold.joblib             0.0 h ago  = 0.673
+  stage1_accept_threshold.joblib             0.0 h ago  = 0.814
   stage1_optimal_threshold.joblib            0.0 h ago  = 0.554
   stage1_rf_model.joblib                     0.0 h ago  
 stage1 top features: is_best_site 0.008, has_cwns_point 0.004, od_has_detection 0.003, is_municipal 0.003, lbcs_ownership 0.003, site_name_pool_gap 0.003, site_rank 0.002, ll_bldg_count 0.002, od_n_detections_raw 0.002, od_n_objects 0.001, site_name_pool_rank 0.001, d_to_cwns_point_m 0.001
@@ -98,28 +98,28 @@ JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
   03.log                               0.0 h ago   exit 0
-  02b_merge.log                        0.4 h ago   exit 0
-  02_1.log                             0.6 h ago   exit 0
-  02_28.log                            0.6 h ago   exit 0
-  02_38.log                            0.6 h ago   exit 0
-  02_10.log                            0.6 h ago   exit 0
-  02_32.log                            0.6 h ago   exit 0
-  02_39.log                            0.6 h ago   exit 0
-  02_0.log                             0.6 h ago   exit 0
-  02_43.log                            1.4 h ago   exit 0
-  02_4.log                             1.6 h ago   exit 0
-  02_8.log                             1.6 h ago   exit 0
-  02_34.log                            1.6 h ago   exit 0
-  02_13.log                            1.6 h ago   exit 0
-  02_33.log                            1.6 h ago   exit 0
-  02_37.log                            1.7 h ago   exit 0
-  02_9.log                             1.7 h ago   exit 0
-  02_26.log                            1.7 h ago   exit 0
-  02_14.log                            1.7 h ago   exit 0
-  02_21.log                            1.7 h ago   exit 0
-  02_48.log                            1.7 h ago   exit 0
-  02_3.log                             1.7 h ago   exit 0
-  02_23.log                            1.7 h ago   exit 0
-  02_45.log                            1.7 h ago   exit 0
-  02_5.log                             1.7 h ago   exit 0
+  02b_merge.log                       20.4 h ago   exit 0
+  02_1.log                            20.5 h ago   exit 0
+  02_28.log                           20.5 h ago   exit 0
+  02_38.log                           20.5 h ago   exit 0
+  02_10.log                           20.5 h ago   exit 0
+  02_32.log                           20.5 h ago   exit 0
+  02_39.log                           20.5 h ago   exit 0
+  02_0.log                            20.5 h ago   exit 0
+  02_43.log                           21.4 h ago   exit 0
+  02_4.log                            21.6 h ago   exit 0
+  02_8.log                            21.6 h ago   exit 0
+  02_34.log                           21.6 h ago   exit 0
+  02_13.log                           21.6 h ago   exit 0
+  02_33.log                           21.6 h ago   exit 0
+  02_37.log                           21.6 h ago   exit 0
+  02_9.log                            21.6 h ago   exit 0
+  02_26.log                           21.6 h ago   exit 0
+  02_14.log                           21.6 h ago   exit 0
+  02_21.log                           21.6 h ago   exit 0
+  02_48.log                           21.6 h ago   exit 0
+  02_3.log                            21.6 h ago   exit 0
+  02_23.log                           21.6 h ago   exit 0
+  02_45.log                           21.6 h ago   exit 0
+  02_5.log                            21.6 h ago   exit 0
 

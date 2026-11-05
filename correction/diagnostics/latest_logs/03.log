@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/03_7607944.log
-# job 7607944 on r7n14, exit status 0, copied 2026-11-04 15:11:39
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/03_7608598.log
+# job 7608598 on r7n22, exit status 0, copied 2026-11-05 11:09:49
 #
 ==========================================
-Node:    r7n14
-Job ID:  7607944
+Node:    r7n22
+Job ID:  7608598
 CPUs:    16
-Started: Wed Nov  4 15:07:04 EST 2026
+Started: Thu Nov  5 11:05:15 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -80,10 +80,10 @@ Top 20 features:
          is_municipal    0.003259        0.000680
        lbcs_ownership    0.002774        0.000900
    site_name_pool_gap    0.002649        0.000724
-            site_rank    0.002366        0.000893
+            site_rank    0.002366        0.000894
         ll_bldg_count    0.001684        0.000387
   od_n_detections_raw    0.001660        0.000597
-         od_n_objects    0.001327        0.000564
+         od_n_objects    0.001327        0.000565
   site_name_pool_rank    0.001318        0.000518
     d_to_cwns_point_m    0.001245        0.000464
     od_dominant_class    0.001194        0.000656
@@ -103,7 +103,7 @@ Plant-level accept analysis (323 held-out plants, 328 OSM-tagged plants left out
   accept at score >= 0.70: 220 plants, precision 0.955, captures 84.0% of plants that have a Correct site
   accept at score >= 0.85: 173 plants, precision 0.977, captures 67.6% of plants that have a Correct site
   accept at score >= 0.95: 125 plants, precision 1.000, captures 50.0% of plants that have a Correct site
-  Plant-level threshold for 95% precision: 0.673; Youden 0.554; ACCEPT THRESHOLD = 0.673
+  Plant-level threshold for 98% precision: 0.814; Youden 0.554; ACCEPT THRESHOLD = 0.814
 
 Saving model...
   stage1_rf_model.joblib saved: 24.7 MB
@@ -113,9 +113,9 @@ Saving model...
 FINAL RESULTS SUMMARY
   Test roc_auc: 0.9863
   Optimal threshold: 0.554
-  Accept threshold (plant level): 0.673
+  Accept threshold (plant level): 0.814
   CV comparison:
          cv   roc_auc
 1  Standard  0.986269
 0   Spatial  0.985182
-Finished: Wed Nov  4 15:11:39 EST 2026
+Finished: Thu Nov  5 11:09:49 EST 2026
