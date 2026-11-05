@@ -553,7 +553,8 @@ def run_stage2a(flagged: pd.DataFrame, plant_features: pd.DataFrame,
         return pd.DataFrame()
 
     cand_df = pd.concat(rows, ignore_index=True)
-    print(f"  Raw candidates (post reported-parcel exclusion): {len(cand_df)}")
+    # multi-source excludes no parcel (build_candidates_for_plant_multi); single-seed drops the reported one
+    print(f"  Raw candidates ({'no parcel excluded' if C.MULTI else 'post reported-parcel exclusion'}): {len(cand_df)}")
 
     cand_df = cand_df.merge(
         flagged[["CWNS_ID", "STATE_CODE", "LATITUDE", "LONGITUDE"]], on="CWNS_ID", how="left")
@@ -746,7 +747,7 @@ def main():
     n_flagged_no_cands = int((_flagged_mask & (stage1_out["n_candidates"] == 0)).sum())
     n_unflagged = int((~_flagged_mask).sum())
     print(f"  Flagged w/ 0 candidates  : {n_flagged_no_cands} "
-          f"(no parcel survived K_RINGS + reported-parcel exclusion)")
+          f"(no parcel in the candidate window{'' if C.MULTI else ' after reported-parcel exclusion'})")
     print(f"  Not flagged (Stage 1 ok) : {n_unflagged} "
           f"(no candidates by design -- confirm_reported task in 10)")
     print(f"\nWritten: {summary_path}")
