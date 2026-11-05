@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/04_7608601.log
-# job 7608601 on r7n22, exit status 0, copied 2026-11-05 11:41:36
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/04_7608620.log
+# job 7608620 on r7n19, exit status 0, copied 2026-11-05 11:55:38
 #
 ==========================================
-Node:    r7n22
-Job ID:  7608601
+Node:    r7n19
+Job ID:  7608620
 CPUs:    16
-Started: Thu Nov  5 11:38:29 EST 2026
+Started: Thu Nov  5 11:52:16 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -22,8 +22,9 @@ Loading Stage 2 training data...
 
 Sampling negatives with hard negative mining...
   Positives: 754
-  Hard negatives sampled: 26390
-  Easy negatives sampled: 11310
+  Seed-parcel negatives kept (all): 1433
+  Hard negatives sampled: 25387
+  Easy negatives sampled: 10880
   Total training rows: 38454
 
   Class distribution after negative sampling (1 : 50 by design, NOT balanced):
@@ -44,88 +45,88 @@ Sampling negatives with hard negative mining...
   Model columns: 69
 
 Setting up cross-validation folds...
-  Spatial fold 1: train  30,918 (80.4%,   666 pos)  |  test   7,536 (19.6%,    88 pos)
-  Spatial fold 2: train  30,875 (80.3%,   610 pos)  |  test   7,579 (19.7%,   144 pos)
-  Spatial fold 3: train  30,579 (79.5%,   565 pos)  |  test   7,875 (20.5%,   189 pos)
-  Spatial fold 4: train  30,819 (80.1%,   565 pos)  |  test   7,635 (19.9%,   189 pos)
-  Spatial fold 5: train  30,625 (79.6%,   610 pos)  |  test   7,829 (20.4%,   144 pos)
+  Spatial fold 1: train  30,849 (80.2%,   652 pos)  |  test   7,605 (19.8%,   102 pos)
+  Spatial fold 2: train  30,857 (80.2%,   597 pos)  |  test   7,597 (19.8%,   157 pos)
+  Spatial fold 3: train  30,641 (79.7%,   600 pos)  |  test   7,813 (20.3%,   154 pos)
+  Spatial fold 4: train  30,932 (80.4%,   574 pos)  |  test   7,522 (19.6%,   180 pos)
+  Spatial fold 5: train  30,537 (79.4%,   593 pos)  |  test   7,917 (20.6%,   161 pos)
   Spatial folds: 5  |  Standard folds: 5
 
 ========================================
 Tuning with SPATIAL cross-validation...
 ========================================
-  SPATIAL CV complete in 1.1 minutes
-  Best SPATIAL ROC AUC: 0.9965
+  SPATIAL CV complete in 1.2 minutes
+  Best SPATIAL ROC AUC: 0.9932
 
 ========================================
 Tuning with STANDARD cross-validation...
 ========================================
-  STANDARD CV complete in 1.0 minutes
-  Best STANDARD ROC AUC: 0.9972
+  STANDARD CV complete in 1.1 minutes
+  Best STANDARD ROC AUC: 0.9938
 
 CV Comparison:
          cv   roc_auc
-1  Standard  0.997231
-0   Spatial  0.996527
+1  Standard  0.993753
+0   Spatial  0.993181
 
 ========================================
 Fitting final model on full training data...
 ========================================
-  Grouped split by CWNS_ID: 575 plant(s) train / 192 test
-    train 29,865 rows (564 pos)  |  test 8,589 rows (190 pos)
+  Grouped split by CWNS_ID: 576 plant(s) train / 192 test
+    train 30,042 rows (565 pos)  |  test 8,412 rows (189 pos)
 
 FINAL RESULTS SUMMARY
 Test set metrics:
-  roc_auc     : 0.9965
-  accuracy    : 0.9789
-  sensitivity : 0.9684
-  specificity : 0.9792
-  brier_class : 0.0160
+  roc_auc     : 0.9915
+  accuracy    : 0.9604
+  sensitivity : 0.9524
+  specificity : 0.9606
+  brier_class : 0.0288
 
-  Scaled to deployment: 2.1% false-positive rate against ~11,997 candidate
-  parcels per plant is roughly 250 false parcel(s) per plant ranked
+  Scaled to deployment: 3.9% false-positive rate against ~11,997 candidate
+  parcels per plant is roughly 473 false parcel(s) per plant ranked
   above threshold. That is why rank-1 accuracy, not specificity, is the number
   that matters -- see 12_score_holdout.py.
 
 Confusion matrix (rows=truth, cols=predicted; 1=this parcel IS the plant, 0=it is not):
-[[8224  175]
- [   6  184]]
+[[7899  324]
+ [   9  180]]
 
 Computing feature importance...
 Top 20 features:
             Variable  Importance  Importance_std
-       ll_bldg_count    0.001845        0.000077
-         log_gisacre    0.001699        0.000404
-          ll_gisacre    0.001655        0.000401
-    name_pool_is_max    0.001280        0.000320
-        total_pixels    0.000618        0.000232
-      d_seed_nearest    0.000575        0.000219
-              osm_ww    0.000569        0.000010
-d_seed_nearest_indep    0.000558        0.000222
-    name_match_score    0.000496        0.000135
-      dominant_count    0.000268        0.000179
-       bldg_per_acre    0.000259        0.000073
-           has_water    0.000256        0.000052
-       name_pool_gap    0.000240        0.000086
-      name_pool_rank    0.000183        0.000089
-     water_pixel_pct    0.000176        0.000038
-        in_seed_site    0.000173        0.000005
-      lbcs_ownership    0.000164        0.000049
-  name_pool_n_at_max    0.000159        0.000096
-      on_seed_parcel    0.000148        0.000005
-       lbcs_function    0.000139        0.000063
+         log_gisacre    0.005270        0.000484
+          ll_gisacre    0.005069        0.000493
+       ll_bldg_count    0.003375        0.000345
+      lbcs_ownership    0.002652        0.000419
+        is_municipal    0.002194        0.000262
+        total_pixels    0.001271        0.000301
+    name_pool_is_max    0.001267        0.000260
+      name_pool_rank    0.001225        0.000207
+    name_match_score    0.001144        0.000182
+              osm_ww    0.001098        0.000024
+      dominant_count    0.001060        0.000236
+d_seed_nearest_indep    0.000957        0.000426
+  owner_has_llc_corp    0.000931        0.000234
+      d_seed_nearest    0.000884        0.000436
+  name_pool_n_at_max    0.000732        0.000231
+       bldg_per_acre    0.000563        0.000172
+        water_pixels    0.000545        0.000033
+       name_pool_gap    0.000476        0.000100
+     water_pixel_pct    0.000429        0.000072
+d_seed_icis_fac_addr    0.000420        0.000141
 
 Running threshold analysis...
-  Optimal Stage 2 threshold (Youden J): 0.524
+  Optimal Stage 2 threshold (Youden J): 0.329
 
 CV Comparison:
          cv   roc_auc
-1  Standard  0.997231
-0   Spatial  0.996527
-Optimal threshold: 0.524
+1  Standard  0.993753
+0   Spatial  0.993181
+Optimal threshold: 0.329
 
 Saving model...
-  stage2_rf_model.joblib saved: 30.1 MB
+  stage2_rf_model.joblib saved: 30.0 MB
 
 === Stage 2 training complete ===
-Finished: Thu Nov  5 11:41:35 EST 2026
+Finished: Thu Nov  5 11:55:38 EST 2026
