@@ -142,6 +142,7 @@ Full-universe run started 2026-11-03, walking the steps one at a time. Results a
 | 02 rerun + 02b | 2026-11-04 | 7 tasks rerun, all exit 0; AK/HI/PR od_ran False. 14_stage1 5,435 sites / 2,901 plants; 15_stage2 9.97M rows / 818 plants. CWNS-point site Correct 75.4%, other sites 16.8% |
 | 03, first pass | 2026-11-04 | no label leak; spatial CV AUC 0.985; plant-level 95% target -> 0.673 (~85% captured). Raised STAGE1_ACCEPT_PRECISION to 0.975 (0.85 gave 97.7% / 67.6% captured on 323 held-out plants); rerun 03 |
 | 03 rerun | 2026-11-05 | 97.5% target -> ACCEPT THRESHOLD 0.814 (Youden 0.554); same model, AUC 0.985 |
+| 04, first pass | 2026-11-05 | 768 plants (14 with no positive), spatial CV AUC 0.9965, no errors -- but the 1:50 negative sample was drawn on parcel attributes only, so almost no negative sat on a seed parcel (0.02% of candidates) and the declined seed sites / CWNS-point parcel were barely in training. Fixed: 04 keeps every seed-parcel negative; rerun 04 |
 | 02 onward | not started | |
 
 Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a

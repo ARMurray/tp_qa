@@ -90,24 +90,35 @@ def sample_negatives(s2: pd.DataFrame, neg_ratio: int, random_state: int = 123) 
         (s2["owner_is_govt"] == True) |
         (s2["has_ww_keyword"] == True)
     )
-    hard_negatives = s2[(s2["label"] == 0) & hard_mask]
-    easy_negatives = s2[(s2["label"] == 0) & ~s2["ll_uuid"].isin(hard_negatives["ll_uuid"])]
+    # Multi-source: every negative on one of the plant's own seed parcels / seed sites is kept, unsampled. These
+    # are what Stage 2 has to rank below the truth at inference (the sites Stage 1 declined, the CWNS-point parcel
+    # among them), but they are ~0.02% of candidates, so random sampling dropped nearly all of them and the model
+    # saw "on a seed parcel" as all but a positive label (2026-11-05).
+    seed_cols = [c for c in ("on_seed_parcel", "in_seed_site") if c in s2.columns]
+    seed_mask = (s2[seed_cols].fillna(False).astype(bool).any(axis=1) if seed_cols
+                 else pd.Series(False, index=s2.index))
+    seed_negatives = s2[(s2["label"] == 0) & seed_mask]
+    rest = s2[(s2["label"] == 0) & ~seed_mask]
+    hard_negatives = rest[hard_mask[rest.index]]
+    easy_negatives = rest[~rest["ll_uuid"].isin(hard_negatives["ll_uuid"])]
 
     n_positives = len(positives)
-    n_target_neg = n_positives * neg_ratio
+    n_target_neg = max(n_positives * neg_ratio - len(seed_negatives), 0)
     n_hard = min(len(hard_negatives), round(n_target_neg * 0.7))
     n_easy = min(len(easy_negatives), n_target_neg - n_hard)
 
     print(f"  Positives: {n_positives}")
+    if seed_cols:
+        print(f"  Seed-parcel negatives kept (all): {len(seed_negatives)}")
     print(f"  Hard negatives sampled: {n_hard}")
     print(f"  Easy negatives sampled: {n_easy}")
-    print(f"  Total training rows: {n_positives + n_hard + n_easy}")
+    print(f"  Total training rows: {n_positives + len(seed_negatives) + n_hard + n_easy}")
 
     rng = np.random.RandomState(random_state)
     hard_sample = hard_negatives.sample(n=n_hard, random_state=rng) if n_hard > 0 else hard_negatives.iloc[:0]
     easy_sample = easy_negatives.sample(n=n_easy, random_state=rng) if n_easy > 0 else easy_negatives.iloc[:0]
 
-    return pd.concat([positives, hard_sample, easy_sample], ignore_index=True)
+    return pd.concat([positives, seed_negatives, hard_sample, easy_sample], ignore_index=True)
 
 
 def main():
