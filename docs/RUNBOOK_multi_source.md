@@ -141,6 +141,7 @@ Full-universe run started 2026-11-03, walking the steps one at a time. Results a
 | 02, first pass | 2026-11-04 | two arrays ran at once (7607149, and 7607200 cancelled part-way); AK/HI/PR stopped on 'no seed-site detection' but reported exit 0, so 02b would have merged without them. Elsewhere OD joined 5,338 / 5,338 and correct sites per plant {1: 2560, 0: 282}. Fixed: no-NAIP states get od_ran False (C.NO_NAIP_STATES); the slurm script exits with Python's status. Rerun tasks 0,1,10,28,32,38,39, then 02b |
 | 02 rerun + 02b | 2026-11-04 | 7 tasks rerun, all exit 0; AK/HI/PR od_ran False. 14_stage1 5,435 sites / 2,901 plants; 15_stage2 9.97M rows / 818 plants. CWNS-point site Correct 75.4%, other sites 16.8% |
 | 03, first pass | 2026-11-04 | no label leak; spatial CV AUC 0.985; plant-level 95% target -> 0.673 (~85% captured). Raised STAGE1_ACCEPT_PRECISION to 0.975 (0.85 gave 97.7% / 67.6% captured on 323 held-out plants); rerun 03 |
+| 03 rerun | 2026-11-05 | 97.5% target -> ACCEPT THRESHOLD 0.814 (Youden 0.554); same model, AUC 0.985 |
 | 02 onward | not started | |
 
 Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a

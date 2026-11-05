@@ -318,11 +318,11 @@ def main():
             print(f"  accept at score >= {r['threshold']:.2f}: {int(r['n_accepted'])} plants, "
                   f"precision {r['precision']:.3f}, captures {r['capture']:.1%} of plants that have a Correct site")
         if plant_thr is None:
-            print(f"  No cut reaches {C.STAGE1_ACCEPT_PRECISION:.0%} plant-level precision over >= 30 plants; "
+            print(f"  No cut reaches {C.STAGE1_ACCEPT_PRECISION:.1%} plant-level precision over >= 30 plants; "
                   f"keeping the Youden threshold {optimal_threshold:.3f}")
         else:
             accept_threshold = max(optimal_threshold, plant_thr)
-            print(f"  Plant-level threshold for {C.STAGE1_ACCEPT_PRECISION:.0%} precision: {plant_thr:.3f}; "
+            print(f"  Plant-level threshold for {C.STAGE1_ACCEPT_PRECISION:.1%} precision: {plant_thr:.3f}; "
                   f"Youden {optimal_threshold:.3f}; ACCEPT THRESHOLD = {accept_threshold:.3f}")
 
     # ---- Save model ----
