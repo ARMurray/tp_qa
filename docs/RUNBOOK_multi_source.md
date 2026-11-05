@@ -143,6 +143,7 @@ Full-universe run started 2026-11-03, walking the steps one at a time. Results a
 | 03, first pass | 2026-11-04 | no label leak; spatial CV AUC 0.985; plant-level 95% target -> 0.673 (~85% captured). Raised STAGE1_ACCEPT_PRECISION to 0.975 (0.85 gave 97.7% / 67.6% captured on 323 held-out plants); rerun 03 |
 | 03 rerun | 2026-11-05 | 97.5% target -> ACCEPT THRESHOLD 0.814 (Youden 0.554); same model, AUC 0.985 |
 | 04, first pass | 2026-11-05 | 768 plants (14 with no positive), spatial CV AUC 0.9965, no errors -- but the 1:50 negative sample was drawn on parcel attributes only, so almost no negative sat on a seed parcel (0.02% of candidates) and the declined seed sites / CWNS-point parcel were barely in training. Fixed: 04 keeps every seed-parcel negative; rerun 04 |
+| 04 rerun | 2026-11-05 | job 7608620, exit 0: 1,433 seed-parcel negatives kept within the same 37,700-negative budget; spatial CV AUC 0.9965 -> 0.9932, test AUC 0.9915, Youden 0.524 -> 0.329 (05 ranks by Stage 2 score and does not use this threshold). Parcel-size / ownership features now lead; on_seed_parcel and in_seed_site left the top 20 because sitting on a seed no longer means 'the plant' by itself |
 | 02 onward | not started | |
 
 Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a
