@@ -1,26 +1,26 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/05_arr_7568283_32.log
-# job 7568283 task 32 on r7n07, exit status 0, copied 2026-10-09 11:59:12
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/05_arr_7608672_32.log
+# job 7608672 task 32 on r4n08, exit status 0, copied 2026-11-05 14:16:10
 #
 ==========================================
-Node:    r7n07
-Job ID:  7568448
+Node:    r4n08
+Job ID:  7608708
 CPUs:    8
-Started: Fri Oct  9 11:52:07 EDT 2026
+Started: Thu Nov  5 14:11:51 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
 Processing state: OH  (array index 32 of 48)
-Output: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=OH
-Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states OH --out-dir /work/GRDVULN/tp_qa/correction/data/inference_shards/state=OH
+Output: /work/GRDVULN/tp_qa/correction/data/inference_shards_multi/state=OH
+Running: python /work/GRDVULN/tp_qa/correction/scripts/05_run_inference.py --states OH --out-dir /work/GRDVULN/tp_qa/correction/data/inference_shards_multi/state=OH
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/sklearn/impute/_base.py:647: UserWarning: Skipping features without any observed values: ['od_max_conf_drying_bed']. At least one non-missing value is needed for imputation with strategy='median'.
   warnings.warn(
 === 05_run_inference.py ===
 States: ['OH']
 
 Loading Stage 1 / Stage 2a models...
-  Loaded stage1_rf_model.joblib: 74 feature columns, threshold=0.595
-  Loaded stage2_rf_model.joblib: 49 feature columns, threshold=0.646
+  Loaded stage1_rf_model.joblib: 94 feature columns, threshold=0.814
+  Loaded stage2_rf_model.joblib: 69 feature columns, threshold=0.329
 
 Loading full-universe plant list...
   Dropped 1 rows with non-numeric/missing coordinates
@@ -28,33 +28,32 @@ Loading full-universe plant list...
   774 plants across 1 state(s)
 
 Loading plant/parcel features (from 02_feature_engineering.py --full-universe)...
-  Parcel features narrowed to ['OH']: 77679378 -> 4417789 rows
-  Plant features: 15543 rows  |  Parcel features: 4417789 rows
+  Parcel features narrowed to ['OH']: 85587556 -> 4686473 rows
+  Plant features: 15543 rows  |  Parcel features: 4686473 rows
 
-Loading OD features (01b reported-location output)...
-  12677 plants with OD output
+Multi-source: seed-site OD is loaded inside Stage 1 (01e --seed-sites output)
 
-=== Stage 1: reported-location scoring ===
-  Plants: 774  |  reported parcel found: 565  |  no parcel: 209 (27.0%)
-  OSM-confirmed (passed by rule, not by the model): 51
-  Flagged for Stage 2: 554 (209 no_parcel + 345 low_confidence)
+=== Stage 1: seed-site scoring (multi-source) ===
+  Plants: 774  |  seed sites: 1799 for 774 plants
+  Seed-site OD joined: od_ran True for 1799 / 1799 sites
+  Accepted by Stage 1: 471 (OSM rule 159)  |  multi_pass flagged: 0
+  Flagged for Stage 2: 303 (0 no_parcel + 303 low_confidence)
 
 === Stage 2a: candidate scoring ===
-    OH: 100/554 plants (0.1 min elapsed)
-    OH: 200/554 plants (0.3 min elapsed)
-    OH: 300/554 plants (0.4 min elapsed)
-    OH: 400/554 plants (0.6 min elapsed)
-    OH: 500/554 plants (0.7 min elapsed)
-  OH: 554 flagged plants processed
-  Raw candidates (post reported-parcel exclusion): 4893705
+  Multi-source: seeds for 303 of 303 flagged plants
+    OH: 100/303 plants (0.2 min elapsed)
+    OH: 200/303 plants (0.4 min elapsed)
+    OH: 300/303 plants (0.6 min elapsed)
+  OH: 303 flagged plants processed
+  Raw candidates (post reported-parcel exclusion): 2691785
 
 === Summary ===
   Plants scored          : 774
-  Flagged for Stage 2     : 554
-  Plants with >=1 candidate: 554
+  Flagged for Stage 2     : 303
+  Plants with >=1 candidate: 303
   Flagged w/ 0 candidates  : 0 (no parcel survived K_RINGS + reported-parcel exclusion)
-  Not flagged (Stage 1 ok) : 220 (no candidates by design -- confirm_reported task in 10)
+  Not flagged (Stage 1 ok) : 471 (no candidates by design -- confirm_reported task in 10)
 
-Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=OH/plant_summary.parquet
-Written: /work/GRDVULN/tp_qa/correction/data/inference_shards/state=OH/stage2_candidates.parquet
-Finished: Fri Oct  9 11:59:12 EDT 2026  (exit 0)
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards_multi/state=OH/plant_summary.parquet
+Written: /work/GRDVULN/tp_qa/correction/data/inference_shards_multi/state=OH/stage2_candidates.parquet
+Finished: Thu Nov  5 14:16:10 EST 2026  (exit 0)
