@@ -1,16 +1,16 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_odcand_7608823.log
-# job 7608823 on r7n22, exit status 0, copied 2026-11-05 22:26:46
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_odcand_7608916.log
+# job 7608916 on r7n21, exit status 0, copied 2026-11-06 07:59:32
 #
 ==========================================
-Node:    r7n22
-Job ID:  7608823
+Node:    r7n21
+Job ID:  7608916
 CPUs:    32
-Started: Thu Nov  5 20:39:28 EST 2026
+Started: Fri Nov  6 07:52:50 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
-Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32 --training-corrections
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
@@ -20,60 +20,34 @@ Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py 
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 === 01e_run_od_candidates.py ===
-output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_train_multi
+output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 
 Loading Stage 2a candidates...
   127488 candidate(s) across 6379 plant(s) (top 20 each)
-  Corrections layer: 841 plant(s)
-  Excluding 425 holdout plant(s) -> 791 trainable
-  Candidates for those plants: 6919 across 346 plant(s)
-  NOTE: 445 trainable correction(s) have no Stage 2a candidates at all -- Stage 1 did not flag them, or K_RINGS produced nothing. They cannot contribute a row either way.
+  Holdout manifest: 425 plants; 50 in bin(s) ['corrections']
+  Candidates for those plants: 560 across 28 plant(s)
 
 --- work plan ---
-  AL: 20 candidate parcel(s), 1 plant(s)
-  AR: 80 candidate parcel(s), 4 plant(s)
-  AZ: 40 candidate parcel(s), 2 plant(s)
-  CA: 180 candidate parcel(s), 9 plant(s)
-  CO: 80 candidate parcel(s), 4 plant(s)
-  DE: 20 candidate parcel(s), 1 plant(s)
-  FL: 140 candidate parcel(s), 7 plant(s)
-  GA: 100 candidate parcel(s), 5 plant(s)
-  IA: 200 candidate parcel(s), 10 plant(s)
-  ID: 80 candidate parcel(s), 4 plant(s)
-  IL: 420 candidate parcel(s), 21 plant(s)
-  IN: 100 candidate parcel(s), 5 plant(s)
-  KS: 80 candidate parcel(s), 4 plant(s)
-  KY: 220 candidate parcel(s), 11 plant(s)
-  LA: 160 candidate parcel(s), 8 plant(s)
+  FL: 20 candidate parcel(s), 1 plant(s)
+  GA: 20 candidate parcel(s), 1 plant(s)
+  IA: 20 candidate parcel(s), 1 plant(s)
+  IL: 20 candidate parcel(s), 1 plant(s)
+  KS: 20 candidate parcel(s), 1 plant(s)
+  KY: 60 candidate parcel(s), 3 plant(s)
   MA: 20 candidate parcel(s), 1 plant(s)
-  MD: 100 candidate parcel(s), 5 plant(s)
-  ME: 39 candidate parcel(s), 2 plant(s)
-  MI: 80 candidate parcel(s), 4 plant(s)
-  MN: 160 candidate parcel(s), 8 plant(s)
-  MO: 180 candidate parcel(s), 9 plant(s)
-  MS: 40 candidate parcel(s), 2 plant(s)
-  NC: 180 candidate parcel(s), 9 plant(s)
-  ND: 140 candidate parcel(s), 7 plant(s)
-  NE: 240 candidate parcel(s), 12 plant(s)
-  NH: 40 candidate parcel(s), 2 plant(s)
-  NJ: 20 candidate parcel(s), 1 plant(s)
-  NM: 100 candidate parcel(s), 5 plant(s)
-  NY: 420 candidate parcel(s), 21 plant(s)
-  OH: 800 candidate parcel(s), 40 plant(s)
-  OK: 100 candidate parcel(s), 5 plant(s)
-  OR: 460 candidate parcel(s), 23 plant(s)
-  PA: 100 candidate parcel(s), 5 plant(s)
-  SC: 60 candidate parcel(s), 3 plant(s)
-  TN: 20 candidate parcel(s), 1 plant(s)
-  TX: 520 candidate parcel(s), 26 plant(s)
-  UT: 140 candidate parcel(s), 7 plant(s)
-  VA: 20 candidate parcel(s), 1 plant(s)
-  VT: 40 candidate parcel(s), 2 plant(s)
-  WA: 140 candidate parcel(s), 7 plant(s)
-  WI: 700 candidate parcel(s), 35 plant(s)
-  WV: 120 candidate parcel(s), 6 plant(s)
-  WY: 20 candidate parcel(s), 1 plant(s)
-  TOTAL: 6919 candidate parcel(s)
+  MI: 20 candidate parcel(s), 1 plant(s)
+  MT: 20 candidate parcel(s), 1 plant(s)
+  NC: 20 candidate parcel(s), 1 plant(s)
+  ND: 20 candidate parcel(s), 1 plant(s)
+  NE: 20 candidate parcel(s), 1 plant(s)
+  NY: 60 candidate parcel(s), 3 plant(s)
+  OH: 20 candidate parcel(s), 1 plant(s)
+  OK: 20 candidate parcel(s), 1 plant(s)
+  OR: 60 candidate parcel(s), 3 plant(s)
+  SD: 20 candidate parcel(s), 1 plant(s)
+  TX: 20 candidate parcel(s), 1 plant(s)
+  WI: 80 candidate parcel(s), 4 plant(s)
+  TOTAL: 560 candidate parcel(s)
   Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
   Using weights: best.pt
 
@@ -83,197 +57,73 @@ Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digest
 Connecting to Planetary Computer STAC API...
 Connected.
 
---- State AL: 20 candidate(s) ---
+--- State FL: 20 candidate(s) ---
     ...20 candidate(s) done, 20 row(s) flushed (0.5 min elapsed)
 
---- State AR: 80 candidate(s) ---
-    ...100 candidate(s) done, 80 row(s) flushed (1.1 min elapsed)
+--- State GA: 20 candidate(s) ---
+    ...40 candidate(s) done, 20 row(s) flushed (0.8 min elapsed)
 
---- State AZ: 40 candidate(s) ---
-    ...140 candidate(s) done, 40 row(s) flushed (1.5 min elapsed)
+--- State IA: 20 candidate(s) ---
+    ...60 candidate(s) done, 20 row(s) flushed (0.9 min elapsed)
 
---- State CA: 180 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014153Z-15656b5c7b6gs8skhC1IAD6z040000001fk0000000009p1m.) -- retrying in 11s (attempt 1/5)
-    ...320 candidate(s) done, 180 row(s) flushed (2.9 min elapsed)
+--- State IL: 20 candidate(s) ---
+    ...80 candidate(s) done, 20 row(s) flushed (1.1 min elapsed)
 
---- State CO: 80 candidate(s) ---
-    ...400 candidate(s) done, 80 row(s) flushed (3.5 min elapsed)
+--- State KS: 20 candidate(s) ---
+    ...100 candidate(s) done, 20 row(s) flushed (1.3 min elapsed)
 
---- State DE: 20 candidate(s) ---
-    ...420 candidate(s) done, 20 row(s) flushed (3.7 min elapsed)
-
---- State FL: 140 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014354Z-17b55b9d57fgnpvhhC1IAD6kmg00000019r00000000019m1.) -- retrying in 9s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014437Z-17b55b9d57fpb8gchC1IADd89800000013t0000000006qcg.) -- retrying in 14s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014455Z-17b55b9d57fxt2hxhC1IADxrs000000015e0000000006tdu.) -- retrying in 9s (attempt 1/5)
-    ...560 candidate(s) done, 140 row(s) flushed (5.2 min elapsed)
-
---- State GA: 100 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014547Z-r1fcbf6d797xlnxthC1IAD9b8g0000001690000000000s3c.) -- retrying in 12s (attempt 1/5)
-    ...660 candidate(s) done, 100 row(s) flushed (6.2 min elapsed)
-
---- State IA: 200 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014645Z-r1fcbf6d79796vllhC1IADzg7n00000019sg000000000h66.) -- retrying in 14s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014733Z-er16cb5f4fbq2vhxhC1IAD3p0c0000001fmg00000000bxgn.) -- retrying in 15s (attempt 1/5)
-    ...860 candidate(s) done, 200 row(s) flushed (8.2 min elapsed)
-
---- State ID: 80 candidate(s) ---
-    ...940 candidate(s) done, 80 row(s) flushed (8.7 min elapsed)
-
---- State IL: 420 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014859Z-16995f4f7c6h4n2whC1IADxyd400000013q0000000003v7v.) -- retrying in 8s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T014942Z-16995f4f7c6cmkqvhC1IADq23g00000019e0000000003mka.) -- retrying in 11s (attempt 1/5)
-    ...1140 candidate(s) done, 200 row(s) flushed (10.7 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T015056Z-r1fcbf6d79742v9thC1IADeafg0000001fbg000000007s59.) -- retrying in 15s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T015145Z-16b94c8dd67bxpgfhC1BL1f47s00000013q0000000006319.) -- retrying in 15s (attempt 1/5)
-    ...1340 candidate(s) done, 200 row(s) flushed (12.7 min elapsed)
-    ...1360 candidate(s) done, 20 row(s) flushed (12.9 min elapsed)
-
---- State IN: 100 candidate(s) ---
-    ...1460 candidate(s) done, 100 row(s) flushed (13.7 min elapsed)
-
---- State KS: 80 candidate(s) ---
-    ...1540 candidate(s) done, 80 row(s) flushed (14.3 min elapsed)
-
---- State KY: 220 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T015444Z-16995f4f7c6nvvbzhC1IADeqzg00000013t0000000005w1s.) -- retrying in 9s (attempt 1/5)
-    ...1740 candidate(s) done, 200 row(s) flushed (15.9 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T015555Z-er16cb5f4fb8v2f7hC1IADpeuw0000001fyg0000000009gg.) -- retrying in 10s (attempt 1/5)
-    ...1760 candidate(s) done, 20 row(s) flushed (16.2 min elapsed)
-
---- State LA: 160 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T015646Z-r1fcbf6d797pkgd9hC1IADhesn00000019cg00000000b4km.) -- retrying in 9s (attempt 1/5)
-    ...1920 candidate(s) done, 160 row(s) flushed (33.0 min elapsed)
+--- State KY: 60 candidate(s) ---
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T125457Z-16b688ff68fpnj27hC1BL1zp5c0000001d4g00000000akg9.) -- retrying in 14s (attempt 1/5)
+    ...160 candidate(s) done, 60 row(s) flushed (2.2 min elapsed)
 
 --- State MA: 20 candidate(s) ---
-    ...1940 candidate(s) done, 20 row(s) flushed (33.2 min elapsed)
+    ...180 candidate(s) done, 20 row(s) flushed (2.4 min elapsed)
 
---- State MD: 100 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T021344Z-er16cb5f4fbvtcgmhC1IADpaa400000019g0000000003uh3.) -- retrying in 8s (attempt 1/5)
-    ...2040 candidate(s) done, 100 row(s) flushed (34.1 min elapsed)
+--- State MI: 20 candidate(s) ---
+    ...200 candidate(s) done, 20 row(s) flushed (2.6 min elapsed)
 
---- State ME: 39 candidate(s) ---
-    ...2079 candidate(s) done, 39 row(s) flushed (34.4 min elapsed)
+--- State MT: 20 candidate(s) ---
+    ...220 candidate(s) done, 20 row(s) flushed (2.8 min elapsed)
 
---- State MI: 80 candidate(s) ---
-    ...2159 candidate(s) done, 80 row(s) flushed (35.0 min elapsed)
+--- State NC: 20 candidate(s) ---
+    ...240 candidate(s) done, 20 row(s) flushed (3.0 min elapsed)
 
---- State MN: 160 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T021536Z-16995f4f7c6wcxklhC1IADhmfc0000001470000000008s81.) -- retrying in 16s (attempt 1/5)
-    ...2319 candidate(s) done, 160 row(s) flushed (36.4 min elapsed)
+--- State ND: 20 candidate(s) ---
+    ...260 candidate(s) done, 20 row(s) flushed (3.2 min elapsed)
 
---- State MO: 180 candidate(s) ---
-    ...2499 candidate(s) done, 180 row(s) flushed (37.8 min elapsed)
+--- State NE: 20 candidate(s) ---
+    ...280 candidate(s) done, 20 row(s) flushed (3.3 min elapsed)
 
---- State MS: 40 candidate(s) ---
-    ...2539 candidate(s) done, 40 row(s) flushed (38.1 min elapsed)
+--- State NY: 60 candidate(s) ---
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T125654Z-er16cb5f4fbgwj4rhC1IADxsw00000001dbg000000000eke.) -- retrying in 13s (attempt 1/5)
+    ...340 candidate(s) done, 60 row(s) flushed (4.1 min elapsed)
 
---- State NC: 180 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T021846Z-er16cb5f4fb4whd7hC1IAD8c3400000015t0000000004w5c.) -- retrying in 16s (attempt 1/5)
-    ...2719 candidate(s) done, 180 row(s) flushed (39.7 min elapsed)
+--- State OH: 20 candidate(s) ---
+    ...360 candidate(s) done, 20 row(s) flushed (4.3 min elapsed)
 
---- State ND: 140 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T022033Z-16b94c8dd6756nbrhC1BL1xxd8000000184000000000dtbh.) -- retrying in 13s (attempt 1/5)
-    ...2859 candidate(s) done, 140 row(s) flushed (41.3 min elapsed)
+--- State OK: 20 candidate(s) ---
+    ...380 candidate(s) done, 20 row(s) flushed (4.4 min elapsed)
 
---- State NE: 240 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T022153Z-16995f4f7c64dbzwhC1IAD8r6g00000019d000000000zr9y.) -- retrying in 9s (attempt 1/5)
-    ...3059 candidate(s) done, 200 row(s) flushed (43.0 min elapsed)
-    ...3099 candidate(s) done, 40 row(s) flushed (43.2 min elapsed)
+--- State OR: 60 candidate(s) ---
+    ...440 candidate(s) done, 60 row(s) flushed (5.0 min elapsed)
 
---- State NH: 40 candidate(s) ---
-    33000034001::a4cecd02-8acf-4a50-ac63-6719f50e1243: every tile failed -- Read failed. See previous exception for details. | caused by: CPLE_AppDefinedError: IReadBlock failed at X offset 7, Y offset 12: TIFFReadEncodedTile() failed. 
-    ...3139 candidate(s) done, 40 row(s) flushed (59.2 min elapsed)
+--- State SD: 20 candidate(s) ---
+    ...460 candidate(s) done, 20 row(s) flushed (5.1 min elapsed)
 
---- State NJ: 20 candidate(s) ---
-    ...3159 candidate(s) done, 20 row(s) flushed (59.4 min elapsed)
+--- State TX: 20 candidate(s) ---
+    ...480 candidate(s) done, 20 row(s) flushed (5.3 min elapsed)
 
---- State NM: 100 candidate(s) ---
-    ...3259 candidate(s) done, 100 row(s) flushed (60.1 min elapsed)
-
---- State NY: 420 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024045Z-16995f4f7c647znrhC1IADev60000000147g000000001pep.) -- retrying in 15s (attempt 1/5)
-    ...3459 candidate(s) done, 200 row(s) flushed (61.8 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024233Z-16995f4f7c6drhwbhC1IADrnt40000001fr000000000hw0w.) -- retrying in 14s (attempt 1/5)
-    ...3659 candidate(s) done, 200 row(s) flushed (63.6 min elapsed)
-    ...3679 candidate(s) done, 20 row(s) flushed (63.8 min elapsed)
-
---- State OH: 800 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024433Z-15656b5c7b6hcrpshC1IADqxfs000000162000000000n37w.) -- retrying in 10s (attempt 1/5)
-    ...3879 candidate(s) done, 200 row(s) flushed (65.2 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024550Z-15656b5c7b6vqs7hhC1IADg4x4000000162g000000003wtz.) -- retrying in 12s (attempt 1/5)
-    ...4079 candidate(s) done, 200 row(s) flushed (66.8 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024659Z-16995f4f7c6wcxklhC1IADhmfc0000001420000000004hd9.) -- retrying in 11s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024743Z-16995f4f7c6cmkqvhC1IADq23g00000019n0000000004zy0.) -- retrying in 11s (attempt 1/5)
-    ...4279 candidate(s) done, 200 row(s) flushed (68.6 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024854Z-17b55b9d57fgxvqthC1IADa73n0000001ft00000000047wm.) -- retrying in 9s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T024936Z-17b55b9d57flxjdghC1IADx7tc0000001fr000000000b05x.) -- retrying in 10s (attempt 1/5)
-    ...4479 candidate(s) done, 200 row(s) flushed (70.4 min elapsed)
-
---- State OK: 100 candidate(s) ---
-    ...4579 candidate(s) done, 100 row(s) flushed (71.1 min elapsed)
-
---- State OR: 460 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T025141Z-er16cb5f4fbvhlkjhC1IADzgqc0000001480000000005dbd.) -- retrying in 12s (attempt 1/5)
-    ...4779 candidate(s) done, 200 row(s) flushed (72.7 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T025337Z-er16cb5f4fb58jqmhC1IAD1fmc00000019q000000000371y.) -- retrying in 11s (attempt 1/5)
-    ...4979 candidate(s) done, 200 row(s) flushed (74.4 min elapsed)
-    ...5039 candidate(s) done, 60 row(s) flushed (74.8 min elapsed)
-
---- State PA: 100 candidate(s) ---
-    ...5139 candidate(s) done, 100 row(s) flushed (75.6 min elapsed)
-
---- State SC: 60 candidate(s) ---
-    ...5199 candidate(s) done, 60 row(s) flushed (76.1 min elapsed)
-
---- State TN: 20 candidate(s) ---
-    ...5219 candidate(s) done, 20 row(s) flushed (76.3 min elapsed)
-
---- State TX: 520 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T025653Z-er16cb5f4fb8v2f7hC1IADpeuw0000001g70000000000xaw.) -- retrying in 12s (attempt 1/5)
-    ...5419 candidate(s) done, 200 row(s) flushed (77.8 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T025832Z-16b94c8dd67nc6zghC1BL1r6c800000018n0000000001qzn.) -- retrying in 11s (attempt 1/5)
-    ...5619 candidate(s) done, 200 row(s) flushed (79.3 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T025952Z-17b55b9d57fznm2mhC1IADkavn00000014n00000000004mh.) -- retrying in 8s (attempt 1/5)
-    ...5739 candidate(s) done, 120 row(s) flushed (97.3 min elapsed)
-
---- State UT: 140 candidate(s) ---
-    ...5879 candidate(s) done, 140 row(s) flushed (98.0 min elapsed)
-
---- State VA: 20 candidate(s) ---
-    ...5899 candidate(s) done, 20 row(s) flushed (98.2 min elapsed)
-
---- State VT: 40 candidate(s) ---
-    ...5939 candidate(s) done, 40 row(s) flushed (98.6 min elapsed)
-
---- State WA: 140 candidate(s) ---
-    ...6079 candidate(s) done, 140 row(s) flushed (99.6 min elapsed)
-
---- State WI: 700 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T031950Z-16995f4f7c6wcxklhC1IADhmfc00000014fg0000000027h4.) -- retrying in 14s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T032037Z-er16cb5f4fbhcb7khC1IADxmfn0000001en0000000002u4t.) -- retrying in 11s (attempt 1/5)
-    ...6279 candidate(s) done, 200 row(s) flushed (101.4 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T032153Z-16995f4f7c6c69k8hC1IADd5aw0000001460000000005ra7.) -- retrying in 11s (attempt 1/5)
-    ...6479 candidate(s) done, 200 row(s) flushed (102.9 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T032332Z-r1fcbf6d797krqhmhC1IAD58e8000000143g000000005bfb.) -- retrying in 10s (attempt 1/5)
-    ...6679 candidate(s) done, 200 row(s) flushed (104.5 min elapsed)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T032454Z-16b94c8dd67qp8c4hC1BL1hrm000000015y00000000046p4.) -- retrying in 11s (attempt 1/5)
-    ...6779 candidate(s) done, 100 row(s) flushed (105.4 min elapsed)
-
---- State WV: 120 candidate(s) ---
-    ...6899 candidate(s) done, 120 row(s) flushed (106.3 min elapsed)
-
---- State WY: 20 candidate(s) ---
-    ...6919 candidate(s) done, 20 row(s) flushed (106.5 min elapsed)
+--- State WI: 80 candidate(s) ---
+    ...560 candidate(s) done, 80 row(s) flushed (5.9 min elapsed)
 
 === Summary ===
-  Candidates processed : 6919
+  Candidates processed : 560
   Skipped (resume)     : 0
   No parcel geometry   : 0
-  Every tile failed    : 1  (od_fetch_error holds the first error; a rerun retries them)
+  Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
   Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 106.5 min
+  Elapsed              : 5.9 min
 
-Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_train_multi
+Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Thu Nov  5 22:26:46 EST 2026  (exit 0)
+Finished: Fri Nov  6 07:59:31 EST 2026  (exit 0)
