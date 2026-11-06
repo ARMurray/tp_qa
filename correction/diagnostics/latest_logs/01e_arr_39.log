@@ -1,17 +1,17 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7607096_39.log
-# job 7607096 task 39 on r5n05, exit status 0, copied 2026-11-04 13:13:29
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7609031_39.log
+# job 7609031 task 39 on r5n04, exit status 0, copied 2026-11-06 13:39:19
 #
 ==========================================
-Node:    r5n05
-Job ID:  7607139
+Node:    r5n04
+Job ID:  7609130
 CPUs:    16
-Started: Wed Nov  4 13:12:06 EST 2026
+Started: Fri Nov  6 13:25:46 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
 Processing state: TN  (array index 39 of 48)
-Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --seed-sites --states TN --workers 8
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --all --states TN --workers 8
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
@@ -21,15 +21,16 @@ Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py 
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.modules.head.Detect' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 === 01e_run_od_candidates.py ===
-output: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
+output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 
-Loading seed sites...
-  400 seed-site parcel(s) across 252 plant(s)
-  Restricted to ['TN']: 400 candidate(s)
+Loading Stage 2a candidates...
+  127488 candidate(s) across 6379 plant(s) (top 20 each)
+  --all: no scope restriction
+  Restricted to ['TN']: 820 candidate(s)
 
 --- work plan ---
-  TN: 400 candidate parcel(s), 252 plant(s)
-  TOTAL: 400 candidate parcel(s)
+  TN: 820 candidate parcel(s), 41 plant(s)
+  TOTAL: 820 candidate parcel(s)
   Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
   Using weights: best.pt
 
@@ -39,26 +40,73 @@ Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digest
 Connecting to Planetary Computer STAC API...
 Connected.
 
---- State TN: 400 candidate(s) ---
-  Resume: skipping 372 already done
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181228Z-15656b5c7b649d9shC1IADyszn0000000tz00000000018tm.) -- retrying in 13s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181251Z-16995f4f7c6xrqlthC1IADqfnc0000000tz0000000002zfq.) -- retrying in 13s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181311Z-r1fcbf6d7979c5l2hC1IADzpps0000000z4g00000000741e.) -- retrying in 15s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181312Z-r1fcbf6d797vff9jhC1IADzrkg0000000zgg00000000249h.) -- retrying in 11s (attempt 1/5)
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261104T181312Z-r1fcbf6d797h4rn4hC1IAD57bn0000000310000000007485.) -- retrying in 12s (attempt 1/5)
-    ...28 candidate(s) done, 28 row(s) flushed (1.1 min elapsed)
+--- State TN: 820 candidate(s) ---
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182637Z-er16cb5f4fbmhvjzhC1IADwdg000000019b0000000002fey.) -- retrying in 15s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182710Z-16b688ff68fbbx9xhC1BL1zw1g0000001f00000000002cnd.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182733Z-er16cb5f4fb4whd7hC1IAD8c340000001bag0000000002af.) -- retrying in 12s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182745Z-15656b5c7b6d4lt9hC1IAD97zg0000001b1g00000000250h.) -- retrying in 22s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182830Z-17b55b9d57f8dzx4hC1IAD14pw000000190g00000000adg2.) -- retrying in 14s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182844Z-er16cb5f4fbgwj4rhC1IADxsw00000001ew0000000004nz6.) -- retrying in 16s (attempt 2/5)
+    ...200 candidate(s) done, 200 row(s) flushed (2.9 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182926Z-er16cb5f4fbkjlb7hC1IADhp1c0000001b1g000000006dz0.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T182936Z-er16cb5f4fb8pkcfhC1IADq2e40000001b00000000003kes.) -- retrying in 23s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183009Z-16b688ff68fj75nnhC1BL1s9c80000001eqg00000000mwf4.) -- retrying in 13s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183032Z-er16cb5f4fbl69lkhC1IAD81tc0000001nug00000000637k.) -- retrying in 11s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183044Z-16b688ff68fbbx9xhC1BL1zw1g0000001f1g0000000030zx.) -- retrying in 17s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183122Z-16b94c8dd67qp8c4hC1BL1hrm00000001b90000000000tu5.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183127Z-16b94c8dd675ppwwhC1BL1bff00000001ayg000000006pke.) -- retrying in 16s (attempt 1/5)
+    ...400 candidate(s) done, 200 row(s) flushed (5.6 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183219Z-17b55b9d57fk9z9bhC1IAD2gvn0000001mn0000000003s1g.) -- retrying in 13s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183233Z-r1fcbf6d797vff9jhC1IADzrkg0000001ez00000000033ur.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183244Z-r1fcbf6d7978rvr8hC1IADgh0c00000019c00000000017k0.) -- retrying in 18s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183314Z-16b688ff68fj9b6qhC1BL1t8200000001mr0000000003nkp.) -- retrying in 15s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183331Z-16995f4f7c6p6qmzhC1IADgakg0000001m6g00000000839t.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183348Z-17b55b9d57fjmvbzhC1IAD3nu80000001av00000000083zz.) -- retrying in 13s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183419Z-17b55b9d57fpx9nrhC1IADffwc0000001b7g000000001suh.) -- retrying in 13s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183419Z-17b55b9d57fbw5dkhC1IADqb2n0000001b2g00000000adx3.) -- retrying in 13s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183420Z-17b55b9d57fkgfjmhC1IAD54cc000000192g000000007zpp.) -- retrying in 16s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183420Z-17b55b9d57f75bdmhC1IAD4bzn00000019cg000000009ruw.) -- retrying in 9s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183420Z-17b55b9d57fb7r5nhC1IAD6qtc0000001930000000009rwg.) -- retrying in 13s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183420Z-17b55b9d57fcmpc6hC1IADenn00000001b6g000000007twu.) -- retrying in 9s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183421Z-17b55b9d57flxjdghC1IADx7tc0000001p80000000000zm4.) -- retrying in 9s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183421Z-17b55b9d57f8dzx4hC1IAD14pw000000190g00000000b63n.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183429Z-17b55b9d57fkgfjmhC1IAD54cc00000018vg00000000zm8w.) -- retrying in 17s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183429Z-17b55b9d57f5p42xhC1IADzabg0000001bp0000000002meg.) -- retrying in 20s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183430Z-17b55b9d57fxt2hxhC1IADxrs00000001b0g000000008yc9.) -- retrying in 21s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183431Z-17b55b9d57f9rn4hhC1IADrb580000001f200000000070r4.) -- retrying in 18s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183432Z-17b55b9d57f8629khC1IADg2zw0000001mtg000000000tg5.) -- retrying in 18s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183435Z-16995f4f7c6qrg8khC1IADcgac00000019a0000000001pr0.) -- retrying in 18s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183442Z-r1fcbf6d797dhtbxhC1IADnfv400000019kg0000000014c9.) -- retrying in 16s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183446Z-r1fcbf6d797clkknhC1IADn5pn0000001980000000007rqx.) -- retrying in 14s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183449Z-17b55b9d57fgxvqthC1IADa73n0000001ns000000000b3pu.) -- retrying in 35s (attempt 3/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183449Z-17b55b9d57fznm2mhC1IADkavn000000198g00000000515z.) -- retrying in 32s (attempt 3/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183449Z-17b55b9d57f7s2kjhC1IAD7wk400000019c00000000071z9.) -- retrying in 39s (attempt 3/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183450Z-17b55b9d57fgxvqthC1IADa73n0000001p200000000040zw.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183459Z-16995f4f7c697khdhC1IADk0vg000000198g00000000n8k0.) -- retrying in 15s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183515Z-16b688ff68f7cp2whC1BL1zxr00000001nng00000000w07b.) -- retrying in 9s (attempt 1/5)
+    ...600 candidate(s) done, 200 row(s) flushed (9.4 min elapsed)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183544Z-17b55b9d57fpx9nrhC1IADffwc0000001b8g000000001zbv.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183555Z-16b688ff68fqn4t8hC1BL10chs0000001mn0000000006wq2.) -- retrying in 20s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183620Z-r1fcbf6d797dhtbxhC1IADnfv400000019h00000000013nk.) -- retrying in 14s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183648Z-16995f4f7c64blsrhC1IAD0e9c0000001mv000000000041y.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183658Z-15656b5c7b6ztm2dhC1IADr00s0000001ax00000000061pu.) -- retrying in 16s (attempt 2/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183725Z-16b94c8dd67h667dhC1BL113hn0000001bb0000000008rq3.) -- retrying in 9s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183742Z-er16cb5f4fbjsgtdhC1IADc5fs00000018wg00000000ab3d.) -- retrying in 10s (attempt 1/5)
+    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T183752Z-er16cb5f4fbrc294hC1IADsn2c0000001bq00000000022f3.) -- retrying in 17s (attempt 2/5)
+    ...800 candidate(s) done, 200 row(s) flushed (12.9 min elapsed)
+    ...820 candidate(s) done, 20 row(s) flushed (13.1 min elapsed)
 
 === Summary ===
-  Candidates processed : 28
-  Skipped (resume)     : 372
+  Candidates processed : 820
+  Skipped (resume)     : 0
   No parcel geometry   : 0
   Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
   Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 1.1 min
+  Elapsed              : 13.1 min
 
-Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_seed_sites
+Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Wed Nov  4 13:13:29 EST 2026  (exit 0, 1 min)
-THROUGHPUT NOTE: divide this task's 'Candidates processed' by 1
+Finished: Fri Nov  6 13:39:19 EST 2026  (exit 0, 13 min)
+THROUGHPUT NOTE: divide this task's 'Candidates processed' by 13
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.
