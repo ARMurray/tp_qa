@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/07b_rerank_7568966.log
-# job 7568966 on r5n14, exit status 0, copied 2026-10-09 15:20:08
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/07b_rerank_7608860.log
+# job 7608860 on r7n22, exit status 0, copied 2026-11-06 00:33:55
 #
 ==========================================
-Node:    r5n14
-Job ID:  7568966
+Node:    r7n22
+Job ID:  7608860
 CPUs:    16
-Started: Fri Oct  9 15:14:56 EDT 2026
+Started: Fri Nov  6 00:30:28 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -16,17 +16,17 @@ Running: python /work/GRDVULN/tp_qa/correction/scripts/07b_train_rerank.py
 === 07b_train_rerank.py: Stage 2a Re-ranker ===
 
 Loading re-rank training data...
-  [holdout] rerank: removed 0 rows / 0 plants (12495 -> 12495)
-  Rows: 12495  |  plants: 625
-  Label=1 (true parcel): 552
-  Label=0 (competitor) : 11943
-  Pools containing the true parcel: 552/625 (88%)
+  [holdout] rerank: removed 0 rows / 0 plants (6714 -> 6714)
+  Rows: 6714  |  plants: 336
+  Label=1 (true parcel): 309
+  Label=0 (competitor) : 6405
+  Pools containing the true parcel: 309/336 (92%)
 
-  Split by plant: 469 train / 156 test plant(s)
+  Split by plant: 252 train / 84 test plant(s)
   Dropping leaking columns: ['true_ll_uuid', 'pool_has_positive']
   Dropping 1 all-NaN columns: ['od_max_conf_drying_bed']
-  Model columns: 84
-  Class balance 1:22  |  weights true 0.956 / competitor 0.044
+  Model columns: 104
+  Class balance 1:21  |  weights true 0.954 / competitor 0.046
 
 Setting up cross-validation folds...
   Spatial folds: 5  |  Standard (grouped): 5
@@ -34,21 +34,21 @@ Setting up cross-validation folds...
 ========================================
 Tuning with SPATIAL cross-validation...
 ========================================
-  SPATIAL CV complete in 2.4 minutes
-  Best SPATIAL ROC AUC: 0.9834
-    across 20 configs: mean 0.9804, sd 0.0020
+  SPATIAL CV complete in 1.5 minutes
+  Best SPATIAL ROC AUC: 0.9737
+    across 20 configs: mean 0.9692, sd 0.0028
 
 ========================================
 Tuning with STANDARD (grouped) cross-validation...
 ========================================
-  STANDARD (grouped) CV complete in 2.3 minutes
-  Best STANDARD (grouped) ROC AUC: 0.9824
-    across 20 configs: mean 0.9803, sd 0.0015
+  STANDARD (grouped) CV complete in 1.4 minutes
+  Best STANDARD (grouped) ROC AUC: 0.9756
+    across 20 configs: mean 0.9709, sd 0.0033
 
 CV Comparison:
          cv   roc_auc
-0   Spatial  0.983407
-1  Standard  0.982419
+1  Standard  0.975629
+0   Spatial  0.973659
 
 ========================================
 Fitting final model...
@@ -57,39 +57,39 @@ Fitting final model...
 ========================================
 Ranking performance on held-out plants
 ========================================
-  recall@1:  Stage 2a 63.8% (88/138)   re-rank 83.3% (115/138)   +19.6%
-  recall@3:  Stage 2a 83.3% (115/138)   re-rank 97.8% (135/138)   +14.5%
-  recall@5:  Stage 2a 89.9% (124/138)   re-rank 98.6% (136/138)   +8.7%
+  recall@1:  Stage 2a 60.8% (48/79)   re-rank 73.4% (58/79)   +12.7%
+  recall@3:  Stage 2a 86.1% (68/79)   re-rank 93.7% (74/79)   +7.6%
+  recall@5:  Stage 2a 87.3% (69/79)   re-rank 94.9% (75/79)   +7.6%
 
-  Denominator is the 138 test plant(s) whose pool contains
-  the true parcel, of 156 total. The other 18 cannot be
+  Denominator is the 79 test plant(s) whose pool contains
+  the true parcel, of 84 total. The other 5 cannot be
   found by ANY ranking -- that gap belongs to candidate generation
   (see 08_diagnose_candidate_coverage.py), not to this model.
 
 Computing feature importance...
               Variable  Importance  Importance_std
-          stage2a_rank    0.009760        0.000643
-   stage2_prob_correct    0.009035        0.001554
-                osm_ww    0.004695        0.000501
-            distance_m    0.001821        0.000096
-          log_distance    0.001650        0.000106
-  od_any_fired_in_pool    0.001536        0.000522
-         lbcs_activity    0.001514        0.000052
-          is_municipal    0.001390        0.000487
-od_fired_share_of_pool    0.001314        0.000312
-       od_pool_n_fired    0.001081        0.000097
-        lbcs_ownership    0.000964        0.000351
-        dominant_count    0.000667        0.000077
-     od_max_confidence    0.000524        0.000039
-    name_pool_n_at_max    0.000504        0.000347
-         bldg_per_acre    0.000493        0.000171
-          od_n_objects    0.000477        0.000149
-            ll_gisacre    0.000418        0.000177
-   od_n_detections_raw    0.000415        0.000167
-  dominant_class_group    0.000399        0.000161
-            within_1km    0.000393        0.000121
+          stage2a_rank    0.017864        0.002140
+   stage2_prob_correct    0.008656        0.001498
+                osm_ww    0.003499        0.000283
+  d_seed_nearest_indep    0.003110        0.000337
+od_fired_share_of_pool    0.002859        0.000457
+      od_has_detection    0.002756        0.000412
+        d_seed_nearest    0.002236        0.000299
+  dominant_class_group    0.002065        0.000194
+   od_n_detections_raw    0.001803        0.000382
+  od_any_fired_in_pool    0.001626        0.000275
+        lbcs_ownership    0.001450        0.000681
+          od_n_objects    0.001393        0.000357
+        dominant_count    0.001260        0.000869
+           n_seeds_1km    0.001197        0.000250
+       od_pool_n_fired    0.001158        0.000090
+     od_max_confidence    0.001120        0.000086
+         n_origins_1km    0.001047        0.000276
+          od_n_classes    0.000976        0.000291
+     od_dominant_class    0.000838        0.000203
+            ll_gisacre    0.000778        0.000552
 
 Saved: rerank_rf_model.joblib
 
 Next: 05b_rerank_candidates.py, then score the holdout.
-Finished: Fri Oct  9 15:20:08 EDT 2026  (exit 0)
+Finished: Fri Nov  6 00:33:55 EST 2026  (exit 0)
