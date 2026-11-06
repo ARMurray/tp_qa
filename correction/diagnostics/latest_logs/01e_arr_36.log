@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7609031_36.log
-# job 7609031 task 36 on r5n04, exit status 0, copied 2026-11-06 13:10:00
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_arr_7609222_36.log
+# job 7609222 task 36 on r5n10, exit status 0, copied 2026-11-06 18:13:30
 #
 ==========================================
-Node:    r5n04
-Job ID:  7609124
+Node:    r5n10
+Job ID:  7609259
 CPUs:    16
-Started: Fri Nov  6 13:09:38 EST 2026
+Started: Fri Nov  6 18:13:27 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -21,7 +21,7 @@ Loading Stage 2a candidates...
   Restricted to ['RI']: 0 candidate(s)
 
 Nothing to do.
-Finished: Fri Nov  6 13:10:00 EST 2026  (exit 0, 0 min)
+Finished: Fri Nov  6 18:13:30 EST 2026  (exit 0, 0 min)
 THROUGHPUT NOTE: divide this task's 'Candidates processed' by 0
   min, then SUM across concurrent tasks to get aggregate rate. Compare
   that against the 39/min single-job baseline before raising the throttle.
