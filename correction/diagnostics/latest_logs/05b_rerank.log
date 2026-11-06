@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/05b_rerank_7609018.log
-# job 7609018 on r7n13, exit status 0, copied 2026-11-06 10:05:20
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/05b_rerank_7609276.log
+# job 7609276 on r7n11, exit status 0, copied 2026-11-06 18:47:29
 #
 ==========================================
-Node:    r7n13
-Job ID:  7609018
+Node:    r7n11
+Job ID:  7609276
 CPUs:    8
-Started: Fri Nov  6 10:04:57 EST 2026
+Started: Fri Nov  6 18:46:44 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -21,22 +21,21 @@ Loading Stage 2a candidates...
   127488 candidate(s) across 6379 plant(s)
 
 Loading candidate OD features (01e --all)...
-  680 candidate(s) with OD across 34 plant(s)
-  OD coverage: 680/127488 candidate(s) (0.5%)
-  WARNING: under half of candidates have OD. Rows without it score as 'nothing detected', which is indistinguishable from a genuine non-detection. Consider --no-od until the 01e array has covered these states.
+  127488 candidate(s) with OD across 6379 plant(s)
+  OD coverage: 127488/127488 candidate(s) (100.0%)
 
 Deriving features...
 Scoring...
 
-  Fallback to Stage 2a ordering for 6355 plant(s) where no candidate fired
+  Fallback to Stage 2a ordering for 2028 plant(s) where no candidate fired
 
-  Candidates whose rank changed : 429 (0.3%)
-  Plants with a NEW top pick    : 10 (0.2%)
-  Median Stage 2a rank of the promoted candidate: 6
+  Candidates whose rank changed : 75939 (59.6%)
+  Plants with a NEW top pick    : 1328 (20.8%)
+  Median Stage 2a rank of the promoted candidate: 3
 
 Written: /work/GRDVULN/tp_qa/correction/data/inference_multi/stage2_candidates_reranked.parquet
 Written: /work/GRDVULN/tp_qa/correction/data/inference_multi/plant_summary_reranked.parquet
 
 Next: point 10_build_review_queue.py at the reranked table. Both scores are
 preserved per candidate, so a reviewer can compare Stage 2a against the re-rank.
-Finished: Fri Nov  6 10:05:20 EST 2026  (exit 0)
+Finished: Fri Nov  6 18:47:29 EST 2026  (exit 0)
