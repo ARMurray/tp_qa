@@ -1,16 +1,16 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_odcand_7608974.log
-# job 7608974 on r7n13, exit status 0, copied 2026-11-06 09:24:08
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_odcand_7608990.log
+# job 7608990 on r5n11, exit status 0, copied 2026-11-06 09:39:59
 #
 ==========================================
-Node:    r7n13
-Job ID:  7608974
+Node:    r5n11
+Job ID:  7608990
 CPUs:    32
-Started: Fri Nov  6 09:23:26 EST 2026
+Started: Fri Nov  6 09:37:17 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
-Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32 --holdout-bins corrections
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32 --holdout-bins corrections,correct
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
@@ -24,11 +24,11 @@ output: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 
 Loading Stage 2a candidates...
   127488 candidate(s) across 6379 plant(s) (top 20 each)
-  Holdout manifest: 425 plants; 50 in bin(s) ['corrections']
-  Candidates for those plants: 560 across 28 plant(s)
+  Holdout manifest: 425 plants; 350 in bin(s) ['corrections', 'correct']
+  Candidates for those plants: 680 across 34 plant(s)
 
 --- work plan ---
-  FL: 20 candidate parcel(s), 1 plant(s)
+  FL: 40 candidate parcel(s), 2 plant(s)
   GA: 20 candidate parcel(s), 1 plant(s)
   IA: 20 candidate parcel(s), 1 plant(s)
   IL: 20 candidate parcel(s), 1 plant(s)
@@ -36,18 +36,20 @@ Loading Stage 2a candidates...
   KY: 60 candidate parcel(s), 3 plant(s)
   MA: 20 candidate parcel(s), 1 plant(s)
   MI: 20 candidate parcel(s), 1 plant(s)
+  MO: 20 candidate parcel(s), 1 plant(s)
   MT: 20 candidate parcel(s), 1 plant(s)
   NC: 20 candidate parcel(s), 1 plant(s)
   ND: 20 candidate parcel(s), 1 plant(s)
   NE: 20 candidate parcel(s), 1 plant(s)
-  NY: 60 candidate parcel(s), 3 plant(s)
+  NY: 80 candidate parcel(s), 4 plant(s)
   OH: 20 candidate parcel(s), 1 plant(s)
   OK: 20 candidate parcel(s), 1 plant(s)
   OR: 60 candidate parcel(s), 3 plant(s)
   SD: 20 candidate parcel(s), 1 plant(s)
-  TX: 20 candidate parcel(s), 1 plant(s)
-  WI: 80 candidate parcel(s), 4 plant(s)
-  TOTAL: 560 candidate parcel(s)
+  TX: 40 candidate parcel(s), 2 plant(s)
+  WI: 100 candidate parcel(s), 5 plant(s)
+  WV: 20 candidate parcel(s), 1 plant(s)
+  TOTAL: 680 candidate parcel(s)
   Each is tiled by 01b's generate_tile_grid -- most parcels are one tile, large ones more.
   Using weights: best.pt
 
@@ -57,8 +59,9 @@ Classes: {0: 'aeration_basin', 1: 'chlorine_contact', 2: 'clarifier', 3: 'digest
 Connecting to Planetary Computer STAC API...
 Connected.
 
---- State FL: 20 candidate(s) ---
+--- State FL: 40 candidate(s) ---
   Resume: skipping 20 already done
+    ...20 candidate(s) done, 20 row(s) flushed (0.6 min elapsed)
 
 --- State GA: 20 candidate(s) ---
   Resume: skipping 20 already done
@@ -81,6 +84,9 @@ Connected.
 --- State MI: 20 candidate(s) ---
   Resume: skipping 20 already done
 
+--- State MO: 20 candidate(s) ---
+    ...40 candidate(s) done, 20 row(s) flushed (0.8 min elapsed)
+
 --- State MT: 20 candidate(s) ---
   Resume: skipping 20 already done
 
@@ -93,8 +99,9 @@ Connected.
 --- State NE: 20 candidate(s) ---
   Resume: skipping 20 already done
 
---- State NY: 60 candidate(s) ---
+--- State NY: 80 candidate(s) ---
   Resume: skipping 60 already done
+    ...60 candidate(s) done, 20 row(s) flushed (1.1 min elapsed)
 
 --- State OH: 20 candidate(s) ---
   Resume: skipping 20 already done
@@ -108,20 +115,25 @@ Connected.
 --- State SD: 20 candidate(s) ---
   Resume: skipping 20 already done
 
---- State TX: 20 candidate(s) ---
+--- State TX: 40 candidate(s) ---
   Resume: skipping 20 already done
+    ...80 candidate(s) done, 20 row(s) flushed (1.3 min elapsed)
 
---- State WI: 80 candidate(s) ---
+--- State WI: 100 candidate(s) ---
   Resume: skipping 80 already done
+    ...100 candidate(s) done, 20 row(s) flushed (1.5 min elapsed)
+
+--- State WV: 20 candidate(s) ---
+    ...120 candidate(s) done, 20 row(s) flushed (1.7 min elapsed)
 
 === Summary ===
-  Candidates processed : 0
+  Candidates processed : 120
   Skipped (resume)     : 560
   No parcel geometry   : 0
   Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
   Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 0.0 min
+  Elapsed              : 1.7 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Fri Nov  6 09:24:07 EST 2026  (exit 0)
+Finished: Fri Nov  6 09:39:59 EST 2026  (exit 0)
