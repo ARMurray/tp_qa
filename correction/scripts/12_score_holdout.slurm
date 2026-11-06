@@ -38,6 +38,9 @@
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
 
+# sbatch --export splits on commas: pass BINS="corrections+correct"; '+' and spaces become commas here.
+BINS="$(echo "${BINS:-}" | tr '+ ' ',,')"
+
 CMD="python $SCRIPTS/12_score_holdout.py"
 [ -n "${NOOD:-}" ]   && CMD="$CMD --no-od"
 [ -n "${BINS:-}" ]   && CMD="$CMD --bins $BINS"

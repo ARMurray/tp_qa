@@ -16,7 +16,7 @@
 #   sbatch --export=DRYRUN="1" 01e_run_od_candidates.slurm            # plan only
 #   sbatch 01e_run_od_candidates.slurm                                # holdout corrections
 #   sbatch --export=SCOPE="train" 01e_run_od_candidates.slurm         # re-rank TRAINING data
-#   sbatch --export=SCOPE="all",STATES="OH,WI,KS" 01e_run_od_candidates.slurm
+#   sbatch --export=SCOPE="all",STATES="OH+WI+KS" 01e_run_od_candidates.slurm
 #
 # SCOPE: all | train | queue | unset (holdout)
 # (original note follows)
@@ -34,8 +34,8 @@
 #
 # Other variables:
 #   DRYRUN=1      report the work plan, fetch no imagery
-#   BINS=...      holdout bins (default "corrections")
-#   STATES=...    comma-separated state filter
+#   BINS=...      holdout bins (default "corrections"), e.g. "corrections+correct"
+#   STATES=...    state filter, e.g. "OH+WI+KS" (not commas: sbatch --export splits on them)
 #   TOPK=20       candidates per plant. Keep at 20: capping OD at the top 5
 #                 means the re-ranker can only reorder the 5 you would have
 #                 reviewed anyway, and cannot promote a true parcel sitting
@@ -56,6 +56,11 @@
 # split by state instead.
 
 source /work/GRDVULN/tp_qa/correction/scripts/_common.sh
+
+# sbatch --export splits on commas, so a list passed that way must use '+' or spaces
+# (BINS="corrections+correct"); they are turned into commas here.
+BINS="$(echo "${BINS:-}" | tr '+ ' ',,')"
+STATES="$(echo "${STATES:-}" | tr '+ ' ',,')"
 
 CMD="python $SCRIPTS/01e_run_od_candidates.py --workers ${WORKERS:-32}"
 
