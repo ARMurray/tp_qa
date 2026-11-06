@@ -1,16 +1,16 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_odcand_7608916.log
-# job 7608916 on r7n21, exit status 0, copied 2026-11-06 07:59:32
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/01e_odcand_7608974.log
+# job 7608974 on r7n13, exit status 0, copied 2026-11-06 09:24:08
 #
 ==========================================
-Node:    r7n21
-Job ID:  7608916
+Node:    r7n13
+Job ID:  7608974
 CPUs:    32
-Started: Fri Nov  6 07:52:50 EST 2026
+Started: Fri Nov  6 09:23:26 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
 ------------------------------------------
-Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32
+Running: python /work/GRDVULN/tp_qa/correction/scripts/01e_run_od_candidates.py --workers 32 --holdout-bins corrections
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'ultralytics.nn.tasks.DetectionModel' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
   _check_container_source(*data)
 /work/GRDVULN/tp_qa/correction/.venv/lib64/python3.11/site-packages/torch/serialization.py:1831: SourceChangeWarning: source code of class 'torch.nn.modules.container.Sequential' has changed. you can retrieve the original source code by accessing the object's source attribute or set `torch.nn.Module.dump_patches = True` and use the patch tool to revert the changes.
@@ -58,72 +58,70 @@ Connecting to Planetary Computer STAC API...
 Connected.
 
 --- State FL: 20 candidate(s) ---
-    ...20 candidate(s) done, 20 row(s) flushed (0.5 min elapsed)
+  Resume: skipping 20 already done
 
 --- State GA: 20 candidate(s) ---
-    ...40 candidate(s) done, 20 row(s) flushed (0.8 min elapsed)
+  Resume: skipping 20 already done
 
 --- State IA: 20 candidate(s) ---
-    ...60 candidate(s) done, 20 row(s) flushed (0.9 min elapsed)
+  Resume: skipping 20 already done
 
 --- State IL: 20 candidate(s) ---
-    ...80 candidate(s) done, 20 row(s) flushed (1.1 min elapsed)
+  Resume: skipping 20 already done
 
 --- State KS: 20 candidate(s) ---
-    ...100 candidate(s) done, 20 row(s) flushed (1.3 min elapsed)
+  Resume: skipping 20 already done
 
 --- State KY: 60 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T125457Z-16b688ff68fpnj27hC1BL1zp5c0000001d4g00000000akg9.) -- retrying in 14s (attempt 1/5)
-    ...160 candidate(s) done, 60 row(s) flushed (2.2 min elapsed)
+  Resume: skipping 60 already done
 
 --- State MA: 20 candidate(s) ---
-    ...180 candidate(s) done, 20 row(s) flushed (2.4 min elapsed)
+  Resume: skipping 20 already done
 
 --- State MI: 20 candidate(s) ---
-    ...200 candidate(s) done, 20 row(s) flushed (2.6 min elapsed)
+  Resume: skipping 20 already done
 
 --- State MT: 20 candidate(s) ---
-    ...220 candidate(s) done, 20 row(s) flushed (2.8 min elapsed)
+  Resume: skipping 20 already done
 
 --- State NC: 20 candidate(s) ---
-    ...240 candidate(s) done, 20 row(s) flushed (3.0 min elapsed)
+  Resume: skipping 20 already done
 
 --- State ND: 20 candidate(s) ---
-    ...260 candidate(s) done, 20 row(s) flushed (3.2 min elapsed)
+  Resume: skipping 20 already done
 
 --- State NE: 20 candidate(s) ---
-    ...280 candidate(s) done, 20 row(s) flushed (3.3 min elapsed)
+  Resume: skipping 20 already done
 
 --- State NY: 60 candidate(s) ---
-    Transient error (Request rate limited or blocked. Slow down, or contact planetarycomputer@microsoft.com with reference 20261106T125654Z-er16cb5f4fbgwj4rhC1IADxsw00000001dbg000000000eke.) -- retrying in 13s (attempt 1/5)
-    ...340 candidate(s) done, 60 row(s) flushed (4.1 min elapsed)
+  Resume: skipping 60 already done
 
 --- State OH: 20 candidate(s) ---
-    ...360 candidate(s) done, 20 row(s) flushed (4.3 min elapsed)
+  Resume: skipping 20 already done
 
 --- State OK: 20 candidate(s) ---
-    ...380 candidate(s) done, 20 row(s) flushed (4.4 min elapsed)
+  Resume: skipping 20 already done
 
 --- State OR: 60 candidate(s) ---
-    ...440 candidate(s) done, 60 row(s) flushed (5.0 min elapsed)
+  Resume: skipping 60 already done
 
 --- State SD: 20 candidate(s) ---
-    ...460 candidate(s) done, 20 row(s) flushed (5.1 min elapsed)
+  Resume: skipping 20 already done
 
 --- State TX: 20 candidate(s) ---
-    ...480 candidate(s) done, 20 row(s) flushed (5.3 min elapsed)
+  Resume: skipping 20 already done
 
 --- State WI: 80 candidate(s) ---
-    ...560 candidate(s) done, 80 row(s) flushed (5.9 min elapsed)
+  Resume: skipping 80 already done
 
 === Summary ===
-  Candidates processed : 560
-  Skipped (resume)     : 0
+  Candidates processed : 0
+  Skipped (resume)     : 560
   No parcel geometry   : 0
   Every tile failed    : 0  (od_fetch_error holds the first error; a rerun retries them)
   Parcels capped      : 0  (area > 2 km2 or > 150 tiles: one tile around the seed)
-  Elapsed              : 5.9 min
+  Elapsed              : 0.0 min
 
 Outputs in: /work/GRDVULN/tp_qa/correction/data/od_features_candidates_multi
 Next: score these with stage2b_rf_model.joblib and compare rank-1 accuracy against Stage 2a alone, on the holdout's known truth.
-Finished: Fri Nov  6 07:59:31 EST 2026  (exit 0)
+Finished: Fri Nov  6 09:24:07 EST 2026  (exit 0)
