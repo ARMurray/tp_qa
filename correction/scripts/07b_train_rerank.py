@@ -193,7 +193,7 @@ def main():
     # model see 19 of a plant's 20 candidates during training and then rank
     # the twentieth, which is not the inference task.
     rng = np.random.default_rng(args.seed)
-    plants = df["CWNS_ID"].unique()
+    plants = np.asarray(df["CWNS_ID"].unique(), dtype=object)   # numpy, not ArrowStringArray: shuffle warns on the latter
     rng.shuffle(plants)
     n_test = max(1, int(len(plants) * args.test_frac))
     test_plants = set(plants[:n_test])
