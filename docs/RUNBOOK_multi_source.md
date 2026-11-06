@@ -151,6 +151,7 @@ Full-universe run started 2026-11-03, walking the steps one at a time. Results a
 | 01e holdout | 2026-11-06 | job 7608916, exit 0, 6 min: corrections bin 560 candidates / 28 plants, 0 failed. Stage 1 accepted the other 22 of the 50 corrections-bin plants (out of sample). 12 also scores the correct bin, and in multi mode a flagged correct plant can be moved_right (no parcel is excluded), so its order matters too: rerun with BINS=corrections,correct (resume skips the 560) before 05b |
 | 01e holdout, both bins | 2026-11-06 | job 7608974 did nothing: sbatch --export split BINS="corrections,correct" at the comma, so it ran --holdout-bins corrections and resumed all 560. Fixed: 01e and 12 slurm turn '+' or spaces into commas (BINS="corrections+correct", STATES="OH+WI+KS") |
 | 01e holdout rerun | 2026-11-06 | job 7608990, exit 0: --holdout-bins corrections,correct; 680 candidates / 34 plants, 560 resumed, 120 new, 0 failed. Only 6 of the 300 correct-bin plants were flagged to Stage 2 (out of sample) |
+| 05b (holdout OD only) | 2026-11-06 | job 7609018, exit 0: OD for 680/127,488 candidates (34 holdout plants; the <50% warning is expected before the full 01e array). Fallback to Stage 2a for 6,355 plants = 6,345 without OD + 10 holdout plants where no candidate fired (by design); 24 plants re-ranked, 10 with a new #1 (median promoted from Stage 2a rank 6) |
 | 02 onward | not started | |
 
 Next, once 01e finishes: confirm all array tasks exited 0 (`sacct -j <JOBID> -X --format=JobID%20,State,ExitCode`; a
