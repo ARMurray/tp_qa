@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/12_holdout_7609019.log
-# job 7609019 on a0n15, exit status 0, copied 2026-11-06 10:07:24
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/12_holdout_7609022.log
+# job 7609022 on a0n15, exit status 0, copied 2026-11-06 10:17:51
 #
 ==========================================
 Node:    a0n15
-Job ID:  7609019
+Job ID:  7609022
 CPUs:    4
-Started: Fri Nov  6 10:07:10 EST 2026
+Started: Fri Nov  6 10:17:43 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -62,9 +62,9 @@ CORRECT BIN -- false-move rate
   Flagged for relocation   : 6 (2.1%)  <-- FALSE-MOVE RATE
     low_confidence  : 6
 
-  These plants are known CORRECT, so every flag is a false positive.
-  This is a STAGE 1 property -- re-ranking cannot change it. A plant
-  Stage 1 never flagged has no candidates to reorder.
+  Multi-source: Stage 1 can also ACCEPT a site away from the reported parcel, and a flagged
+  plant can be put back on it by the re-ranker, so flags are not the false-move rate here.
+  The end-to-end FALSE-MOVE RATE is in the MULTI-SOURCE block below.
 
 ==================================================================
 MULTI-SOURCE END TO END -- Stage 1 accept, else re-ranked #1
@@ -79,7 +79,8 @@ MULTI-SOURCE END TO END -- Stage 1 accept, else re-ranked #1
     END-TO-END right    269 / 281 = 95.7%
     Stage 1 accepts     275  precision 97.5%  (7 false accept(s))
     accepted-right by sources: cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs 63, cwns_point+icis_fac_frs 58, cwns_point 35, cwns_point+icis_fac_frs+icis_feat_INF 21, cwns_point+icis_fac_addr+icis_fac_frs 19, cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs+icis_feat_INF 19
-    (a correct plant should be accepted_right; flagged_wrong / accepted_wrong are false moves)
+    accepted-WRONG by sources: icis_fac_frs 2, cwns_addr+icis_fac_addr+icis_fac_frs 2, cwns_point+icis_fac_frs 1, cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs 1, cwns_point 1
+    FALSE-MOVE RATE      12 / 281 = 4.3%  (accepted_wrong + flagged_wrong: a correct plant should be accepted_right)
 
   corrections bin: 50 plants, 48 scored
     moved_right          17
@@ -90,6 +91,7 @@ MULTI-SOURCE END TO END -- Stage 1 accept, else re-ranked #1
     END-TO-END right     34 / 48 = 70.8%
     Stage 1 accepts      20  precision 85.0%  (3 false accept(s))
     accepted-right by sources: icis_fac_frs+icis_feat_INF 4, cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs 2, icis_fac_addr+icis_fac_frs 2, icis_fac_frs 2, cwns_addr+icis_fac_addr 1, cwns_addr+icis_fac_addr+icis_fac_frs+icis_feat_INO 1
+    accepted-WRONG by sources: cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs+icis_feat_INF 1, cwns_point+icis_fac_addr+icis_fac_frs 1, cwns_addr+icis_fac_addr+icis_fac_frs 1
 
 ==================================================================
 BY POPULATION BAND
@@ -97,20 +99,22 @@ BY POPULATION BAND
   corrections bin -- re-ranked #1 is the true parcel (all plants):
     100-1k        10/15  =  66.7%
     >1k           24/35  =  68.6%
-  correct bin -- flagged by Stage 1 (every flag is a false one):
+  correct bin -- moved off the right parcel, end to end:
     100-1k         1/50  =   2.0%
-    >1k            5/231 =   2.2%
+    >1k           11/231 =   4.8%
 
 ==================================================================
 OSM-CONFIRMED RULE -- plants passed without Stage 1
 ==================================================================
   correct     : 196 of 281 scored plants passed by the OSM rule
   corrections : 11 of 48 scored plants passed by the OSM rule
-  -> 11 known-MISPLACED plant(s) kept at their reported location by the rule. That is the rule's error rate; worth a look.
+    correct      OSM-passed outcomes: accepted_right 192, accepted_wrong 4
+    corrections  OSM-passed outcomes: accepted_right 10, accepted_wrong 1
+  (multi-source: the rule accepts an OSM-tagged seed site, not the reported parcel; accepted_wrong is its error)
 
 ==================================================================
 Reading these: the 'pool' denominator measures RANKING, the 'all'
 denominator measures the PIPELINE. If they diverge sharply, the
 gap belongs to candidate generation (08_diagnose_candidate_
 coverage.py), not to any ranking model.
-Finished: Fri Nov  6 10:07:24 EST 2026  (exit 0)
+Finished: Fri Nov  6 10:17:51 EST 2026  (exit 0)
