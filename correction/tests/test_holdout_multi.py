@@ -31,5 +31,12 @@ assert out.at["B", "outcome"] == "accepted_wrong"                               
 assert out.at["C", "outcome"] == "moved_right" and out.at["D", "outcome"] == "flagged_wrong"
 assert out.at["E", "outcome"] == "truth_unresolved"
 assert out.at["F", "outcome"] == "accepted_right" and out.at["G", "outcome"] == "flagged_wrong"            # a false move
-s12.print_multi_source(out.reset_index())
+import contextlib, io
+buf = io.StringIO()
+with contextlib.redirect_stdout(buf):
+    s12.print_multi_source(out.reset_index())
+text = buf.getvalue()
+print(text)
+assert "accepted-WRONG by sources: cwns_point 1" in text, text                         # B's false accept
+assert "FALSE-MOVE RATE       1 / 2 = 50.0%" in text, text                             # G flagged_wrong; F accepted_right
 print("holdout multi-source tests passed")

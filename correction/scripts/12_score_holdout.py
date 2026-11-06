@@ -157,8 +157,13 @@ def print_multi_source(out: pd.DataFrame):
         src = acc[acc["outcome"] == "accepted_right"]["accepted_sources"].fillna("?").value_counts().head(6)
         if len(src):
             print("    accepted-right by sources: " + ", ".join(f"{k} {v}" for k, v in src.items()))
+        src = acc[acc["outcome"] == "accepted_wrong"]["accepted_sources"].fillna("?").value_counts()
+        if len(src):
+            print("    accepted-WRONG by sources: " + ", ".join(f"{k} {v}" for k, v in src.items()))
         if b == "correct":
-            print("    (a correct plant should be accepted_right; flagged_wrong / accepted_wrong are false moves)")
+            moved = int(scored["outcome"].isin(["accepted_wrong", "flagged_wrong"]).sum())
+            print(f"    FALSE-MOVE RATE    {moved:>4} / {n} = {moved / n if n else float('nan'):.1%}  "
+                  f"(accepted_wrong + flagged_wrong: a correct plant should be accepted_right)")
 
 
 def main():
@@ -219,6 +224,7 @@ def main():
         summ["CWNS_ID"] = summ["CWNS_ID"].astype(str)
 
     band_rows = {}   # bin -> (plant ids scored, per-plant outcome Series)
+    outcomes = None  # multi-source end-to-end outcome per plant
 
     # =======================================================================
     # corrections -- the headline
@@ -304,11 +310,16 @@ def main():
                   f"({len(flagged) / len(s):.1%})  <-- FALSE-MOVE RATE")
             for r, n in flagged["trigger_reason"].value_counts().items():
                 print(f"    {r:16s}: {n}")
-            print(f"\n  These plants are known CORRECT, so every flag is a "
-                  f"false positive.")
-            print(f"  This is a STAGE 1 property -- re-ranking cannot change "
-                  f"it. A plant\n  Stage 1 never flagged has no candidates to "
-                  f"reorder.")
+            if C.MULTI:
+                print("\n  Multi-source: Stage 1 can also ACCEPT a site away from the reported parcel, and a flagged")
+                print("  plant can be put back on it by the re-ranker, so flags are not the false-move rate here.")
+                print("  The end-to-end FALSE-MOVE RATE is in the MULTI-SOURCE block below.")
+            else:
+                print(f"\n  These plants are known CORRECT, so every flag is a "
+                      f"false positive.")
+                print(f"  This is a STAGE 1 property -- re-ranking cannot change "
+                      f"it. A plant\n  Stage 1 never flagged has no candidates to "
+                      f"reorder.")
             band_rows["correct"] = (s["CWNS_ID"],
                                     s.set_index("CWNS_ID")["trigger_reason"] != "none")
             no_parcel = int((flagged["trigger_reason"] == "no_parcel").sum())
@@ -332,6 +343,10 @@ def main():
             band_rows["corrections"] = (held_all.loc[held_all["bin"] == "corrections", "CWNS_ID"],
                                         outcomes[outcomes["bin"] == "corrections"].set_index("CWNS_ID")["outcome"]
                                         .isin(["accepted_right", "moved_right"]))
+            if "correct" in band_rows:
+                band_rows["correct"] = (band_rows["correct"][0],
+                                        outcomes[outcomes["bin"] == "correct"].set_index("CWNS_ID")["outcome"]
+                                        .isin(["accepted_wrong", "flagged_wrong"]))
 
     # =======================================================================
     # by population band (since the floor dropped to 100, 2026-10-05)
@@ -352,7 +367,8 @@ def main():
         if "correct" in band_rows:
             ids, flag = band_rows["correct"]
             b = ids.map(lambda i: C.pop_band(pops.get(i)))
-            print("  correct bin -- flagged by Stage 1 (every flag is a false one):")
+            print("  correct bin -- " + ("moved off the right parcel, end to end:" if outcomes is not None
+                                       else "flagged by Stage 1 (every flag is a false one):"))
             for band, grp in ids.groupby(b):
                 n = len(grp)
                 k = int(flag.reindex(grp).fillna(False).astype(bool).sum())
@@ -375,7 +391,18 @@ def main():
             print(f"  {b:12s}: {n_osm} of {int(r.notna().sum())} scored plants passed by the OSM rule")
         n_bad = int((routed.reindex(man.loc[man["bin"] == "corrections", "CWNS_ID"])
                      == "osm_confirmed").sum())
-        if n_bad:
+        if outcomes is not None:
+            # multi-source: the rule accepts the plant's OSM-tagged seed SITE, which need not hold the reported point
+            o = outcomes.set_index("CWNS_ID")
+            for b in ("correct", "corrections"):
+                ids = man.loc[man["bin"] == b, "CWNS_ID"]
+                osm_ids = [i for i in ids if routed.get(i) == "osm_confirmed" and i in o.index]
+                if osm_ids:
+                    vc = o.loc[osm_ids, "outcome"].value_counts()
+                    print(f"    {b:12s} OSM-passed outcomes: " + ", ".join(f"{k} {v}" for k, v in vc.items()))
+            print("  (multi-source: the rule accepts an OSM-tagged seed site, not the reported parcel;"
+                  " accepted_wrong is its error)")
+        elif n_bad:
             print(f"  -> {n_bad} known-MISPLACED plant(s) kept at their reported location "
                   f"by the rule. That is the rule's error rate; worth a look.")
 
