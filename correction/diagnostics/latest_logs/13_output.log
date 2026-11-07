@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/13_output_7573424.log
-# job 7573424 on r7n09, exit status 0, copied 2026-10-13 17:15:36
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/13_output_7609280.log
+# job 7609280 on r7n11, exit status 0, copied 2026-11-06 19:22:17
 #
 ==========================================
-Node:    r7n09
-Job ID:  7573424
+Node:    r7n11
+Job ID:  7609280
 CPUs:    4
-Started: Tue Oct 13 17:04:17 EDT 2026
+Started: Fri Nov  6 19:07:46 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -14,63 +14,66 @@ Running: python /work/GRDVULN/tp_qa/correction/scripts/13_build_corrected_output
 === 13_build_corrected_output.py ===
 move rule: Stage 1 flagged AND re-rank #1 >= 0.95
 site rule: neighbours within 50 m with a detection (conf >= 0.4) or #1's owner (re-rank >= 0.5); max 4 parcels
-  master: Updates.gpkg layer CWNS_Locations_20261013: 32,296 facilities
+  master: Updates.gpkg layer CWNS_Locations_20261014: 32,296 facilities
   treatment plants: 17,874
-  re-ranked #1 candidates with a current-detector result: 93.0%
+  re-ranked #1 candidates with a current-detector result: 100.0%
 
-  flagged plants: 8,562  |  clearing the move rule: 2,192
+  flagged plants: 5,926  |  clearing the move rule: 1,317
+  Stage 1 accepted a non-CWNS seed site for 2,297 plant(s)
 
-  loading 55,302 parcel geometries...
-  found 55,302
+  loading 40,555 parcel geometries...
+  found 40,555
 
   loading detected objects...
   objects from reported            23,081  (91 current file(s))
   objects from corrected                0  (0 current file(s))
-  objects from candidate           74,941  (142 current file(s))
-  objects from candidate_queue      1,688  (70 current file(s))
+  objects from candidate           61,911  (688 current file(s))
+  objects from seed_site           63,938  (112 current file(s))
 
-  moves: 2,070 moved, 122 kept_site (reported parcel in the site), 576 multi-parcel site(s), 0 parcel(s) not found
-  reviewer points kept exactly: 832 of 832
+  moves: 3,052 moved, 562 kept_site (reported parcel in the site), 509 multi-parcel site(s), 0 parcel(s) not found
+  reviewer points kept exactly: 841 of 841
 
-  sites layer: 13,063 plant site(s)  |  detections layer: 32,737 object(s)
+  sites layer: 15,474 plant site(s)  |  detections layer: 42,394 object(s)
+
+  location basis: flagged_not_moved 4,609, stage1_accept 4,216, reviewer 3,117, not_assessed 2,318, stage1_accept_seed 2,297, stage2_move 755, kept_site 562
+  moved plants led by: icis_fac_frs 1,408, cwns_addr+icis_fac_addr 586, cwns_point 330, icis_fac_addr 267, icis_feat_INF 186, cwns_addr 157, cwns_point+icis_fac_frs 33, icis_fac_frs+icis_feat_INF 28
 
 === status ===
-  flagged_not_moved        6,370  (35.6%)
-  kept_model               3,766  (21.1%)
+  flagged_not_moved        4,609  (25.8%)
+  kept_model               3,910  (21.9%)
+  moved                    3,052  (17.1%)
   not_assessed             2,318  (13.0%)
-  verified_correct         2,226  (12.5%)
-  moved                    2,070  (11.6%)
-  verified_corrected         832  (4.7%)
-  kept_site                  122  (0.7%)
-  kept_osm                   121  (0.7%)
+  verified_correct         2,227  (12.5%)
+  verified_corrected         841  (4.7%)
+  kept_site                  562  (3.1%)
+  kept_osm                   306  (1.7%)
   reviewed_unresolved         49  (0.3%)
   TOTAL                   17,874
 
   by population band:
 pop_band             100-1k   >1k  below_floor  unknown
 status                                                 
-flagged_not_moved      2694  3676            0        0
-kept_model             1709  2057            0        0
-kept_osm                 13   108            0        0
-kept_site                42    80            0        0
-moved                   736  1334            0        0
+flagged_not_moved      2342  2267            0        0
+kept_model             1683  2227            0        0
+kept_osm                 28   278            0        0
+kept_site               186   376            0        0
+moved                   955  2097            0        0
 not_assessed             90    75          844     1309
 reviewed_unresolved      16    26            7        0
-verified_correct        393  1692           29      112
-verified_corrected      181   640           11        0
+verified_correct        393  1693           29      112
+verified_corrected      181   649           11        0
   not_assessed by reason: population_le_100_or_unknown 2,124, no_imagery_state 194
-  moved distance: median 293 m, 90th pct 1,048 m, max 4,281 m
-  moved point from: detections 2,004, centroid 66
-  moved points outside their site (mean centre fell between parcels): 27
+  moved distance: median 372 m, 90th pct 2,032 m, max 419,834 m
+  moved point from: detections 2,500, centroid 541, polylabel 11
+  moved points outside their site (mean centre fell between parcels): 13
 
-Written: /work/GRDVULN/tp_qa/correction/data/output/cwns_corrected_locations.parquet / .csv / .gpkg (layers plants, sites, detections)
-Copied for the viewer: /work/GRDVULN/tp_qa/correction/diagnostics/output/  (git add correction/diagnostics/output/)
+Written: /work/GRDVULN/tp_qa/correction/data/output_multi/cwns_corrected_locations.parquet / .csv / .gpkg (layers plants, sites, detections)
+Copied for the viewer: /work/GRDVULN/tp_qa/correction/diagnostics/output_multi/  (git add correction/diagnostics/output/)
 === export_viewer_data.py ===
-  viewer_candidates.parquet: 189,045 rows, 9,459 plants, 10.1 MB  (from stage2_candidates_reranked.parquet)
+  viewer_candidates.parquet: 127,488 rows, 6,379 plants, 6.7 MB  (from stage2_candidates_reranked.parquet)
   objects from reported            23,585  (91 current file(s))
   objects from corrected                0  (0 current file(s))
-  objects from candidate           98,173  (142 current file(s))
-  objects from candidate_queue      3,290  (70 current file(s))
-  viewer_objects.parquet: 121,458 objects, 2.7 MB
-Written to /work/GRDVULN/tp_qa/correction/diagnostics/output -- commit correction/diagnostics/output/ and git pull on the work computer; the viewer picks them up on restart.
-Finished: Tue Oct 13 17:15:36 EDT 2026  (exit 0)
+  objects from candidate           62,266  (688 current file(s))
+  viewer_objects.parquet: 85,851 objects, 1.9 MB
+Written to /work/GRDVULN/tp_qa/correction/diagnostics/output_multi -- commit correction/diagnostics/output/ and git pull on the work computer; the viewer picks them up on restart.
+Finished: Fri Nov  6 19:22:17 EST 2026  (exit 0)
