@@ -19,9 +19,11 @@ all-parcels layer).
 
 `build_data.py` runs at startup:
 
-1. **`correction/diagnostics/output/cwns_corrected_locations.parquet`** if it
-   exists. `13_build_corrected_output.py` writes this copy on the HPC; commit
-   it there (`git add correction/diagnostics/output/`), `git pull` here.
+1. **`correction/diagnostics/output_multi/cwns_corrected_locations.parquet`** if
+   it exists. `13_build_corrected_output.py` writes this copy on the HPC and the
+   job pushes it; `git pull` here. The folder follows `TPQA_SEED_MODE`, like the
+   pipeline: `multi` (the default) reads `output_multi/`; `cwns_only` reads the
+   single-seed run in `output/` (commit that one by hand on the HPC).
 2. Otherwise a **preview** from the master (`Updates.gpkg`): the human
    statuses only, every other plant `pending`.
 
@@ -79,13 +81,14 @@ the panel says so -- use All parcels to inspect the area.
 
 | What | From | Size |
 |---|---|---|
-| candidates | `correction/diagnostics/output/viewer_candidates.parquet` | a few MB |
-| detected objects | `correction/diagnostics/output/viewer_objects.parquet` | a few MB |
+| candidates | `correction/diagnostics/output_multi/viewer_candidates.parquet` | a few MB |
+| detected objects | `correction/diagnostics/output_multi/viewer_objects.parquet` | a few MB |
 | parcels | the local Regrid mirror, live (never in git) | -- |
 
 The two parquet files are written on the HPC by `export_viewer_data.py`,
-which `13_build_corrected_output.slurm` runs after 13. Commit
-`correction/diagnostics/output/` there and `git pull` here; restart the viewer.
+which `13_build_corrected_output.slurm` runs after 13, into the same folder as
+13's copy (`output_multi/`, or `output/` for `cwns_only`). `git pull` here and
+restart the viewer.
 
 Parcels are read with DuckDB from `review_app/config.py`'s `REGRID_ROOT`
 (override with `VIEWER_REGRID_ROOT`): by `ll_uuid` for a plant's candidates,

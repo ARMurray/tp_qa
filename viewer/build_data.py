@@ -5,8 +5,10 @@ Assembles the one table the viewer draws: every CWNS treatment plant, where
 it is, and its location status.
 
 SOURCE, in order of preference
-    1. correction/diagnostics/output/cwns_corrected_locations.parquet
-       -- 13_build_corrected_output.py's product, committed from the HPC.
+    1. correction/diagnostics/output_multi/cwns_corrected_locations.parquet
+       -- 13_build_corrected_output.py's product, pushed from the HPC.
+       Follows TPQA_SEED_MODE like the pipeline: multi (the default) reads
+       output_multi/, cwns_only reads the single-seed run in output/.
     2. PREVIEW: the master alone (correction/data/training/Updates.gpkg).
        Gives the human statuses (verified_correct / verified_corrected /
        reviewed_unresolved); every other plant shows as 'pending'.
@@ -29,9 +31,13 @@ import numpy as np
 import pandas as pd
 
 REPO = Path(__file__).resolve().parents[1]
-OUTPUT_PARQUET = Path(os.environ.get(
-    "VIEWER_OUTPUT",
-    REPO / "correction" / "diagnostics" / "output" / "cwns_corrected_locations.parquet"))
+# Same switch and default as correction/scripts/config.py: multi-source runs write
+# diagnostics/output_multi/, single-seed (cwns_only) runs diagnostics/output/.
+SEED_MODE = os.environ.get("TPQA_SEED_MODE", "multi")
+if SEED_MODE not in ("multi", "cwns_only"):
+    raise ValueError(f"TPQA_SEED_MODE must be 'multi' or 'cwns_only', got {SEED_MODE!r}")
+SHARE = REPO / "correction" / "diagnostics" / ("output_multi" if SEED_MODE == "multi" else "output")
+OUTPUT_PARQUET = Path(os.environ.get("VIEWER_OUTPUT", SHARE / "cwns_corrected_locations.parquet"))
 MASTER_GPKG = REPO / "correction" / "data" / "training" / "Updates.gpkg"
 REVIEW_DIR = REPO / "review_app" / "data" / "outgoing"
 MASTER_LAYER_RE = r"^CWNS_Locations_(\d{8})(_v\d+)?$"
@@ -131,8 +137,9 @@ def build() -> dict:
     if OUTPUT_PARQUET.exists():
         df = pd.read_parquet(OUTPUT_PARQUET)
         df["CWNS_ID"] = df["CWNS_ID"].astype(str)
-        source = f"13 output ({OUTPUT_PARQUET.name}, built {df['built'].iloc[0]})" \
-            if "built" in df.columns and len(df) else f"13 output ({OUTPUT_PARQUET.name})"
+        where = f"{OUTPUT_PARQUET.parent.name}/{OUTPUT_PARQUET.name}"
+        source = f"13 output ({where}, built {df['built'].iloc[0]})" \
+            if "built" in df.columns and len(df) else f"13 output ({where})"
         cutoff = float(df["move_cutoff"].iloc[0]) if "move_cutoff" in df.columns and len(df) else None
     else:
         df = preview_from_master(master)

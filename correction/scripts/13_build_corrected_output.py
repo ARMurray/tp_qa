@@ -44,7 +44,8 @@ results (national 01e not run). --allow-low-od overrides, for testing only.
 Outputs (data/output/):
     cwns_corrected_locations.parquet / .csv     one row per plant
     cwns_corrected_locations.gpkg               layers plants, sites, detections
-and copies of all three tables in diagnostics/output/ for the viewer.
+and copies of all three tables in diagnostics/output_multi/ for the viewer
+(diagnostics/output/ when TPQA_SEED_MODE is cwns_only).
 
 Usage:
     python 13_build_corrected_output.py --cutoff 0.95
@@ -617,7 +618,7 @@ def main():
     s["geometry"] = s.geometry.simplify(0.00001, preserve_topology=True)
     s.to_parquet(SHARE_DIR / "cwns_sites.parquet", index=False)
     dets.to_parquet(SHARE_DIR / "cwns_detections.parquet", index=False)
-    print(f"Copied for the viewer: {SHARE_DIR}/  (git add correction/diagnostics/output/)")
+    print(f"Copied for the viewer: {SHARE_DIR}/  (git add correction/diagnostics/{SHARE_DIR.name}/)")
 
 
 if __name__ == "__main__":

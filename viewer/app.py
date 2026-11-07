@@ -11,8 +11,9 @@ Run (work computer, from this folder):
     python app.py --port 8051
 
 Data is assembled at startup by build_data.py: the 13 output if
-correction/diagnostics/output/cwns_corrected_locations.parquet exists,
-otherwise a preview from the master. Restart after pulling new output, or
+correction/diagnostics/output_multi/cwns_corrected_locations.parquet exists
+(output/ with TPQA_SEED_MODE=cwns_only), otherwise a preview from the
+master. Restart after pulling new output, or
 hit /api/reload.
 
 Requires: starlette, uvicorn, pandas, pyarrow, geopandas (all already in

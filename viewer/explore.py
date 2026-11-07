@@ -5,7 +5,8 @@ Everything behind "why was this plant (not) moved, and what else is there?"
 
 DATA, and where each piece lives
     viewer_candidates.parquet, viewer_objects.parquet
-        correction/diagnostics/output/, written on the HPC by
+        correction/diagnostics/output_multi/ (output/ when TPQA_SEED_MODE is
+        cwns_only; see build_data.SHARE), written on the HPC by
         export_viewer_data.py (run by 13_build_corrected_output.slurm) and
         committed. Every scored candidate of every flagged plant -- not only
         the #1 or those above the move cutoff -- and every detected object.
@@ -32,8 +33,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-REPO = Path(__file__).resolve().parents[1]
-SHARE = REPO / "correction" / "diagnostics" / "output"
+from build_data import REPO, SHARE  # one place decides output/ vs output_multi/
 CANDS_PARQUET = Path(os.environ.get("VIEWER_CANDIDATES", SHARE / "viewer_candidates.parquet"))
 OBJECTS_PARQUET = Path(os.environ.get("VIEWER_OBJECTS", SHARE / "viewer_objects.parquet"))
 

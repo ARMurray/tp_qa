@@ -5,7 +5,8 @@ Slim copies of the scored candidates and every detected object, for the
 viewer (viewer/) on the work computer. Run by 13_build_corrected_output.slurm
 right after 13, so each cycle refreshes them; can also be run on its own.
 
-Writes to correction/diagnostics/output/ (committed, overwritten each run):
+Writes to correction/diagnostics/output_multi/ (output/ when TPQA_SEED_MODE is
+cwns_only), committed and overwritten each run:
 
   viewer_candidates.parquet   one row per (plant, candidate parcel) that
                               05/05b scored -- ALL of them, not only #1 or
@@ -142,7 +143,7 @@ def main():
     SHARE_DIR.mkdir(parents=True, exist_ok=True)
     export_candidates()
     export_objects()
-    print(f"Written to {SHARE_DIR} -- commit correction/diagnostics/output/ and "
+    print(f"Written to {SHARE_DIR} -- commit correction/diagnostics/{SHARE_DIR.name}/ and "
           f"git pull on the work computer; the viewer picks them up on restart.")
 
 
