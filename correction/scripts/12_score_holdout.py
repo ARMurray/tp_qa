@@ -138,6 +138,43 @@ def multi_source_outcomes(held: pd.DataFrame, truth: pd.DataFrame, summ: pd.Data
     return pd.DataFrame(rows, columns=["CWNS_ID", "bin", "outcome", "accepted_sources"])
 
 
+def per_plant_table(band_rows: dict, summ, truth: pd.DataFrame, outcomes) -> pd.DataFrame:
+    """One row per holdout plant, in either seed mode, so two runs can be paired plant by plant.
+
+    right    corrections: the re-ranked #1 (or, multi-source, the site Stage 1 accepted) is the true parcel
+             correct:     the plant was not moved off its reported parcel
+    outcome  multi-source: multi_source_outcomes' label. Single-seed, the same vocabulary where it applies:
+             accepted_reported (a misplaced plant's reported parcel was accepted, so it stays wrong),
+             accepted_right, moved_right, flagged_wrong, truth_unresolved, not_scored.
+    scored   False for not_scored / truth_unresolved; pair runs on plants scored in both.
+    band_rows: bin -> (plant ids, per-plant bool: corrections #1 is the truth / correct plant moved off)."""
+    o = outcomes.set_index("CWNS_ID")["outcome"] if outcomes is not None else None
+    trig = summ.set_index("CWNS_ID")["trigger_reason"] if summ is not None else pd.Series(dtype=object)
+    known = truth["true_ll_uuid"].notna()
+    if "true_lon" in truth.columns:
+        known |= truth["true_lon"].notna()
+    has_truth = set(truth.loc[known, "CWNS_ID"])
+    rows = []
+    for b, (ids, flag) in band_rows.items():
+        flag = flag[~flag.index.duplicated()].reindex(list(ids)).fillna(False).astype(bool)
+        for cid, v in flag.items():
+            right = bool(v) if b == "corrections" else not bool(v)
+            if o is not None:
+                out = o.get(cid, "not_scored")
+            elif cid not in trig.index:
+                out = "not_scored"
+            elif b == "corrections" and cid not in has_truth:
+                out = "truth_unresolved"
+            elif trig.get(cid) == "none":
+                out = "accepted_right" if b == "correct" else "accepted_reported"
+            else:
+                out = "moved_right" if (b == "corrections" and v) else "flagged_wrong"
+            rows.append((cid, b, C.SEED_MODE, out, right))
+    df = pd.DataFrame(rows, columns=["CWNS_ID", "bin", "seed_mode", "outcome", "right"])
+    df["scored"] = ~df["outcome"].isin(["not_scored", "truth_unresolved"])
+    return df
+
+
 def print_multi_source(out: pd.DataFrame):
     print(f"\n{'=' * 66}\nMULTI-SOURCE END TO END -- Stage 1 accept, else re-ranked #1\n{'=' * 66}")
     for b, g in out.groupby("bin"):
@@ -347,6 +384,16 @@ def main():
                 band_rows["correct"] = (band_rows["correct"][0],
                                         outcomes[outcomes["bin"] == "correct"].set_index("CWNS_ID")["outcome"]
                                         .isin(["accepted_wrong", "flagged_wrong"]))
+
+    # =======================================================================
+    # per plant, for pairing runs (single-seed vs multi-source) plant by plant
+    # =======================================================================
+    if band_rows:
+        pp = per_plant_table(band_rows, summ, truth, outcomes)
+        pp_path = C.ROOT / "diagnostics" / f"holdout_plants_{C.SEED_MODE}{tag}.csv"
+        pp_path.parent.mkdir(parents=True, exist_ok=True)
+        pp.to_csv(pp_path, index=False)
+        print(f"\nPer-plant outcomes: {pp_path}  ({len(pp)} plants, {int(pp['scored'].sum())} scored)")
 
     # =======================================================================
     # by population band (since the floor dropped to 100, 2026-10-05)

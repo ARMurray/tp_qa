@@ -39,4 +39,17 @@ text = buf.getvalue()
 print(text)
 assert "accepted-WRONG by sources: cwns_point 1" in text, text                         # B's false accept
 assert "FALSE-MOVE RATE       1 / 2 = 50.0%" in text, text                             # G flagged_wrong; F accepted_right
+# per-plant table: multi-source uses the outcomes as they are; single-seed maps flags to the same labels
+band = {"corrections": (pd.Series(list("ABCDE")), pd.Series({"A": True, "C": True, "D": False})),
+        "correct": (pd.Series(list("FG")), pd.Series({"F": False, "G": True}))}
+pp = s12.per_plant_table(band, summ, truth, out.reset_index()).set_index("CWNS_ID")
+assert pp.at["A", "right"] and pp.at["C", "right"] and not pp.at["B", "right"] and not pp.at["G", "right"]
+assert pp.at["F", "right"] and not pp.at["E", "scored"] and pp["scored"].sum() == 6
+band["corrections"] = (pd.Series(list("ABCDE")), pd.Series({"C": True, "D": False}))   # single-seed: accepted = no #1
+pp1 = s12.per_plant_table(band, summ, truth, None).set_index("CWNS_ID")
+assert pp1.at["A", "outcome"] == "accepted_reported" and not pp1.at["A", "right"] and pp1.at["C", "right"]
+assert pp1.at["B", "outcome"] == "accepted_reported" and pp1.at["C", "outcome"] == "moved_right"
+assert pp1.at["D", "outcome"] == "flagged_wrong" and pp1.at["E", "outcome"] == "truth_unresolved"
+assert pp1.at["F", "outcome"] == "accepted_right" and pp1.at["G", "outcome"] == "flagged_wrong"
+print("per-plant table ok")
 print("holdout multi-source tests passed")
