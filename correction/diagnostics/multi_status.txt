@@ -3,19 +3,19 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-09 09:38:39
+generated   : 2026-11-09 17:09:35
 seed mode   : multi   suffix '_multi'
-git commit  : be6dffe  (Mon Nov 9 09:36:31 2026 -0500 diagnostics: 12 single seed per plant (2026-11-09 09:36))
+git commit  : b6923ad  (Mon Nov 9 09:38:42 2026 -0500 diagnostics: corr_12_holdout 7623455 (2026-11-09 09:38))
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
-training gpkg: 5.8 d ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
-holdout manifest: 76.0 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
-detector best.pt: 41.5 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
+training gpkg: 6.1 d ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
+holdout manifest: 76.3 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
+detector best.pt: 41.8 d ago   /work/GRDVULN/tp_qa/correction/models/object_detection/best.pt
 
 ==============================================================================
 01a  candidate windows (seeds as centers)
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/nlcd_features_multi: 51 state file(s)
-total parcels 85,587,556; newest file 5.7 d ago
+total parcels 85,587,556; newest file 6.0 d ago
 vs single-seed run (77,679,378): ratio median 1.09, min 1.01, max 5.51  (the recall check expected ~1.0-1.3)
 largest growth: AK 5.51, PR 2.73, SC 1.40, DE 1.31, SD 1.29
 states: AK AL AR AZ CA CO CT DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK OR PA PR RI SC SD TN TX UT VA VT WA WI WV WY
@@ -52,10 +52,10 @@ part files older than best.pt (ignored downstream): 0
 02   feature tables
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/features_multi
-  05_plant_features          15,543 rows   4.8 d ago
-  10_parcel_features     85,587,556 rows   4.8 d ago
-  14_stage1_training          5,435 rows   4.8 d ago
-  15_stage2_training      9,971,866 rows   4.8 d ago
+  05_plant_features          15,543 rows   5.1 d ago
+  10_parcel_features     85,587,556 rows   5.1 d ago
+  14_stage1_training          5,435 rows   5.1 d ago
+  15_stage2_training      9,971,866 rows   5.1 d ago
 Stage 1: 5,435 site rows, 2,901 plants; classes Incorrect: 2,823, Correct: 2,612
   Correct sites per plant: {0: 289, 1: 2612}
   Correct rate when site holds the CWNS point / not: 75.4% (n=2,896) / 16.8% (n=2,539)
@@ -70,12 +70,12 @@ Stage 2: 9,971,866 candidate rows, 818 plants, 802 positives
 03/04 models
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/models_multi
-  rerank_rf_model.joblib                     3.4 d ago  
-  stage1_accept_threshold.joblib             3.9 d ago  = 0.814
-  stage1_optimal_threshold.joblib            3.9 d ago  = 0.554
-  stage1_rf_model.joblib                     3.9 d ago  
-  stage2_optimal_threshold.joblib            3.9 d ago  = 0.329
-  stage2_rf_model.joblib                     3.9 d ago  
+  rerank_rf_model.joblib                     3.7 d ago  
+  stage1_accept_threshold.joblib             4.2 d ago  = 0.814
+  stage1_optimal_threshold.joblib            4.2 d ago  = 0.554
+  stage1_rf_model.joblib                     4.2 d ago  
+  stage2_optimal_threshold.joblib            4.2 d ago  = 0.329
+  stage2_rf_model.joblib                     4.2 d ago  
 stage1 top features: is_best_site 0.008, has_cwns_point 0.004, od_has_detection 0.003, is_municipal 0.003, lbcs_ownership 0.003, site_name_pool_gap 0.003, site_rank 0.002, ll_bldg_count 0.002, od_n_detections_raw 0.002, od_n_objects 0.001, site_name_pool_rank 0.001, d_to_cwns_point_m 0.001
 stage2 top features: log_gisacre 0.005, ll_gisacre 0.005, ll_bldg_count 0.003, lbcs_ownership 0.003, is_municipal 0.002, total_pixels 0.001, name_pool_is_max 0.001, name_pool_rank 0.001, name_match_score 0.001, osm_ww 0.001, dominant_count 0.001, d_seed_nearest_indep 0.001
 Stage 1 plant-level accept table (held-out plants):
@@ -89,17 +89,17 @@ Stage 1 CV: Standard 0.986; Spatial 0.985
 05   inference decisions
 ==============================================================================
 /work/GRDVULN/tp_qa/correction/data/inference_multi
-plant_summary: 15,337 plants, 3.8 d ago
+plant_summary: 15,337 plants, 4.1 d ago
   trigger_reason: none: 8,948, low_confidence: 6,316, no_parcel: 73
   route: model: 12,252, osm_confirmed: 3,012, no_parcel: 73
   multi_pass: 1   sites per plant: {0: 73, 1: 3890, 2: 6626, 3: 3712, 4: 940, 5: 68}
   accepted plants whose site lacks the CWNS point: 2,661 of 8,948
   accepted by sources: cwns_point+icis_fac_frs: 1,586, cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs: 1,211, cwns_point: 1,199, cwns_addr+icis_fac_addr+icis_fac_frs: 717, icis_fac_frs: 695, cwns_point+icis_fac_frs+icis_feat_INF: 583, cwns_point+icis_fac_addr+icis_fac_frs: 427, cwns_addr+cwns_point: 342, cwns_addr+cwns_point+icis_fac_addr+icis_fac_frs+icis_feat_INF: 313, icis_fac_addr+icis_fac_frs: 269
   flagged plants 6,389; with candidates 6,379
-stage2_candidates: 127,488 rows, 3.8 d ago
-  stage1_sites                    32,615 rows  3.8 d ago
-  plant_summary_reranked          15,337 rows  2.6 d ago
-  stage2_candidates_reranked     127,488 rows  2.6 d ago
+stage2_candidates: 127,488 rows, 4.1 d ago
+  stage1_sites                    32,615 rows  4.1 d ago
+  plant_summary_reranked          15,337 rows  2.9 d ago
+  stage2_candidates_reranked     127,488 rows  2.9 d ago
 
 ==============================================================================
 13   corrected output + provenance
@@ -115,29 +115,29 @@ stage2_candidates: 127,488 rows, 3.8 d ago
 JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
-  12_holdout.log                       0.0 h ago   exit 0
-  13_output.log                        2.6 d ago   exit 0
-  05b_rerank.log                       2.6 d ago   exit 0
-  01e_arr_46.log                       2.6 d ago   exit 0
-  01e_arr_45.log                       2.6 d ago   exit 0
-  01e_arr_24.log                       2.6 d ago   exit 0
-  01e_arr_21.log                       2.6 d ago   exit 0
-  01e_arr_31.log                       2.6 d ago   exit 0
-  01e_arr_40.log                       2.6 d ago   exit 0
-  01e_arr_44.log                       2.6 d ago   exit 0
-  01e_arr_47.log                       2.6 d ago   exit 0
-  01e_arr_42.log                       2.6 d ago   exit 0
-  01e_arr_43.log                       2.6 d ago   exit 0
-  01e_arr_19.log                       2.6 d ago   exit 0
-  01e_arr_25.log                       2.6 d ago   exit 0
-  01e_arr_32.log                       2.6 d ago   exit 0
-  01e_arr_41.log                       2.6 d ago   exit 0
-  01e_arr_39.log                       2.6 d ago   exit 0
-  01e_arr_38.log                       2.6 d ago   exit 0
-  01e_arr_20.log                       2.6 d ago   exit 0
-  01e_arr_37.log                       2.6 d ago   exit 0
-  01e_arr_36.log                       2.6 d ago   exit 0
-  01e_arr_35.log                       2.6 d ago   exit 0
-  01e_arr_1.log                        2.6 d ago   exit 0
-  01e_arr_34.log                       2.6 d ago   exit 0
+  12_holdout.log                       7.5 h ago   exit 0
+  13_output.log                        2.9 d ago   exit 0
+  05b_rerank.log                       2.9 d ago   exit 0
+  01e_arr_46.log                       3.0 d ago   exit 0
+  01e_arr_45.log                       3.0 d ago   exit 0
+  01e_arr_24.log                       3.0 d ago   exit 0
+  01e_arr_21.log                       3.0 d ago   exit 0
+  01e_arr_31.log                       3.0 d ago   exit 0
+  01e_arr_40.log                       3.0 d ago   exit 0
+  01e_arr_44.log                       3.0 d ago   exit 0
+  01e_arr_47.log                       3.0 d ago   exit 0
+  01e_arr_42.log                       3.0 d ago   exit 0
+  01e_arr_43.log                       3.0 d ago   exit 0
+  01e_arr_19.log                       3.0 d ago   exit 0
+  01e_arr_25.log                       3.0 d ago   exit 0
+  01e_arr_32.log                       3.0 d ago   exit 0
+  01e_arr_41.log                       3.0 d ago   exit 0
+  01e_arr_39.log                       3.0 d ago   exit 0
+  01e_arr_38.log                       3.0 d ago   exit 0
+  01e_arr_20.log                       3.0 d ago   exit 0
+  01e_arr_37.log                       3.0 d ago   exit 0
+  01e_arr_36.log                       3.0 d ago   exit 0
+  01e_arr_35.log                       3.0 d ago   exit 0
+  01e_arr_1.log                        3.0 d ago   exit 0
+  01e_arr_34.log                       3.0 d ago   exit 0
 
