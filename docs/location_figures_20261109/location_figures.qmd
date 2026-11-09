@@ -1,0 +1,508 @@
+---
+title: "Treatment plant locations: figures for review"
+subtitle: "Verified corrections, location sources, and the multi-source pipeline"
+date: 2026-11-09
+format:
+  html:
+    embed-resources: true
+    toc: true
+    fig-width: 11
+    fig-height: 6.4
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+# Render from this folder:   quarto render location_figures.qmd
+#
+# Every figure is saved twice:
+#   figures/<name>.png            with its title, ready to drop into a slide as is
+#   figures/no_title/<name>.png   title line removed, for slides that carry their own title
+#
+# Inputs
+#   ../../correction/data/training/Updates.gpkg   the master; the latest CWNS_Locations_YYYYMMDD layer.
+#                                                 Read as plain SQLite (only attribute columns are needed).
+#   data/cwns_corrected_locations.csv             13_build_corrected_output's plant table, multi-source run
+#                                                 (job 7609280). On the HPC: correction/data/output_multi/.
+#   data/holdout_plants_multi.csv                 12_score_holdout's per-plant outcomes, multi-source run (job 7623455)
+#   data/holdout_plants_cwns_only.csv             the same, single-seed run (job 7624559). Both are written to
+#                                                 correction/diagnostics/ by 12_score_holdout.
+# Packages: ggplot2, dplyr, tidyr, readr, scales, forcats, DBI, RSQLite (ragg if present).
+
+suppressPackageStartupMessages({
+  library(ggplot2); library(dplyr); library(tidyr); library(readr)
+  library(scales); library(forcats); library(DBI)
+})
+
+MASTER  <- "../../correction/data/training/Updates.gpkg"
+OUT13   <- "data/cwns_corrected_locations.csv"
+HOLDOUT_MULTI  <- "data/holdout_plants_multi.csv"
+HOLDOUT_SINGLE <- "data/holdout_plants_cwns_only.csv"
+FIG     <- "figures"
+dir.create(file.path(FIG, "no_title"), recursive = TRUE, showWarnings = FALSE)
+
+ORANGE <- "#F0913A"; MED_C <- "#1F6F7A"; MEAN_C <- "#D23B3B"; INK <- "#1A1A1A"; MUTED <- "#5A5A5A"
+GRID <- "#E3E3E3"; NAVY <- "#1E3A5F"; GREY <- "#BDBDBD"
+
+# One colour per location source, on every source chart.
+SRC_LEVELS <- c("CWNS coordinate", "CWNS address geocode", "ICIS facility coordinate (FRS)",
+                "ICIS address geocode", "Both address geocodes (same point)", "ICIS permit feature (INF/INO)",
+                "Tie: several sources")
+SRC_COLS <- setNames(c("#1E3A5F", "#5B8DB8", "#F0913A", "#F6C28B", "#9C6ADE", "#2A9D8F", "#BDBDBD"), SRC_LEVELS)
+
+theme_fig <- function(base = 15) {
+  theme_minimal(base_size = base) +
+    theme(plot.title = element_text(face = "bold", colour = INK, size = rel(1.2)),
+          plot.subtitle = element_text(colour = MUTED, margin = margin(b = 10)),
+          plot.title.position = "plot",
+          axis.text = element_text(colour = MUTED), axis.title = element_text(colour = INK),
+          panel.grid.major = element_line(colour = GRID), panel.grid.minor = element_blank(),
+          legend.position = "top", legend.justification = "left", legend.title = element_blank(),
+          plot.background = element_rect(fill = "white", colour = NA),
+          plot.margin = margin(14, 18, 10, 14))
+}
+
+save_fig <- function(p, name, w = 11, h = 6.4) {
+  dev <- if (requireNamespace("ragg", quietly = TRUE)) ragg::agg_png else "png"
+  ggsave(file.path(FIG, name), p, width = w, height = h, dpi = 200, device = dev, bg = "white")
+  ggsave(file.path(FIG, "no_title", name), p + labs(title = NULL), width = w, height = h - 0.4, dpi = 200,
+         device = dev, bg = "white")
+  p
+}
+
+haversine_mi <- function(lat1, lon1, lat2, lon2) {
+  r <- pi / 180
+  a <- sin((lat2 - lat1) * r / 2)^2 + cos(lat1 * r) * cos(lat2 * r) * sin((lon2 - lon1) * r / 2)^2
+  2 * 6371008.8 * asin(sqrt(a)) / 1609.344
+}
+
+# Source labels as the pipeline writes them (cwns_point, icis_fac_frs, ...; '+' joins ties) -> one category.
+source_category <- function(x) {
+  one <- c(cwns_point = "CWNS coordinate", cwns_addr = "CWNS address geocode",
+           icis_fac_frs = "ICIS facility coordinate (FRS)", icis_fac_addr = "ICIS address geocode",
+           icis_feat_INF = "ICIS permit feature (INF/INO)", icis_feat_INO = "ICIS permit feature (INF/INO)")
+  out <- vapply(strsplit(ifelse(is.na(x), "", x), "+", fixed = TRUE), function(s) {
+    if (length(s) == 0) return(NA_character_)
+    if (setequal(s, c("cwns_addr", "icis_fac_addr"))) return("Both address geocodes (same point)")
+    cats <- unique(one[s])
+    if (length(cats) == 1) cats else "Tie: several sources"
+  }, character(1))
+  factor(out, levels = SRC_LEVELS)
+}
+pc <- function(x, acc = 1) percent(x, accuracy = acc)
+```
+
+```{r data}
+con <- dbConnect(RSQLite::SQLite(), MASTER)
+layer <- sort(grep("^CWNS_Locations_[0-9]{8}", dbListTables(con), value = TRUE), decreasing = TRUE)[1]
+master <- dbGetQuery(con, sprintf(
+  'SELECT CWNS_ID, STATE_CODE, FACILITY_NAME, FACILITY_TYPE, LATITUDE, LONGITUDE, Original_Correct,
+          Verified, Corrected_X, Corrected_Y, How_Corrected FROM "%s"', layer))
+dbDisconnect(con)
+
+tp <- master %>% filter(FACILITY_TYPE == "Treatment Plant")
+verified <- tp %>% filter(Verified == "Yes", Original_Correct %in% c("Yes", "No"))
+fixes <- verified %>%
+  filter(Original_Correct == "No", !is.na(Corrected_X)) %>%
+  mutate(mi = haversine_mi(LATITUDE, LONGITUDE, Corrected_Y, Corrected_X),
+         method = recode(How_Corrected, Model = "Model proposal, verified", Parcel = "Placed on parcel by reviewer",
+                         Manual_Review = "Manual review", Viewer = "Viewer", `Early Review` = "Early review"))
+write_csv(fixes %>% select(CWNS_ID, STATE_CODE, FACILITY_NAME, How_Corrected, mi), "data/verified_corrections.csv")
+
+out13 <- read_csv(OUT13, show_col_types = FALSE, guess_max = 20000,
+                  col_types = cols(CWNS_ID = col_character(), .default = col_guess()))
+vc <- out13 %>% filter(status == "verified_corrected")
+mv <- out13 %>% filter(status == "moved") %>%
+  mutate(cat = source_category(led_by),
+         stage = recode(loc_basis, stage1_accept_seed = "Stage 1: accepted a site from another source",
+                        stage2_move = "Stage 2: moved to a candidate parcel"))
+
+med <- median(fixes$mi); avg <- mean(fixes$mi); nat <- mean(verified$Original_Correct == "No")
+by_method <- fixes %>% group_by(method) %>%
+  summarise(n = n(), median = median(mi), mean = mean(mi), max = max(mi), .groups = "drop") %>% arrange(desc(n))
+bm <- function(m, col) by_method[[col]][by_method$method == m]
+```
+
+Data: master layer **`r layer`** (`r comma(nrow(tp))` treatment plants, `r comma(nrow(verified))` verified), and the
+multi-source pipeline output (`r comma(nrow(out13))` plants). A verified correction is a treatment plant with
+`Verified = "Yes"`, `Original_Correct = "No"` and a corrected point; its distance is the great-circle distance from the
+reported CWNS point to the corrected point.
+
+## Headline numbers
+
+| | Slide 11 | Now |
+|---|---|---|
+| Verified corrections | 316 | **`r comma(nrow(fixes))`** |
+| Median correction distance | 0.80 mi | **`r sprintf("%.2f", med)` mi** |
+| Mean correction distance | 3.14 mi | **`r sprintf("%.2f", avg)` mi** |
+| Corrections of 10 mi or more | 20 | **`r sum(fixes$mi >= 10)`** |
+| Verified plants whose reported location was wrong | ~40% | **`r pc(nat)`** (`r nrow(fixes)` of `r comma(nrow(verified))`) |
+
+Also: `r pc(mean(fixes$mi >= 0.5))` of corrections moved half a mile or more, `r pc(mean(fixes$mi >= 1))` a mile or
+more, `r pc(mean(fixes$mi >= 5))` five miles or more; the largest is `r sprintf("%.0f", max(fixes$mi))` mi. The mean
+without the corrections of 10 mi or more is `r sprintf("%.2f", mean(fixes$mi[fixes$mi < 10]))` mi.
+
+**Why the numbers fell.** `r bm("Model proposal, verified", "n")` of the corrections are model proposals a reviewer
+confirmed. The model searches near the reported point, so these are short: median
+`r sprintf("%.2f", bm("Model proposal, verified", "median"))` mi, longest
+`r sprintf("%.1f", bm("Model proposal, verified", "max"))` mi. The `r bm("Placed on parcel by reviewer", "n")`
+reviewer-placed corrections still look like slide 11: median
+`r sprintf("%.2f", bm("Placed on parcel by reviewer", "median"))` mi, mean
+`r sprintf("%.2f", bm("Placed on parcel by reviewer", "mean"))` mi. Reviewed plants were prioritised, not sampled at
+random, so neither the old ~40% nor the new `r pc(nat)` is a national error rate.
+
+## Verified corrections
+
+### Fig 1. Correction distances (slide 11)
+
+```{r fig01}
+CAP <- 10; W <- 0.2
+n_cap <- sum(fixes$mi >= CAP)
+h <- fixes %>% filter(mi < CAP) %>% mutate(bin = floor(mi / W) * W) %>% count(bin)
+top <- max(h$n, n_cap)
+p <- ggplot() +
+  geom_col(data = h, aes(bin + W / 2, n), width = W * 0.9, fill = ORANGE) +
+  geom_col(aes(x = CAP + 0.26, y = n_cap), width = W * 1.6, fill = ORANGE) +
+  geom_vline(xintercept = med, colour = MED_C, linetype = "longdash", linewidth = 1.1) +
+  annotate("segment", x = avg, xend = avg, y = 0, yend = top * 1.02, colour = MEAN_C, linetype = "dotted", linewidth = 1.2) +
+  annotate("text", x = med + 0.08, y = top * 1.08, label = sprintf("Median: %.2f mi", med), hjust = 0,
+           colour = MED_C, fontface = "bold", size = 5) +
+  annotate("text", x = avg + 0.08, y = top * 0.98, label = sprintf("Mean: %.2f mi", avg), hjust = 0,
+           colour = MEAN_C, fontface = "bold", size = 5) +
+  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, CAP + 0.26), labels = c(0, 2, 4, 6, 8, "≥10"),
+                     limits = c(-0.15, CAP + 0.55), expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, top * 1.12), expand = c(0, 0)) +
+  labs(title = "Treatment Plant Location Correction Distances — National",
+       subtitle = sprintf("%s verified corrected plants across all states  |  %d plants ≥ %d mi (capped for display)",
+                          comma(nrow(fixes)), n_cap, CAP),
+       x = "Relocation Distance (miles)", y = "Number of Plants") +
+  theme_fig()
+save_fig(p, "fig01_correction_distances.png")
+```
+
+Drop-in replacement for the chart on slide 11. Bars are 0.2 mi wide; corrections of 10 mi or more are pooled in the last bar.
+
+### Fig 2. Distance bands
+
+```{r fig02}
+bands <- fixes %>%
+  mutate(band = cut(mi, c(-Inf, 0.1, 0.25, 0.5, 1, 2, 5, 10, Inf),
+                    labels = c("< 0.1", "0.1–0.25", "0.25–0.5", "0.5–1", "1–2", "2–5", "5–10", "≥ 10"),
+                    right = FALSE)) %>%
+  count(band) %>% mutate(share = n / sum(n))
+p <- ggplot(bands, aes(band, n)) +
+  geom_col(fill = ORANGE, width = 0.75) +
+  geom_text(aes(label = sprintf("%d\n%s", n, pc(share))), vjust = -0.25, colour = INK, size = 4.2, lineheight = 0.9) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  labs(title = "How far verified corrections moved",
+       subtitle = sprintf("%s verified corrections, by distance band (miles; each band includes its lower bound)", comma(nrow(fixes))),
+       x = "Relocation distance (miles)", y = "Plants") +
+  theme_fig() + theme(panel.grid.major.x = element_blank())
+save_fig(p, "fig02_distance_bands.png")
+```
+
+### Fig 3. Distance by how the correction was made
+
+```{r fig03}
+lev <- fixes %>% count(method) %>% arrange(desc(n)) %>% filter(n >= 20)   # smaller groups only in the dashed total
+fx2 <- fixes %>% filter(method %in% lev$method) %>%
+  mutate(lab = factor(sprintf("%s (n = %d)", method, lev$n[match(method, lev$method)]),
+                      levels = sprintf("%s (n = %d)", lev$method, lev$n)))
+p <- ggplot(fx2, aes(mi, colour = lab)) +
+  stat_ecdf(linewidth = 1.2) +
+  stat_ecdf(data = fixes, aes(mi), colour = INK, linewidth = 1.1, linetype = "dashed", inherit.aes = FALSE) +
+  geom_hline(yintercept = 0.5, colour = MUTED, linewidth = 0.4) +
+  annotate("text", x = 0.012, y = 0.53, label = "half of corrections", hjust = 0, colour = MUTED, size = 4) +
+  scale_x_log10(breaks = c(0.01, 0.1, 0.25, 0.5, 1, 2, 5, 10, 50, 200), labels = label_number(drop0trailing = TRUE)) +
+  scale_y_continuous(labels = percent, breaks = seq(0, 1, 0.25)) +
+  scale_colour_manual(values = c("#F0913A", "#1E3A5F", "#2A9D8F")) +
+  labs(title = "Model-proposed corrections are short; reviewer-placed ones carry the long tail",
+       subtitle = sprintf("Share moved no more than x miles (log scale). Dashed: all %d, incl. %d from smaller groups.",
+                          nrow(fixes), nrow(fixes) - nrow(fx2)),
+       x = "Relocation distance (miles, log scale)", y = "Share of corrections") +
+  theme_fig()
+save_fig(p, "fig03_distance_by_method.png")
+```
+
+```{r method-table}
+knitr::kable(by_method %>% mutate(across(c(median, mean, max), ~ round(.x, 2))),
+             col.names = c("How corrected", "Plants", "Median mi", "Mean mi", "Max mi"))
+```
+
+### Fig 4. Share of verified plants found wrong, by state
+
+```{r fig04}
+st <- verified %>% group_by(STATE_CODE) %>%
+  summarise(n = n(), wrong = sum(Original_Correct == "No"), .groups = "drop") %>%
+  mutate(share = wrong / n) %>% filter(n >= 15)
+p <- ggplot(st, aes(fct_reorder(STATE_CODE, -share), share)) +
+  geom_col(aes(fill = share > nat), width = 0.72, show.legend = FALSE) +
+  geom_hline(yintercept = nat, colour = MEAN_C, linetype = "dotted", linewidth = 1) +
+  geom_text(aes(label = n), vjust = -0.4, size = 2.9, colour = MUTED) +
+  annotate("text", x = nrow(st), y = nat + 0.02, label = sprintf("all verified plants: %s", pc(nat, 0.1)),
+           hjust = 1, vjust = 0, colour = MEAN_C, size = 4.2) +
+  scale_fill_manual(values = c(`TRUE` = ORANGE, `FALSE` = "#F6C28B")) +
+  scale_y_continuous(labels = percent, expand = expansion(mult = c(0, 0.08))) +
+  labs(title = "Share of verified plants whose reported location was wrong, by state",
+       subtitle = "States with at least 15 verified plants; the number on each bar is plants verified. Review was prioritised, not random.",
+       x = NULL, y = "Reported location wrong") +
+  theme_fig(14) + theme(panel.grid.major.x = element_blank(), axis.text.x = element_text(size = 10))
+save_fig(p, "fig04_wrong_share_by_state.png", w = 12, h = 5.8)
+```
+
+## Where the right location comes from
+
+Sources, as the pipeline names them: **CWNS coordinate** (`cwns_point`, the reported location), **CWNS address
+geocode** (`cwns_addr`), **ICIS facility coordinate** from FRS for a linked NPDES permit (`icis_fac_frs`), **ICIS
+address geocode** of that permit (`icis_fac_addr`), and **ICIS permit features** inside the plant: influent structure
+(`icis_feat_INF`) and internal outfall (`icis_feat_INO`). CWNS and ICIS are separate systems, but the two address
+geocodes often land on the same point, so they are shown together where they tie.
+
+### Fig 5. Each source's distance from the verified location
+
+```{r fig05}
+SRC <- c(cwns_point = "CWNS coordinate", cwns_addr = "CWNS address geocode",
+         icis_fac_frs = "ICIS facility coordinate (FRS)", icis_fac_addr = "ICIS address geocode",
+         icis_feat_INF = "ICIS influent structure (INF)")
+acc <- bind_rows(lapply(names(SRC), function(s) {
+  d <- vc[[paste0("dist_to_final_", s, "_m")]]
+  tibble(source = SRC[[s]],
+         band = cut(d, c(-Inf, 250, 1000, Inf), labels = c("within 250 m", "250 m – 1 km", "over 1 km")))
+})) %>%
+  mutate(band = fct_na_value_to_level(band, "no point from this source")) %>%
+  count(source, band) %>% group_by(source) %>% mutate(share = n / sum(n)) %>% ungroup()
+ord <- acc %>% filter(band == "within 250 m") %>% arrange(share) %>% pull(source)
+acc$source <- factor(acc$source, levels = ord)
+lab <- filter(acc, share >= 0.05)
+p <- ggplot(acc, aes(share, source, fill = fct_rev(band))) +
+  geom_col(width = 0.7) +
+  geom_text(data = lab, aes(label = pc(share)), position = position_stack(vjust = 0.5), size = 4.2,
+            colour = ifelse(lab$band %in% c("within 250 m", "over 1 km"), "white", INK)) +
+  scale_fill_manual(values = c("within 250 m" = "#2A9D8F", "250 m – 1 km" = "#A8D5CF",
+                               "over 1 km" = "#D23B3B", "no point from this source" = "#E6E6E6"),
+                    breaks = c("within 250 m", "250 m – 1 km", "over 1 km", "no point from this source")) +
+  scale_x_continuous(labels = percent, expand = c(0, 0)) +
+  labs(title = "Where the right location was: each source's distance from the verified point",
+       subtitle = sprintf("%s plants whose CWNS location was wrong and a reviewer placed correctly", comma(nrow(vc))),
+       x = "Share of verified corrections", y = NULL) +
+  theme_fig() + theme(panel.grid.major.y = element_blank())
+save_fig(p, "fig05_source_accuracy.png", h = 5.6)
+```
+
+```{r src-table}
+src_tab <- bind_rows(lapply(names(SRC), function(s) {
+  d <- vc[[paste0("dist_to_final_", s, "_m")]]
+  tibble(Source = SRC[[s]], `Has a point` = pc(mean(!is.na(d))),
+         `Median distance (m)` = round(median(d, na.rm = TRUE)),
+         `Within 250 m, of all plants` = pc(sum(d <= 250, na.rm = TRUE) / length(d)),
+         `Within 250 m, where present` = pc(mean(d[!is.na(d)] <= 250)))
+}))
+knitr::kable(src_tab)
+```
+
+The CWNS coordinate is wrong for every plant here by definition (these are the corrected ones). Where it is within
+250 m, a reviewer still judged it to be in the wrong place.
+
+### Fig 6. The source closest to the verified location
+
+```{r fig06}
+near <- vc %>% mutate(cat = source_category(nearest_source)) %>% count(cat) %>%
+  mutate(share = n / sum(n), cat = fct_reorder(cat, n))
+p <- ggplot(near, aes(n, cat, fill = cat)) +
+  geom_col(width = 0.7, show.legend = FALSE) +
+  geom_text(aes(label = sprintf("%d  (%s)", n, pc(share))), hjust = -0.08, colour = INK, size = 4.4) +
+  scale_fill_manual(values = SRC_COLS) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.22))) +
+  labs(title = "The source closest to the verified location",
+       subtitle = sprintf("%s verified corrections. 'Both address geocodes': CWNS and ICIS addresses geocode to the same point.",
+                          comma(nrow(vc))),
+       x = "Plants", y = NULL) +
+  theme_fig() + theme(panel.grid.major.y = element_blank())
+save_fig(p, "fig06_nearest_source.png", h = 5.4)
+```
+
+```{r near-rollup}
+icis <- c("ICIS facility coordinate (FRS)", "ICIS address geocode", "ICIS permit feature (INF/INO)")
+nr <- function(cats) sum(near$n[near$cat %in% cats]) / sum(near$n)
+```
+
+Rolled up: an ICIS source alone was closest for `r pc(nr(icis))`, the CWNS coordinate for
+`r pc(nr("CWNS coordinate"))`, the CWNS address geocode alone for `r pc(nr("CWNS address geocode"))`, and the two
+address geocodes tied for `r pc(nr("Both address geocodes (same point)"))`.
+
+### Fig 7. Where the pipeline's new locations came from
+
+```{r fig07}
+mvc <- mv %>% count(stage, cat) %>% group_by(stage) %>% mutate(share = n / sum(n)) %>% ungroup()
+tot <- mv %>% count(cat) %>% arrange(n)
+mvc$cat <- factor(mvc$cat, levels = tot$cat)
+p <- ggplot(mvc, aes(n, cat, fill = cat)) +
+  geom_col(width = 0.7, show.legend = FALSE) +
+  geom_text(aes(label = n), hjust = -0.15, colour = INK, size = 4) +
+  facet_wrap(~stage, ncol = 2, scales = "free_x") +
+  scale_fill_manual(values = SRC_COLS) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.18))) +
+  labs(title = "Where the pipeline's new locations came from",
+       subtitle = sprintf("%s plants moved by the multi-source pipeline, by the source closest to the new location",
+                          comma(nrow(mv))),
+       x = "Plants moved", y = NULL) +
+  theme_fig() + theme(panel.grid.major.y = element_blank(), strip.text = element_text(face = "bold", hjust = 0, colour = INK))
+save_fig(p, "fig07_pipeline_move_sources.png", w = 12, h = 5.8)
+```
+
+```{r move-table}
+knitr::kable(mvc %>% mutate(share = pc(share)) %>% arrange(stage, desc(n)) %>%
+               rename(Stage = stage, Source = cat, Plants = n, Share = share))
+```
+
+Stage 1 accepts a site that another source points to, so its new locations come mostly from ICIS. Stage 2 picks a
+candidate parcel near the reported point, so the CWNS coordinate is often the nearest source: the new parcel is
+usually a neighbour of the reported one.
+
+## Pipeline results
+
+### Fig 8. Location status of every treatment plant
+
+```{r fig08}
+STAT <- c(verified_correct = "Verified correct (reviewer)", verified_corrected = "Verified corrected (reviewer)",
+          reviewed_unresolved = "Reviewed, unresolved", kept_model = "Kept: model confirms location",
+          kept_osm = "Kept: OSM-tagged site", kept_site = "Kept: site includes reported parcel",
+          moved = "Moved by the pipeline", flagged_not_moved = "Flagged, not moved (below 0.95)",
+          not_assessed = "Not assessed (pop. ≤ 100 / no imagery)")
+GRP <- c(verified_correct = "Reviewer", verified_corrected = "Reviewer", reviewed_unresolved = "Reviewer",
+         kept_model = "Kept", kept_osm = "Kept", kept_site = "Kept", moved = "Moved",
+         flagged_not_moved = "Needs review", not_assessed = "Not assessed")
+GCOL <- c(Reviewer = NAVY, Kept = "#2A9D8F", Moved = ORANGE, `Needs review` = MEAN_C, `Not assessed` = GREY)
+sc <- out13 %>% count(status) %>% mutate(lab = STAT[status], grp = GRP[status], share = n / sum(n),
+                                         lab = fct_reorder(lab, n))
+p <- ggplot(sc, aes(n, lab, fill = grp)) +
+  geom_col(width = 0.7) +
+  geom_text(aes(label = sprintf("%s  (%s)", comma(n), pc(share, 0.1))), hjust = -0.08, colour = INK, size = 4.2) +
+  scale_fill_manual(values = GCOL) +
+  scale_x_continuous(labels = comma, expand = expansion(mult = c(0, 0.25))) +
+  labs(title = "Location status of every CWNS treatment plant",
+       subtitle = sprintf("%s plants: multi-source pipeline (move cutoff 0.95) plus reviewer verdicts", comma(nrow(out13))),
+       x = "Plants", y = NULL) +
+  theme_fig() + theme(panel.grid.major.y = element_blank())
+save_fig(p, "fig08_pipeline_status.png", h = 5.8)
+```
+
+### Fig 9. Pipeline move distances against verified corrections
+
+```{r fig09}
+s1 <- mv$moved_m[mv$loc_basis == "stage1_accept_seed"] / 1609.344
+s2 <- mv$moved_m[mv$loc_basis == "stage2_move"] / 1609.344
+cmp <- bind_rows(tibble(set = sprintf("Verified corrections (n = %d)", nrow(fixes)), mi = fixes$mi),
+                 tibble(set = sprintf("Pipeline: Stage 1 site accepts (n = %d)", length(s1)), mi = s1),
+                 tibble(set = sprintf("Pipeline: Stage 2 moves (n = %d)", length(s2)), mi = s2))
+p <- ggplot(cmp, aes(mi, colour = set)) +
+  stat_ecdf(linewidth = 1.2) +
+  geom_hline(yintercept = 0.5, colour = MUTED, linewidth = 0.4) +
+  scale_x_log10(breaks = c(0.01, 0.1, 0.25, 0.5, 1, 2, 5, 10, 50, 200), labels = label_number(drop0trailing = TRUE)) +
+  scale_y_continuous(labels = percent, breaks = seq(0, 1, 0.25)) +
+  scale_colour_manual(values = c(NAVY, ORANGE, "#2A9D8F")) +
+  labs(title = "Pipeline moves run a little shorter than verified corrections",
+       subtitle = "Share moved no more than x miles (log scale)",
+       x = "Relocation distance (miles, log scale)", y = "Share of plants") +
+  guides(colour = guide_legend(nrow = 2)) +
+  theme_fig()
+save_fig(p, "fig09_pipeline_vs_verified_distance.png")
+```
+
+Medians: Stage 2 moves `r sprintf("%.2f", median(s2))` mi, Stage 1 site accepts `r sprintf("%.2f", median(s1))` mi,
+verified corrections `r sprintf("%.2f", med)` mi. `r sum(mv$moved_m > 5000)` pipeline moves exceed 5 km; they were
+kept as moves (decision of 6 Nov 2026).
+
+### Fig 10. Frozen holdout: single-seed against multi-source
+
+```{r fig10}
+# One row per holdout plant and run: right / outcome / scored (12_score_holdout's per-plant files).
+rd <- function(f) read_csv(f, show_col_types = FALSE, col_types = cols(CWNS_ID = col_character()))
+ho <- inner_join(rd(HOLDOUT_SINGLE), rd(HOLDOUT_MULTI), by = c("CWNS_ID", "bin"), suffix = c("_s", "_m"))
+stopifnot(nrow(ho) == nrow(rd(HOLDOUT_MULTI)), nrow(ho) == nrow(rd(HOLDOUT_SINGLE)))
+corr <- ho %>% filter(bin == "corrections"); ok <- ho %>% filter(bin == "correct")
+wilson <- function(k, n, z = 1.96) {
+  p <- k / n; c <- (p + z^2 / (2 * n)) / (1 + z^2 / n)
+  h <- z * sqrt(p * (1 - p) / n + z^2 / (4 * n^2)) / (1 + z^2 / n); c(c - h, c + h)
+}
+hd <- tribble(~panel, ~run, ~k, ~n,
+              "Misplaced plants put on the right parcel", "Single-seed (CWNS point)", sum(corr$right_s), nrow(corr),
+              "Misplaced plants put on the right parcel", "Multi-source", sum(corr$right_m), nrow(corr),
+              "Correct plants moved off their parcel", "Single-seed (CWNS point)", sum(!ok$right_s), nrow(ok),
+              "Correct plants moved off their parcel", "Multi-source", sum(!ok$right_m), nrow(ok)) %>%
+  rowwise() %>% mutate(p = k / n, lo = wilson(k, n)[1], hi = wilson(k, n)[2]) %>% ungroup() %>%
+  mutate(run = factor(run, levels = c("Single-seed (CWNS point)", "Multi-source")),
+         panel = factor(panel, levels = c("Misplaced plants put on the right parcel", "Correct plants moved off their parcel")))
+p <- ggplot(hd, aes(run, p, fill = run)) +
+  geom_col(width = 0.6, show.legend = FALSE) +
+  geom_errorbar(aes(ymin = lo, ymax = hi), width = 0.12, colour = INK, linewidth = 0.6) +
+  geom_text(aes(y = hi, label = sprintf("%d / %d = %s", k, n, pc(p, 0.1))), vjust = -0.6, size = 4.4, colour = INK) +
+  facet_wrap(~panel, scales = "free_y") +
+  scale_fill_manual(values = c(GREY, ORANGE)) +
+  scale_y_continuous(labels = percent, expand = expansion(mult = c(0, 0.15))) +
+  labs(title = "Frozen holdout: adding other location sources",
+       subtitle = "Same plants scored both ways; bars show 95% Wilson intervals. Unscored plants count as wrong.",
+       x = NULL, y = NULL) +
+  theme_fig() + theme(panel.grid.major.x = element_blank(), strip.text = element_text(face = "bold", hjust = 0, colour = INK))
+save_fig(p, "fig10_holdout_single_vs_multi.png", h = 5.8)
+```
+
+### Fig 11. The same plants, paired
+
+```{r fig11}
+# Exact McNemar test: of the plants whose result differs between runs, is the split 50/50?
+mcnemar <- function(d) {
+  gain <- sum(!d$right_s & d$right_m); loss <- sum(d$right_s & !d$right_m)
+  list(gain = gain, loss = loss, p = binom.test(gain, gain + loss, 0.5)$p.value)
+}
+mc_corr <- mcnemar(corr); mc_ok <- mcnemar(ok)
+
+# Where each misplaced plant ended up, single-seed -> multi-source.
+how <- function(o) ifelse(o == "accepted_right", "Stage 1 accepted the right site", "Stage 2 moved it to the right parcel")
+pair_corr <- corr %>% mutate(group = case_when(
+  !scored_m | !scored_s ~ "Not scored",
+  right_s & right_m ~ "Right in both",
+  !right_s & right_m ~ paste0("Fixed only by multi-source: ", tolower(how(outcome_m))),
+  right_s & !right_m ~ "Right only in single-seed",
+  TRUE ~ "Wrong in both"))
+lv <- c("Right in both", "Fixed only by multi-source: stage 1 accepted the right site",
+        "Fixed only by multi-source: stage 2 moved it to the right parcel", "Right only in single-seed",
+        "Wrong in both", "Not scored")
+pc_tab <- pair_corr %>% count(group) %>% mutate(group = factor(group, levels = rev(lv))) %>% filter(!is.na(group))
+p <- ggplot(pc_tab, aes(n, group, fill = group)) +
+  geom_col(width = 0.7, show.legend = FALSE) +
+  geom_text(aes(label = n), hjust = -0.3, colour = INK, size = 4.6) +
+  scale_fill_manual(values = setNames(c("#E6E6E6", GREY, MEAN_C, "#2A9D8F", ORANGE, NAVY), rev(lv)), drop = FALSE) +
+  scale_x_continuous(expand = expansion(mult = c(0, 0.12))) +
+  labs(title = "Misplaced holdout plants, scored both ways",
+       subtitle = sprintf("%d misplaced plants. Multi-source fixed %d that single-seed got wrong and lost %d (exact McNemar p = %.3f).",
+                          nrow(corr), mc_corr$gain, mc_corr$loss, mc_corr$p),
+       x = "Plants", y = NULL) +
+  theme_fig() + theme(panel.grid.major.y = element_blank())
+save_fig(p, "fig11_holdout_paired.png", h = 5.2)
+```
+
+```{r paired-table}
+knitr::kable(table(single_seed = corr$outcome_s, multi_source = corr$outcome_m),
+             caption = "Misplaced plants: outcome in each run (rows single-seed, columns multi-source)")
+```
+
+**Paired result.** On the `r nrow(corr)` misplaced plants, multi-source put `r mc_corr$gain` right that single-seed
+got wrong and lost `r mc_corr$loss` (exact McNemar p = `r sprintf("%.3f", mc_corr$p)`), so the gain is real, not
+noise. Most of it comes from **Stage 2**, not Stage 1:
+`r sum(pair_corr$group == lv[3])` plants were moved to the right parcel by multi-source's Stage 2 where single-seed
+got them wrong, against `r sum(pair_corr$group == lv[2])` that multi-source's Stage 1 accepted outright.
+Of the `r sum(corr$outcome_m == "accepted_right")` plants multi-source's Stage 1 got right,
+`r sum(corr$outcome_m == "accepted_right" & corr$right_s)` were already right in single-seed through Stage 2; Stage 1
+now reaches them earlier. On the `r nrow(ok)` correct plants the runs differ on `r mc_ok$gain + mc_ok$loss`
+(`r mc_ok$gain` better, `r mc_ok$loss` worse, p = `r sprintf("%.2f", mc_ok$p)`): no detectable change in false moves.
+
+## Caveats
+
+- Verified plants were chosen for review, not sampled at random: shares of plants found wrong are not national rates.
+- Model-proposed corrections are short by construction, which pulls the median and mean down.
+- The CWNS and ICIS address geocodes often coincide; count them as one piece of evidence.
+- Distances are point to point. A large plant can be correctly located 250 m or more from a source point.
+- The master here is the copy of 26 Oct 2026 (`r layer`); reviews after that are not included.
