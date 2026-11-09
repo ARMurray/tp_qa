@@ -3,9 +3,9 @@ multi_status.txt -- written by multi_status.py; see its docstring
 ==============================================================================
 ENVIRONMENT
 ==============================================================================
-generated   : 2026-11-09 09:36:20
+generated   : 2026-11-09 09:38:39
 seed mode   : multi   suffix '_multi'
-git commit  : 5bff875  (Fri Nov 6 22:40:13 2026 -0500 diagnostics: corr_12_holdout 7609314 (2026-11-06 22:40))
+git commit  : be6dffe  (Mon Nov 9 09:36:31 2026 -0500 diagnostics: 12 single seed per plant (2026-11-09 09:36))
 seeds file  : /work/GRDVULN/tp_qa/correction/data/candidates/plant_seeds.csv  8.4 MB
 training gpkg: 5.8 d ago   /work/GRDVULN/tp_qa/correction/data/training/training_locations.gpkg
 holdout manifest: 76.0 d ago   /work/GRDVULN/tp_qa/correction/data/holdout/holdout_manifest.parquet
@@ -115,7 +115,7 @@ stage2_candidates: 127,488 rows, 3.8 d ago
 JOB LOGS
 ==============================================================================
 313 log(s); newest first (name, age, exit status):
-  12_holdout.log                       2.5 d ago   exit 0
+  12_holdout.log                       0.0 h ago   exit 0
   13_output.log                        2.6 d ago   exit 0
   05b_rerank.log                       2.6 d ago   exit 0
   01e_arr_46.log                       2.6 d ago   exit 0

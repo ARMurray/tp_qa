@@ -1,11 +1,11 @@
-# latest copy of /work/GRDVULN/tp_qa/correction/logs/12_holdout_7609314.log
-# job 7609314 on a0n15, exit status 0, copied 2026-11-06 22:40:05
+# latest copy of /work/GRDVULN/tp_qa/correction/logs/12_holdout_7623455.log
+# job 7623455 on a0n15, exit status 0, copied 2026-11-09 09:38:39
 #
 ==========================================
 Node:    a0n15
-Job ID:  7609314
+Job ID:  7623455
 CPUs:    4
-Started: Fri Nov  6 22:39:57 EST 2026
+Started: Mon Nov  9 09:38:34 EST 2026
 ==========================================
 Loaded module: python/3.11
 Python:  Python 3.11.13  (/work/GRDVULN/tp_qa/correction/.venv/bin/python)
@@ -119,4 +119,4 @@ Reading these: the 'pool' denominator measures RANKING, the 'all'
 denominator measures the PIPELINE. If they diverge sharply, the
 gap belongs to candidate generation (08_diagnose_candidate_
 coverage.py), not to any ranking model.
-Finished: Fri Nov  6 22:40:05 EST 2026  (exit 0)
+Finished: Mon Nov  9 09:38:39 EST 2026  (exit 0)
